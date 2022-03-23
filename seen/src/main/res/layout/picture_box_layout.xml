@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="self"
+            type="com.protone.seen.PictureBoxSeen" />
+
+        <import type="com.protone.seen.PictureBoxSeen.PictureBox"/>
+
+    </data>
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:background="@color/black"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pic_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.protone.seen.customView.PictureListScrollView
+            android:id="@+id/ddd"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+<!--        <Button-->
+<!--            android:layout_centerInParent="true"-->
+<!--            android:onClick="@{()->self.offer(PictureBox.SelectPicList)}"-->
+<!--            android:layout_width="50dp"-->
+<!--            android:layout_height="50dp"/>-->
+
+
+    </RelativeLayout>
+</layout>

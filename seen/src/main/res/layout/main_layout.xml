@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="self"
+            type="com.protone.seen.MainSeen" />
+
+        <import type="com.protone.seen.MainSeen.Touch" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/main_group"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/main_background"
+        android:orientation="vertical">
+
+        <com.protone.seen.customView.UserCard
+            android:id="@+id/userCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background_white"
+            android:elevation="30dp" />
+
+        <LinearLayout
+            android:id="@+id/model"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/glass"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/main_padding"
+            app:layout_behavior="@string/behavior_userCard">
+
+            <ImageView
+                android:onClick="@{()->self.offer(Touch.GALLEY)}"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/small_Icon"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:contentDescription="@string/model_Galley"
+                android:src="@drawable/ic_baseline_image_24_white" />
+
+            <ImageView
+                android:onClick="@{()->self.offer(Touch.NOTE)}"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/small_Icon"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:contentDescription="@string/model_noteBook"
+                android:src="@drawable/ic_baseline_book_24_white" />
+
+            <ImageView
+                android:onClick="@{()->self.offer(Touch.MUSIC)}"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/small_Icon"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:contentDescription="@string/model_music"
+                android:src="@drawable/ic_baseline_album_24_white" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/glass" />
+
+        <com.protone.seen.customView.MyMusicPlayer
+            android:id="@+id/musicPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/glass" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/model_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
+
+
+        <!--        <com.protone.seen.customView.NoteCard-->
+        <!--            android:id="@+id/noteCard"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="@dimen/main_margin"-->
+        <!--            app:cardBackgroundColor="@color/transparent_white"-->
+        <!--            app:cardCornerRadius="@dimen/main_padding"-->
+        <!--            app:cardElevation="0dp"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/musicPlayer" />-->
+
+        <!--        <com.protone.seen.customView.PhotoCard-->
+        <!--            android:id="@+id/photoCard"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="@dimen/main_margin"-->
+        <!--            app:cardBackgroundColor="@color/transparent_white"-->
+        <!--            app:cardCornerRadius="@dimen/main_padding"-->
+        <!--            app:cardElevation="0dp"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/noteCard" />-->
+
+        <!--        <com.protone.seen.customView.video.MyVideoPlayer-->
+        <!--            android:id="@+id/videoPlayer"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_margin="@dimen/main_margin"-->
+        <!--            app:cardBackgroundColor="@color/black"-->
+        <!--            app:cardCornerRadius="@dimen/main_padding"-->
+        <!--            app:cardElevation="0dp"-->
+        <!--            app:layout_constraintTop_toBottomOf="@id/photoCard" />-->
+
+    </LinearLayout>
+
+</layout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_white"
+        android:elevation="0dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/galley_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/small_Icon"
+            android:background="@color/background_white"
+            android:elevation="0dp"
+            android:paddingEnd="1dp" />
+
+        <LinearLayout
+            android:id="@+id/galley_bucketContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background_white"
+            android:elevation="20dp"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.protone.seen.customView.StateImageView
+                    android:id="@+id/galley_showBucket"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/small_Icon"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:ActiveDrawable="@drawable/ic_baseline_arrow_drop_up_24"
+                    app:NegativeDrawable="@drawable/ic_baseline_arrow_drop_down_24"
+                    tools:ignore="ContentDescription" />
+
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/galley_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true" />
+
+                <ImageView
+                    android:id="@+id/galley_toolButton"
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_alignParentEnd="true"
+                    android:contentDescription="@string/add"
+                    android:padding="@dimen/icon_padding_lite"
+                    android:src="@drawable/ic_baseline_add_24" />
+
+            </RelativeLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/galley_bucket"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/lists_margin" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

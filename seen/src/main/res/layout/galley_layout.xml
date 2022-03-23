@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="self"
+            type="com.protone.seen.GalleySeen" />
+
+        <import type="com.protone.seen.GalleySeen.Touch" />
+        <import type="com.protone.seen.GalleyFragment.Event" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/galley_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background_white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/galley_back"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_alignBottom="@id/galley_tab"
+                android:background="@color/blue_1"
+                android:contentDescription="@string/back" />
+
+            <ImageView
+                android:onClick="@{()->self.offer(Touch.Finish)}"
+                android:layout_width="@dimen/smaller_Icon"
+                android:layout_height="@dimen/smaller_Icon"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/back_margin"
+                android:layout_marginTop="@dimen/back_margin"
+                android:contentDescription="@string/back"
+                android:src="@drawable/ic_baseline_arrow_left_24" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/galley_tab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                app:tabIndicatorColor="@color/blue_1">
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/photo" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/video" />
+
+            </com.google.android.material.tabs.TabLayout>
+
+            <ImageView
+                android:onClick="@{()->self.offer(Touch.ShowOptionMenu)}"
+                android:id="@+id/galley_actionMenu"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="@dimen/small_Icon"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="@string/action"
+                android:padding="@dimen/icon_padding"
+                android:src="@drawable/ic_baseline_more_horiz_24" />
+
+        </RelativeLayout>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/galley_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/galley_bar" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+

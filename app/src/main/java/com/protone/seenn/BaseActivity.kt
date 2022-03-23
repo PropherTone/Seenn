@@ -1,0 +1,151 @@
+package com.protone.seenn
+
+import android.content.ComponentName
+import android.content.ServiceConnection
+import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import android.view.View
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.appcompat.app.AppCompatActivity
+import com.protone.api.ActivityLifecycleOwner
+import com.protone.api.context.intent
+import com.protone.database.room.entity.Music
+import com.protone.mediamodle.Galley
+import com.protone.mediamodle.media.MediaContentObserver
+import com.protone.seen.Seen
+import com.protone.seenn.service.MusicService
+import com.protone.seenn.theme.ThemeProvider
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+
+abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
+    CoroutineScope by MainScope() {
+
+    private var serviceConnection: ServiceConnection? = null
+    lateinit var binder: MusicService.MusicControlLer
+
+    enum class Event {
+        OnStart,
+        OnResume,
+        OnStop,
+        OnDestroy
+    }
+
+    val mediaContentObserver = MediaContentObserver(Handler(Looper.getMainLooper()))
+
+    protected val event = Channel<Event>(Channel.UNLIMITED)
+    private val themeProvider by lazy { ThemeProvider(this) }
+    private var onFinish: suspend () -> Unit = {}
+    private val increaseInteger = AtomicInteger(0)
+    protected var seen: S? = null
+        private set(value) {
+            field = value
+            if (value != null) {
+                setContentView(value.viewRoot)
+            } else {
+                setContentView(View(this))
+            }
+        }
+
+    fun doOnFinish(block: suspend () -> Unit) {
+        this.onFinish = block
+    }
+
+    abstract suspend fun main()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (themeProvider.isCustomTheme) {
+            //
+        }
+
+        launch {
+            main()
+
+            finish()
+        }
+    }
+
+    suspend fun <I, O> startActivityForResult(
+        contract: ActivityResultContract<I, O>,
+        input: I
+    ): O = withContext(Dispatchers.Main) {
+        val requestCode = increaseInteger.getAndIncrement().toString()
+
+        ActivityLifecycleOwner().use { lifecycle, start ->
+            suspendCoroutine { co ->
+                activityResultRegistry.register(requestCode, lifecycle, contract) {
+                    co.resumeWith(Result.success(it))
+                }.apply { start() }.launch(input)
+            }
+        }
+    }
+
+    suspend fun setContentSeen(seen: S) {
+        suspendCoroutine<Unit> {
+            window.decorView.post {
+                this.seen = seen
+                it.resume(Unit)
+            }
+        }
+    }
+
+    fun bindMusicService(block: () -> Unit) {
+        serviceConnection = object : ServiceConnection {
+            override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+                binder = (p1 as MusicService.MusicControlLer)
+                block()
+            }
+
+            override fun onServiceDisconnected(p0: ComponentName?) {
+            }
+
+        }
+        serviceConnection?.let {
+            bindService(MusicService::class.intent, it, BIND_AUTO_CREATE)
+        }
+    }
+
+    fun setMusicList(mutableList: MutableList<Music>) {
+        binder.setDate(mutableList)
+    }
+
+    override fun finish() {
+        try {
+            contentResolver.unregisterContentObserver(mediaContentObserver)
+            event.offer(Event.OnDestroy)
+            launch {
+                onFinish()
+            }
+        } finally {
+            super.finish()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        event.offer(Event.OnStart)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        event.offer(Event.OnResume)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        event.offer(Event.OnStop)
+    }
+
+    override fun onDestroy() {
+        seen?.cancel()
+        cancel()
+        serviceConnection?.let { unbindService(it) }
+        super.onDestroy()
+    }
+}

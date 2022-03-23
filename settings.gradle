@@ -1,0 +1,16 @@
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        jcenter() // Warning: this repository is going to shut down soon
+    }
+}
+rootProject.name = "Seenn"
+include ':seen'
+include ':api'
+include ':dataBase'
+include ':cloud'
+include ':modelFunc'
+include ':mediaModle'
+include ':app'

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Seenn</string>
+    <string name="model_account">Account</string>
+    <string name="model_Galley">Galley</string>
+    <string name="model_noteBook">NoteBook</string>
+    <string name="photo">相片</string>
+    <string name="video">视频</string>
+    <string name="back">back</string>
+    <string name="add">add</string>
+    <string name="action">action</string>
+    <string name="multi_choose">多选</string>
+    <string name="icon">icon</string>
+    <string name="model_music">音乐</string>
+    <string name="bruh">bruh</string>
+    <string name="behavior_userCard">com.protone.seen.behavior.UserCardBehavior</string>
+    <string name="rename">改名</string>
+    <string name="moveTo">移动</string>
+    <string name="delete">删除</string>
+    <string name="setCategory">添加标签</string>
+    <string name="selectAll">全选</string>
+    <string name="dialog_rename">重命名</string>
+    <string name="enter">请输入</string>
+    <string name="confirm">确认</string>
+    <string name="cancel">取消</string>
+    <string name="no_music_is_playing">NO MUSIC IS PLAYING</string>
+</resources>
