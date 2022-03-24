@@ -7,13 +7,14 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
+import com.protone.api.json.toUri
 import com.protone.database.room.entity.Music
 
 class MusicTypeConverter{
 
     @TypeConverter
     fun stringToObject(value: String): Uri {
-        return value.toEntity(Uri::class.java)
+        return value.toUri()
     }
 
     @TypeConverter

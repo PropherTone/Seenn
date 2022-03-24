@@ -24,4 +24,6 @@
     <string name="confirm">确认</string>
     <string name="cancel">取消</string>
     <string name="no_music_is_playing">NO MUSIC IS PLAYING</string>
+    <string name="music_bucket_name">歌单名称</string>
+    <string name="description">描述</string>
 </resources>

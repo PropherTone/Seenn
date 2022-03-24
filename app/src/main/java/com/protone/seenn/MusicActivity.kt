@@ -12,7 +12,7 @@ import com.protone.mediamodle.Galley
 import com.protone.mediamodle.media.musicBroadCastManager
 import com.protone.seen.MusicSeen
 import com.protone.seen.adapter.MusicBucketAdapter
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
 
 class MusicActivity : BaseActivity<MusicSeen>() {
@@ -40,14 +40,13 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                 musicSeen.viewEvent.onReceive {
                     when (it) {
                         MusicSeen.Event.AddBucket -> {
-                            val result = startActivityForResult(
+                            startActivityForResult(
                                 ActivityResultContracts.StartActivityForResult(),
                                 AddBucketActivity::class.intent
-                            )
-                            val stringExtra = result.data?.getStringExtra("BUCKET_NAME")
-                            Log.d(TAG, "main: $stringExtra")
-                            stringExtra?.let { name->
-                                musicSeen.addBucket(MusicBucket(name,null))
+                            ).data?.apply {
+                                getStringExtra("BUCKET_NAME")?.let { name ->
+                                    musicSeen.addBucket(MusicBucket(name, null, 0, null, null))
+                                }
                             }
                         }
                     }
@@ -78,9 +77,11 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         }
     }
 
-    private fun MusicSeen.addBucket(musicBucket: MusicBucket) {
-        MusicBucketDAOHelper.addMusicBucketWithCallBack(musicBucket){
-            (binding.musicBucket.adapter as MusicBucketAdapter).addBucket(musicBucket)
+    private suspend fun MusicSeen.addBucket(musicBucket: MusicBucket) {
+        MusicBucketDAOHelper.addMusicBucketWithCallBack(musicBucket) {
+            launch {
+                (binding.musicBucket.adapter as MusicBucketAdapter).addBucket(musicBucket)
+            }
         }
     }
 }

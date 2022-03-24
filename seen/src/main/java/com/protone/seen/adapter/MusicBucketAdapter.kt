@@ -18,6 +18,8 @@ import com.protone.database.room.dao.MusicDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicBucketAdapterLayoutBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
 
@@ -100,7 +102,7 @@ class MusicBucketAdapter(context: Context, var musicBuckets: MutableList<MusicBu
 
     override fun getItemCount(): Int = musicBuckets.size
 
-    fun addBucket(musicBucket: MusicBucket) {
+    suspend fun addBucket(musicBucket: MusicBucket) = withContext(Dispatchers.Main) {
         musicBuckets.add(musicBucket)
         notifyItemInserted(musicBuckets.indexOf(musicBucket))
     }

@@ -35,7 +35,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
         when (it.what) {
             1 -> {
                 if (!userConfig.isFirstBoot) {
-                    MusicBucketDAOHelper.addMusicBucket(MusicBucket("ALL", null))
+                    MusicBucketDAOHelper.addMusicBucket(MusicBucket("ALL", null,0,null,null))
                     MusicDAOHelper.insertMusicMulti(Galley.music)
                     userConfig.isFirstBoot = true
                 }

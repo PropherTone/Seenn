@@ -16,4 +16,7 @@
     <dimen name="main_margin">10dp</dimen>
     <dimen name="small_margin">5dp</dimen>
     <dimen name="list_item_height">68dp</dimen>
+    <dimen name="huge_icon">180dp</dimen>
+    <dimen name="full_edit_margin">24dp</dimen>
+    <dimen name="small_title_text">18sp</dimen>
 </resources>

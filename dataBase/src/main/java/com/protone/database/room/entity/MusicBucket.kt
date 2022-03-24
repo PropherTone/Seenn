@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 import com.protone.database.room.converters.MusicTypeConverter
 
 @Entity
-data class MusicBucket(var name: String, var Icon: String?){
+data class MusicBucket(var name: String, var Icon: String?,var size : Int,var detail : String?,var date : String?){
     @PrimaryKey(autoGenerate = true)
     var id : Long = 0
 }

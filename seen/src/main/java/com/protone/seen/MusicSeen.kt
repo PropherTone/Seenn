@@ -38,7 +38,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
         }
 
     init {
-        binding
+        binding.self = this
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(this)
     }
 

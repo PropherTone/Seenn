@@ -21,6 +21,10 @@ fun <C> String.toEntity(clazz: Class<C>): C {
         .fromJson(this, clazz)
 }
 
+fun String.toUri(): Uri{
+    return Uri.parse(this)
+}
+
 private class UriSerializer : JsonSerializer<Uri> {
     override fun serialize(
         src: Uri?,
@@ -37,7 +41,6 @@ private class UriDeserializer : JsonDeserializer<Uri> {
         typeOfT: Type?,
         context: JsonDeserializationContext?
     ): Uri {
-        Log.d(TAG, "deserialize: ${json?.asJsonObject}")
-        return Uri.parse("json?.asString")
+        return Uri.parse(json?.asString)
     }
 }

@@ -9,6 +9,8 @@ import com.protone.seen.databinding.AddBucketLayoutBinding
 class AddBucketSeen(context: Context) : Seen<AddBucketSeen.Event>(context) {
 
     enum class Event{
+        ChooseIcon,
+        Confirm,
         Finished
     }
 
