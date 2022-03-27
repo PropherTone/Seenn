@@ -124,5 +124,6 @@ data class MusicState(
     val name: String,
     val duration: Long,
     val now_duration: Long,
-    val albumUri: Uri
+    val albumUri: Uri,
+    val isPlaying: Boolean = false
 )

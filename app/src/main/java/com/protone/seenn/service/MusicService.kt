@@ -17,6 +17,7 @@ import com.protone.mediamodle.Galley
 import com.protone.mediamodle.MusicState
 import com.protone.mediamodle.media.*
 import com.protone.seenn.R
+import java.lang.Exception
 import java.util.*
 import kotlin.concurrent.timerTask
 
@@ -31,9 +32,10 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
 
     private var remoteViews: RemoteViews? = null
 
-    private var notificationManager : NotificationManager? = null
+    private var notificationManager: NotificationManager? = null
 
     private val receiver = object : MusicReceiver() {
+
         override fun play() {
             this@MusicService.play()
         }
@@ -55,6 +57,7 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
         }
 
     }
+
     private var playPosition = MutableLiveData<Long>()
     private var musicLists: MutableList<Music> = mutableListOf()
     private var musicPlayer: MediaPlayer? = null
@@ -65,11 +68,12 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
                     uri
                 ).also {
                     it.setOnCompletionListener(this@MusicService)
-                    it.setOnPreparedListener {
+                    it.setOnPreparedListener { mp ->
                         postData(
                             musicLists[musicPosition].title,
                             musicLists[musicPosition].duration,
-                            uri
+                            uri,
+                            mp.isPlaying
                         )
                     }
                 }
@@ -121,27 +125,28 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
     private fun initMusicNotification(): Notification {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         remoteViews = RemoteViews(packageName, R.layout.music_notification_layout).apply {
-            val intentFlags = 0
+            val intentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+
             PendingIntent.getBroadcast(
                 this@MusicService,
                 0,
                 Intent(MUSIC_PLAY),
                 intentFlags
-            ).let { setOnClickPendingIntent(R.id.notify_music_control,it) }
+            ).let { setOnClickPendingIntent(R.id.notify_music_control, it) }
 
             PendingIntent.getBroadcast(
                 this@MusicService,
                 0,
                 Intent(MUSIC_PREVIOUS),
                 intentFlags
-            ).let { setOnClickPendingIntent(R.id.notify_music_previous,it) }
+            ).let { setOnClickPendingIntent(R.id.notify_music_previous, it) }
 
             PendingIntent.getBroadcast(
                 this@MusicService,
                 0,
                 Intent(MUSIC_NEXT),
                 intentFlags
-            ).let { setOnClickPendingIntent(R.id.notify_music_next,it) }
+            ).let { setOnClickPendingIntent(R.id.notify_music_next, it) }
         }
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -179,20 +184,30 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
             )
             return
         }
+        if (musicTimer == null) musicTimer = Timer()
         musicPlayer?.apply {
             start()
-            musicTimer = Timer()
             musicTimer?.schedule(timerTask {
-                playPosition.postValue(currentPosition.toLong())
+                try {
+                    if (isPlaying) playPosition.postValue(currentPosition.toLong())
+                } catch (ignored: Exception){}
             }, 0, 100)
         }
     }
 
     private fun pause() {
         if (musicPlayer?.isPlaying == false) return
-        musicPlayer?.pause()
-        musicTimer?.cancel()
-        musicTimer = null
+        musicPlayer?.let {
+            it.pause()
+            postData(
+                musicLists[musicPosition].title,
+                musicLists[musicPosition].duration,
+                uri,
+                it.isPlaying
+            )
+        }
+//        musicTimer?.cancel()
+//        musicTimer = null
     }
 
     private fun next() {
@@ -217,8 +232,8 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
     }
 
     private fun musicFinish() {
-        musicTimer?.cancel()
-        musicTimer = null
+//        musicTimer?.cancel()
+//        musicTimer = null
         musicPlayer?.apply {
             stop()
             reset()
@@ -257,13 +272,19 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
         }
     }
 
-    private fun postData(displayName: String, duration: Long, uri: Uri) {
+    private fun postData(
+        displayName: String,
+        duration: Long,
+        uri: Uri,
+        isPlaying: Boolean = false
+    ) {
         Galley.musicState.postValue(
             MusicState(
                 displayName,
                 duration,
                 0,
-                uri
+                uri,
+                isPlaying
             )
         )
     }

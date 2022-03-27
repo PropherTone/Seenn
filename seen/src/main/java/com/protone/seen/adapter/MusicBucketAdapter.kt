@@ -1,29 +1,23 @@
 package com.protone.seen.adapter
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
 import com.protone.api.toBitmapByteArray
-import com.protone.database.room.dao.MusicDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicBucketAdapterLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 
 
-class MusicBucketAdapter(context: Context, var musicBuckets: MutableList<MusicBucket>) :
+class MusicBucketAdapter(context: Context, private var musicBuckets: MutableList<MusicBucket>) :
     SelectListAdapter<MusicBucketAdapterLayoutBinding, MusicBucket>(context) {
 
     override val select: (
@@ -56,20 +50,13 @@ class MusicBucketAdapter(context: Context, var musicBuckets: MutableList<MusicBu
 
     override fun onBindViewHolder(holder: Holder<MusicBucketAdapterLayoutBinding>, position: Int) {
         holder.binding.apply {
+            setSelect(holder, selectList.contains(musicBuckets[position]))
             musicBucketName.text = musicBuckets[position].name
             musicBucketIcon.apply {
                 when {
-                    musicBuckets[position].Icon != null -> {
-                        loadIcon(this, Uri.parse(musicBuckets[position].Icon).toBitmapByteArray())
+                    musicBuckets[position].icon != null -> {
+                        loadIcon(this, Uri.parse(musicBuckets[position].icon).toBitmapByteArray())
                     }
-//                    musicBuckets[position].musicList != null && musicBuckets[position].musicList?.isNotEmpty() == true -> {
-//                        musicBuckets[position].musicList?.let { list ->
-//                            loadIcon(
-//                                this,
-//                                list[list.size - 1].albumID.toBitmapByteArray()
-//                            )
-//                        }
-//                    }
                     else -> {
                         loadIcon(
                             this,
@@ -82,7 +69,7 @@ class MusicBucketAdapter(context: Context, var musicBuckets: MutableList<MusicBu
                     }
                 }
             }
-//            musicBucketNum.text = musicBuckets[position].musicList?.size?.toString() ?: "0"
+            musicBucketNum.text = musicBuckets[position].size.toString()
         }
     }
 

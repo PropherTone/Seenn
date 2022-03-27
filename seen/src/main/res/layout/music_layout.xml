@@ -20,6 +20,7 @@
             android:id="@+id/music_musicList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -67,13 +68,13 @@
                 app:layout_constraintTop_toBottomOf="@+id/mySmallMusicPlayer" />
 
             <ImageView
-                android:onClick="@{()->self.offer(Event.AddBucket)}"
-                android:contentDescription="@string/action"
                 android:id="@+id/music_addBucket"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_add_24"
+                android:contentDescription="@string/action"
+                android:onClick="@{()->self.offer(Event.AddBucket)}"
                 android:padding="@dimen/main_padding"
+                android:src="@drawable/ic_baseline_add_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />

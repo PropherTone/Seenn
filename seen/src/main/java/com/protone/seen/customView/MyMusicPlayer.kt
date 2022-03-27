@@ -26,7 +26,7 @@ class MyMusicPlayer @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val binding = MusicplayerLayoutBinding.inflate(context.layoutInflater, this, true)
-    private var isPlaying = false
+    var isPlaying = false
         set(value) {
             if (value) binding.musicControl.setImageDrawable(
                 ResourcesCompat.getDrawable(

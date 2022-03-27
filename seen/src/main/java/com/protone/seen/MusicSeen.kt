@@ -9,7 +9,6 @@ import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.seen.customView.StateImageView
 import com.protone.seen.databinding.MusicLayoutBinding
-import org.w3c.dom.Text
 
 class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageView.StateListener,
     ViewTreeObserver.OnGlobalLayoutListener {
@@ -63,6 +62,8 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             )
         }
         binding.musicShowBucket.setOnStateListener(this)
+
+        binding.musicMusicList.setPadding(0,0,0,binding.mySmallMusicPlayer.height)
 
         binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
     }

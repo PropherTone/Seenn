@@ -82,7 +82,7 @@
             app:layout_constraintTop_toBottomOf="@+id/musicBucket_enterName" />
 
         <EditText
-            android:id="@+id/musicBucket_enterDetial"
+            android:id="@+id/musicBucket_enterDetail"
             android:layout_width="match_parent"
             android:layout_height="@dimen/huge_icon"
             android:layout_marginStart="@dimen/full_edit_margin"
@@ -115,7 +115,6 @@
             android:src="@drawable/ic_baseline_close_24"
             app:layout_constraintBottom_toTopOf="@+id/musicBucket_confirm"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent" />
 
         <View

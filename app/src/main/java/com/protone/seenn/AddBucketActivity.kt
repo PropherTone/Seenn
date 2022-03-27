@@ -1,8 +1,6 @@
 package com.protone.seenn
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import com.protone.seen.AddBucketSeen
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
@@ -36,7 +34,7 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                             val intent = Intent().apply {
                                 putExtra(BUCKET_ICON,addBucketSeen.binding.musicBucketEnterName.text.toString())
                                 putExtra(BUCKET_NAME,addBucketSeen.binding.musicBucketEnterName.text.toString())
-                                putExtra(BUCKET_DETAIL,addBucketSeen.binding.musicBucketEnterDetial.text.toString())
+                                putExtra(BUCKET_DETAIL,addBucketSeen.binding.musicBucketEnterDetail.text.toString())
                             }
                             setResult(RESULT_OK,intent)
                             finish()

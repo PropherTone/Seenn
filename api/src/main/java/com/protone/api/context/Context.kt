@@ -2,7 +2,6 @@ package com.protone.api.context
 
 import android.app.Activity
 import android.content.Context
-import android.content.IntentFilter
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -51,6 +50,12 @@ fun Int.to16to9Height(): Int {
 
 fun Long.toDate(): Date? {
     return longToDate(this, "yyyy-MM-dd HH:mm:ss")
+}
+
+fun Long.toStringMinuteTime(): String {
+    val musicTime: Long = this / 1000
+    val sec = musicTime % 60
+    return "${musicTime / 60}:${if (sec > 10) sec else "0$sec"}"
 }
 
 fun dateToString(data: Date?, formatType: String?): String? {

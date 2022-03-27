@@ -11,10 +11,10 @@ import java.util.ArrayList
 interface MusicBucketDAO {
 
     @Query("SELECT * FROM MusicBucket")
-    fun getAllMusicBucket(): List<MusicBucket>
+    fun getAllMusicBucket(): List<MusicBucket>?
 
     @Query("SELECT * FROM MusicBucket WHERE name LIKE :name")
-    fun getMusicBucketByName(name : String): List<MusicBucket>
+    fun getMusicBucketByName(name : String): List<MusicBucket>?
 
     @Insert
     fun addMusicBucket(musicBucket: MusicBucket)

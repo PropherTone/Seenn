@@ -38,6 +38,14 @@ object MusicBucketDAOHelper : BaseDAOHelper() {
     fun addMusicBucketWithCallBack(musicBucket: MusicBucket, callBack: (result: Boolean) -> Unit) {
         runnableFunc = {
             musicBucketDAO?.apply {
+                var count = 0
+                val name = musicBucket.name
+                getAllMusicBucket()?.forEach {
+                    if (it.name == musicBucket.name) {
+                        musicBucket.name = "${name}(${++count})"
+                    }
+                }
+                musicBucket.name = name
                 addMusicBucket(musicBucket)
                 callBack(getMusicBucketByName(musicBucket.name) == null)
             }

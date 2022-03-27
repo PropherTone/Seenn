@@ -60,6 +60,12 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
             field = value
         }
 
+    var isPlaying: Boolean = false
+        set(value) {
+            binding.musicPlayer.isPlaying = value
+            field = value
+        }
+
     val group: ViewGroup
         get() = binding.mainGroup
 

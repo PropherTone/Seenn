@@ -11,20 +11,25 @@ import com.protone.api.context.*
 
 const val LOOPING = 1
 const val LIST_LOOPING = 2
-const val RANDOM =3
+const val RANDOM = 3
 
 val musicBroadCastManager by lazy { LocalBroadcastManager.getInstance(Global.application) }
 
 abstract class MusicReceiver : BroadcastReceiver() {
 
+    private var isPlaying = false
+
     override fun onReceive(p0: Context?, p1: Intent?) {
         Log.d(TAG, "onReceive: ")
         when (p1?.action) {
             MUSIC_PLAY -> {
-                play()
-            }
-            MUSIC_PAUSE -> {
-                pause()
+                if (!isPlaying) {
+                    isPlaying = true
+                    play()
+                } else {
+                    isPlaying = false
+                    pause()
+                }
             }
             MUSIC_FINISH -> {
                 finish()

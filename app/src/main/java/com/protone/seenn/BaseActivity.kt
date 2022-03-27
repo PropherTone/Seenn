@@ -26,7 +26,12 @@ import kotlin.coroutines.suspendCoroutine
 abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     CoroutineScope by MainScope() {
 
+    companion object{
+        val TAG = this::class.simpleName
+    }
+
     private var serviceConnection: ServiceConnection? = null
+
     lateinit var binder: MusicService.MusicControlLer
 
     enum class Event {

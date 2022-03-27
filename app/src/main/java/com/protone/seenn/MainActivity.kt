@@ -3,6 +3,10 @@ package com.protone.seenn
 import android.content.Context
 import android.content.Intent
 import android.transition.TransitionManager
+import android.util.Log
+import com.protone.api.context.MUSIC_NEXT
+import com.protone.api.context.MUSIC_PLAY
+import com.protone.api.context.MUSIC_PREVIOUS
 import com.protone.api.context.intent
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.media.musicBroadCastManager
@@ -27,6 +31,7 @@ class MainActivity : BaseActivity<MainSeen>() {
                     duration = it.duration
                 }
             }
+            mainSeen.setAndUpdateDuration()
         }
 
         while (isActive) {
@@ -34,6 +39,7 @@ class MainActivity : BaseActivity<MainSeen>() {
                 event.onReceive {
                     when (it) {
                         Event.OnStart -> {
+
                         }
                         else -> {}
                     }
@@ -107,19 +113,16 @@ class MainActivity : BaseActivity<MainSeen>() {
                         }
                         MainSeen.Touch.NOTE -> {}
                         MainSeen.Touch.PlayMusic -> {
-                            musicBroadCastManager.sendBroadcast(Intent().setAction("PlayMusic"))
-                            mainSeen.updateDuration()
+                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
                         }
                         MainSeen.Touch.PauseMusic -> {
-                            musicBroadCastManager.sendBroadcast(Intent().setAction("PauseMusic"))
+                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
                         }
                         MainSeen.Touch.PreviousMusic -> {
-                            musicBroadCastManager.sendBroadcast(Intent().setAction("PreviousMusic"))
-                            mainSeen.setAndUpdateDuration()
+                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PREVIOUS))
                         }
                         MainSeen.Touch.NextMusic -> {
-                            musicBroadCastManager.sendBroadcast(Intent().setAction("NextMusic"))
-                            mainSeen.setAndUpdateDuration()
+                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_NEXT))
                         }
                         MainSeen.Touch.PauseVideo -> {}
                     }
@@ -141,9 +144,11 @@ class MainActivity : BaseActivity<MainSeen>() {
 
     private fun MainSeen.setAndUpdateDuration() {
         Galley.musicState.observe(this@MainActivity) {
+            Log.d(TAG, "setAndUpdateDuration: $it")
             duration = it.duration
             musicName = it.name
             icon = it.albumUri
+            isPlaying = it.isPlaying
         }
         updateDuration()
     }

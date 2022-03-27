@@ -4,7 +4,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import kotlin.reflect.KClass
 
-const val MUSIC_PLAY = "PlayMusic"
+const val MUSIC_PLAY = "ControlMusic"
 const val MUSIC_PAUSE = "PauseMusic"
 const val MUSIC_NEXT = "NextMusic"
 const val MUSIC_PREVIOUS = "PreviousMusic"
