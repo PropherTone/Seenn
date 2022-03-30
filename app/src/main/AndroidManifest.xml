@@ -27,6 +27,7 @@
             android:exported="true"
             android:launchMode="singleTop" />
         <activity android:name=".NoteSyncActivity" />
+        <activity android:name=".NoteActivity"/>
         <activity android:name=".PictureBoxActivity" />
         <activity android:name=".GalleyActivity" />
         <activity android:name=".MusicActivity" />

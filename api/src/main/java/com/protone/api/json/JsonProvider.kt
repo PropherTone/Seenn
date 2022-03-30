@@ -3,6 +3,7 @@ package com.protone.api.json
 import android.net.Uri
 import android.util.Log
 import com.google.gson.*
+import com.google.gson.reflect.TypeToken
 import com.protone.api.TAG
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
@@ -24,6 +25,9 @@ fun <C> String.toEntity(clazz: Class<C>): C {
 fun String.toUri(): Uri{
     return Uri.parse(this)
 }
+
+fun <T> Gson.jsonToList(json: String) : List<T> =
+    this.fromJson(json, object : TypeToken<List<T>>() {}.type)
 
 private class UriSerializer : JsonSerializer<Uri> {
     override fun serialize(

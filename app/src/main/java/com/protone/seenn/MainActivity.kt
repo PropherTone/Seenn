@@ -108,22 +108,29 @@ class MainActivity : BaseActivity<MainSeen>() {
 //                                BIND_AUTO_CREATE
 //                            )
                         }
-                        MainSeen.Touch.MUSIC -> {
-                            startActivity(MusicActivity::class.intent)
-                        }
-                        MainSeen.Touch.NOTE -> {}
-                        MainSeen.Touch.PlayMusic -> {
-                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
-                        }
-                        MainSeen.Touch.PauseMusic -> {
-                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
-                        }
-                        MainSeen.Touch.PreviousMusic -> {
-                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PREVIOUS))
-                        }
-                        MainSeen.Touch.NextMusic -> {
-                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_NEXT))
-                        }
+                        MainSeen.Touch.MUSIC -> startActivity(MusicActivity::class.intent)
+                        MainSeen.Touch.NOTE -> startActivity(NoteActivity::class.intent)
+                        MainSeen.Touch.PlayMusic -> musicBroadCastManager.sendBroadcast(
+                            Intent().setAction(
+                                MUSIC_PLAY
+                            )
+                        )
+                        MainSeen.Touch.PauseMusic -> musicBroadCastManager.sendBroadcast(
+                            Intent().setAction(
+                                MUSIC_PLAY
+                            )
+                        )
+                        MainSeen.Touch.PreviousMusic -> musicBroadCastManager.sendBroadcast(
+                            Intent().setAction(
+                                MUSIC_PREVIOUS
+                            )
+                        )
+                        MainSeen.Touch.NextMusic -> musicBroadCastManager.sendBroadcast(
+                            Intent().setAction(
+                                MUSIC_NEXT
+                            )
+                        )
+
                         MainSeen.Touch.PauseVideo -> {}
                     }
                 }
