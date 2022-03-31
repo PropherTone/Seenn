@@ -4,8 +4,12 @@ import android.content.Intent
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.protone.api.context.MUSIC_PAUSE
+import com.protone.api.context.MUSIC_PLAY
 import com.protone.api.context.intent
+import com.protone.api.json.toUri
 import com.protone.database.room.dao.MusicBucketDAOHelper
+import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.media.musicBroadCastManager
@@ -15,15 +19,29 @@ import com.protone.seen.adapter.MusicListAdapter
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 class MusicActivity : BaseActivity<MusicSeen>() {
+
+    private var cacheMusicBucketName = "ALL"
 
     override suspend fun main() {
         val musicSeen = MusicSeen(this)
 
         setContentSeen(musicSeen)
 
-        musicSeen.initSeen()
+        bindMusicService { }
+        musicSeen.apply {
+            initSeen()
+            mbClickCallBack { name ->
+                cacheMusicBucketName = name
+            }
+            mlClickCallBack { position ->
+                binder.setDate(Galley.music)
+                binder.setMusicPosition(position)
+            }
+        }
+
 
         bindMusicService {
             setMusicList(Galley.music)
@@ -51,7 +69,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                                         name = it
                                     }
                                     getStringExtra(AddBucketActivity.BUCKET_ICON)?.let {
-                                        icon = it
+                                        icon = it.toUri()
                                     }
                                     getStringExtra(AddBucketActivity.BUCKET_DETAIL)?.let {
                                         detail = it
@@ -65,36 +83,21 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         }
     }
 
-    private fun MusicSeen.initSeen() {
-        MusicBucketDAOHelper.getAllMusicBucket { list ->
-            list?.let {
-                runOnUiThread {
-                    binding.musicBucket.apply {
-                        layoutManager = LinearLayoutManager(this@MusicActivity)
-                        adapter = MusicBucketAdapter(
-                            this@MusicActivity,
-                            it as MutableList<MusicBucket>
-                        )
-                    }
+    private suspend fun MusicSeen.initSeen() {
+        initList(suspendCancellableCoroutine { co ->
+            MusicBucketDAOHelper.getAllMusicBucket { list ->
+                list?.let {
+                    co.resumeWith(Result.success(it as MutableList<MusicBucket>))
                 }
+                co.cancel()
             }
-        }
+        }, Galley.music)
 
-        binding.musicMusicList.apply {
-            layoutManager = LinearLayoutManager(this@MusicActivity)
-            adapter = MusicListAdapter(this@MusicActivity).apply {
-                musicList = Galley.music
-            }
-        }
-
-        binding.mySmallMusicPlayer.apply {
-            playMusic = {
-                musicBroadCastManager.sendBroadcast(Intent().setAction("PlayMusic"))
-            }
-            pauseMusic = {
-                musicBroadCastManager.sendBroadcast(Intent().setAction("PauseMusic"))
-            }
-        }
+        initSmallMusic({
+            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
+        }, {
+            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PAUSE))
+        })
     }
 
     private suspend fun MusicSeen.addBucket(musicBucket: MusicBucket) {

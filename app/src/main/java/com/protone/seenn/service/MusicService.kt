@@ -21,7 +21,7 @@ import java.lang.Exception
 import java.util.*
 import kotlin.concurrent.timerTask
 
-class MusicService() : Service(), MediaPlayer.OnCompletionListener {
+class MusicService() : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
 
     companion object {
         @JvmStatic
@@ -92,6 +92,7 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
 
 
     private var musicPosition = 0
+
     var musicPlayerMode = LIST_LOOPING
 
     override fun onCreate() {
@@ -171,61 +172,6 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
         }
     }
 
-    private fun setDate(list: MutableList<Music>) {
-        this.musicLists = list
-    }
-
-    private fun play() {
-        if (musicLists.size <= 0) {
-            postData(
-                "NO MUSIC",
-                0,
-                Uri.EMPTY
-            )
-            return
-        }
-        if (musicTimer == null) musicTimer = Timer()
-        musicPlayer?.apply {
-            start()
-            musicTimer?.schedule(timerTask {
-                try {
-                    if (isPlaying) playPosition.postValue(currentPosition.toLong())
-                } catch (ignored: Exception){}
-            }, 0, 100)
-        }
-    }
-
-    private fun pause() {
-        if (musicPlayer?.isPlaying == false) return
-        musicPlayer?.let {
-            it.pause()
-            postData(
-                musicLists[musicPosition].title,
-                musicLists[musicPosition].duration,
-                uri,
-                it.isPlaying
-            )
-        }
-//        musicTimer?.cancel()
-//        musicTimer = null
-    }
-
-    private fun next() {
-        musicPosition =
-            if (musicLists.size > 0) {
-                if (musicPosition + 1 >= musicLists.size) 0 else ++musicPosition
-            } else musicPosition
-        restart()
-    }
-
-    private fun previous() {
-        musicPosition =
-            if (musicLists.size > 0) {
-                if (musicPosition - 1 < 0) musicLists.size - 1 else --musicPosition
-            } else musicPosition
-        restart()
-    }
-
     private fun restart() {
         musicFinish()
         play()
@@ -242,7 +188,63 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
         musicPlayer = null
     }
 
-    private fun seekTo(position: Long) {
+    override fun setDate(list: MutableList<Music>) {
+        this.musicLists = list
+    }
+
+    override fun play() {
+        if (musicLists.size <= 0) {
+            postData(
+                "NO MUSIC",
+                0,
+                Uri.EMPTY
+            )
+            return
+        }
+        if (musicTimer == null) musicTimer = Timer()
+        musicPlayer?.apply {
+            start()
+            musicTimer?.schedule(timerTask {
+                try {
+                    if (isPlaying) playPosition.postValue(currentPosition.toLong())
+                } catch (ignored: Exception) {
+                }
+            }, 0, 100)
+        }
+    }
+
+    override fun pause() {
+        if (musicPlayer?.isPlaying == false) return
+        musicPlayer?.let {
+            it.pause()
+            postData(
+                musicLists[musicPosition].title,
+                musicLists[musicPosition].duration,
+                uri,
+                it.isPlaying
+            )
+        }
+//        musicTimer?.cancel()
+//        musicTimer = null
+    }
+
+    override fun next() {
+        musicPosition =
+            if (musicLists.size > 0) {
+                if (musicPosition + 1 >= musicLists.size) 0 else ++musicPosition
+            } else musicPosition
+        restart()
+    }
+
+    override fun previous() {
+        musicPosition =
+            if (musicLists.size > 0) {
+                if (musicPosition - 1 < 0) musicLists.size - 1 else --musicPosition
+            } else musicPosition
+        restart()
+    }
+
+    override fun seekTo(position: Long) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             musicPlayer?.seekTo(
                 position * musicLists[musicPosition].duration / 100,
@@ -253,9 +255,9 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
         }
     }
 
-    private fun getPosition() = playPosition
+    override fun getPosition() = playPosition
 
-    private fun getMusicDetail() = musicLists[musicPosition]
+    override fun getMusicDetail() = musicLists[musicPosition]
 
     override fun onCompletion(p0: MediaPlayer?) {
         when (musicPlayerMode) {
@@ -270,6 +272,18 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
                 restart()
             }
         }
+    }
+
+    override fun getData() = if (musicLists.size > 0) MusicState(
+        musicLists[musicPosition].title,
+        musicLists[musicPosition].duration,
+        0,
+        musicLists[musicPosition].uri
+    ) else MusicState("NO MUSIC", 0, 0, Uri.EMPTY)
+
+    override fun setMusicPosition(position: Int) {
+        musicPosition = position
+        restart()
     }
 
     private fun postData(
@@ -289,22 +303,16 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener {
         )
     }
 
-    private fun getData() = if (musicLists.size > 0) MusicState(
-        musicLists[musicPosition].title,
-        musicLists[musicPosition].duration,
-        0,
-        musicLists[musicPosition].uri
-    ) else MusicState("NO MUSIC", 0, 0, Uri.EMPTY)
-
-    inner class MusicControlLer : Binder() {
-        fun setDate(list: MutableList<Music>) = this@MusicService.setDate(list)
-        fun play() = this@MusicService.play()
-        fun pause() = this@MusicService.pause()
-        fun next() = this@MusicService.next()
-        fun previous() = this@MusicService.previous()
-        fun getPosition() = this@MusicService.getPosition()
-        fun getMusicDetail() = this@MusicService.getMusicDetail()
-        fun getData() = this@MusicService.getData()
-        fun seekTo(position: Long) = this@MusicService.seekTo(position)
+    inner class MusicControlLer : Binder(), IMusicPlayer {
+        override fun setDate(list: MutableList<Music>) = this@MusicService.setDate(list)
+        override fun play() = this@MusicService.play()
+        override fun pause() = this@MusicService.pause()
+        override fun next() = this@MusicService.next()
+        override fun previous() = this@MusicService.previous()
+        override fun getPosition() = this@MusicService.getPosition()
+        override fun getMusicDetail() = this@MusicService.getMusicDetail()
+        override fun getData() = this@MusicService.getData()
+        override fun setMusicPosition(position: Int) = this@MusicService.setMusicPosition(position)
+        override fun seekTo(position: Long) = this@MusicService.seekTo(position)
     }
 }

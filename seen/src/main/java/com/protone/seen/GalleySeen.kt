@@ -1,7 +1,6 @@
 package com.protone.seen
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
@@ -31,7 +30,8 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
         RENAME,
         MOVE_TO,
         SELECT_ALL,
-        ADD_CATE
+        ADD_CATE,
+        IntoBOX
     }
 
     private val binding = GalleyLayoutBinding.inflate(context.layoutInflater, context.root, false)
@@ -42,7 +42,7 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
 
     private lateinit var rightChannel: Channel<GalleyFragment.Event>
 
-    val chooseDate: MutableLiveData<MutableList<GalleyMedia>> =
+    val chooseData: MutableLiveData<MutableList<GalleyMedia>> =
         MutableLiveData<MutableList<GalleyMedia>>().apply {
             observe(context as LifecycleOwner) {
                 it?.let {
@@ -93,11 +93,11 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
             it.adapter = MyFragmentStateAdapter(
                 context as FragmentActivity,
                 arrayListOf(
-                    GalleyFragment(context, galleyMediaList, chooseDate),
+                    GalleyFragment(context, galleyMediaList, chooseData),
                     GalleyFragment(
                         context,
                         videoMediaList,
-                        chooseDate,
+                        chooseData,
                         isVideo = true
                     )
                 )
@@ -126,7 +126,7 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
                 galleyRename -> offer(Touch.RENAME)
                 galleySelectAll -> offer(Touch.SELECT_ALL)
                 galleySetCate -> offer(Touch.ADD_CATE)
-                imageView6 -> offer(Touch.DELETE)
+                imageView6 -> offer(Touch.IntoBOX)
                 binding.galleyActionMenu -> offer(Touch.ShowOptionMenu)
             }
         }

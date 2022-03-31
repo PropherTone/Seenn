@@ -17,7 +17,7 @@ data class Music(
     val artist: String,
     val mimeType: String,
     val bucketDisplayName: String,
-    val displayName: String,
+    val displayName: String?,
     val duration: Long,
     val year: Long,
     var uri: Uri,

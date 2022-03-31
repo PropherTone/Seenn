@@ -44,7 +44,7 @@ class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context) {
                     RichNoteStates(
                         context.getString(R.string.huge_text),
                         listOf
-                    ), RichPhotoStates(Uri.parse("asd"),"")
+                    ), RichPhotoStates(Uri.parse("asd"),null,"",null)
                 )
             )
         }

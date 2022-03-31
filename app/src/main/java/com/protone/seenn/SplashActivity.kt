@@ -34,8 +34,16 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     private val mHandler: Handler = Handler(Looper.getMainLooper()) {
         when (it.what) {
             1 -> {
-                if (!userConfig.isFirstBoot) {
-                    MusicBucketDAOHelper.addMusicBucket(MusicBucket("ALL", null,Galley.music.size,null,null))
+                if (!userConfig.isFirstBoot && Galley.music.size > 0) {
+                    MusicBucketDAOHelper.addMusicBucket(
+                        MusicBucket(
+                            "ALL",
+                            Galley.music[0].uri,
+                            Galley.music.size,
+                            null,
+                            null
+                        )
+                    )
                     MusicDAOHelper.insertMusicMulti(Galley.music)
                     userConfig.isFirstBoot = true
                 }
@@ -68,7 +76,8 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                                 registerBroadcast()
                             })
                         }
-                        else -> {}
+                        else -> {
+                        }
                     }
                 }
             }

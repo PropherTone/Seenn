@@ -11,8 +11,6 @@
 
     </data>
 
-
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:background="@color/black"
@@ -25,14 +23,9 @@
 
         <com.protone.seen.customView.PictureListScrollView
             android:id="@+id/ddd"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
-<!--        <Button-->
-<!--            android:layout_centerInParent="true"-->
-<!--            android:onClick="@{()->self.offer(PictureBox.SelectPicList)}"-->
-<!--            android:layout_width="50dp"-->
-<!--            android:layout_height="50dp"/>-->
 
 
     </RelativeLayout>

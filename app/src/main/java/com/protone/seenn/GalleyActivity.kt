@@ -1,8 +1,10 @@
 package com.protone.seenn
 
+import android.content.Intent
 import com.protone.api.context.deleteMedia
 import com.protone.api.context.renameMedia
 import com.protone.api.context.showFailedToast
+import com.protone.api.json.toJson
 import com.protone.mediamodle.Galley
 import com.protone.seen.GalleySeen
 import com.protone.seen.dialog.RenameDialog
@@ -12,6 +14,15 @@ import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withContext
 
 class GalleyActivity : BaseActivity<GalleySeen>() {
+
+    companion object {
+        @JvmStatic
+        val BUCKET = "GalleyBucket"
+
+        @JvmStatic
+        val CUSTOM = "CustomChoose"
+    }
+
     override suspend fun main() {
         val galleySeen = GalleySeen(this)
 
@@ -19,7 +30,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
 
         galleySeen.initPager(Galley.photo, Galley.video)
 
-        galleySeen.chooseDate.observe(this) {
+        galleySeen.chooseData.observe(this) {
             if (it.size > 0) {
                 galleySeen.setOptionButton(true)
             } else galleySeen.setOptionButton(false)
@@ -31,7 +42,8 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                     when (it) {
                         Event.OnStart -> {
                         }
-                        else -> {}
+                        else -> {
+                        }
                     }
                 }
                 galleySeen.viewEvent.onReceive {
@@ -42,11 +54,24 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                         GalleySeen.Touch.ShowOptionMenu -> {
                             galleySeen.showPop()
                         }
-                        GalleySeen.Touch.MOVE_TO -> {}
+                        GalleySeen.Touch.MOVE_TO -> {
+                        }
                         GalleySeen.Touch.RENAME -> galleySeen.rename()
-                        GalleySeen.Touch.ADD_CATE -> {}
-                        GalleySeen.Touch.SELECT_ALL -> {}
+                        GalleySeen.Touch.ADD_CATE -> {
+                        }
+                        GalleySeen.Touch.SELECT_ALL -> {
+                        }
                         GalleySeen.Touch.DELETE -> galleySeen.delete()
+                        GalleySeen.Touch.IntoBOX -> {
+                            startActivity(
+                                Intent(
+                                    this@GalleyActivity,
+                                    PictureBoxActivity::class.java
+                                ).apply {
+                                    galleySeen.chooseData()
+                                        ?.let { d -> putExtra(CUSTOM, d.toJson()) }
+                                })
+                        }
                     }
                 }
             }
@@ -54,7 +79,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
     }
 
     private fun GalleySeen.rename() {
-        chooseDate.value?.onEach {
+        chooseData.value?.onEach {
             RenameDialog(context, it.name) { name ->
                 renameMedia(name, it.uri) { result ->
                     if (result) {
@@ -66,7 +91,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
     }
 
     private suspend fun GalleySeen.delete() = withContext(Dispatchers.IO) {
-        chooseDate.value?.onEach {
+        chooseData.value?.onEach {
             deleteMedia(it.uri) { result ->
                 if (result) {
                     Galley.deleteMedia(it.isVideo, it)
@@ -74,4 +99,6 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
             }
         }
     }
+
+    private fun GalleySeen.chooseData() = chooseData.value
 }

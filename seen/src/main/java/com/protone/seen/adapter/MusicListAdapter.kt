@@ -6,11 +6,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import com.protone.api.context.layoutInflater
-import com.protone.api.context.toStringMinuteTime
+import com.protone.api.toStringMinuteTime
 import com.protone.database.room.entity.Music
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
@@ -25,6 +24,8 @@ class MusicListAdapter(context: Context) :
             field.addAll(value)
             notifyDataSetChanged()
         }
+
+    var clickCallback: (Int) -> Unit? = { }
 
     override val select: (holder: Holder<MusicListLayoutBinding>, isSelect: Boolean) -> Unit =
         { holder, isSelect ->
@@ -59,8 +60,8 @@ class MusicListAdapter(context: Context) :
     private fun startAnimation(target: ViewGroup) {
         val x = ObjectAnimator.ofFloat(target, "scaleX", 0.96f).apply { duration = 50 }
         val y = ObjectAnimator.ofFloat(target, "scaleY", 0.96f).apply { duration = 50 }
-        val x1 = ObjectAnimator.ofFloat(target, "scaleX", 1f).apply { duration = 360 }
-        val y2 = ObjectAnimator.ofFloat(target, "scaleY", 1f).apply { duration = 360 }
+        val x1 = ObjectAnimator.ofFloat(target, "scaleX", 1f).apply { duration = 460 }
+        val y2 = ObjectAnimator.ofFloat(target, "scaleY", 1f).apply { duration = 460 }
         AnimatorSet().apply {
             playTogether(x, y)
             start()
@@ -95,8 +96,9 @@ class MusicListAdapter(context: Context) :
                 setSelect(holder, selectList.contains(music))
                 musicListContainer.setOnClickListener {
                     checkSelect(holder, music)
+                    clickCallback(holder.layoutPosition)
                 }
-                musicListName.text = music.displayName
+                musicListName.text = music.title
                 musicListDetail.text = "${music.artist} · ${music.album}"
                 musicListTime.text = music.duration.toStringMinuteTime()
             }

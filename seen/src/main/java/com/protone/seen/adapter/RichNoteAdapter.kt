@@ -1,7 +1,11 @@
 package com.protone.seen.adapter
 
 import android.content.Context
+import android.net.Uri
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.context.layoutInflater
 import com.protone.mediamodle.note.entity.*
@@ -9,7 +13,7 @@ import com.protone.seen.databinding.*
 
 class RichNoteAdapter(
     val context: Context,
-    val isEditable: Boolean = true,
+    private val isEditable: Boolean = true,
     dataList: ArrayList<Any>
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -84,7 +88,17 @@ class RichNoteAdapter(
                 holder.binding.edit.setText((dataList[holder.layoutPosition] as RichNoteStates).text)
             }
             is RichPhotoHolder -> {
-
+                holder.binding.apply {
+                    (dataList[holder.layoutPosition]
+                            as RichPhotoStates).let {
+                        richPhotoTitle.text = it.name
+                        it.date?.let { d-> richPhotoDetail.text = d }
+                        richPhotoTvContainer.setOnClickListener { c ->
+                            c.visibility = if (c.isVisible) View.INVISIBLE else View.VISIBLE
+                        }
+                        glideIv(richPhotoIv,it.uri)
+                    }
+                }
             }
             is RichMusicHolder -> {
 
@@ -96,6 +110,11 @@ class RichNoteAdapter(
     }
 
     override fun getItemCount(): Int = dataList.size
+
+    private fun glideIv(iv: ImageView, uri: Uri) {
+
+        iv.layoutParams
+    }
 
     class RichTextHolder(val binding: RichTextLayoutBinding) :
         RecyclerView.ViewHolder(binding.root)

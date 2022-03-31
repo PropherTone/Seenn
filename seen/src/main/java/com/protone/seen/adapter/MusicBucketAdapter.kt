@@ -1,5 +1,6 @@
 package com.protone.seen.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -17,8 +18,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 
-class MusicBucketAdapter(context: Context, private var musicBuckets: MutableList<MusicBucket>) :
+class MusicBucketAdapter(context: Context) :
     SelectListAdapter<MusicBucketAdapterLayoutBinding, MusicBucket>(context) {
+
+    var musicBuckets: MutableList<MusicBucket> = mutableListOf()
+        @SuppressLint("NotifyDataSetChanged")
+        set(value) {
+            field.clear()
+            field.addAll(value)
+            notifyDataSetChanged()
+        }
+
+    var clickCallback: (String) -> Unit? = { }
 
     override val select: (
         holder: Holder<MusicBucketAdapterLayoutBinding>,
@@ -51,11 +62,14 @@ class MusicBucketAdapter(context: Context, private var musicBuckets: MutableList
     override fun onBindViewHolder(holder: Holder<MusicBucketAdapterLayoutBinding>, position: Int) {
         holder.binding.apply {
             setSelect(holder, selectList.contains(musicBuckets[position]))
+            musicBucketCard.setOnClickListener {
+                clickCallback(musicBuckets[holder.layoutPosition].name)
+            }
             musicBucketName.text = musicBuckets[position].name
             musicBucketIcon.apply {
                 when {
                     musicBuckets[position].icon != null -> {
-                        loadIcon(this, Uri.parse(musicBuckets[position].icon).toBitmapByteArray())
+                        loadIcon(this, musicBuckets[position].icon?.toBitmapByteArray())
                     }
                     else -> {
                         loadIcon(

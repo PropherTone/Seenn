@@ -6,6 +6,7 @@ import android.net.Uri
 import android.text.TextUtils
 import android.transition.TransitionManager
 import android.util.AttributeSet
+import android.util.Log
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
@@ -14,6 +15,10 @@ import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.protone.api.context.layoutInflater
+import com.protone.api.json.toEntity
+import com.protone.api.json.toJson
+import com.protone.api.json.toUri
+import com.protone.api.toBitmapByteArray
 import com.protone.seen.Progress
 import com.protone.seen.R
 import com.protone.seen.customView.DragBar.DragBar
@@ -81,9 +86,7 @@ class MyMusicPlayer @JvmOverloads constructor(
     var icon: Uri = Uri.EMPTY
         set(value) {
             if (value != Uri.EMPTY) {
-                val mediaMetadataRetriever = MediaMetadataRetriever()
-                mediaMetadataRetriever.setDataSource(context, value)
-                loadAlbum(mediaMetadataRetriever.embeddedPicture)
+                loadAlbum(value.toBitmapByteArray())
                 field = value
             }
         }

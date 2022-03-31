@@ -1,16 +1,14 @@
 package com.protone.database.room.entity
 
 import android.net.Uri
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.protone.database.room.converters.MusicTypeConverter
 
 @Entity
+@TypeConverters(MusicTypeConverter::class)
 data class MusicBucket(
     var name: String,
-    var icon: String?,
+    var icon: Uri?,
     var size: Int,
     var detail: String?,
     var date: String?
@@ -18,5 +16,6 @@ data class MusicBucket(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 
+    @Ignore
     constructor() : this("", null, 0, null, null)
 }
