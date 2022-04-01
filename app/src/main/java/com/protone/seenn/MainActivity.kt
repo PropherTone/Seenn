@@ -29,6 +29,7 @@ class MainActivity : BaseActivity<MainSeen>() {
                     musicName = it.name
                     icon = it.albumUri
                     duration = it.duration
+                    isPlaying = it.isPlaying
                 }
             }
             mainSeen.setAndUpdateDuration()
@@ -48,35 +49,6 @@ class MainActivity : BaseActivity<MainSeen>() {
                     when (it) {
                         MainSeen.Touch.GALLEY -> {
                             startActivity(GalleyActivity::class.intent)
-//                           val startActivityForResult = startActivityForResult(
-//                                ActivityResultContracts.StartActivityForResult(),
-//                                Intent(
-//                                    Intent.ACTION_PICK,
-//                                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-//                                )
-//                            )
-//                            if (startActivityForResult.resultCode == RESULT_OK) {
-//                                startActivityForResult.data?.data?.let { it1 ->
-//                                    mainSeen.setVideo(
-//                                        it1
-//                                    )
-//                                }
-//                            }
-//                            val startActivityForResult = startActivityForResult(
-//                                ActivityResultContracts.StartActivityForResult(),
-//                                NoteSyncActivity::class.intent
-//                            )
-//
-//                            if(startActivityForResult.resultCode == RESULT_OK){
-//                                Log.d(TAG, "main: ${startActivityForResult.data?.getStringExtra("ttt")}")
-//                            }
-//                            val galleyFilter = MediaFilter()
-//                            galleyFilter.scanAudio(object : MediaFilter.Filter<MutableList<MediaFilter.AudioDetail>>{
-//                                override fun offer(arg: MutableList<MediaFilter.AudioDetail>) {
-//                                    Log.d(TAG, "offer: ${arg[0]}")
-//                                }
-//
-//                            })
 //                            bindService(
 //                                NoteSyncService::class.intent.apply {
 //                                    action = "SERVER"
@@ -109,7 +81,7 @@ class MainActivity : BaseActivity<MainSeen>() {
 //                            )
                         }
                         MainSeen.Touch.MUSIC -> startActivity(MusicActivity::class.intent)
-                        MainSeen.Touch.NOTE -> startActivity(NoteActivity::class.intent)
+                        MainSeen.Touch.NOTE -> startActivity(NoteEditActivity::class.intent)
                         MainSeen.Touch.PlayMusic -> musicBroadCastManager.sendBroadcast(
                             Intent().setAction(
                                 MUSIC_PLAY
@@ -147,11 +119,13 @@ class MainActivity : BaseActivity<MainSeen>() {
         binder.getPosition().observe(this@MainActivity) {
             progress = it
         }
+        binder.getPlayState().observe(this@MainActivity){
+            isPlaying = it
+        }
     }
 
     private fun MainSeen.setAndUpdateDuration() {
         Galley.musicState.observe(this@MainActivity) {
-            Log.d(TAG, "setAndUpdateDuration: $it")
             duration = it.duration
             musicName = it.name
             icon = it.albumUri

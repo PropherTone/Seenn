@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="icon_50">50dp</dimen>
     <dimen name="small_Icon">40dp</dimen>
     <dimen name="smaller_Icon">30dp</dimen>
     <dimen name="icon_margin">20dp</dimen>

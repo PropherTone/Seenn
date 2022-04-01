@@ -11,4 +11,6 @@ abstract class Seen<C>(val context: Context) : CoroutineScope by CoroutineScope(
     abstract val viewRoot : View
 
     val viewEvent = Channel<C>(Channel.UNLIMITED)
+
+    abstract fun offer(event:C)
 }

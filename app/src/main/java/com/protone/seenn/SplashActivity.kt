@@ -8,16 +8,14 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
 import com.protone.api.Config
-import com.protone.api.TAG
 import com.protone.api.checkNeededPermission
 import com.protone.api.context.intent
 import com.protone.api.requestContentPermission
-import com.protone.database.room.config.UserConfig
-import com.protone.database.room.dao.MusicBucketDAOHelper
-import com.protone.database.room.dao.MusicDAOHelper
-import com.protone.database.room.entity.Music
+import com.protone.api.toBitmapByteArray
+import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
+import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.media.scanAudio
 import com.protone.mediamodle.media.scanPicture
 import com.protone.mediamodle.media.scanVideo
@@ -29,22 +27,20 @@ import kotlinx.coroutines.selects.select
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : BaseActivity<SplashSeen>() {
 
-    private val userConfig by lazy { UserConfig(this) }
-
     private val mHandler: Handler = Handler(Looper.getMainLooper()) {
         when (it.what) {
             1 -> {
                 if (!userConfig.isFirstBoot && Galley.music.size > 0) {
-                    MusicBucketDAOHelper.addMusicBucket(
+                    DataBaseDAOHelper.addMusicBucket(
                         MusicBucket(
                             "ALL",
-                            Galley.music[0].uri,
+                            Galley.music[0].uri.toBitmapByteArray(),
                             Galley.music.size,
                             null,
                             null
                         )
                     )
-                    MusicDAOHelper.insertMusicMulti(Galley.music)
+                    DataBaseDAOHelper.insertMusicMulti(Galley.music)
                     userConfig.isFirstBoot = true
                 }
                 startService(Intent(this, MusicService::class.java))
@@ -114,13 +110,11 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     }
 
     private fun updateMedia() {
-        Thread {
-            Galley.apply {
-                photo = scanPicture()
-                video = scanVideo()
-                music = scanAudio()
+        GalleyHelper.run {
+            updateAll {
+                mHandler.sendEmptyMessage(1)
             }
-            mHandler.sendEmptyMessage(1)
-        }.start()
+            sortMusicBucket()
+        }
     }
 }

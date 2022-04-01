@@ -1,6 +1,7 @@
 package com.protone.seen
 
 import android.content.Context
+import android.view.DragEvent
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
@@ -68,8 +69,8 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
 
     }
 
-    fun offer(msg: Touch) {
-        viewEvent.offer(msg)
+    override fun offer(event : Touch) {
+        viewEvent.offer(event)
     }
 
     fun setOptionButton(visible: Boolean) {

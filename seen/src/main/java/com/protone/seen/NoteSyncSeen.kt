@@ -1,6 +1,7 @@
 package com.protone.seen
 
 import android.content.Context
+import android.view.DragEvent
 import android.view.View
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
@@ -22,7 +23,7 @@ class NoteSyncSeen(context: Context) : Seen<NoteSyncSeen.NoteSync>(context) {
         binding.self = this
     }
 
-    fun offer(noteSync: NoteSync){
-        viewEvent.offer(noteSync)
+    override fun offer(event : NoteSync){
+        viewEvent.offer(event)
     }
 }

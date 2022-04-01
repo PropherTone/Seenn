@@ -16,4 +16,8 @@ class NoteListSeen(context: Context) : Seen<NoteListSeen.NoteListEvent>(context)
 
     override val viewRoot: View
         get() = binding.root
+
+    override fun offer(event: NoteListEvent) {
+
+    }
 }

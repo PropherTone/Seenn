@@ -1,11 +1,7 @@
 package com.protone.database.room.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.protone.database.room.converters.MusicTypeConverter
-import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.MusicBucket
-import java.util.ArrayList
 
 @Dao
 interface MusicBucketDAO {
@@ -14,7 +10,7 @@ interface MusicBucketDAO {
     fun getAllMusicBucket(): List<MusicBucket>?
 
     @Query("SELECT * FROM MusicBucket WHERE name LIKE :name")
-    fun getMusicBucketByName(name : String): List<MusicBucket>?
+    fun getMusicBucketByName(name: String): MusicBucket?
 
     @Insert
     fun addMusicBucket(musicBucket: MusicBucket)
@@ -23,6 +19,6 @@ interface MusicBucketDAO {
     fun updateMusicBucketName(oldName: String, name: String)
 
     @Query("UPDATE MusicBucket SET icon = :icon WHERE name LIKE :bucketName")
-    fun updateMusicBucketIcon(bucketName: String, icon: String)
+    fun updateMusicBucketIcon(bucketName: String, icon: ByteArray)
 
 }

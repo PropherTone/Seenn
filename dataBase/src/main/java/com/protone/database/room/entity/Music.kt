@@ -4,10 +4,10 @@ import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.protone.database.room.converters.MusicTypeConverter
+import com.protone.database.room.converters.UriTypeConverter
 
 @Entity
-@TypeConverters(MusicTypeConverter::class)
+@TypeConverters(UriTypeConverter::class)
 data class Music(
     val musicId: Long,
     val title: String,

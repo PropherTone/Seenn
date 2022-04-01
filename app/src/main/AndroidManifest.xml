@@ -5,14 +5,15 @@
 
     <uses-permission android:name="android.permission.INTERNET" /> <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE" /> -->
     <!-- <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" /> -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".SeennApplication"
@@ -27,11 +28,12 @@
             android:exported="true"
             android:launchMode="singleTop" />
         <activity android:name=".NoteSyncActivity" />
-        <activity android:name=".NoteActivity"/>
+        <activity android:name=".NoteActivity" />
         <activity android:name=".PictureBoxActivity" />
         <activity android:name=".GalleyActivity" />
         <activity android:name=".MusicActivity" />
         <activity android:name=".AddBucketActivity" />
+        <activity android:name=".NoteEditActivity" />
         <activity
             android:name=".SplashActivity"
             android:exported="true">
@@ -44,15 +46,16 @@
 
         <service android:name=".service.MusicService" />
 
-        <receiver android:name="com.protone.mediamodle.media.MusicReceiver"
+        <receiver
+            android:name="com.protone.mediamodle.media.MusicReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="PlayMusic"/>
-                <action android:name="PauseMusic"/>
-                <action android:name="NextMusic"/>
-                <action android:name="PreviousMusic"/>
-                <action android:name="FinishMusic"/>
+                <action android:name="PlayMusic" />
+                <action android:name="PauseMusic" />
+                <action android:name="NextMusic" />
+                <action android:name="PreviousMusic" />
+                <action android:name="FinishMusic" />
             </intent-filter>
         </receiver>
     </application>

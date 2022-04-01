@@ -19,23 +19,23 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/music_musicList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:background="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/music_bucketContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:background="@color/white"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
             <com.protone.seen.customView.StateImageView
                 android:id="@+id/music_showBucket"
@@ -80,6 +80,26 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/blue_1"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/toolbar_back"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/action"
+                android:onClick="@{()->(self.offer(Event.Finish))}"
+                android:paddingStart="@dimen/main_padding"
+                android:paddingTop="@dimen/main_margin"
+                android:paddingEnd="0dp"
+                android:paddingBottom="@dimen/main_margin"
+                android:src="@drawable/ic_baseline_arrow_back_24_white" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

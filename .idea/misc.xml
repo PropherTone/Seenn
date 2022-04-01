@@ -3,6 +3,23 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/background_ripple_red.xml" value="0.1315" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/background_ripple_transparent_white.xml" value="0.1315" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_arrow_left_24.xml" value="0.1315" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_arrow_right_24.xml" value="0.1315" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_keyboard_arrow_left_24.xml" value="0.1315" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_pause_24.xml" value="0.1315" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_play_arrow_24.xml" value="0.1315" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_play_arrow_24_white.xml" value="0.1315" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/add_bucket_layout.xml" value="0.22826086956521738" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/main_layout.xml" value="0.22871376811594202" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/music_bucket_adapter_layout.xml" value="0.22826086956521738" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/music_layout.xml" value="0.264" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/music_list_layout.xml" value="0.22871376811594202" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/music_notification_layout.xml" value="0.22826086956521738" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/note_edit_layout.xml" value="0.22871376811594202" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/note_layout.xml" value="0.22871376811594202" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/small_music_player_layout.xml" value="0.22826086956521738" />
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/activity_main.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/colors.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidStudioProject/Seenn/richNote/src/main/res/layout/activity_connect.xml" value="0.155622060709705" />

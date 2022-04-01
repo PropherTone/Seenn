@@ -7,10 +7,12 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import com.protone.api.ActivityLifecycleOwner
 import com.protone.api.context.intent
+import com.protone.database.room.config.UserConfig
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.media.MediaContentObserver
@@ -26,11 +28,13 @@ import kotlin.coroutines.suspendCoroutine
 abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     CoroutineScope by MainScope() {
 
-    companion object{
+    companion object {
         val TAG = this::class.simpleName
     }
 
     private var serviceConnection: ServiceConnection? = null
+
+    protected val userConfig by lazy { UserConfig(this) }
 
     lateinit var binder: MusicService.MusicControlLer
 
@@ -118,6 +122,10 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
 
     fun setMusicList(mutableList: MutableList<Music>) {
         binder.setDate(mutableList)
+    }
+
+    fun toast(msg: CharSequence) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
     }
 
     override fun finish() {

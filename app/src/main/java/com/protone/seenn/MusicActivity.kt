@@ -1,21 +1,15 @@
 package com.protone.seenn
 
 import android.content.Intent
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.MUSIC_PAUSE
 import com.protone.api.context.MUSIC_PLAY
 import com.protone.api.context.intent
-import com.protone.api.json.toUri
-import com.protone.database.room.dao.MusicBucketDAOHelper
-import com.protone.database.room.entity.Music
+import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.media.musicBroadCastManager
 import com.protone.seen.MusicSeen
-import com.protone.seen.adapter.MusicBucketAdapter
-import com.protone.seen.adapter.MusicListAdapter
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
@@ -31,14 +25,17 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         setContentSeen(musicSeen)
 
         bindMusicService { }
+
         musicSeen.apply {
             initSeen()
             mbClickCallBack { name ->
                 cacheMusicBucketName = name
+                musicSeen.hideBucket()
             }
             mlClickCallBack { position ->
                 binder.setDate(Galley.music)
                 binder.setMusicPosition(position)
+                userConfig.playedMusicBucket = cacheMusicBucketName
             }
         }
 
@@ -48,6 +45,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
             binder.getData().apply {
                 musicSeen.musicName = name
                 musicSeen.icon = albumUri
+                musicSeen.isPlaying = isPlaying
             }
             musicSeen.observeMusicUpdate()
         }
@@ -63,55 +61,73 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                             startActivityForResult(
                                 ActivityResultContracts.StartActivityForResult(),
                                 AddBucketActivity::class.intent
-                            ).data?.apply {
-                                musicSeen.addBucket(MusicBucket().apply {
-                                    getStringExtra(AddBucketActivity.BUCKET_NAME)?.let {
-                                        name = it
+                            ).apply {
+                                resultCode.let { code ->
+                                    when (code) {
+                                        RESULT_OK -> {
+                                            data?.getStringExtra(
+                                                AddBucketActivity.BUCKET_NAME
+                                            )?.let {
+                                                musicSeen.addBucket(
+                                                    it
+                                                )
+                                            }
+                                        }
+                                        RESULT_CANCELED -> {
+                                            toast(getString(R.string.cancel))
+                                        }
                                     }
-                                    getStringExtra(AddBucketActivity.BUCKET_ICON)?.let {
-                                        icon = it.toUri()
-                                    }
-                                    getStringExtra(AddBucketActivity.BUCKET_DETAIL)?.let {
-                                        detail = it
-                                    }
-                                })
+                                }
                             }
                         }
+                        MusicSeen.Event.Finish -> finish()
                     }
                 }
+
             }
         }
+
     }
 
     private suspend fun MusicSeen.initSeen() {
-        initList(suspendCancellableCoroutine { co ->
-            MusicBucketDAOHelper.getAllMusicBucket { list ->
-                list?.let {
-                    co.resumeWith(Result.success(it as MutableList<MusicBucket>))
+        Galley.musicBucket[userConfig.playedMusicBucket]?.let {
+            initList(suspendCancellableCoroutine { co ->
+                DataBaseDAOHelper.getAllMusicBucket { list ->
+                    list?.let { lm ->
+                        co.resumeWith(Result.success(lm as MutableList<MusicBucket>))
+                    }
+                    co.cancel()
                 }
-                co.cancel()
-            }
-        }, Galley.music)
+            }, it)
+        }
 
         initSmallMusic({
-            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
+            musicBroadCastManager.sendBroadcast(
+                Intent().setAction(
+                    MUSIC_PLAY
+                )
+            )
         }, {
-            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PAUSE))
+            musicBroadCastManager.sendBroadcast(
+                Intent().setAction(
+                    MUSIC_PLAY
+                )
+            )
         })
     }
 
-    private suspend fun MusicSeen.addBucket(musicBucket: MusicBucket) {
-        MusicBucketDAOHelper.addMusicBucketWithCallBack(musicBucket) {
-            launch {
-                (binding.musicBucket.adapter as MusicBucketAdapter).addBucket(musicBucket)
-            }
-        }
+    private suspend fun MusicSeen.addBucket(name: String) = launch {
+        DataBaseDAOHelper.getMusicBucketByName(name)?.let { addBucket(it) }
     }
 
     private fun MusicSeen.observeMusicUpdate() {
         Galley.musicState.observe(this@MusicActivity) {
             musicName = it.name
             icon = it.albumUri
+            isPlaying = it.isPlaying
+        }
+        binder.getPlayState().observe(this@MusicActivity) {
+            isPlaying = it
         }
     }
 }

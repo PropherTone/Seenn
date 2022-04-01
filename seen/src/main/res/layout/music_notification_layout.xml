@@ -10,8 +10,10 @@
         android:layout_height="@dimen/user_icon"
         android:layout_gravity="center"
         android:layout_margin="@dimen/icon_margin"
-        android:background="@drawable/ic_baseline_music_note_24"
-        android:contentDescription="@string/icon" />
+        android:background="@color/gray_1"
+        android:contentDescription="@string/icon"
+        android:padding="@dimen/icon_padding"
+        android:src="@drawable/ic_baseline_music_note_24" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,11 +29,12 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="center"
-            android:letterSpacing="0.05"
+            android:letterSpacing="0.02"
             android:lines="1"
             android:marqueeRepeatLimit="marquee_forever"
             android:padding="@dimen/texts_padding"
             android:text="@string/no_music_is_playing"
+            android:textSize="@dimen/sub_text"
             android:textStyle="bold" />
 
 

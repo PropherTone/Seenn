@@ -14,7 +14,11 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
 
                 }
                 noteEditSeen.viewEvent.onReceive{
-
+                    when (it) {
+                        NoteEditSeen.NoteEditEvent.Confirm -> {
+                        }
+                        NoteEditSeen.NoteEditEvent.Finish -> finish()
+                    }
                 }
             }
         }

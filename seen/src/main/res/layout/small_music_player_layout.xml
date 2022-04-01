@@ -35,9 +35,13 @@
 
         <ImageView
             android:id="@+id/smallMusic_start"
-            android:layout_width="@dimen/small_Icon"
-            android:layout_height="@dimen/small_Icon"
-            android:layout_margin="@dimen/main_margin"
+            android:layout_width="@dimen/icon_50"
+            android:layout_height="@dimen/icon_50"
+            android:paddingLeft="@dimen/main_padding"
+            android:paddingTop="@dimen/main_padding"
+            android:paddingRight="@dimen/main_padding"
+            android:paddingBottom="@dimen/main_padding"
+            android:layout_marginEnd="@dimen/main_margin"
             android:contentDescription="@string/action"
             android:src="@drawable/ic_baseline_play_arrow_24"
             app:layout_constraintBottom_toBottomOf="parent"

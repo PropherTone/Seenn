@@ -3,6 +3,7 @@ package com.protone.seenn.service
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Binder
@@ -12,6 +13,7 @@ import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.MutableLiveData
 import com.protone.api.context.*
+import com.protone.api.toBitmapByteArray
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.MusicState
@@ -21,11 +23,13 @@ import java.lang.Exception
 import java.util.*
 import kotlin.concurrent.timerTask
 
-class MusicService() : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
+class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
 
     companion object {
         @JvmStatic
         val MUSIC_NOTIFICATION_NAME = "MUSIC_NOTIFICATION"
+
+        const val NOTIFICATION_ID = 0x01
 
         private val TAG = this::class.simpleName
     }
@@ -34,14 +38,18 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer
 
     private var notificationManager: NotificationManager? = null
 
+    private var notification: Notification? = null
+
     private val receiver = object : MusicReceiver() {
 
         override fun play() {
             this@MusicService.play()
+            notificationPlayState(true)
         }
 
         override fun pause() {
             this@MusicService.pause()
+            notificationPlayState(false)
         }
 
         override fun finish() {
@@ -50,15 +58,53 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer
 
         override fun previous() {
             this@MusicService.previous()
+            notificationText()
+            notificationPlayState(true)
         }
 
         override fun next() {
             this@MusicService.next()
+            notificationText()
+            notificationPlayState(true)
         }
 
+        private fun notificationText() {
+            remoteViews?.setTextViewText(
+                R.id.notify_music_name,
+                musicLists[musicPosition].title
+            )
+            notificationManager?.notify(NOTIFICATION_ID, notification)
+        }
+
+        private fun notificationPlayState(state: Boolean) {
+            playState.postValue(state)
+            remoteViews?.setImageViewResource(
+                R.id.notify_music_control,
+                if (state) R.drawable.ic_baseline_pause_24
+                else R.drawable.ic_baseline_play_arrow_24
+            )
+            if (state) {
+                remoteViews?.setTextViewText(
+                    R.id.notify_music_name,
+                    musicLists[musicPosition].title
+                )
+                musicLists[musicPosition].uri.toBitmapByteArray()?.let { ba ->
+                    remoteViews?.setImageViewBitmap(
+                        R.id.notify_music_icon,
+                        BitmapFactory.decodeByteArray(
+                            ba,
+                            0,
+                            ba.size
+                        )
+                    )
+                }
+            }
+            notificationManager?.notify(NOTIFICATION_ID, notification)
+        }
     }
 
     private var playPosition = MutableLiveData<Long>()
+    private var playState = MutableLiveData<Boolean>()
     private var musicLists: MutableList<Music> = mutableListOf()
     private var musicPlayer: MediaPlayer? = null
         get() {
@@ -123,6 +169,7 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer
         musicBroadCastManager.unregisterReceiver(receiver)
     }
 
+    @Suppress("DEPRECATION")
     private fun initMusicNotification(): Notification {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         remoteViews = RemoteViews(packageName, R.layout.music_notification_layout).apply {
@@ -168,7 +215,8 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer
             }
         }.also {
             it.flags = Notification.FLAG_NO_CLEAR
-            notificationManager?.notify(0x01, it)
+            notification = it
+            notificationManager?.notify(NOTIFICATION_ID, it)
         }
     }
 
@@ -255,6 +303,8 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer
         }
     }
 
+    override fun getPlayState(): MutableLiveData<Boolean> = playState
+
     override fun getPosition() = playPosition
 
     override fun getMusicDetail() = musicLists[musicPosition]
@@ -282,8 +332,8 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer
     ) else MusicState("NO MUSIC", 0, 0, Uri.EMPTY)
 
     override fun setMusicPosition(position: Int) {
-        musicPosition = position
-        restart()
+        musicPosition = position - 1
+        musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
     }
 
     private fun postData(
@@ -314,5 +364,6 @@ class MusicService() : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer
         override fun getData() = this@MusicService.getData()
         override fun setMusicPosition(position: Int) = this@MusicService.setMusicPosition(position)
         override fun seekTo(position: Long) = this@MusicService.seekTo(position)
+        override fun getPlayState(): MutableLiveData<Boolean> = this@MusicService.getPlayState()
     }
 }

@@ -2,18 +2,15 @@ package com.protone.seen
 
 import android.animation.ObjectAnimator
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
-import com.protone.database.room.dao.MusicBucketDAOHelper
 import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.MusicBucket
-import com.protone.mediamodle.Galley
-import com.protone.mediamodle.media.musicBroadCastManager
 import com.protone.seen.adapter.MusicBucketAdapter
 import com.protone.seen.adapter.MusicListAdapter
 import com.protone.seen.customView.StateImageView
@@ -25,11 +22,12 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
     ViewTreeObserver.OnGlobalLayoutListener {
 
     enum class Event {
-        AddBucket
+        AddBucket,
+        Finish
     }
 
     private var containerAnimator: ObjectAnimator? = null
-    val binding = MusicLayoutBinding.inflate(context.layoutInflater, context.root, true)
+    private val binding = MusicLayoutBinding.inflate(context.layoutInflater, context.root, true)
 
     override val viewRoot: View
         get() = binding.root
@@ -47,12 +45,19 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             field = value
         }
 
+    var isPlaying: Boolean = false
+        set(value) {
+            if (value != field)
+                binding.mySmallMusicPlayer.isPlaying = value
+            field = value
+        }
+
     init {
         binding.self = this
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(this)
     }
 
-    fun offer(event: Event) {
+    override fun offer(event: Event) {
         viewEvent.offer(event)
     }
 
@@ -89,12 +94,20 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
         (binding.musicMusicList.adapter as MusicListAdapter).clickCallback = callback
     }
 
+    suspend fun addBucket(bucket: MusicBucket) = withContext(Dispatchers.Main) {
+        (binding.musicBucket.adapter as MusicBucketAdapter).addBucket(bucket)
+    }
+
     override fun onActive() {
         containerAnimator?.reverse()
     }
 
     override fun onNegative() {
         containerAnimator?.start()
+    }
+
+    fun hideBucket(){
+        binding.musicShowBucket.negative()
     }
 
     override fun onGlobalLayout() {

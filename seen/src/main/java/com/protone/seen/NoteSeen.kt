@@ -29,24 +29,10 @@ class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context) {
         get() = binding.root
 
     init {
-        binding.note.apply {
-            layoutManager = LinearLayoutManager(context)
-            val listOf = listOf(
-                SpanStates(1, 3, SpanStates.Spans.ForegroundColorSpan, iColor = "#48a1ff"),
-                SpanStates(1, 3, SpanStates.Spans.StrikeThroughSpan),
-                SpanStates(4, 7, SpanStates.Spans.ForegroundColorSpan, iColor = Color.RED),
-                SpanStates(8, 12, SpanStates.Spans.UnderlineSpan),
-                SpanStates(13, 15, SpanStates.Spans.ForegroundColorSpan),
-                SpanStates(16, 18, SpanStates.Spans.ForegroundColorSpan)
-            )
-            adapter = RichNoteAdapter(
-                context, true, arrayListOf(
-                    RichNoteStates(
-                        context.getString(R.string.huge_text),
-                        listOf
-                    ), RichPhotoStates(Uri.parse("asd"),null,"",null)
-                )
-            )
-        }
+
+    }
+
+    override fun offer(event: NoteEvent) {
+
     }
 }

@@ -14,4 +14,8 @@ class UserConfig(context: Context) {
     var userName by config.string("USER_NAME", "NO NAME")
 
     var userPassword by config.string("USER_PASSWORD","")
+
+    var playedMusicBucket by config.string("PLAYED_MUSIC_BUCKET", "ALL")
+
+    val playedMusicPosition by config.int("MUSIC_POSITION",0)
 }

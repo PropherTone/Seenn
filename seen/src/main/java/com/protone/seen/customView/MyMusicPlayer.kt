@@ -63,7 +63,7 @@ class MyMusicPlayer @JvmOverloads constructor(
 
     var duration: Long = 0
         set(value) {
-            binding.musicProgress.barDuration =value
+            binding.musicProgress.barDuration = value
             field = value
         }
 

@@ -48,11 +48,11 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
         itemList.add("tTime:$todayTime")
         notifyItemInserted(itemList.size)
         Galley.apply {
-            musicInToday?.toJson()?.let { itemList.add("music:$it") }
+            musicInToday()?.toJson()?.let { itemList.add("music:$it") }
             notifyItemInserted(itemList.size)
-            photoInToday?.toJson()?.let { itemList.add("photo:$it") }
+            photoInToday()?.toJson()?.let { itemList.add("photo:$it") }
             notifyItemInserted(itemList.size)
-            videoInToday?.toJson()?.let { itemList.add("video:$it") }
+            videoInToday()?.toJson()?.let { itemList.add("video:$it") }
             notifyItemInserted(itemList.size)
         }
     }

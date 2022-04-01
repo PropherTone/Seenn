@@ -13,5 +13,5 @@ interface MusicDAO {
     fun insertMusic(music: Music)
 
     @Query("SELECT * FROM Music")
-    fun getAllMusic() : List<Music>
+    fun getAllMusic() : List<Music>?
 }

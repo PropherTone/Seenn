@@ -1,6 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <data>
+
+        <variable
+            name="self"
+            type="com.protone.seen.NoteEditSeen" />
+
+        <import type="com.protone.seen.NoteEditSeen.NoteEditEvent" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/blue_1"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/toolbar_back"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/action"
+                android:onClick="@{()->self.offer(NoteEditEvent.Finish)}"
+                android:paddingStart="@dimen/main_padding"
+                android:paddingTop="@dimen/main_margin"
+                android:paddingEnd="0dp"
+                android:paddingBottom="@dimen/main_margin"
+                android:src="@drawable/ic_baseline_arrow_back_24_white" />
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/noteEdit_richView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/noteEdit_tool"
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+        <ScrollView
+            android:id="@+id/noteEdit_tool"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:contentDescription="@string/action" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

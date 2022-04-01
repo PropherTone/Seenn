@@ -20,7 +20,6 @@ abstract class MusicReceiver : BroadcastReceiver() {
     private var isPlaying = false
 
     override fun onReceive(p0: Context?, p1: Intent?) {
-        Log.d(TAG, "onReceive: ")
         when (p1?.action) {
             MUSIC_PLAY -> {
                 if (!isPlaying) {

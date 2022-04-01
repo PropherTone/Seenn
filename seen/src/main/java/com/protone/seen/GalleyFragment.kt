@@ -148,7 +148,7 @@ class GalleyFragment(
         })
     }
 
-    private fun getGalleyAdapter(): GalleyListAdapter {
+    private fun getGalleyAdapter(): GalleyListAdapter? {
         return initListData()?.run {
             this
         }?.let {
@@ -163,7 +163,7 @@ class GalleyFragment(
                     }
                 })
             }
-        } as GalleyListAdapter
+        }
     }
 
     private suspend fun initList() = withContext(Dispatchers.Main) {
@@ -189,7 +189,7 @@ class GalleyFragment(
         }
         galleyView.galleyList.apply {
             layoutManager = GridLayoutManager(mContext, 4)
-            adapter = getGalleyAdapter().apply {
+            adapter = getGalleyAdapter()?.apply {
                 galleyView.galleyToolButton.setOnClickListener {
                     if (isBucketShowUp) {
                         addBucket()

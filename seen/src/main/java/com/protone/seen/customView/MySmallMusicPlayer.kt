@@ -6,6 +6,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.text.TextUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
@@ -25,7 +26,7 @@ class MySmallMusicPlayer @JvmOverloads constructor(
     private var oldX = 0f
 
     private val binding = SmallMusicPlayerLayoutBinding.inflate(context.layoutInflater, this, true)
-    private var isPlaying = false
+    var isPlaying = false
         set(value) {
             if (value) binding.smallMusicStart.setImageDrawable(
                 ResourcesCompat.getDrawable(

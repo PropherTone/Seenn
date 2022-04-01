@@ -29,4 +29,8 @@ class SplashSeen(context: Context) : Seen<SplashSeen.Event>(context),
             it.viewTreeObserver.removeOnGlobalLayoutListener(this)
         }
     }
+
+    override fun offer(event: Event) {
+
+    }
 }

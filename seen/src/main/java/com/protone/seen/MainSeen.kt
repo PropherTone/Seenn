@@ -41,7 +41,7 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
     var musicName: String = ""
         set(value) {
             if (value != field)
-            binding.musicPlayer.name = value
+                binding.musicPlayer.name = value
             field = value
         }
 
@@ -49,13 +49,14 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
     var icon: Uri = Uri.parse("")
         set(value) {
             if (value != field)
-            binding.musicPlayer.icon = value
+                binding.musicPlayer.icon = value
             field = value
         }
 
     var isPlaying: Boolean = false
         set(value) {
-            binding.musicPlayer.isPlaying = value
+            if (value != field)
+                binding.musicPlayer.isPlaying = value
             field = value
         }
 
@@ -91,8 +92,8 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
 
     }
 
-    fun offer(msg: Touch) {
-        viewEvent.offer(msg)
+    override fun offer(event: Touch) {
+        viewEvent.offer(event)
     }
 
     fun musicSeek(listener: Progress) {

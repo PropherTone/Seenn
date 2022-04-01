@@ -26,8 +26,8 @@ class PictureBoxSeen(context: Context) : Seen<PictureBoxSeen.PictureBox>(context
         binding.self = this
     }
 
-    fun offer(msg: PictureBox) {
-        viewEvent.offer(msg)
+    override fun offer(event: PictureBox) {
+        viewEvent.offer(event)
     }
 
     fun initPictureBox(picUri: MutableList<GalleyMedia>) {

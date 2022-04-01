@@ -1,9 +1,10 @@
 package com.protone.database.room
 
-import com.protone.database.room.dao.MusicBucketDAO
-import com.protone.database.room.dao.MusicDAO
-import com.protone.database.room.dao.NoteDAO
-import com.protone.database.room.dao.NoteTypeDAO
+import com.protone.database.room.dao.*
+
+fun getGalleyDAO(): SignedGalleyDAO {
+    return SeennDataBase.database.getGalleyDAO()
+}
 
 fun getNoteDAO(): NoteDAO {
     return SeennDataBase.database.getNoteDAO()

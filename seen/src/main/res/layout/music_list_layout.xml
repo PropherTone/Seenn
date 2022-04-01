@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
+        android:layout_marginTop="@dimen/main_padding"
         android:id="@+id/musicList_container"
         android:background="@color/white"
         android:layout_width="match_parent"
@@ -22,7 +23,7 @@
                 android:letterSpacing="0.02"
                 android:paddingStart="@dimen/icon_padding"
                 android:paddingEnd="@dimen/main_padding"
-                android:textColor="@color/black"
+                android:textColor="@color/black_1"
                 android:textSize="@dimen/title_text"
                 app:layout_constraintBottom_toTopOf="@id/musicList_detail"
                 app:layout_constraintEnd_toStartOf="@id/musicList_time"
@@ -50,8 +51,8 @@
                 android:letterSpacing="0.02"
                 android:paddingStart="@dimen/icon_padding"
                 android:paddingTop="@dimen/icon_padding"
+                android:textColor="@color/black_1"
                 android:paddingEnd="@dimen/main_padding"
-                android:textColor="@color/black"
                 android:textSize="@dimen/sub_text"
                 app:layout_constraintEnd_toStartOf="@id/musicList_time"
                 app:layout_constraintStart_toStartOf="parent"
@@ -68,6 +69,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
     </LinearLayout>
 
 </layout>

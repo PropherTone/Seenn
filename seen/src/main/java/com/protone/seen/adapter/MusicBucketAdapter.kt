@@ -3,14 +3,13 @@ package com.protone.seen.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.net.Uri
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.protone.api.context.layoutInflater
-import com.protone.api.toBitmapByteArray
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicBucketAdapterLayoutBinding
@@ -36,9 +35,10 @@ class MusicBucketAdapter(context: Context) :
         isSelect: Boolean
     ) -> Unit =
         { holder, isSelect ->
+            Log.d("TAG", ": $isSelect")
             holder.binding.musicBucketBack.setBackgroundColor(
                 context.resources.getColor(
-                    if (isSelect) R.color.transparent_black else R.color.transparent_white,
+                    if (isSelect) R.color.gray_2 else R.color.transparent_white,
                     context.theme
                 )
             )
@@ -63,13 +63,17 @@ class MusicBucketAdapter(context: Context) :
         holder.binding.apply {
             setSelect(holder, selectList.contains(musicBuckets[position]))
             musicBucketCard.setOnClickListener {
+                if (!selectList.contains(musicBuckets[position])) checkSelect(
+                    holder,
+                    musicBuckets[position]
+                )
                 clickCallback(musicBuckets[holder.layoutPosition].name)
             }
             musicBucketName.text = musicBuckets[position].name
             musicBucketIcon.apply {
                 when {
                     musicBuckets[position].icon != null -> {
-                        loadIcon(this, musicBuckets[position].icon?.toBitmapByteArray())
+                        loadIcon(this, musicBuckets[position].icon)
                     }
                     else -> {
                         loadIcon(

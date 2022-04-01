@@ -1,16 +1,16 @@
 package com.protone.mediamodle
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.protone.api.TAG
-import com.protone.api.context.Global
 import com.protone.api.context.onBackground
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 import java.util.*
+import kotlin.collections.ArrayList
 
 object Galley {
+
+    val photoLive = MutableLiveData<MutableMap<String, MutableList<GalleyMedia>>>()
 
     var photo: MutableMap<String, MutableList<GalleyMedia>> = mutableMapOf()
         set(value) {
@@ -20,7 +20,10 @@ object Galley {
             }
             value["ALL"] = ap
             field = value
+            photoLive.postValue(field)
         }
+
+    val videoLive = MutableLiveData<MutableMap<String, MutableList<GalleyMedia>>>()
 
     var video: MutableMap<String, MutableList<GalleyMedia>> = mutableMapOf()
         set(value) {
@@ -30,9 +33,18 @@ object Galley {
             }
             value["ALL"] = ap
             field = value
+            videoLive.postValue(field)
         }
 
+    val musicLive = MutableLiveData<MutableList<Music>>()
+
     var music: MutableList<Music> = mutableListOf()
+        set(value) {
+            field = value
+            musicLive.postValue(field)
+        }
+
+    val musicBucket = mutableMapOf<String, MutableList<Music>>()
 
     val allPhoto: MutableList<GalleyMedia> by lazy {
         val ap = mutableListOf<GalleyMedia>()
@@ -50,59 +62,56 @@ object Galley {
         ap
     }
 
-    val photoInToday: GalleyMedia?
-        get() {
-            val ca = Calendar.getInstance(Locale.CHINA)
-            val now = Calendar.getInstance(Locale.CHINA).apply {
-                timeInMillis = System.currentTimeMillis()
-            }
-            allPhoto.forEach {
-                ca.timeInMillis = it.date * 1000
-                return if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH) && ca.get(Calendar.DAY_OF_MONTH) == now.get(
-                        Calendar.DAY_OF_MONTH
-                    )
-                ) {
-                    it
-                } else null
-            }
-            return null
+    fun photoInToday(): GalleyMedia? {
+        val ca = Calendar.getInstance(Locale.CHINA)
+        val now = Calendar.getInstance(Locale.CHINA).apply {
+            timeInMillis = System.currentTimeMillis()
         }
+        allPhoto.forEach {
+            ca.timeInMillis = it.date * 1000
+            return if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH) && ca.get(Calendar.DAY_OF_MONTH) == now.get(
+                    Calendar.DAY_OF_MONTH
+                )
+            ) {
+                it
+            } else null
+        }
+        return null
+    }
 
-    val videoInToday: GalleyMedia?
-        get() {
-            val ca = Calendar.getInstance(Locale.CHINA)
-            val now = Calendar.getInstance(Locale.CHINA).apply {
-                timeInMillis = System.currentTimeMillis()
-            }
-            allVideo.forEach {
-                ca.timeInMillis = it.date * 1000
-                return if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH) && ca.get(Calendar.DAY_OF_MONTH) == now.get(
-                        Calendar.DAY_OF_MONTH
-                    )
-                ) {
-                    it
-                } else null
-            }
-            return null
+    fun videoInToday(): GalleyMedia? {
+        val ca = Calendar.getInstance(Locale.CHINA)
+        val now = Calendar.getInstance(Locale.CHINA).apply {
+            timeInMillis = System.currentTimeMillis()
         }
+        allVideo.forEach {
+            ca.timeInMillis = it.date * 1000
+            return if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH) && ca.get(Calendar.DAY_OF_MONTH) == now.get(
+                    Calendar.DAY_OF_MONTH
+                )
+            ) {
+                it
+            } else null
+        }
+        return null
+    }
 
-    val musicInToday: Music?
-        get() {
-            val ca = Calendar.getInstance(Locale.CHINA)
-            val now = Calendar.getInstance(Locale.CHINA).apply {
-                timeInMillis = System.currentTimeMillis()
-            }
-            music.forEach {
-                ca.timeInMillis = it.year * 1000
-                return if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH) && ca.get(Calendar.DAY_OF_MONTH) == now.get(
-                        Calendar.DAY_OF_MONTH
-                    )
-                ) {
-                    it
-                } else null
-            }
-            return null
+    fun musicInToday(): Music? {
+        val ca = Calendar.getInstance(Locale.CHINA)
+        val now = Calendar.getInstance(Locale.CHINA).apply {
+            timeInMillis = System.currentTimeMillis()
         }
+        music.forEach {
+            ca.timeInMillis = it.year * 1000
+            return if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH) && ca.get(Calendar.DAY_OF_MONTH) == now.get(
+                    Calendar.DAY_OF_MONTH
+                )
+            ) {
+                it
+            } else null
+        }
+        return null
+    }
 
     val musicState by lazy { MutableLiveData<MusicState>() }
 
