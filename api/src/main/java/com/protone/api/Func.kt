@@ -2,6 +2,7 @@ package com.protone.api
 
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.util.Log
 import com.protone.api.context.Global
 import java.lang.Exception
 import java.text.SimpleDateFormat
@@ -18,6 +19,7 @@ fun String.getParentPath(): String {
 }
 
 fun Uri.toBitmapByteArray(): ByteArray? {
+    Log.d(TAG, "toBitmapByteArray: $this")
     val mediaMetadataRetriever = MediaMetadataRetriever()
     var embeddedPicture:ByteArray? = null
     try {

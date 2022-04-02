@@ -1,10 +1,12 @@
 package com.protone.seenn
 
 import android.content.Intent
+import android.util.Log
 import com.protone.api.context.deleteMedia
 import com.protone.api.context.renameMedia
 import com.protone.api.context.showFailedToast
 import com.protone.api.json.toJson
+import com.protone.api.toBitmapByteArray
 import com.protone.mediamodle.Galley
 import com.protone.seen.GalleySeen
 import com.protone.seen.dialog.RenameDialog
@@ -21,19 +23,32 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
 
         @JvmStatic
         val CUSTOM = "CustomChoose"
+
+        @JvmStatic
+        val CHOOSE_MODE = "ChooseData"
     }
+
+    private var chooseMode = false
+
+    private var chooseType = ""
 
     override suspend fun main() {
         val galleySeen = GalleySeen(this)
 
         setContentSeen(galleySeen)
 
-        galleySeen.initPager(Galley.photo, Galley.video)
+        intent.getStringExtra(CHOOSE_MODE)?.let {
+            chooseMode = true
+            chooseType = it
+        }
 
-        galleySeen.chooseData.observe(this) {
-            if (it.size > 0) {
-                galleySeen.setOptionButton(true)
-            } else galleySeen.setOptionButton(false)
+        galleySeen.apply {
+            initPager(Galley.photo, Galley.video, chooseType)
+            chooseData.observe(this@GalleyActivity) {
+                if (it.size > 0) {
+                    galleySeen.setOptionButton(true)
+                } else galleySeen.setOptionButton(false)
+            }
         }
 
         while (isActive) {
@@ -71,6 +86,17 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                                     galleySeen.chooseData()
                                         ?.let { d -> putExtra(CUSTOM, d.toJson()) }
                                 })
+                        }
+                        GalleySeen.Touch.ConfirmChoose -> {
+                            galleySeen.chooseData.value?.let { list ->
+                                if (list.size > 0) {
+                                    setResult(RESULT_OK, Intent().apply {
+                                        Log.d(TAG, "main: ${list[0].uri.toBitmapByteArray()}")
+                                        putExtra("Uri",list[0].uri.toJson())
+                                    })
+                                }
+                            }
+                            finish()
                         }
                     }
                 }

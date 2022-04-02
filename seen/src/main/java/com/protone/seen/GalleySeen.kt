@@ -1,8 +1,10 @@
 package com.protone.seen
 
 import android.content.Context
+import android.util.Log
 import android.view.DragEvent
 import android.view.View
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
@@ -32,12 +34,22 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
         MOVE_TO,
         SELECT_ALL,
         ADD_CATE,
-        IntoBOX
+        IntoBOX,
+        ConfirmChoose
+    }
+
+    companion object {
+        @JvmStatic
+        val CHOOSE_PHOTO = "PHOTO"
+
+        @JvmStatic
+        val CHOOSE_VIDEO = "VIDEO"
     }
 
     private val binding = GalleyLayoutBinding.inflate(context.layoutInflater, context.root, false)
 
-    private val popLayout = GalleyOptionPopBinding.inflate(context.layoutInflater, context.root, false)
+    private val popLayout =
+        GalleyOptionPopBinding.inflate(context.layoutInflater, context.root, false)
 
     private val pop = GalleyOptionPop(context, popLayout.root)
 
@@ -47,7 +59,7 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
         MutableLiveData<MutableList<GalleyMedia>>().apply {
             observe(context as LifecycleOwner) {
                 it?.let {
-                    binding.galleyActionMenu.isVisible = it.size > 0
+                    setOptionButton(it.size > 0)
                 }
             }
         }
@@ -66,15 +78,22 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
             galleySetCate.setOnClickListener(this@GalleySeen)
             imageView6.setOnClickListener(this@GalleySeen)
         }
-
     }
 
-    override fun offer(event : Touch) {
+    private fun initViewMode(chooseMode: Boolean) {
+        if (chooseMode) {
+            binding.galleyChooseConfirm.isGone = !chooseMode
+            binding.galleyChooseConfirm.setOnClickListener { offer(Touch.ConfirmChoose) }
+            binding.galleyActionMenu.isGone = chooseMode
+        }
+    }
+
+    override fun offer(event: Touch) {
         viewEvent.offer(event)
     }
 
     fun setOptionButton(visible: Boolean) {
-        binding.galleyActionMenu.isVisible = visible
+        if (!binding.galleyActionMenu.isGone) binding.galleyActionMenu.isVisible = visible
     }
 
     fun offer(msg: GalleyFragment.Event) {
@@ -88,20 +107,35 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
 
     suspend fun initPager(
         galleyMediaList: MutableMap<String, MutableList<GalleyMedia>>,
-        videoMediaList: MutableMap<String, MutableList<GalleyMedia>>
+        videoMediaList: MutableMap<String, MutableList<GalleyMedia>>,
+        chooseType: String = ""
     ) = withContext(Dispatchers.Main) {
+        initViewMode(chooseType.isNotEmpty())
         binding.galleyPager.let {
+            val photoFragment by lazy {
+                GalleyFragment(
+                    context as FragmentActivity,
+                    galleyMediaList,
+                    chooseData,
+                    multiChoose = chooseType.isNotEmpty()
+                )
+            }
+            val videoFragment by lazy {
+                GalleyFragment(
+                    context as FragmentActivity,
+                    videoMediaList,
+                    chooseData,
+                    multiChoose = chooseType.isNotEmpty(),
+                    isVideo = true
+                )
+            }
             it.adapter = MyFragmentStateAdapter(
                 context as FragmentActivity,
-                arrayListOf(
-                    GalleyFragment(context, galleyMediaList, chooseData),
-                    GalleyFragment(
-                        context,
-                        videoMediaList,
-                        chooseData,
-                        isVideo = true
-                    )
-                )
+                when (chooseType) {
+                    CHOOSE_PHOTO -> arrayListOf(photoFragment)
+                    CHOOSE_VIDEO -> arrayListOf(videoFragment)
+                    else -> arrayListOf(photoFragment, videoFragment)
+                }
             )
             TabLayoutMediator(
                 binding.galleyTab.apply {
@@ -110,10 +144,14 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
                 it
             ) { tab, position ->
                 tab.setText(
-                    arrayOf(
-                        R.string.photo,
-                        R.string.video
-                    )[position]
+                    when (chooseType) {
+                        CHOOSE_PHOTO -> arrayOf(R.string.photo)
+                        CHOOSE_VIDEO -> arrayOf(R.string.video)
+                        else -> arrayOf(
+                            R.string.photo,
+                            R.string.video
+                        )
+                    }[position]
                 )
             }.attach()
         }

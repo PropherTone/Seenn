@@ -8,7 +8,7 @@ import com.protone.database.room.getMusicBucketDAO
 
 object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGalleyDAO {
 
-    //TODO MusicBucket
+    //MusicBucket
     private var musicBucketDAO: MusicBucketDAO? = null
 
     init {
@@ -79,7 +79,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
 
-    //TODO Music
+    //Music
     private var musicDAO: MusicDAO? = null
 
     init {
@@ -113,7 +113,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     override fun getAllMusic(): List<Music>? = musicDAO?.getAllMusic()
 
 
-    //TODO Galley
+    //Galley
     private var signedGalleyDAO: SignedGalleyDAO? = null
 
     init {

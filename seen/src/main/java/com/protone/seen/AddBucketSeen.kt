@@ -23,8 +23,7 @@ class AddBucketSeen(context: Context) : Seen<AddBucketSeen.Event>(context) {
     val detail: String
         get() = binding.musicBucketEnterDetail.text.toString()
 
-    val uri: Uri
-        get() = Uri.EMPTY
+    var uri: Uri? = Uri.EMPTY
 
     override val viewRoot: View
         get() = binding.root

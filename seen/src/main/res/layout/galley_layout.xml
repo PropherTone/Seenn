@@ -9,6 +9,7 @@
             type="com.protone.seen.GalleySeen" />
 
         <import type="com.protone.seen.GalleySeen.Touch" />
+
         <import type="com.protone.seen.GalleyFragment.Event" />
     </data>
 
@@ -33,13 +34,13 @@
                 android:contentDescription="@string/back" />
 
             <ImageView
-                android:onClick="@{()->self.offer(Touch.Finish)}"
                 android:layout_width="@dimen/smaller_Icon"
                 android:layout_height="@dimen/smaller_Icon"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/back_margin"
                 android:layout_marginTop="@dimen/back_margin"
                 android:contentDescription="@string/back"
+                android:onClick="@{()->self.offer(Touch.Finish)}"
                 android:src="@drawable/ic_baseline_arrow_left_24" />
 
             <com.google.android.material.tabs.TabLayout
@@ -62,13 +63,25 @@
             </com.google.android.material.tabs.TabLayout>
 
             <ImageView
-                android:onClick="@{()->self.offer(Touch.ShowOptionMenu)}"
+                android:id="@+id/galley_choose_confirm"
+                android:layout_width="@dimen/small_Icon"
+                android:layout_height="@dimen/small_Icon"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="@dimen/main_margin"
+                android:contentDescription="@string/action"
+                android:padding="@dimen/icon_padding"
+                android:src="@drawable/ic_baseline_check_24"
+                android:visibility="gone" />
+
+            <ImageView
                 android:id="@+id/galley_actionMenu"
                 android:layout_width="@dimen/small_Icon"
                 android:layout_height="@dimen/small_Icon"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:contentDescription="@string/action"
+                android:onClick="@{()->self.offer(Touch.ShowOptionMenu)}"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_baseline_more_horiz_24" />
 

@@ -1,11 +1,15 @@
 package com.protone.seenn
 
 import android.content.Intent
+import androidx.activity.result.contract.ActivityResultContracts
+import com.protone.api.context.intent
+import com.protone.api.json.toUri
 import com.protone.api.toBitmapByteArray
 import com.protone.api.todayTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.AddBucketSeen
+import com.protone.seen.GalleySeen
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 
@@ -34,7 +38,17 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                 addBucketSeen.viewEvent.onReceive {
                     when (it) {
                         AddBucketSeen.Event.ChooseIcon -> {
-
+                            startActivityForResult(
+                                ActivityResultContracts.StartActivityForResult(),
+                                GalleyActivity::class.intent.also { intent ->
+                                    intent.putExtra(
+                                        GalleyActivity.CHOOSE_MODE,
+                                        GalleySeen.CHOOSE_PHOTO
+                                    )
+                                }
+                            )?.let { result->
+                                addBucketSeen.uri = result.data?.getStringExtra("Uri")?.toUri()
+                            }
                         }
                         AddBucketSeen.Event.Confirm -> {
                             addBucketSeen.addMusicBucket { re, name ->
@@ -61,7 +75,7 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
 
     private fun AddBucketSeen.addMusicBucket(callBack: (result: Boolean, name: String) -> Unit) =
         DataBaseDAOHelper.addMusicBucketWithCallBack(
-            MusicBucket(name, uri.toBitmapByteArray(), 0, detail, todayTime),
+            MusicBucket(name, uri?.toBitmapByteArray(), 0, detail, todayTime),
             callBack
         )
 

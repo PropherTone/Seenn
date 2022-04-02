@@ -19,7 +19,7 @@ data class GalleyMedia(
     var cate: String,
     var uri: Uri,
     var date: Long,
-    val thumbnailUri: Uri,
+    val thumbnailUri: Uri?,
     val duration: Long,
     val isVideo: Boolean
 ) {

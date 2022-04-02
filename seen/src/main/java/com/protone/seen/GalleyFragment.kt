@@ -35,6 +35,7 @@ class GalleyFragment(
     private val mContext: FragmentActivity,
     private val galleyMediaList: MutableMap<String, MutableList<GalleyMedia>>,
     val live: MutableLiveData<MutableList<GalleyMedia>>,
+    val multiChoose : Boolean = false,
     private val isVideo: Boolean = false
 ) : Fragment(),
     CoroutineScope by CoroutineScope(Dispatchers.Main),
@@ -197,7 +198,7 @@ class GalleyFragment(
                         quitSelectMod()
                     }
                 }
-                multiChoose = true
+                multiChoose = !this@GalleyFragment.multiChoose
             }
             addItemDecoration(GalleyItemDecoration(paddingEnd))
         }
