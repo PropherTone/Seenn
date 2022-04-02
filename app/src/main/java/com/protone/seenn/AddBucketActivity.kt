@@ -39,10 +39,12 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                         AddBucketSeen.Event.Confirm -> {
                             addBucketSeen.addMusicBucket { re, name ->
                                 Intent().apply {
-                                    if (re) {
-                                        putExtra(BUCKET_NAME, name)
-                                    }
-                                    setResult(if (re) RESULT_OK else RESULT_CANCELED, this)
+                                    setResult(
+                                        if (re) {
+                                            putExtra(BUCKET_NAME, name)
+                                            RESULT_OK
+                                        } else RESULT_CANCELED, this
+                                    )
                                 }
                                 finish()
                             }

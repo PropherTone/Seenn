@@ -10,6 +10,7 @@ import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.media.musicBroadCastManager
 import com.protone.seen.MusicSeen
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
@@ -116,7 +117,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         })
     }
 
-    private suspend fun MusicSeen.addBucket(name: String) = launch {
+    private suspend fun MusicSeen.addBucket(name: String) = launch(Dispatchers.IO) {
         DataBaseDAOHelper.getMusicBucketByName(name)?.let { addBucket(it) }
     }
 

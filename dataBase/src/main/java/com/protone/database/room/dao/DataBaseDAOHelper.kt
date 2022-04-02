@@ -43,21 +43,27 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    fun addMusicBucketWithCallBack(musicBucket: MusicBucket, callBack: (result: Boolean,name:String) -> Unit) {
+    fun addMusicBucketWithCallBack(
+        musicBucket: MusicBucket,
+        callBack: (result: Boolean, name: String) -> Unit
+    ) {
         runnableFunc = {
-            musicBucketDAO?.apply {
-                var count = 0
-                val name = musicBucket.name
-                getAllMusicBucket()?.forEach {
-                    if (it.name == musicBucket.name) {
-                        musicBucket.name = "${name}(${++count})"
-                    }
+            var count = 0
+            val name = musicBucket.name
+            val names = mutableMapOf<String, Int>()
+            getAllMusicBucket()?.forEach {
+                names[it.name] = 1
+                if (it.name == musicBucket.name) {
+                    musicBucket.name = "${name}(${++count})"
                 }
-                musicBucket.name = name
-                addMusicBucket(musicBucket)
-                callBack(getMusicBucketByName(musicBucket.name) == null,name)
             }
+            while (names[musicBucket.name] != null) {
+                musicBucket.name = "${name}(${++count})"
+            }
+            addMusicBucket(musicBucket)
+            callBack(getMusicBucketByName(musicBucket.name) == null, musicBucket.name)
         }
+
     }
 
     override fun updateMusicBucketName(oldName: String, name: String) {
@@ -123,8 +129,6 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
             }
         }
     }
-
-
 
     override fun getAllSignedMedia(): List<GalleyMedia>? = signedGalleyDAO?.getAllSignedMedia()
 
