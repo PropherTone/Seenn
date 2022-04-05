@@ -130,7 +130,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
     private var uri: Uri = Uri.EMPTY
         get() {
             if (musicLists.size > 0) musicLists[musicPosition].uri
-            Log.d(TAG, "bucket: ${musicLists[musicPosition]}")
             return if (musicLists.size > 0) musicLists[musicPosition].uri else field
         }
 
@@ -305,6 +304,8 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
 
     override fun getPlayState(): MutableLiveData<Boolean> = playState
 
+    override fun getPlayPosition(): Int = musicPosition
+
     override fun getPosition() = playPosition
 
     override fun getMusicDetail() = musicLists[musicPosition]
@@ -365,5 +366,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         override fun setMusicPosition(position: Int) = this@MusicService.setMusicPosition(position)
         override fun seekTo(position: Long) = this@MusicService.seekTo(position)
         override fun getPlayState(): MutableLiveData<Boolean> = this@MusicService.getPlayState()
+        override fun getPlayPosition(): Int = this@MusicService.getPlayPosition()
     }
 }

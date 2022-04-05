@@ -7,6 +7,7 @@ import com.protone.api.context.renameMedia
 import com.protone.api.context.showFailedToast
 import com.protone.api.json.toJson
 import com.protone.api.toBitmapByteArray
+import com.protone.api.toMediaBitmapByteArray
 import com.protone.mediamodle.Galley
 import com.protone.seen.GalleySeen
 import com.protone.seen.dialog.RenameDialog
@@ -91,7 +92,6 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                             galleySeen.chooseData.value?.let { list ->
                                 if (list.size > 0) {
                                     setResult(RESULT_OK, Intent().apply {
-                                        Log.d(TAG, "main: ${list[0].uri.toBitmapByteArray()}")
                                         putExtra("Uri",list[0].uri.toJson())
                                     })
                                 }

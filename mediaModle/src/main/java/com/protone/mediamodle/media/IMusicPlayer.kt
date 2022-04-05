@@ -16,4 +16,5 @@ interface IMusicPlayer {
     fun setMusicPosition(position: Int)
     fun seekTo(position: Long)
     fun getPlayState(): MutableLiveData<Boolean>
+    fun getPlayPosition(): Int
 }

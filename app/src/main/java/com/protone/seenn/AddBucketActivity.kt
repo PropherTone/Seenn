@@ -5,6 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.intent
 import com.protone.api.json.toUri
 import com.protone.api.toBitmapByteArray
+import com.protone.api.toMediaBitmapByteArray
 import com.protone.api.todayTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
@@ -46,7 +47,7 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                                         GalleySeen.CHOOSE_PHOTO
                                     )
                                 }
-                            )?.let { result->
+                            )?.let { result ->
                                 addBucketSeen.uri = result.data?.getStringExtra("Uri")?.toUri()
                             }
                         }
@@ -75,7 +76,13 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
 
     private fun AddBucketSeen.addMusicBucket(callBack: (result: Boolean, name: String) -> Unit) =
         DataBaseDAOHelper.addMusicBucketWithCallBack(
-            MusicBucket(name, uri?.toBitmapByteArray(), 0, detail, todayTime),
+            MusicBucket(
+                name,
+                if (uri != null) uri?.toMediaBitmapByteArray() else null,
+                0,
+                detail,
+                todayTime
+            ),
             callBack
         )
 

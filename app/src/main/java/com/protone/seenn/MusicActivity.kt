@@ -1,20 +1,18 @@
 package com.protone.seenn
 
 import android.content.Intent
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
-import com.protone.api.context.MUSIC_PAUSE
 import com.protone.api.context.MUSIC_PLAY
 import com.protone.api.context.intent
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
+import com.protone.mediamodle.media.MusicReceiver
 import com.protone.mediamodle.media.musicBroadCastManager
 import com.protone.seen.MusicSeen
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.suspendCancellableCoroutine
 
 class MusicActivity : BaseActivity<MusicSeen>() {
 
@@ -24,8 +22,6 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         val musicSeen = MusicSeen(this)
 
         setContentSeen(musicSeen)
-
-        bindMusicService { }
 
         musicSeen.apply {
             initSeen()
@@ -40,6 +36,33 @@ class MusicActivity : BaseActivity<MusicSeen>() {
             }
         }
 
+        bindMusicService {
+            musicReceiver = object : MusicReceiver() {
+                override fun play() {
+                    musicSeen.isPlaying = true
+                    Log.d(TAG, "play: ")
+                }
+
+                override fun pause() {
+                    musicSeen.isPlaying = false
+                    Log.d(TAG, "pause: ")
+                }
+
+                override fun finish() {
+
+                }
+
+                override fun previous() {
+                    musicSeen.playPosition()
+                }
+
+                override fun next() {
+                    musicSeen.playPosition()
+                }
+
+            }
+            musicSeen.playPosition()
+        }
 
         bindMusicService {
             setMusicList(Galley.music)
@@ -81,7 +104,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                                 }
                             }
                         }
-                        MusicSeen.Event.Finish -> finish()
+                        MusicSeen.Event.Finish -> cancel()
                     }
                 }
 
@@ -117,6 +140,10 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         })
     }
 
+    private fun MusicSeen.playPosition() {
+        playPosition(binder.getPlayPosition())
+    }
+
     private suspend fun MusicSeen.addBucket(name: String) = launch(Dispatchers.IO) {
         DataBaseDAOHelper.getMusicBucketByName(name)?.let { addBucket(it) }
     }
@@ -125,10 +152,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         Galley.musicState.observe(this@MusicActivity) {
             musicName = it.name
             icon = it.albumUri
-            isPlaying = it.isPlaying
-        }
-        binder.getPlayState().observe(this@MusicActivity) {
-            isPlaying = it
+//            isPlaying = it.isPlaying
         }
     }
 }

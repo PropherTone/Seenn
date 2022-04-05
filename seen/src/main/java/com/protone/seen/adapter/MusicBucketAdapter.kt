@@ -35,7 +35,6 @@ class MusicBucketAdapter(context: Context) :
         isSelect: Boolean
     ) -> Unit =
         { holder, isSelect ->
-            Log.d("TAG", ": $isSelect")
             holder.binding.musicBucketBack.setBackgroundColor(
                 context.resources.getColor(
                     if (isSelect) R.color.gray_2 else R.color.transparent_white,

@@ -27,6 +27,8 @@ class MusicListAdapter(context: Context) :
 
     var clickCallback: (Int) -> Unit? = { }
 
+    private var playPosition = 0
+
     override val select: (holder: Holder<MusicListLayoutBinding>, isSelect: Boolean) -> Unit =
         { holder, isSelect ->
             holder.binding.apply {
@@ -35,7 +37,7 @@ class MusicListAdapter(context: Context) :
                     musicListContainer.setBackgroundColor(
                         ContextCompat.getColor(
                             context,
-                            R.color.blue_1
+                            R.color.blue_9
                         )
                     )
                     musicListName.setTextColor(ContextCompat.getColor(context, R.color.white))
@@ -96,6 +98,7 @@ class MusicListAdapter(context: Context) :
                 setSelect(holder, selectList.contains(music))
                 musicListContainer.setOnClickListener {
                     checkSelect(holder, music)
+                    playPosition = holder.layoutPosition
                     clickCallback(holder.layoutPosition)
                 }
                 musicListName.text = music.title
@@ -106,4 +109,12 @@ class MusicListAdapter(context: Context) :
     }
 
     override fun getItemCount(): Int = musicList.size
+
+    fun playPosition(position: Int) {
+        selectList.clear()
+        selectList.add(musicList[position])
+        notifyItemChanged(playPosition)
+        playPosition = position
+        notifyItemChanged(playPosition)
+    }
 }

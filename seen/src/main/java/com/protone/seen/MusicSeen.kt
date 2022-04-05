@@ -47,7 +47,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
 
     var isPlaying: Boolean = false
         set(value) {
-            if (value != field)
+            Log.d("TAG", "$value: ")
                 binding.mySmallMusicPlayer.isPlaying = value
             field = value
         }
@@ -96,6 +96,10 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
 
     suspend fun addBucket(bucket: MusicBucket) = withContext(Dispatchers.Main) {
         (binding.musicBucket.adapter as MusicBucketAdapter).addBucket(bucket)
+    }
+
+    fun playPosition(position: Int){
+        (binding.musicMusicList.adapter as MusicListAdapter).playPosition(position)
     }
 
     override fun onActive() {
