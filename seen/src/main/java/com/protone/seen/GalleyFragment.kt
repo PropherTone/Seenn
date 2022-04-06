@@ -46,7 +46,7 @@ class GalleyFragment(
 
     val channel = Channel<Event>(Channel.UNLIMITED)
 
-    private var selectedBucket: String = getString(R.string.all_music)
+    private lateinit var selectedBucket: String
 
     private var isSelectMod = false
 
@@ -102,6 +102,7 @@ class GalleyFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        selectedBucket = getString(R.string.all_music)
         galleyView = GalleyFragmentLayoutBinding.inflate(inflater, container, false).apply {
             root.viewTreeObserver.addOnGlobalLayoutListener(this@GalleyFragment)
             galleyList.itemAnimator = null

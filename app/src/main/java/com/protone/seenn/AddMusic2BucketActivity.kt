@@ -1,6 +1,7 @@
 package com.protone.seenn
 
 import com.protone.seen.AddMusic2BucketSeen
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 
@@ -11,7 +12,14 @@ class AddMusic2BucketActivity : BaseActivity<AddMusic2BucketSeen>() {
 
         setContentSeen(addMusic2BucketSeen)
 
-        addMusic2BucketSeen.initSeen()
+        val bucket = intent.getStringExtra("BUCKET")
+
+        if (bucket != null) {
+            addMusic2BucketSeen.initSeen(bucket)
+        } else {
+            toast(getString(R.string.no_bucket))
+            cancel()
+        }
 
         while (isActive) {
             select<Unit> {

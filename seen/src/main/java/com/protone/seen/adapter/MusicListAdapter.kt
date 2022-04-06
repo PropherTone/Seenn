@@ -102,7 +102,7 @@ class MusicListAdapter(context: Context) :
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: Holder<MusicListLayoutBinding>, position: Int) {
         holder.binding.apply {
-            musicList.get(position).let { music ->
+            musicList[position].let { music ->
                 setSelect(holder, selectList.contains(music))
                 musicListContainer.setOnClickListener {
                     if (playPosition == holder.layoutPosition) return@setOnClickListener

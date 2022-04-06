@@ -91,44 +91,46 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                     checkSelect(holder, musicBuckets[position])
                 clickCallback(musicBuckets[holder.layoutPosition].name)
             }
-            musicBucketAction.setOnClickListener {
-                when (musicBucketBack.isVisible) {
-                    true -> {
-                        AnimationHelper.translationX(
-                            musicBucketBack,
-                            0f,
-                            -musicBucketBack.measuredWidth.toFloat(),
-                            200,
-                            play = true,
-                            doOnEnd = {
-                                musicBucketBack.isVisible = false
-                            }
-                        )
-                    }
-                    false -> {
-                        AnimationHelper.translationX(
-                            musicBucketBack,
-                            -musicBucketBack.measuredWidth.toFloat(),
-                            0f,
-                            200,
-                            play = true,
-                            doOnStart = {
-                                musicBucketBack.isVisible = true
-                            }
-                        )
+            if (musicBuckets[holder.layoutPosition].name != context.getString(R.string.all_music))
+                musicBucketAction.setOnClickListener {
+                    when (musicBucketBack.isVisible) {
+                        true -> {
+                            AnimationHelper.translationX(
+                                musicBucketBack,
+                                0f,
+                                -musicBucketBack.measuredWidth.toFloat(),
+                                200,
+                                play = true,
+                                doOnEnd = {
+                                    musicBucketBack.isVisible = false
+                                }
+                            )
+                        }
+                        false -> {
+                            AnimationHelper.translationX(
+                                musicBucketBack,
+                                -musicBucketBack.measuredWidth.toFloat(),
+                                0f,
+                                200,
+                                play = true,
+                                doOnStart = {
+                                    musicBucketBack.isVisible = true
+                                }
+                            )
+                        }
                     }
                 }
-            }
-            musicBucketEdit.setOnClickListener {  }
-            musicBucketDelete.setOnClickListener {  }
+            musicBucketEdit.setOnClickListener { }
+            musicBucketDelete.setOnClickListener { }
             musicBucketAddList.setOnClickListener {
-                addList(addList)
+                addList(musicBuckets[holder.layoutPosition].name, addList)
             }
         }
     }
 
-    var addList : ()->Unit = {}
-    private inline fun addList(crossinline onClick : ()->Unit) = onClick()
+    var addList: (String) -> Unit = {}
+    private inline fun addList(bucket: String, crossinline onClick: (String) -> Unit) =
+        onClick(bucket)
 
     private fun loadIcon(imageView: ImageView, byteArray: ByteArray?) {
         Glide.with(imageView.context).load(byteArray)

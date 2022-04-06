@@ -21,7 +21,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    fun getAllMusicBucket(callBack: (result: List<MusicBucket>?) -> Unit) {
+    inline fun getAllMusicBucket(crossinline callBack: (result: List<MusicBucket>?) -> Unit) {
         runnableFunc = {
             getAllMusicBucket()?.apply {
                 callBack(this)
@@ -43,9 +43,9 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    fun addMusicBucketWithCallBack(
+    inline fun addMusicBucketWithCallBack(
         musicBucket: MusicBucket,
-        callBack: (result: Boolean, name: String) -> Unit
+        crossinline callBack: (result: Boolean, name: String) -> Unit
     ) {
         runnableFunc = {
             var count = 0
@@ -96,7 +96,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    fun getAllMusic(callBack: (List<Music>) -> Unit) {
+    inline fun getAllMusic(crossinline callBack: (List<Music>) -> Unit) {
         runnableFunc = {
             getAllMusic()?.let {
                 callBack(it)
@@ -118,6 +118,13 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
+    override fun updateMusic(music: Music): Int = musicDAO?.updateMusic(music) ?: -1
+
+    inline fun updateMusicWithCallBack(music: Music, crossinline callBack: (Int) -> Unit) {
+        runnableFunc = {
+            callBack(updateMusic(music))
+        }
+    }
 
     //Galley
     private var signedGalleyDAO: SignedGalleyDAO? = null
@@ -128,7 +135,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    fun getAllSignedMedia(callBack: (List<GalleyMedia>) -> Unit) {
+    inline fun getAllSignedMedia(crossinline callBack: (List<GalleyMedia>) -> Unit) {
         runnableFunc = {
             getAllSignedMedia()?.let {
                 callBack(it)

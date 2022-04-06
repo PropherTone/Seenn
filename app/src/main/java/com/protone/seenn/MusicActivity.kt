@@ -91,7 +91,9 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                             )
                         )
                         MusicSeen.Event.Finish -> cancel()
-                        MusicSeen.Event.AddList -> startActivity(AddMusic2BucketActivity::class.intent)
+                        MusicSeen.Event.AddList -> startActivity(AddMusic2BucketActivity::class.intent.also {
+                            it.putExtra("BUCKET",musicSeen.bucket)
+                        })
                     }
                 }
 

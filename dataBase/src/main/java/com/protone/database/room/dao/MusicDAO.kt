@@ -1,9 +1,6 @@
 package com.protone.database.room.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.protone.database.room.entity.Music
 
 
@@ -18,5 +15,8 @@ interface MusicDAO {
 
     @Delete
     fun deleteMusic(music: Music)
+
+    @Update
+    fun updateMusic(music: Music) : Int
 
 }

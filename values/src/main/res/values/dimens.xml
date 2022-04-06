@@ -23,4 +23,6 @@
     <dimen name="huge_icon">180dp</dimen>
     <dimen name="full_edit_margin">24dp</dimen>
     <dimen name="small_title_text">18sp</dimen>
+    <dimen name="small_elevation">2dp</dimen>
+    <dimen name="icon_58">58dp</dimen>
 </resources>

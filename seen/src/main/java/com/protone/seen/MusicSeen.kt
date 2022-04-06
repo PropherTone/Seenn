@@ -56,6 +56,8 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             field = value
         }
 
+    var bucket : String = ""
+
     init {
         binding.self = this
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(this)
@@ -80,6 +82,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
                 ).apply {
                     this.musicBuckets = musicBucket
                     this.addList = {
+                        bucket = it
                         offer(Event.AddList)
                     }
                 }

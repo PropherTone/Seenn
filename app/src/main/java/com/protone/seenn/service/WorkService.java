@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import com.protone.api.context.IntentKt;
 import com.protone.database.room.dao.DataBaseDAOHelper;
 import com.protone.database.room.entity.Music;
+import com.protone.database.room.entity.MusicBucket;
 import com.protone.mediamodle.Galley;
 import com.protone.mediamodle.IWorkService;
 import com.protone.mediamodle.WorkReceiver;
@@ -75,11 +76,15 @@ public class WorkService extends Service {
             List<Music> allMusic = DataBaseDAOHelper.INSTANCE.getAllMusic();
             Map<String, List<Music>> musicBucket = Galley.INSTANCE.getMusicBucket();
             musicBucket.put(getString(R.string.all_music), Galley.INSTANCE.getMusic());
+            List<MusicBucket> allMusicBucket = DataBaseDAOHelper.INSTANCE.getAllMusicBucket();
+            assert allMusicBucket != null;
+            Log.d("TAG", "updateMusicBucket: " + allMusicBucket.get(1));
             if (allMusic != null) {
                 String myBucket;
                 for (Music music : allMusic) {
                     if (Galley.INSTANCE.getMusic().contains(music)) {
                         cacheList.remove(music);
+                        Log.d("TAG", "updateMusicBucket: "+music.getMyBucket());
                         myBucket = music.getMyBucket();
                         if (myBucket != null) {
                             String[] split = myBucket.split("/");
@@ -95,7 +100,7 @@ public class WorkService extends Service {
                     }
                 }
             }
-            Log.d("TAG", "updateMusicBucket: " + musicBucket);
+            Log.d("TAG", "updateMusicBucket: " + musicBucket.keySet());
             Log.d("TAG", "updateMusicBucket: " + cacheList);
             DataBaseDAOHelper.INSTANCE.insertMusicMulti(cacheList);
         });

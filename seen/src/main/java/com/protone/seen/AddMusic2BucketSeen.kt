@@ -5,6 +5,7 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
+import com.protone.mediamodle.Galley
 import com.protone.seen.adapter.AddMusicListAdapter
 import com.protone.seen.databinding.AddMusicBucketLayoutBinding
 
@@ -29,10 +30,12 @@ class AddMusic2BucketSeen(context: Context) : Seen<AddMusic2BucketSeen.Event>(co
         binding.self = this
     }
 
-    fun initSeen() {
+    fun initSeen(bucket : String) {
         binding.addMBList.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = AddMusicListAdapter(context)
+            adapter = AddMusicListAdapter(context,bucket).apply {
+                musicList = Galley.music
+            }
         }
     }
 

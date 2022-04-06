@@ -13,7 +13,6 @@ abstract class BaseDAOHelper {
 
     var runnableFunc : ()->Unit = {}
     set(value) {
-        Log.d(TAG, "set: ")
         synchronized(this) {
             field = value
             execute()
@@ -21,7 +20,6 @@ abstract class BaseDAOHelper {
     }
 
     fun execute(){
-        Log.d(TAG, "execute: ")
         executorService.execute(runnable)
     }
 
