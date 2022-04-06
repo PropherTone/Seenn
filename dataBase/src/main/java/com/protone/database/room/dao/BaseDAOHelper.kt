@@ -2,7 +2,6 @@ package com.protone.database.room.dao
 
 import android.util.Log
 import com.protone.api.TAG
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 abstract class BaseDAOHelper {

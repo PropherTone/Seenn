@@ -1,10 +1,8 @@
 package com.protone.mediamodle
 
-import android.util.Log
-import com.protone.api.TAG
+import com.protone.api.context.Global
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
-import com.protone.database.room.entity.Music
 import com.protone.mediamodle.media.scanAudio
 import com.protone.mediamodle.media.scanPicture
 import com.protone.mediamodle.media.scanVideo
@@ -33,7 +31,7 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private val sortMusicBucket = Runnable {
         DataBaseDAOHelper.let { base ->
             base.getAllMusic { list ->
-                Galley.musicBucket["ALL"] = Galley.music
+                Galley.musicBucket[Global.application.getString(R.string.all_music)] = Galley.music
                 list.forEach { music ->
                     music.myBucket?.let {
                         if (!Galley.musicBucket.containsKey(it)) {

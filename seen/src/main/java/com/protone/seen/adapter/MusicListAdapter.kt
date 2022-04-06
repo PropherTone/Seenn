@@ -1,13 +1,12 @@
 package com.protone.seen.adapter
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
+import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.api.toStringMinuteTime
 import com.protone.database.room.entity.Music
@@ -17,7 +16,7 @@ import com.protone.seen.databinding.MusicListLayoutBinding
 class MusicListAdapter(context: Context) :
     SelectListAdapter<MusicListLayoutBinding, Music>(context) {
 
-    var musicList = mutableListOf<Music>()
+    var musicList: MutableList<Music> = mutableListOf()
         @SuppressLint("NotifyDataSetChanged")
         set(value) {
             field.clear()
@@ -60,20 +59,29 @@ class MusicListAdapter(context: Context) :
         }
 
     private fun startAnimation(target: ViewGroup) {
-        val x = ObjectAnimator.ofFloat(target, "scaleX", 0.96f).apply { duration = 50 }
-        val y = ObjectAnimator.ofFloat(target, "scaleY", 0.96f).apply { duration = 50 }
-        val x1 = ObjectAnimator.ofFloat(target, "scaleX", 1f).apply { duration = 460 }
-        val y2 = ObjectAnimator.ofFloat(target, "scaleY", 1f).apply { duration = 460 }
-        AnimatorSet().apply {
-            playTogether(x, y)
-            start()
-            doOnEnd {
-                AnimatorSet().apply {
-                    playTogether(x1, y2)
-                    start()
-                }
-            }
+        AnimationHelper.apply {
+            val x = scaleX(target, 0.96f, duration = 50)
+            val y = scaleY(target, 0.96f, duration = 50)
+            val x1 = scaleX(target, 1f, duration = 360)
+            val y1 = scaleY(target, 1f, duration = 360)
+            animatorSet(x, y, play = true, doOnEnd = {
+                animatorSet(x1, y1, play = true)
+            })
         }
+//        val x = ObjectAnimator.ofFloat(target, "scaleX", 0.96f).apply { duration = 50 }
+//        val y = ObjectAnimator.ofFloat(target, "scaleY", 0.96f).apply { duration = 50 }
+//        val x1 = ObjectAnimator.ofFloat(target, "scaleX", 1f).apply { duration = 360 }
+//        val y2 = ObjectAnimator.ofFloat(target, "scaleY", 1f).apply { duration = 360 }
+//        AnimatorSet().apply {
+//            playTogether(x, y)
+//            start()
+//            doOnEnd {
+//                AnimatorSet().apply {
+//                    playTogether(x1, y2)
+//                    start()
+//                }
+//            }
+//        }
     }
 
     override fun itemIndex(path: Music): Int = musicList.indexOf(path)
@@ -94,9 +102,10 @@ class MusicListAdapter(context: Context) :
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: Holder<MusicListLayoutBinding>, position: Int) {
         holder.binding.apply {
-            musicList[position].let { music ->
+            musicList.get(position).let { music ->
                 setSelect(holder, selectList.contains(music))
                 musicListContainer.setOnClickListener {
+                    if (playPosition == holder.layoutPosition) return@setOnClickListener
                     checkSelect(holder, music)
                     playPosition = holder.layoutPosition
                     clickCallback(holder.layoutPosition)
@@ -110,9 +119,9 @@ class MusicListAdapter(context: Context) :
 
     override fun getItemCount(): Int = musicList.size
 
-    fun playPosition(position: Int) {
+    fun playPosition(position: Int) = musicList[position].let {
         selectList.clear()
-        selectList.add(musicList[position])
+        selectList.add(it)
         notifyItemChanged(playPosition)
         playPosition = position
         notifyItemChanged(playPosition)

@@ -2,6 +2,8 @@ package com.protone.database.room.config
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.protone.api.context.Global
+import com.protone.database.R
 import com.protone.database.sp.SpTool
 import com.protone.database.sp.toSpProvider
 
@@ -15,7 +17,7 @@ class UserConfig(context: Context) {
 
     var userPassword by config.string("USER_PASSWORD","")
 
-    var playedMusicBucket by config.string("PLAYED_MUSIC_BUCKET", "ALL")
+    var playedMusicBucket by config.string("PLAYED_MUSIC_BUCKET", Global.application.getString(R.string.all_music))
 
-    val playedMusicPosition by config.int("MUSIC_POSITION",0)
+    var playedMusicPosition by config.int("MUSIC_POSITION",0)
 }

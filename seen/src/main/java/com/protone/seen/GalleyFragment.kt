@@ -1,11 +1,9 @@
 package com.protone.seen
 
-import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.Config
-import com.protone.api.TAG
+import com.protone.api.animation.AnimationHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.adapter.GalleyBucketAdapter
 import com.protone.seen.adapter.GalleyItemDecoration
@@ -35,7 +33,7 @@ class GalleyFragment(
     private val mContext: FragmentActivity,
     private val galleyMediaList: MutableMap<String, MutableList<GalleyMedia>>,
     val live: MutableLiveData<MutableList<GalleyMedia>>,
-    val multiChoose : Boolean = false,
+    val multiChoose: Boolean = false,
     private val isVideo: Boolean = false
 ) : Fragment(),
     CoroutineScope by CoroutineScope(Dispatchers.Main),
@@ -48,7 +46,7 @@ class GalleyFragment(
 
     val channel = Channel<Event>(Channel.UNLIMITED)
 
-    private var selectedBucket: String = "ALL"
+    private var selectedBucket: String = getString(R.string.all_music)
 
     private var isSelectMod = false
 
@@ -76,11 +74,16 @@ class GalleyFragment(
 
     private fun searchShow() {
         galleyView.apply {
-            searchAnimator = ObjectAnimator.ofFloat(
+            searchAnimator = AnimationHelper.translationY(
                 galleyBucketContainer,
-                "translationY",
-                Config.keyboardHeight.toFloat()
-            ).apply { start() }
+                Config.keyboardHeight.toFloat(),
+                play = true
+            )
+//            searchAnimator = ObjectAnimator.ofFloat(
+//                galleyBucketContainer,
+//                "translationY",
+//                Config.keyboardHeight.toFloat()
+//            )
             galleyToolButton.isVisible = false
             galleyShowBucket.isVisible = false
         }
@@ -223,17 +226,25 @@ class GalleyFragment(
 
     override fun onGlobalLayout() {
         galleyView.galleyBucket.height.toFloat().let {
-            containerAnimator = ObjectAnimator.ofFloat(
+            containerAnimator = AnimationHelper.translationY(
                 galleyView.galleyBucketContainer,
-                "translationY",
                 it
             )
+//            containerAnimator = ObjectAnimator.ofFloat(
+//                galleyView.galleyBucketContainer,
+//                "translationY",
+//                it
+//            )
         }
-        toolButtonAnimator = ObjectAnimator.ofFloat(
+        toolButtonAnimator = AnimationHelper.rotation(
             galleyView.galleyToolButton,
-            "rotation",
             45f
         )
+//        toolButtonAnimator = ObjectAnimator.ofFloat(
+//            galleyView.galleyToolButton,
+//            "rotation",
+//            45f
+//        )
         stateCheck()
         galleyView.root.viewTreeObserver?.removeOnGlobalLayoutListener(this)
     }

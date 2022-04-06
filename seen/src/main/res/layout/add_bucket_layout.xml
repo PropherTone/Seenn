@@ -120,7 +120,7 @@
         <ImageView
             android:id="@+id/musicBucket_close"
             android:layout_width="0dp"
-            android:layout_height="58dp"
+            android:layout_height="@dimen/icon_58"
             android:background="@drawable/background_ripple_red"
             android:contentDescription="@string/action"
             android:onClick="@{()->self.offer(Event.Finished)}"
@@ -134,7 +134,7 @@
         <ImageView
             android:id="@+id/musicBucket_confirm"
             android:layout_width="0dp"
-            android:layout_height="58dp"
+            android:layout_height="@dimen/icon_58"
             android:background="@drawable/background_ripple_blue"
             android:contentDescription="@string/action"
             android:onClick="@{()->self.offer(Event.Confirm)}"

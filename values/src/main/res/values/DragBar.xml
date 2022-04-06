@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="DragBar">
+        <attr name="barHeight" format="integer"/>
+        <attr name="paddingTop" format="integer"/>
+        <attr name="paddingBottom" format="integer"/>
+        <attr name="steep" format="integer"/>
+        <attr name="scrollingSpeed" format="integer"/>
+        <attr name="roundStyle" format="boolean"/>
+        <attr name="blurRadius" format="integer"/>
+        <attr name="barStrokeWidth" format="integer"/>
+        <attr name="barAnimator" format="boolean"/>
+        <attr name="barColor" format="color"/>
+        <attr name="shadowRadius" format="float"/>
+        <attr name="buttonElevation" format="integer"/>
+    </declare-styleable>
+
+</resources>

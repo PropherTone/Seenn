@@ -9,6 +9,7 @@ import android.provider.MediaStore
 import android.util.Log
 import com.protone.api.Config
 import com.protone.api.checkNeededPermission
+import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.intent
 import com.protone.api.requestContentPermission
 import com.protone.api.toBitmapByteArray
@@ -19,8 +20,10 @@ import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.media.scanAudio
 import com.protone.mediamodle.media.scanPicture
 import com.protone.mediamodle.media.scanVideo
+import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.SplashSeen
 import com.protone.seenn.service.MusicService
+import com.protone.seenn.service.WorkService
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 
@@ -33,7 +36,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                 if (!userConfig.isFirstBoot && Galley.music.size > 0) {
                     DataBaseDAOHelper.addMusicBucket(
                         MusicBucket(
-                            "ALL",
+                            getString(R.string.all_music),
                             Galley.music[0].uri.toBitmapByteArray(),
                             Galley.music.size,
                             null,
@@ -41,9 +44,14 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                         )
                     )
                     DataBaseDAOHelper.insertMusicMulti(Galley.music)
-                    userConfig.isFirstBoot = true
+                    userConfig.apply {
+                        isFirstBoot = true
+                        playedMusicBucket = getString(R.string.all_music)
+                        playedMusicPosition = 0
+                    }
                 }
                 startService(Intent(this, MusicService::class.java))
+                startService(Intent(this, WorkService::class.java))
                 startActivity(MainActivity::class.intent)
             }
             2 -> updateMedia()
@@ -112,6 +120,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     private fun updateMedia() {
         GalleyHelper.run {
             updateAll {
+                workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
                 mHandler.sendEmptyMessage(1)
             }
             sortMusicBucket()

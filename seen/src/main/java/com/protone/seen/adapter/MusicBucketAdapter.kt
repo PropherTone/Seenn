@@ -3,12 +3,13 @@ package com.protone.seen.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.R
@@ -17,8 +18,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 
-class MusicBucketAdapter(context: Context) :
+class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
     SelectListAdapter<MusicBucketAdapterLayoutBinding, MusicBucket>(context) {
+
+    init {
+        selectList.add(musicBucket)
+    }
 
     var musicBuckets: MutableList<MusicBucket> = mutableListOf()
         @SuppressLint("NotifyDataSetChanged")
@@ -37,7 +42,7 @@ class MusicBucketAdapter(context: Context) :
         { holder, isSelect ->
             holder.binding.musicBucketBack.setBackgroundColor(
                 context.resources.getColor(
-                    if (isSelect) R.color.gray_2 else R.color.transparent_white,
+                    if (isSelect) R.color.gray_2 else R.color.white,
                     context.theme
                 )
             )
@@ -59,15 +64,8 @@ class MusicBucketAdapter(context: Context) :
     }
 
     override fun onBindViewHolder(holder: Holder<MusicBucketAdapterLayoutBinding>, position: Int) {
+        setSelect(holder, selectList.contains(musicBuckets[position]))
         holder.binding.apply {
-            setSelect(holder, selectList.contains(musicBuckets[position]))
-            musicBucketCard.setOnClickListener {
-                if (!selectList.contains(musicBuckets[position])) checkSelect(
-                    holder,
-                    musicBuckets[position]
-                )
-                clickCallback(musicBuckets[holder.layoutPosition].name)
-            }
             musicBucketName.text = musicBuckets[position].name
             musicBucketIcon.apply {
                 when {
@@ -87,8 +85,50 @@ class MusicBucketAdapter(context: Context) :
                 }
             }
             musicBucketNum.text = musicBuckets[position].size.toString()
+
+            musicBucketBack.setOnClickListener {
+                if (!selectList.contains(musicBuckets[position]))
+                    checkSelect(holder, musicBuckets[position])
+                clickCallback(musicBuckets[holder.layoutPosition].name)
+            }
+            musicBucketAction.setOnClickListener {
+                when (musicBucketBack.isVisible) {
+                    true -> {
+                        AnimationHelper.translationX(
+                            musicBucketBack,
+                            0f,
+                            -musicBucketBack.measuredWidth.toFloat(),
+                            200,
+                            play = true,
+                            doOnEnd = {
+                                musicBucketBack.isVisible = false
+                            }
+                        )
+                    }
+                    false -> {
+                        AnimationHelper.translationX(
+                            musicBucketBack,
+                            -musicBucketBack.measuredWidth.toFloat(),
+                            0f,
+                            200,
+                            play = true,
+                            doOnStart = {
+                                musicBucketBack.isVisible = true
+                            }
+                        )
+                    }
+                }
+            }
+            musicBucketEdit.setOnClickListener {  }
+            musicBucketDelete.setOnClickListener {  }
+            musicBucketAddList.setOnClickListener {
+                addList(addList)
+            }
         }
     }
+
+    var addList : ()->Unit = {}
+    private inline fun addList(crossinline onClick : ()->Unit) = onClick()
 
     private fun loadIcon(imageView: ImageView, byteArray: ByteArray?) {
         Glide.with(imageView.context).load(byteArray)

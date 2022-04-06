@@ -1,9 +1,7 @@
 package com.protone.seenn
 
-import android.content.Context
 import android.content.Intent
 import android.transition.TransitionManager
-import android.util.Log
 import com.protone.api.context.MUSIC_NEXT
 import com.protone.api.context.MUSIC_PLAY
 import com.protone.api.context.MUSIC_PREVIOUS
@@ -129,7 +127,6 @@ class MainActivity : BaseActivity<MainSeen>() {
             duration = it.duration
             musicName = it.name
             icon = it.albumUri
-            isPlaying = it.isPlaying
         }
         updateDuration()
     }

@@ -13,7 +13,7 @@ interface IMusicPlayer {
     fun getPosition(): MutableLiveData<Long>
     fun getMusicDetail(): Music
     fun getData(): MusicState
-    fun setMusicPosition(position: Int)
+    fun setPlayMusicPosition(position: Int)
     fun seekTo(position: Long)
     fun getPlayState(): MutableLiveData<Boolean>
     fun getPlayPosition(): Int

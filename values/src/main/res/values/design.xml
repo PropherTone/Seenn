@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="model_icon_dimen">60dp</dimen>
+    <dimen name="main_padding">10dp</dimen>
+    <dimen name="icon_padding">5dp</dimen>
+    <dimen name="texts_margin">10dp</dimen>
+    <dimen name="lists_margin">1dp</dimen>
+</resources>

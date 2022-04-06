@@ -22,13 +22,14 @@ abstract class MusicReceiver : BroadcastReceiver() {
     override fun onReceive(p0: Context?, p1: Intent?) {
         when (p1?.action) {
             MUSIC_PLAY -> {
-                if (!isPlaying) {
-                    isPlaying = true
+                isPlaying = if (!isPlaying) {
                     play()
+                    true
                 } else {
-                    isPlaying = false
                     pause()
+                    false
                 }
+                Log.d("TAG", "onReceive: $isPlaying")
             }
             MUSIC_FINISH -> {
                 finish()

@@ -1,7 +1,6 @@
 package com.protone.seenn
 
 import android.content.Intent
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.MUSIC_PLAY
 import com.protone.api.context.intent
@@ -16,37 +15,22 @@ import kotlinx.coroutines.selects.select
 
 class MusicActivity : BaseActivity<MusicSeen>() {
 
-    private var cacheMusicBucketName = "ALL"
+    private lateinit var cacheMusicBucketName: String
 
     override suspend fun main() {
         val musicSeen = MusicSeen(this)
 
+        cacheMusicBucketName = userConfig.playedMusicBucket
+
         setContentSeen(musicSeen)
 
-        musicSeen.apply {
-            initSeen()
-            mbClickCallBack { name ->
-                cacheMusicBucketName = name
-                musicSeen.hideBucket()
-            }
-            mlClickCallBack { position ->
-                binder.setDate(Galley.music)
-                binder.setMusicPosition(position)
-                userConfig.playedMusicBucket = cacheMusicBucketName
-            }
-        }
+        musicSeen.initSeen()
 
         bindMusicService {
             musicReceiver = object : MusicReceiver() {
-                override fun play() {
-                    musicSeen.isPlaying = true
-                    Log.d(TAG, "play: ")
-                }
+                override fun play() {}
 
-                override fun pause() {
-                    musicSeen.isPlaying = false
-                    Log.d(TAG, "pause: ")
-                }
+                override fun pause() {}
 
                 override fun finish() {
 
@@ -61,16 +45,13 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                 }
 
             }
-            musicSeen.playPosition()
-        }
-
-        bindMusicService {
             setMusicList(Galley.music)
             binder.getData().apply {
                 musicSeen.musicName = name
                 musicSeen.icon = albumUri
-                musicSeen.isPlaying = isPlaying
             }
+            musicSeen.isPlaying = binder.getPlayState().value == true
+            musicSeen.playPosition()
             musicSeen.observeMusicUpdate()
         }
 
@@ -104,7 +85,13 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                                 }
                             }
                         }
+                        MusicSeen.Event.Play -> musicBroadCastManager.sendBroadcast(
+                            Intent().setAction(
+                                MUSIC_PLAY
+                            )
+                        )
                         MusicSeen.Event.Finish -> cancel()
+                        MusicSeen.Event.AddList -> startActivity(AddMusic2BucketActivity::class.intent)
                     }
                 }
 
@@ -114,30 +101,30 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     }
 
     private suspend fun MusicSeen.initSeen() {
-        Galley.musicBucket[userConfig.playedMusicBucket]?.let {
-            initList(suspendCancellableCoroutine { co ->
+        initList(
+            suspendCancellableCoroutine { co ->
                 DataBaseDAOHelper.getAllMusicBucket { list ->
                     list?.let { lm ->
                         co.resumeWith(Result.success(lm as MutableList<MusicBucket>))
                     }
                     co.cancel()
                 }
-            }, it)
+            },
+            Galley.musicBucket[userConfig.playedMusicBucket] ?: mutableListOf(),
+            userConfig.playedMusicBucket
+        )
+        mbClickCallBack { name ->
+            cacheMusicBucketName = name
+            hideBucket()
+            updateMusicList(Galley.musicBucket[cacheMusicBucketName] ?: mutableListOf())
+        }
+        mlClickCallBack { position ->
+            binder.setDate(Galley.musicBucket[cacheMusicBucketName] ?: mutableListOf())
+            binder.setPlayMusicPosition(position)
+            userConfig.playedMusicBucket = cacheMusicBucketName
         }
 
-        initSmallMusic({
-            musicBroadCastManager.sendBroadcast(
-                Intent().setAction(
-                    MUSIC_PLAY
-                )
-            )
-        }, {
-            musicBroadCastManager.sendBroadcast(
-                Intent().setAction(
-                    MUSIC_PLAY
-                )
-            )
-        })
+        initSmallMusic()
     }
 
     private fun MusicSeen.playPosition() {
@@ -152,7 +139,9 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         Galley.musicState.observe(this@MusicActivity) {
             musicName = it.name
             icon = it.albumUri
-//            isPlaying = it.isPlaying
+        }
+        binder.getPlayState().observe(this@MusicActivity) {
+            isPlaying = it
         }
     }
 }

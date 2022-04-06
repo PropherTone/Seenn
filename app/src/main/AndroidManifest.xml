@@ -25,7 +25,7 @@
         android:theme="@style/Theme.SeennWithBar">
         <activity
             android:name=".MainActivity"
-            android:exported="true"
+            android:exported="false"
             android:launchMode="singleTop" />
         <activity android:name=".NoteSyncActivity" />
         <activity android:name=".NoteActivity" />
@@ -34,6 +34,7 @@
         <activity android:name=".MusicActivity" />
         <activity android:name=".AddBucketActivity" />
         <activity android:name=".NoteEditActivity" />
+        <activity android:name=".AddMusic2BucketActivity" />
         <activity
             android:name=".SplashActivity"
             android:exported="true">
@@ -44,7 +45,14 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.MusicService" />
+        <service
+            android:name=".service.MusicService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name=".service.WorkService"
+            android:enabled="true"
+            android:exported="false" />
 
         <receiver
             android:name="com.protone.mediamodle.media.MusicReceiver"
@@ -56,6 +64,18 @@
                 <action android:name="NextMusic" />
                 <action android:name="PreviousMusic" />
                 <action android:name="FinishMusic" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.protone.mediamodle.WorkReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="UPDATE_MUSIC_BUCKET" />
+                <action android:name="UPDATE_MUSIC" />
+                <action android:name="UPDATE_PHOTO" />
+                <action android:name="UPDATE_VIDEO" />
             </intent-filter>
         </receiver>
     </application>

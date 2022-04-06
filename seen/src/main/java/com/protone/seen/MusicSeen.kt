@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.database.room.entity.Music
@@ -17,13 +18,16 @@ import com.protone.seen.customView.StateImageView
 import com.protone.seen.databinding.MusicLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.stream.Collectors
 
 class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageView.StateListener,
     ViewTreeObserver.OnGlobalLayoutListener {
 
     enum class Event {
         AddBucket,
-        Finish
+        Play,
+        Finish,
+        AddList
     }
 
     private var containerAnimator: ObjectAnimator? = null
@@ -47,8 +51,8 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
 
     var isPlaying: Boolean = false
         set(value) {
-            Log.d("TAG", "$value: ")
-                binding.mySmallMusicPlayer.isPlaying = value
+            Log.d("TAG", "seen: $value")
+            binding.mySmallMusicPlayer.isPlaying = value
             field = value
         }
 
@@ -61,14 +65,23 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
         viewEvent.offer(event)
     }
 
-    suspend fun initList(musicBucket: MutableList<MusicBucket>, musicList: MutableList<Music>) =
+    suspend fun initList(
+        musicBucket: MutableList<MusicBucket>,
+        musicList: MutableList<Music>,
+        userConfig: String
+    ) =
         withContext(Dispatchers.Main) {
             binding.musicBucket.apply {
                 layoutManager = LinearLayoutManager(context)
                 adapter = MusicBucketAdapter(
-                    context
+                    context,
+                    musicBucket.stream().filter { it.name == userConfig }
+                        .collect(Collectors.toList())[0]
                 ).apply {
                     this.musicBuckets = musicBucket
+                    this.addList = {
+                        offer(Event.AddList)
+                    }
                 }
             }
             binding.musicMusicList.apply {
@@ -79,27 +92,33 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             }
         }
 
-    suspend fun initSmallMusic(func1: () -> Unit, func2: () -> Unit) = withContext(Dispatchers.IO) {
+    suspend fun initSmallMusic() = withContext(Dispatchers.IO) {
         binding.mySmallMusicPlayer.apply {
-            playMusic = func1
-            pauseMusic = func2
+            { offer(Event.Play) }.let {
+                playMusic = it
+                pauseMusic = it
+            }
         }
     }
 
     fun mbClickCallBack(callback: (String) -> Unit) {
-        (binding.musicBucket.adapter as MusicBucketAdapter).clickCallback = callback
+        (binding.musicBucket.adapter as MusicBucketAdapter?)?.clickCallback = callback
     }
 
     fun mlClickCallBack(callback: (Int) -> Unit) {
-        (binding.musicMusicList.adapter as MusicListAdapter).clickCallback = callback
+        (binding.musicMusicList.adapter as MusicListAdapter?)?.clickCallback = callback
+    }
+
+    fun updateMusicList(list: MutableList<Music>) {
+        (binding.musicMusicList.adapter as MusicListAdapter?)?.musicList = list
     }
 
     suspend fun addBucket(bucket: MusicBucket) = withContext(Dispatchers.Main) {
-        (binding.musicBucket.adapter as MusicBucketAdapter).addBucket(bucket)
+        (binding.musicBucket.adapter as MusicBucketAdapter?)?.addBucket(bucket)
     }
 
-    fun playPosition(position: Int){
-        (binding.musicMusicList.adapter as MusicListAdapter).playPosition(position)
+    fun playPosition(position: Int) {
+        (binding.musicMusicList.adapter as MusicListAdapter?)?.playPosition(position)
     }
 
     override fun onActive() {
@@ -110,17 +129,21 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
         containerAnimator?.start()
     }
 
-    fun hideBucket(){
+    fun hideBucket() {
         binding.musicShowBucket.negative()
     }
 
     override fun onGlobalLayout() {
         binding.musicBucketContainer.height.toFloat().let {
-            containerAnimator = ObjectAnimator.ofFloat(
+            containerAnimator = AnimationHelper.translationY(
                 binding.musicBucketContainer,
-                "translationY",
                 it - binding.mySmallMusicPlayer.height
             )
+//            containerAnimator = ObjectAnimator.ofFloat(
+//                binding.musicBucketContainer,
+//                "translationY",
+//                it - binding.mySmallMusicPlayer.height
+//            )
         }
         binding.musicShowBucket.setOnStateListener(this)
 

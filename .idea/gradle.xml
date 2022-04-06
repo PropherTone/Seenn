@@ -16,8 +16,8 @@
             <option value="$PROJECT_DIR$/cloud" />
             <option value="$PROJECT_DIR$/dataBase" />
             <option value="$PROJECT_DIR$/mediaModle" />
-            <option value="$PROJECT_DIR$/modelFunc" />
             <option value="$PROJECT_DIR$/seen" />
+            <option value="$PROJECT_DIR$/values" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

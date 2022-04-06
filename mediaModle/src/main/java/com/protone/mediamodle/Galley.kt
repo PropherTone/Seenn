@@ -2,6 +2,7 @@ package com.protone.mediamodle
 
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
+import com.protone.api.context.Global
 import com.protone.api.context.onBackground
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
@@ -18,7 +19,7 @@ object Galley {
             value.forEach { (_, mutableList) ->
                 ap.addAll(mutableList)
             }
-            value["ALL"] = ap
+            value[Global.application.getString(R.string.all_music)] = ap
             field = value
             photoLive.postValue(field)
         }
@@ -31,7 +32,7 @@ object Galley {
             value.forEach { (_, mutableList) ->
                 ap.addAll(mutableList)
             }
-            value["ALL"] = ap
+            value[Global.application.getString(R.string.all_music)] = ap
             field = value
             videoLive.postValue(field)
         }

@@ -28,7 +28,7 @@ class MySmallMusicPlayer @JvmOverloads constructor(
     private val binding = SmallMusicPlayerLayoutBinding.inflate(context.layoutInflater, this, true)
     var isPlaying = false
         set(value) {
-            Log.d("TAG", "get $value: ")
+            Log.d("TAG", ": $value")
             if (value) binding.smallMusicStart.setImageDrawable(
                 ResourcesCompat.getDrawable(
                     resources,

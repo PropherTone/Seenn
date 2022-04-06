@@ -112,6 +112,12 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     override fun getAllMusic(): List<Music>? = musicDAO?.getAllMusic()
 
+    override fun deleteMusic(music: Music) {
+        runnableFunc = {
+            musicDAO?.deleteMusic(music)
+        }
+    }
+
 
     //Galley
     private var signedGalleyDAO: SignedGalleyDAO? = null

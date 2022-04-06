@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="self"
+            type="com.protone.seen.AddMusic2BucketSeen" />
+
+
+        <import type="com.protone.seen.AddMusic2BucketSeen.Event" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <EditText
+            android:id="@+id/addMB_search"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/icon_50"
+            android:background="@color/blue_1"
+            android:drawableStart="@drawable/ic_baseline_search_24_white"
+            android:hint="@string/search"
+            android:importantForAutofill="no"
+            android:inputType="textNoSuggestions"
+            android:paddingStart="@dimen/icon_padding_mid"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textSize="@dimen/title_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="LabelFor" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/small_elevation"
+            android:background="@color/white"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/addMB_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/addMB_leave"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/addMB_search" />
+
+        <ImageView
+            android:id="@+id/addMB_leave"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/icon_58"
+            android:background="@drawable/background_ripple_blue"
+            android:contentDescription="@string/action"
+            android:onClick="@{()-> self.offer(Event.Finished)}"
+            android:padding="@dimen/icon_padding_lite"
+            android:src="@drawable/ic_baseline_keyboard_backspace_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/small_elevation"
+            android:background="@color/red_2"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

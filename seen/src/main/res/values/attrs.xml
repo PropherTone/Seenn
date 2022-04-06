@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <declare-styleable name="DragCard">
-        <attr name="icon" format="reference"/>
-        <attr name="GradientColor1" format="color"/>
-        <attr name="GradientColor2" format="color"/>
-        <attr name="duration" format="integer"/>
-    </declare-styleable>
-</resources>
