@@ -28,22 +28,6 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
         Galley.music = scanAudio()
     }
 
-    private val sortMusicBucket = Runnable {
-        DataBaseDAOHelper.let { base ->
-            base.getAllMusic { list ->
-                Galley.musicBucket[Global.application.getString(R.string.all_music)] = Galley.music
-                list.forEach { music ->
-                    music.myBucket?.let {
-                        if (!Galley.musicBucket.containsKey(it)) {
-                            Galley.musicBucket[it] = arrayListOf()
-                        }
-                        Galley.musicBucket[it]?.add(music)
-                    }
-                }
-            }
-        }
-    }
-
     suspend fun updatePictureCO() = withContext(Dispatchers.IO) {
         Galley.photo = scanPicture()
         sortSignedMedia(false)
@@ -75,8 +59,6 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     fun updateVideo() = threadPool.execute(updateVideo)
 
     fun updateMusic() = threadPool.execute(updateMusic)
-
-    fun sortMusicBucket() = threadPool.execute(sortMusicBucket)
 
     private fun sortSignedMedia(isVideo: Boolean) {
         DataBaseDAOHelper.getAllSignedMedia()?.let { signed ->

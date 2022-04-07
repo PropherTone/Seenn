@@ -119,11 +119,15 @@ class MusicListAdapter(context: Context) :
 
     override fun getItemCount(): Int = musicList.size
 
-    fun playPosition(position: Int) = musicList[position].let {
-        selectList.clear()
-        selectList.add(it)
-        notifyItemChanged(playPosition)
-        playPosition = position
-        notifyItemChanged(playPosition)
+    fun playPosition(position: Int) {
+        if (musicList.size <= 0) return
+        musicList[position].let {
+            selectList.clear()
+            selectList.add(it)
+            notifyItemChanged(playPosition)
+            playPosition = position
+            notifyItemChanged(playPosition)
+        }
     }
+
 }

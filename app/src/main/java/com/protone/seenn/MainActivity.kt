@@ -2,12 +2,10 @@ package com.protone.seenn
 
 import android.content.Intent
 import android.transition.TransitionManager
-import com.protone.api.context.MUSIC_NEXT
-import com.protone.api.context.MUSIC_PLAY
-import com.protone.api.context.MUSIC_PREVIOUS
-import com.protone.api.context.intent
+import com.protone.api.context.*
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.media.musicBroadCastManager
+import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.MainSeen
 import com.protone.seen.Progress
 import kotlinx.coroutines.isActive
@@ -19,6 +17,8 @@ class MainActivity : BaseActivity<MainSeen>() {
         val mainSeen = MainSeen(this)
         setContentSeen(mainSeen)
         mainSeen.beginTransition()
+
+        workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
 
         bindMusicService {
             setMusicList(Galley.music)

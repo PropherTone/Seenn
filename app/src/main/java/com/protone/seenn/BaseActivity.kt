@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
@@ -16,10 +15,8 @@ import com.protone.api.context.intent
 import com.protone.api.context.musicIntentFilter
 import com.protone.database.room.config.UserConfig
 import com.protone.database.room.entity.Music
-import com.protone.mediamodle.Galley
 import com.protone.mediamodle.media.MediaContentObserver
 import com.protone.mediamodle.media.MusicReceiver
-import com.protone.mediamodle.media.musicBroadCastManager
 import com.protone.seen.Seen
 import com.protone.seenn.service.MusicService
 import com.protone.seenn.theme.ThemeProvider

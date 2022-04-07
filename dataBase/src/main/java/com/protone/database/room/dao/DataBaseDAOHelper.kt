@@ -1,5 +1,6 @@
 package com.protone.database.room.dao
 
+import android.util.Log
 import com.protone.database.room.SeennDataBase
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
@@ -89,12 +90,22 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     fun insertMusicMulti(music: List<Music>) {
+        Log.d("TAG", "insertMusicMulti: ${music.size}")
         runnableFunc = {
             music.forEach {
                 musicDAO?.insertMusic(it)
             }
         }
     }
+
+    fun deleteMusicMulti(music: List<Music>) {
+        runnableFunc = {
+            music.forEach {
+                musicDAO?.deleteMusic(it)
+            }
+        }
+    }
+
 
     inline fun getAllMusic(crossinline callBack: (List<Music>) -> Unit) {
         runnableFunc = {
@@ -120,9 +131,22 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     override fun updateMusic(music: Music): Int = musicDAO?.updateMusic(music) ?: -1
 
-    inline fun updateMusicWithCallBack(music: Music, crossinline callBack: (Int) -> Unit) {
+    override fun updateMusicMyBucket(name: String, bucket: List<String>): Int =
+        musicDAO?.updateMusicMyBucket(name, bucket) ?: -1
+
+    inline fun updateMusicCB(music: Music, crossinline callBack: (Int) -> Unit) {
         runnableFunc = {
             callBack(updateMusic(music))
+        }
+    }
+
+    inline fun updateMusicMyBucketCB(
+        name: String,
+        bucket: List<String>,
+        crossinline callBack: (Int) -> Unit
+    ) {
+        runnableFunc = {
+            callBack(updateMusicMyBucket(name, bucket))
         }
     }
 

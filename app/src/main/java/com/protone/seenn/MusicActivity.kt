@@ -110,7 +110,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                     co.cancel()
                 }
             },
-            Galley.musicBucket[userConfig.playedMusicBucket] ?: mutableListOf(),
+            Galley.musicBucket[userConfig.playedMusicBucket] ?: Galley.music,
             userConfig.playedMusicBucket
         )
         mbClickCallBack { name ->

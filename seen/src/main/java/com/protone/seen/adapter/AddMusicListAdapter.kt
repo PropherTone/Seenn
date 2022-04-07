@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.bumptech.glide.load.engine.Resource
+import com.protone.api.TAG
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.api.toStringMinuteTime
@@ -17,7 +17,11 @@ import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Music
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.collections.ArrayList
 
 class AddMusicListAdapter(context: Context, private val bucket: String) :
     SelectListAdapter<MusicListLayoutBinding, Music>(context) {
@@ -96,19 +100,19 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                         when (d) {
                             is Animatable -> {
                                 d.start()
-                                addMusic2Bucket(music.apply {
-                                    when (myBucket) {
-                                        null -> myBucket = "$bucket|"
-                                        else -> myBucket += "$bucket|"
+                                DataBaseDAOHelper.updateMusicMyBucketCB(
+                                    music.title,
+                                    (music.myBucket ?: arrayListOf()).also { bs ->
+                                        (bs as ArrayList).add(bucket)
                                     }
-                                }) { re ->
+                                ) { re ->
                                     if (re != -1 && re != 0) {
-                                        d.stop()
                                         changeIconAni(musicListPlayState)
                                     } else {
                                         selectList.remove(music)
                                         notifyItemChanged()
                                     }
+                                    d.stop()
                                 }
                             }
                             else -> {
@@ -127,31 +131,31 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
     }
 
     private fun notifyItemChanged() {
-        while (viewQueue.isNullOrEmpty()) {
+        while (!viewQueue.isNullOrEmpty()) {
             val poll = viewQueue.poll()
             if (poll != null) {
-                notifyItemChanged(poll)
+                CoroutineScope(Dispatchers.Main).launch {
+                    notifyItemChanged(poll)
+                }
             }
         }
     }
 
-    private fun changeIconAni(view: ImageView) = AnimationHelper.apply {
-        animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
-            view.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    context.resources,
-                    R.drawable.ic_baseline_check_24,
-                    null
+    private fun changeIconAni(view: ImageView) = CoroutineScope(Dispatchers.Main).launch {
+        AnimationHelper.apply {
+            animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
+                view.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        context.resources,
+                        R.drawable.ic_baseline_check_24,
+                        null
+                    )
                 )
-            )
-            animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true)
-        })
+                animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true)
+            })
+        }
     }
 
-
-    private inline fun addMusic2Bucket(music: Music, crossinline callBack: (Int) -> Unit) {
-        DataBaseDAOHelper.updateMusicWithCallBack(music, callBack)
-    }
 
     override fun getItemCount(): Int = musicList.size
 }

@@ -13,6 +13,7 @@ import com.protone.api.checkNeededPermission
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.intent
 import com.protone.api.context.workIntentFilter
+import com.protone.api.json.asdasd
 import com.protone.api.requestContentPermission
 import com.protone.api.toBitmapByteArray
 import com.protone.database.room.dao.DataBaseDAOHelper
@@ -62,6 +63,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     override suspend fun main() {
         val splashSeen = SplashSeen(this)
         setContentSeen(splashSeen)
+        asdasd()
         while (isActive) {
             select<Unit> {
                 event.onReceive {
@@ -120,10 +122,8 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     private fun updateMedia() {
         GalleyHelper.run {
             updateAll {
-                workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
                 mHandler.sendEmptyMessage(1)
             }
-            sortMusicBucket()
         }
     }
 }

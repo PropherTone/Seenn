@@ -56,7 +56,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             field = value
         }
 
-    var bucket : String = ""
+    var bucket: String = ""
 
     init {
         binding.self = this
@@ -78,7 +78,9 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
                 adapter = MusicBucketAdapter(
                     context,
                     musicBucket.stream().filter { it.name == userConfig }
-                        .collect(Collectors.toList())[0]
+                        .collect(Collectors.toList()).let {
+                            if (it.size > 0) it[0] else MusicBucket()
+                        }
                 ).apply {
                     this.musicBuckets = musicBucket
                     this.addList = {
