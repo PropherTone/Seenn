@@ -17,6 +17,7 @@ import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Music
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
+import java.util.*
 
 class AddMusicListAdapter(context: Context, private val bucket: String) :
     SelectListAdapter<MusicListLayoutBinding, Music>(context) {
@@ -26,6 +27,8 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
             field.clear()
             field.addAll(value)
         }
+
+    private val viewQueue = PriorityQueue<Int>()
 
     override val select: (holder: Holder<MusicListLayoutBinding>, isSelect: Boolean) -> Unit =
         { holder, isSelect ->
@@ -88,25 +91,29 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
 
                 musicListContainer.setOnClickListener {
                     checkSelect(holder, music)
+                    viewQueue.add(position)
                     musicListPlayState.drawable.let { d ->
                         when (d) {
                             is Animatable -> {
                                 d.start()
                                 addMusic2Bucket(music.apply {
-                                    myBucket += "$bucket|"
+                                    when (myBucket) {
+                                        null -> myBucket = "$bucket|"
+                                        else -> myBucket += "$bucket|"
+                                    }
                                 }) { re ->
-                                    if (re != -1) {
+                                    if (re != -1 && re != 0) {
                                         d.stop()
                                         changeIconAni(musicListPlayState)
                                     } else {
                                         selectList.remove(music)
-                                        notifyItemChanged(position)
+                                        notifyItemChanged()
                                     }
                                 }
                             }
                             else -> {
                                 selectList.remove(music)
-                                notifyItemChanged(position)
+                                notifyItemChanged()
                             }
                         }
                     }
@@ -115,6 +122,15 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                 musicListName.text = music.title
                 musicListDetail.text = "${music.artist} · ${music.album}"
                 musicListTime.text = music.duration.toStringMinuteTime()
+            }
+        }
+    }
+
+    private fun notifyItemChanged() {
+        while (viewQueue.isNullOrEmpty()) {
+            val poll = viewQueue.poll()
+            if (poll != null) {
+                notifyItemChanged(poll)
             }
         }
     }

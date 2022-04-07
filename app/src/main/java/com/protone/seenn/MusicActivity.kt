@@ -32,9 +32,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
                 override fun pause() {}
 
-                override fun finish() {
-
-                }
+                override fun finish() {}
 
                 override fun previous() {
                     musicSeen.playPosition()
