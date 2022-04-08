@@ -81,7 +81,6 @@ public class DragBar extends ViewGroup {
 
     private final String TAG = "DragBar";
 
-
     public DragBar(Context context) {
         super(context);
     }

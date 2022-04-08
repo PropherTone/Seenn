@@ -103,6 +103,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                                 DataBaseDAOHelper.updateMusicMyBucketCB(
                                     music.title,
                                     (music.myBucket ?: arrayListOf()).also { bs ->
+                                        Log.d(TAG, "onBindViewHolder: ${music.myBucket}")
                                         (bs as ArrayList).add(bucket)
                                     }
                                 ) { re ->
