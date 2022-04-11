@@ -377,7 +377,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         override fun getData() = this@MusicService.getData()
         override fun setPlayMusicPosition(position: Int) =
             this@MusicService.setPlayMusicPosition(position)
-
         override fun seekTo(position: Long) = this@MusicService.seekTo(position)
         override fun getPlayState(): MutableLiveData<Boolean> = this@MusicService.getPlayState()
         override fun getPlayPosition(): Int = this@MusicService.getPlayPosition()

@@ -26,6 +26,10 @@ import kotlin.collections.ArrayList
 class AddMusicListAdapter(context: Context, private val bucket: String) :
     SelectListAdapter<MusicListLayoutBinding, Music>(context) {
 
+    init {
+        multiChoose = true
+    }
+
     var musicList = mutableListOf<Music>()
         set(value) {
             field.clear()
@@ -94,6 +98,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                 setSelect(holder, selectList.contains(music))
 
                 musicListContainer.setOnClickListener {
+                    if (selectList.contains(music)) return@setOnClickListener
                     checkSelect(holder, music)
                     viewQueue.add(position)
                     musicListPlayState.drawable.let { d ->
@@ -103,7 +108,6 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                                 DataBaseDAOHelper.updateMusicMyBucketCB(
                                     music.title,
                                     (music.myBucket ?: arrayListOf()).also { bs ->
-                                        Log.d(TAG, "onBindViewHolder: ${music.myBucket}")
                                         (bs as ArrayList).add(bucket)
                                     }
                                 ) { re ->
@@ -153,7 +157,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                     )
                 )
                 animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true)
-            })
+            }, play = true)
         }
     }
 

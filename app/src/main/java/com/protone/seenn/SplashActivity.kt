@@ -54,6 +54,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                 startService(Intent(this, MusicService::class.java))
                 startService(Intent(this, WorkService::class.java))
                 startActivity(MainActivity::class.intent)
+                finish()
             }
             2 -> updateMedia()
         }

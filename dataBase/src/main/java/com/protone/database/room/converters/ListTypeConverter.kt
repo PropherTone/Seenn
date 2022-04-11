@@ -1,24 +1,21 @@
 package com.protone.database.room.converters
 
-import android.util.Log
 import androidx.room.TypeConverter
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.protone.api.TAG
-import com.protone.api.json.jsonToList
-import com.protone.api.json.listToJson
-import com.protone.api.json.toJson
 
+@Suppress("RedundantNullableReturnType")
 class ListTypeConverter {
 
     @TypeConverter
     fun stringToObject(value: String?): List<String>? {
-        Log.d(TAG, "stringToObject: $value")
-        return Gson().fromJson<List<String>>(value, object : TypeToken<List<String>>() {}.type)
+        val mutableList = mutableListOf<String>()
+        value?.split("|")?.forEach { mutableList.add(it) }
+        return mutableList
     }
 
     @TypeConverter
     fun objectToString(list: List<String>?): String? {
-        return Gson().toJson(list)
+        val sb = StringBuilder()
+        list?.stream()?.forEach { sb.append("$it|") }
+        return sb.toString()
     }
 }

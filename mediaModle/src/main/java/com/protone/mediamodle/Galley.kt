@@ -41,8 +41,15 @@ object Galley {
 
     var music: MutableList<Music> = mutableListOf()
         set(value) {
-            field = value
+            musicBucket[Global.application.getString(R.string.all_music)] = value
             musicLive.postValue(field)
+        }
+        get() {
+            var lists = mutableListOf<Music>()
+            musicBucket[Global.application.getString(R.string.all_music)]?.let {
+                lists = it
+            }
+            return lists
         }
 
     val musicBucket = mutableMapOf<String, MutableList<Music>>()

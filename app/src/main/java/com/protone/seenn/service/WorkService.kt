@@ -7,6 +7,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import com.protone.api.TAG
+import com.protone.api.context.Global
 import com.protone.api.context.workIntentFilter
 import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMulti
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusic
@@ -63,15 +64,21 @@ class WorkService : Service() {
             val cacheList = arrayListOf<Music>().apply { addAll(music) }
             val cacheAllMusic = arrayListOf<Music>()
             val allMusic = (getAllMusic() as ArrayList?)?.also { cacheAllMusic.addAll(it) }
-            val allMusicBucket = getAllMusicBucket()
-            allMusicBucket?.forEach(Consumer { (name) -> musicBucket[name] = ArrayList() })
-            musicBucket[getString(R.string.all_music)] = music
+            val allMusicBucket = getAllMusicBucket().let { l ->
+                (l as ArrayList).stream().filter {
+                    it.name != Global.application.getString(R.string.all_music)
+                }
+            }
+            allMusicBucket?.forEach { (name) -> musicBucket[name] = ArrayList() }
+            Log.d(TAG, "updateMusicBucket: update")
             allMusic?.forEach { music ->
-                if (cacheList.contains(music)) music.myBucket?.forEach(Consumer {
-                        musicBucket[it]?.add(music)
+                music.myBucket?.forEach(Consumer {
+                    Log.d(TAG, "updateMusicBucket: ${music.title}")
+                    Log.d(TAG, "updateMusicBucket: $it")
+                    musicBucket[it]?.add(music)
                 })
-                val remove = cacheList.remove(music)
-                if (remove) {
+                cacheList.stream().filter { it.title != music.title }
+                if (cacheList.size > 0) {
                     cacheAllMusic.remove(music)
                 }
             }
@@ -80,6 +87,7 @@ class WorkService : Service() {
             } else if (cacheAllMusic.size > 0) {
                 deleteMusicMulti(cacheAllMusic)
             }
+            getAllMusic { music = it as MutableList<Music> }
         }
     }
 

@@ -36,7 +36,7 @@
 
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
+        <com.protone.seen.customView.InRecyclerView
             android:id="@+id/noteEdit_richView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -47,6 +47,8 @@
             android:id="@+id/noteEdit_tool"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="@dimen/main_padding"
+            android:paddingBottom="@dimen/main_padding"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <LinearLayout
@@ -57,87 +59,60 @@
                 <ImageView
                     android:layout_width="@dimen/small_Icon"
                     android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->self.setBold()}"
+                    android:src="@drawable/ic_baseline_format_bold_24_black" />
 
                 <ImageView
                     android:layout_width="@dimen/small_Icon"
                     android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->self.setItalic()}"
+                    android:src="@drawable/ic_baseline_format_italic_24_black" />
 
                 <ImageView
                     android:layout_width="@dimen/small_Icon"
                     android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->self.setSize()}"
+                    android:src="@drawable/ic_baseline_format_size_24_black" />
 
                 <ImageView
                     android:layout_width="@dimen/small_Icon"
                     android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->self.setUnderlined()}"
+                    android:src="@drawable/ic_baseline_format_underlined_24_black" />
 
                 <ImageView
                     android:layout_width="@dimen/small_Icon"
                     android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->self.setStrikethrough()}"
+                    android:src="@drawable/ic_baseline_strikethrough_s_24_black" />
 
                 <ImageView
                     android:layout_width="@dimen/small_Icon"
                     android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->self.setColor()}"
+                    android:padding="@dimen/main_padding"
+                    android:src="@color/black" />
 
                 <ImageView
                     android:layout_width="@dimen/small_Icon"
                     android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
-
-                <ImageView
-                    android:layout_width="@dimen/small_Icon"
-                    android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
-
-                <ImageView
-                    android:layout_width="@dimen/small_Icon"
-                    android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
-
-                <ImageView
-                    android:layout_width="@dimen/small_Icon"
-                    android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
-
-                <ImageView
-                    android:layout_width="@dimen/small_Icon"
-                    android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
-
-                <ImageView
-                    android:layout_width="@dimen/small_Icon"
-                    android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
-
-                <ImageView
-                    android:layout_width="@dimen/small_Icon"
-                    android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
-
-                <ImageView
-                    android:layout_width="@dimen/small_Icon"
-                    android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
-
-                <ImageView
-                    android:layout_width="@dimen/small_Icon"
-                    android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
-
-                <ImageView
-                    android:layout_width="@dimen/small_Icon"
-                    android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
-
-                <ImageView
-                    android:layout_width="@dimen/small_Icon"
-                    android:layout_height="@dimen/small_Icon"
-                    android:contentDescription="@string/action" />
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->self.setImage()}"
+                    android:padding="@dimen/texts_padding"
+                    android:src="@drawable/ic_baseline_image_24_black" />
 
             </LinearLayout>
 
