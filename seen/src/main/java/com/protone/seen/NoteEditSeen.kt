@@ -45,7 +45,7 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
             richNoteAdapter = RichNoteAdapter(
                 context,
                 true,
-                arrayListOf(RichNoteStates("", null))
+                arrayListOf(RichNoteStates("", arrayListOf()))
             )
             adapter = richNoteAdapter
         }
@@ -87,5 +87,9 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
 
     override fun setImage(uri: Uri, link: String?, name: String, date: String?) {
         richNoteAdapter?.setImage(uri, link, name, date)
+    }
+
+    suspend fun indexRichNote(){
+        richNoteAdapter?.indexRichNote()
     }
 }

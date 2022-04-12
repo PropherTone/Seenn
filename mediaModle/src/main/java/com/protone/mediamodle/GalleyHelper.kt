@@ -1,5 +1,6 @@
 package com.protone.mediamodle
 
+import android.util.Log
 import com.protone.api.context.Global
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
@@ -41,7 +42,7 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     }
 
     suspend fun updateMusicCO() = withContext(Dispatchers.IO) {
-        Galley.music = scanAudio()
+        Galley.musicBucket[Global.application.getString(R.string.all_music)] = scanAudio()
         cancel()
     }
 

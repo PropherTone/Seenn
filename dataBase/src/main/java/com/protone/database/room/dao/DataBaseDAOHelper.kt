@@ -90,7 +90,6 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     fun insertMusicMulti(music: List<Music>) {
-        Log.d("TAG", "insertMusicMulti: ${music.size}")
         runnableFunc = {
             music.forEach {
                 musicDAO?.insertMusic(it)

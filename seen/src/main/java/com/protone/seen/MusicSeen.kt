@@ -51,7 +51,6 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
 
     var isPlaying: Boolean = false
         set(value) {
-            Log.d("TAG", "seen: $value")
             binding.mySmallMusicPlayer.isPlaying = value
             field = value
         }

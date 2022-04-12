@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.text.Editable
+import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextWatcher
 import android.text.style.AbsoluteSizeSpan
@@ -21,12 +22,17 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.protone.api.context.layoutInflater
+import com.protone.api.json.listToJson
+import com.protone.api.json.toJson
 import com.protone.api.toMediaBitmapByteArray
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ColorSpan
 import com.protone.mediamodle.note.spans.ISpan
 import com.protone.seen.customView.InRecyclerView
 import com.protone.seen.databinding.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 class RichNoteAdapter(
@@ -127,19 +133,18 @@ class RichNoteAdapter(
                             start: Int,
                             count: Int,
                             after: Int
-                        ) {
-                        }
+                        ) = Unit
 
                         override fun onTextChanged(
                             s: CharSequence?,
                             start: Int,
                             before: Int,
                             count: Int
-                        ) {
-                        }
+                        ) = Unit
 
                         override fun afterTextChanged(s: Editable?) {
                             val layoutPosition = holder.layoutPosition
+                            (dataList[layoutPosition] as RichNoteStates).text = s
                             if (s?.length == 0 && layoutPosition != 0) {
                                 dataList.removeAt(layoutPosition)
                                 if (getItemViewType(layoutPosition - 1) != TEXT) {
@@ -197,23 +202,31 @@ class RichNoteAdapter(
         RecyclerView.ViewHolder(binding.root)
 
     override fun setBold() {
-        setEditTextSpan(StyleSpan(Typeface.BOLD))
+        setEditTextSpan(StyleSpan(Typeface.BOLD), SpanStates.Spans.StyleSpan, style = Typeface.BOLD)
     }
 
     override fun setItalic() {
-        setEditTextSpan(StyleSpan(Typeface.ITALIC))
+        setEditTextSpan(
+            StyleSpan(Typeface.ITALIC),
+            SpanStates.Spans.StyleSpan,
+            style = Typeface.ITALIC
+        )
     }
 
     override fun setSize(size: Int) {
-        setEditTextSpan(AbsoluteSizeSpan(size))
+        setEditTextSpan(
+            AbsoluteSizeSpan(size),
+            SpanStates.Spans.AbsoluteSizeSpan,
+            absoluteSize = size
+        )
     }
 
     override fun setUnderlined() {
-        setEditTextSpan(UnderlineSpan())
+        setEditTextSpan(UnderlineSpan(), SpanStates.Spans.UnderlineSpan)
     }
 
     override fun setStrikethrough() {
-        setEditTextSpan(StrikethroughSpan())
+        setEditTextSpan(StrikethroughSpan(), SpanStates.Spans.StrikeThroughSpan)
     }
 
     override fun setColor(color: Any) {
@@ -222,7 +235,7 @@ class RichNoteAdapter(
                 is Int -> ColorSpan(color)
                 is String -> ColorSpan(color)
                 else -> ColorSpan(Color.BLACK)
-            }
+            }, SpanStates.Spans.ForegroundColorSpan, iColor = color
         )
     }
 
@@ -236,25 +249,56 @@ class RichNoteAdapter(
                 var position = it
                 dataList.removeAt(position)
                 notifyItemRemoved(position)
-                dataList.add(position, RichNoteStates(sequenceStart, null))
+                dataList.add(position, RichNoteStates(sequenceStart, arrayListOf()))
                 notifyItemInserted(position++)
                 dataList.add(position, RichPhotoStates(uri, link, name, date))
                 notifyItemInserted(position++)
-                dataList.add(position, RichNoteStates(sequenceEnd, null))
+                dataList.add(position, RichNoteStates(sequenceEnd, arrayListOf()))
                 notifyItemInserted(position)
                 getCurEditText(position)?.requestFocus()
             }
         }
     }
 
-    private fun setEditTextSpan(span: Any) {
-        getCurEditText(curPosition)?.apply {
-            text.setSpan(
-                span,
-                selectionStart,
-                selectionEnd,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
+    private fun setEditTextSpan(
+        span: Any,
+        targetSpan: SpanStates.Spans,
+        iColor: Any? = null,
+        absoluteSize: Int? = null,
+        relativeSize: Float? = null,
+        scaleX: Float? = null,
+        style: Int? = null,
+        url: String? = null
+    ) {
+        curPosition?.let { p ->
+            getCurEditText(p)?.also {
+                it.text.setSpan(
+                    span,
+                    it.selectionStart,
+                    it.selectionEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                when (dataList[p]) {
+                    is RichNoteStates -> (dataList[p] as RichNoteStates).apply {
+                        this.text = it.text
+                        (spanStates as ArrayList)
+                            .add(
+                                SpanStates(
+                                    it.selectionStart,
+                                    it.selectionEnd,
+                                    targetSpan,
+                                    iColor,
+                                    absoluteSize,
+                                    relativeSize,
+                                    scaleX,
+                                    style,
+                                    url
+                                )
+                            )
+                    }
+                }
+                Log.d("TAG", "setEditTextSpan: ${dataList[p]}")
+            }
         }
     }
 
@@ -265,4 +309,30 @@ class RichNoteAdapter(
             null
         }
     }
+
+    suspend fun indexRichNote() = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine<Unit> {
+            val richStatues = arrayListOf<String>()
+            dataList.forEach {
+                when (it) {
+                    is RichNoteStates -> richStatues.add(
+                        RichNoteSer(
+                            getCurEditText(dataList.indexOf(it))?.text.toString(),
+                            it.spanStates.listToJson(SpanStates::class.java).also { s ->
+                                Log.d(
+                                    "TAG",
+                                    "indexRichNote s : $s"
+                                )
+                            }
+                        ).toJson()
+                    )
+                    is RichVideoStates -> richStatues.add(it.toJson())
+                    is RichPhotoStates -> richStatues.add(it.toJson())
+                    is RichMusicStates -> richStatues.add(it.toJson())
+                }
+            }
+            Log.d("TAG", "indexRichNote: $richStatues")
+        }
+    }
+
 }

@@ -3,6 +3,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/user_container"
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/main_padding">

@@ -1,27 +1,20 @@
 package com.protone.seenn
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import android.util.Log
 import com.protone.api.Config
 import com.protone.api.checkNeededPermission
-import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.intent
-import com.protone.api.context.workIntentFilter
-import com.protone.api.json.asdasd
 import com.protone.api.requestContentPermission
 import com.protone.api.toBitmapByteArray
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.GalleyHelper
-import com.protone.mediamodle.WorkReceiver
-import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.SplashSeen
 import com.protone.seenn.service.MusicService
 import com.protone.seenn.service.WorkService
@@ -64,7 +57,6 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     override suspend fun main() {
         val splashSeen = SplashSeen(this)
         setContentSeen(splashSeen)
-        asdasd()
         while (isActive) {
             select<Unit> {
                 event.onReceive {

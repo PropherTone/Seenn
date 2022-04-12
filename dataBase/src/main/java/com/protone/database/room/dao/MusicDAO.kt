@@ -19,7 +19,7 @@ interface MusicDAO {
     @Update
     fun updateMusic(music: Music) : Int
 
-    @Query("UPDATE music SET myBucket = :bucket WHERE title = :name")
+    @Query("UPDATE Music SET myBucket = :bucket WHERE title LIKE :name")
     fun updateMusicMyBucket(name: String,bucket:List<String>) : Int
 
 }

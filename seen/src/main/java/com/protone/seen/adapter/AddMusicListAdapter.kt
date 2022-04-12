@@ -46,7 +46,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                     musicListContainer.setBackgroundColor(
                         ContextCompat.getColor(
                             context,
-                            R.color.blue_9
+                            R.color.zima_blue
                         )
                     )
                     musicListName.setTextColor(ContextCompat.getColor(context, R.color.white))
@@ -98,20 +98,21 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                 setSelect(holder, selectList.contains(music))
 
                 musicListContainer.setOnClickListener {
-                    if (selectList.contains(music)) return@setOnClickListener
                     checkSelect(holder, music)
                     viewQueue.add(position)
                     musicListPlayState.drawable.let { d ->
                         when (d) {
                             is Animatable -> {
                                 d.start()
+                                val bucket = (music.myBucket ?: arrayListOf()).also { bs ->
+                                    (bs as ArrayList).add(bucket)
+                                }
                                 DataBaseDAOHelper.updateMusicMyBucketCB(
                                     music.title,
-                                    (music.myBucket ?: arrayListOf()).also { bs ->
-                                        (bs as ArrayList).add(bucket)
-                                    }
+                                    bucket
                                 ) { re ->
                                     if (re != -1 && re != 0) {
+                                        music.myBucket = bucket
                                         changeIconAni(musicListPlayState)
                                     } else {
                                         selectList.remove(music)
@@ -157,7 +158,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                     )
                 )
                 animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true)
-            }, play = true)
+            })
         }
     }
 
