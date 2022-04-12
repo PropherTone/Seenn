@@ -12,13 +12,15 @@ import com.protone.mediamodle.note.entity.RichPhotoStates
 import com.protone.mediamodle.note.entity.SpanStates
 import com.protone.mediamodle.note.spans.ISpan
 import com.protone.seen.adapter.RichNoteAdapter
+import com.protone.seen.customView.ColorPopWindow
 import com.protone.seen.databinding.NoteEditLayoutBinding
 
 class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context), ISpan {
 
     enum class NoteEditEvent {
         Confirm,
-        Finish
+        Finish,
+        PickImage
     }
 
     private val binding = NoteEditLayoutBinding.inflate(context.layoutInflater, context.root, true)
@@ -74,10 +76,16 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
     }
 
     override fun setColor() {
-        richNoteAdapter?.setColor("4CB8F3")
+        ColorPopWindow(context).startPopWindow(binding.noteEditTool) {
+            richNoteAdapter?.setColor(it)
+        }
     }
 
     override fun setImage() {
-        richNoteAdapter?.setImage(Uri.EMPTY, null, "asd", "asd")
+        offer(NoteEditEvent.PickImage)
+    }
+
+    override fun setImage(uri: Uri, link: String?, name: String, date: String?) {
+        richNoteAdapter?.setImage(uri, link, name, date)
     }
 }

@@ -93,6 +93,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                                 if (list.size > 0) {
                                     setResult(RESULT_OK, Intent().apply {
                                         putExtra("Uri",list[0].uri.toJson())
+                                        putExtra("GalleyData",list[0].toJson())
                                     })
                                 }
                             }

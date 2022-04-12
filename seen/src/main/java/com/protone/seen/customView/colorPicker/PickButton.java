@@ -1,4 +1,4 @@
-package com.protone.seen.customView.MyColorPicker;
+package com.protone.seen.customView.colorPicker;
 
 import android.content.Context;
 import android.graphics.BlurMaskFilter;
@@ -11,23 +11,23 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-public class DragButton extends View {
+public class PickButton extends View {
 
     private Paint paint;
     private float elevation = 5;
     private boolean isRound;
 
-    public DragButton(Context context) {
+    public PickButton(Context context) {
         super(context);
         Init();
     }
 
-    public DragButton(Context context, @Nullable AttributeSet attrs) {
+    public PickButton(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         Init();
     }
 
-    public DragButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public PickButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         Init();
     }

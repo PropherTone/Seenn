@@ -1,4 +1,4 @@
-package com.protone.seen.customView.DragBar;
+package com.protone.seen.customView.dragBar;
 
 import android.content.Context;
 import android.graphics.BlurMaskFilter;

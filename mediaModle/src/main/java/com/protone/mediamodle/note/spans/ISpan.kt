@@ -9,7 +9,7 @@ interface ISpan {
     fun setSize() {}
     fun setUnderlined()
     fun setStrikethrough()
-    fun setColor(color: String) {}
+    fun setColor(color: Any) {}
     fun setColor() {}
     fun setImage(uri: Uri, link: String?, name: String, date: String?) {}
     fun setImage() {}

@@ -1,11 +1,13 @@
 package com.protone.seen
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.protone.api.context.Global
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.seen.adapter.MainModelListAdapter

@@ -1,4 +1,4 @@
-package com.protone.seen.customView.MyColorPicker;
+package com.protone.seen.customView.colorPicker;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -16,9 +16,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 
-import com.protone.view.R;
+import com.protone.seen.R;
 
-public class DragBar extends ViewGroup {
+public class MyColorPicker extends ViewGroup {
 
     private Path mBarPath;
     private Paint mBarPaint;
@@ -29,7 +29,7 @@ public class DragBar extends ViewGroup {
 
     private int mMovedLength;
 
-    private DragButton child;
+    private PickButton child;
 
     private int cacheL;
     private int cacheR;
@@ -73,27 +73,27 @@ public class DragBar extends ViewGroup {
     private Boolean isBarDrawn = false;
 
 
-    public DragBar(Context context) {
+    public MyColorPicker(Context context) {
         super(context);
     }
 
-    public DragBar(Context context, @Nullable AttributeSet attrs) {
+    public MyColorPicker(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         TypedArray array = context.getTheme().obtainStyledAttributes(attrs,
                 R.styleable.DragBar,
                 0, 0);
-        mBarHeight = array.getInteger(R.styleable.DragBar_barHeight, 100);
+        mBarHeight = array.getDimensionPixelSize(R.styleable.DragBar_barHeight, 100);
         mPaddingBottom = array.getInteger(R.styleable.DragBar_paddingBottom, 20);
         mPaddingTop = array.getInteger(R.styleable.DragBar_paddingTop, 20);
         isRound = array.getBoolean(R.styleable.DragBar_roundStyle, true);
-        blurRadius = array.getInteger(R.styleable.DragBar_blurRadius, 20);
+        blurRadius = array.getFloat(R.styleable.DragBar_blurRadius, 20);
         mStrokeWidth = array.getInteger(R.styleable.DragBar_barStrokeWidth, 30);
         mElevation = array.getInteger(R.styleable.DragBar_buttonElevation, 5);
         array.recycle();
         Init();
     }
 
-    public DragBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public MyColorPicker(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -109,7 +109,7 @@ public class DragBar extends ViewGroup {
         mBarPaint.setMaskFilter(
                 new BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.SOLID));
         mBarPath = new Path();
-        addView(new DragButton(getContext()));
+        addView(new PickButton(getContext()));
     }
 
     @Override
@@ -184,7 +184,7 @@ public class DragBar extends ViewGroup {
         if (!isLaidOut) {
             int childCount = getChildCount();
             if (childCount > 0) {
-                child = (DragButton) getChildAt(childCount - 1);
+                child = (PickButton) getChildAt(childCount - 1);
                 child.setClickable(false);
                 child.setFocusable(false);
                 child.setRound(isRound);
@@ -246,6 +246,7 @@ public class DragBar extends ViewGroup {
         void onColorChange(int color);
     }
 
+    @SuppressWarnings("unused")
     public void onColorChangeListener(colorListener colorListener) {
         this.onColorChangeListener = colorListener;
     }

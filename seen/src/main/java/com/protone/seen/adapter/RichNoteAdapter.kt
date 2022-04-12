@@ -2,6 +2,7 @@ package com.protone.seen.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.text.Editable
@@ -11,13 +12,16 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.UnderlineSpan
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.protone.api.context.layoutInflater
+import com.protone.api.toMediaBitmapByteArray
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ColorSpan
 import com.protone.mediamodle.note.spans.ISpan
@@ -173,7 +177,8 @@ class RichNoteAdapter(
     override fun getItemCount(): Int = dataList.size
 
     private fun glideIv(iv: ImageView, uri: Uri) {
-        iv.layoutParams
+        val toMediaBitmapByteArray = uri.toMediaBitmapByteArray()
+        Glide.with(iv.context).load(toMediaBitmapByteArray).into(iv)
     }
 
     class RichTextHolder(val binding: RichTextLayoutBinding) :
@@ -211,16 +216,35 @@ class RichNoteAdapter(
         setEditTextSpan(StrikethroughSpan())
     }
 
-    override fun setColor(color: String) {
-        setEditTextSpan(ColorSpan(color))
+    override fun setColor(color: Any) {
+        setEditTextSpan(
+            when (color) {
+                is Int -> ColorSpan(color)
+                is String -> ColorSpan(color)
+                else -> ColorSpan(Color.BLACK)
+            }
+        )
     }
 
     override fun setImage(uri: Uri, link: String?, name: String, date: String?) {
-        dataList.add(RichPhotoStates(uri, link, name, date))
-        notifyItemInserted(dataList.size - 1)
-        dataList.add(RichNoteStates("", null))
-        getCurEditText(dataList.size - 1)?.requestFocus()
-        notifyItemInserted(dataList.size - 1)
+        getCurEditText(curPosition)?.run {
+            val cs = text as CharSequence
+            val sequenceStart = cs.subSequence(0, selectionStart)
+            val sequenceEnd = cs.subSequence(selectionStart, cs.length)
+            Log.d("TAG", "setImage: $cs ,\n $sequenceStart, \n $sequenceEnd ")
+            curPosition?.let {
+                var position = it
+                dataList.removeAt(position)
+                notifyItemRemoved(position)
+                dataList.add(position, RichNoteStates(sequenceStart, null))
+                notifyItemInserted(position++)
+                dataList.add(position, RichPhotoStates(uri, link, name, date))
+                notifyItemInserted(position++)
+                dataList.add(position, RichNoteStates(sequenceEnd, null))
+                notifyItemInserted(position)
+                getCurEditText(position)?.requestFocus()
+            }
+        }
     }
 
     private fun setEditTextSpan(span: Any) {

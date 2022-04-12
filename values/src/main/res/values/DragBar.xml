@@ -2,13 +2,13 @@
 <resources>
 
     <declare-styleable name="DragBar">
-        <attr name="barHeight" format="integer"/>
+        <attr name="barHeight" format="dimension"/>
         <attr name="paddingTop" format="integer"/>
         <attr name="paddingBottom" format="integer"/>
         <attr name="steep" format="integer"/>
         <attr name="scrollingSpeed" format="integer"/>
         <attr name="roundStyle" format="boolean"/>
-        <attr name="blurRadius" format="integer"/>
+        <attr name="blurRadius" format="float"/>
         <attr name="barStrokeWidth" format="integer"/>
         <attr name="barAnimator" format="boolean"/>
         <attr name="barColor" format="color"/>

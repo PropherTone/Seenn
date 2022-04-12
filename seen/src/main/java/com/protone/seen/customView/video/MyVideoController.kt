@@ -2,17 +2,14 @@ package com.protone.seen.customView.video
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
-import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
 import com.protone.seen.Progress
 import com.protone.seen.R
-import com.protone.seen.customView.DragBar.DragBar
 import com.protone.seen.databinding.VideoControllerBinding
 
 class MyVideoController @JvmOverloads constructor(
