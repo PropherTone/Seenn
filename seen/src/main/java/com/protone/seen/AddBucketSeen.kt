@@ -34,8 +34,10 @@ class AddBucketSeen(context: Context) : Seen<AddBucketSeen.Event>(context) {
     override val viewRoot: View
         get() = binding.root
 
+    override fun getToolBar(): View = binding.musicBucketParent
 
     init {
+        initToolBar()
         binding.self = this
     }
 
@@ -46,5 +48,7 @@ class AddBucketSeen(context: Context) : Seen<AddBucketSeen.Event>(context) {
     private fun loadIcon(model: ByteArray?) = binding.musicBucketIcon.apply {
         Glide.with(context).load(model).into(this)
     }
+
+
 
 }

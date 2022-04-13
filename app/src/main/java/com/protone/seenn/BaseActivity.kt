@@ -8,11 +8,13 @@ import android.os.IBinder
 import android.os.Looper
 import android.view.View
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import com.protone.api.ActivityLifecycleOwner
 import com.protone.api.context.intent
 import com.protone.api.context.musicIntentFilter
+import com.protone.api.context.statuesBarHeight
 import com.protone.database.room.config.UserConfig
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.media.MediaContentObserver
@@ -73,6 +75,7 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     }
 
     abstract suspend fun main()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

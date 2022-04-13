@@ -33,14 +33,15 @@
             android:textSize="@dimen/title_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/view"
             tools:ignore="LabelFor" />
 
         <View
+            android:id="@+id/view"
+            app:layout_constraintTop_toTopOf="parent"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/small_elevation"
-            android:background="@color/white"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:background="@color/blue_1"
+            android:layout_height="1dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/addMB_list"

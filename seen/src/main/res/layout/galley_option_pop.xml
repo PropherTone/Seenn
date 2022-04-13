@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_white">
+    android:layout_gravity="center"
+    android:paddingTop="@dimen/main_margin"
+    android:background="@color/white">
 
     <TextView
         android:id="@+id/galley_rename"
@@ -12,7 +14,7 @@
         android:gravity="center"
         android:text="@string/rename"
         android:textStyle="bold"
-        app:drawableTopCompat="@drawable/ic_baseline_more_horiz_24"
+        app:drawableTopCompat="@drawable/ic_outline_rename_24_black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,7 +25,7 @@
         android:gravity="center"
         android:text="@string/moveTo"
         android:textStyle="bold"
-        app:drawableTopCompat="@drawable/ic_baseline_more_horiz_24"
+        app:drawableTopCompat="@drawable/ic_outline_move_24"
         app:layout_constraintStart_toEndOf="@+id/galley_rename"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,7 +36,7 @@
         android:gravity="center"
         android:text="@string/delete"
         android:textStyle="bold"
-        app:drawableTopCompat="@drawable/ic_baseline_more_horiz_24"
+        app:drawableTopCompat="@drawable/ic_outline_delete_24"
         app:layout_constraintStart_toEndOf="@+id/galley_moveTo"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -45,7 +47,7 @@
         android:gravity="center"
         android:text="@string/setCategory"
         android:textStyle="bold"
-        app:drawableTopCompat="@drawable/ic_baseline_more_horiz_24"
+        app:drawableTopCompat="@drawable/ic_outline_category_24"
         app:layout_constraintStart_toEndOf="@+id/galley_delete"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -56,7 +58,7 @@
         android:gravity="center"
         android:text="@string/selectAll"
         android:textStyle="bold"
-        app:drawableTopCompat="@drawable/ic_baseline_more_horiz_24"
+        app:drawableTopCompat="@drawable/ic_outline_select_all_24"
         app:layout_constraintStart_toEndOf="@+id/galley_rename"
         app:layout_constraintTop_toBottomOf="@+id/galley_moveTo" />
 
@@ -66,7 +68,8 @@
         android:layout_height="@dimen/user_icon"
         android:gravity="center"
         android:textStyle="bold"
-        app:drawableTopCompat="@drawable/ic_baseline_more_horiz_24"
+        android:text="@string/surfing"
+        app:drawableTopCompat="@drawable/ic_outline_surfing_24"
         app:layout_constraintStart_toEndOf="@+id/galley_selectAll"
         app:layout_constraintTop_toBottomOf="@+id/galley_delete" />
 </androidx.constraintlayout.widget.ConstraintLayout>

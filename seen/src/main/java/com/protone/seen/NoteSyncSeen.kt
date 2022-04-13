@@ -19,7 +19,10 @@ class NoteSyncSeen(context: Context) : Seen<NoteSyncSeen.NoteSync>(context) {
     override val viewRoot: View
         get() = binding.root
 
+    override fun getToolBar(): View = binding.root
+
     init {
+        initToolBar()
         binding.self = this
     }
 

@@ -67,7 +67,10 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
     override val viewRoot: View
         get() = binding.root
 
+    override fun getToolBar(): View = binding.view
+
     init {
+        setSettleToolBar()
         binding.self = this
         binding.galleyActionMenu.setOnClickListener(this@GalleySeen)
         popLayout.apply {
@@ -117,7 +120,7 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
                     context as FragmentActivity,
                     galleyMediaList,
                     chooseData,
-                    multiChoose = chooseType.isNotEmpty()
+                    multiChoose = chooseType.isEmpty()
                 )
             }
             val videoFragment by lazy {
@@ -125,7 +128,7 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
                     context as FragmentActivity,
                     videoMediaList,
                     chooseData,
-                    multiChoose = chooseType.isNotEmpty(),
+                    multiChoose = chooseType.isEmpty(),
                     isVideo = true
                 )
             }

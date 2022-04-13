@@ -68,7 +68,10 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
     override val viewRoot: View
         get() = binding.root
 
+    override fun getToolBar(): View = binding.mainGroup
+
     init {
+        initToolBar()
         binding.apply {
             self = this@MainSeen
             musicPlayer.apply {
@@ -105,4 +108,6 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
     fun setBackGround(dr: Drawable) {
         binding.model.background = dr
     }
+
+
 }

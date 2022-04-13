@@ -16,10 +16,10 @@ interface MusicDAO {
     @Delete
     fun deleteMusic(music: Music)
 
-    @Update
+    @Update(entity = Music::class)
     fun updateMusic(music: Music) : Int
 
-    @Query("UPDATE Music SET myBucket = :bucket WHERE title LIKE :name")
+    @Query("UPDATE Music SET myBucket = :bucket WHERE title == :name")
     fun updateMusicMyBucket(name: String,bucket:List<String>) : Int
 
 }

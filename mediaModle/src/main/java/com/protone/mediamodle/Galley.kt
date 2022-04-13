@@ -19,7 +19,7 @@ object Galley {
             value.forEach { (_, mutableList) ->
                 ap.addAll(mutableList)
             }
-            value[Global.application.getString(R.string.all_music)] = ap
+            value[Global.application.getString(R.string.all_galley)] = ap
             field = value
             photoLive.postValue(field)
         }
@@ -32,7 +32,7 @@ object Galley {
             value.forEach { (_, mutableList) ->
                 ap.addAll(mutableList)
             }
-            value[Global.application.getString(R.string.all_music)] = ap
+            value[Global.application.getString(R.string.all_galley)] = ap
             field = value
             videoLive.postValue(field)
         }

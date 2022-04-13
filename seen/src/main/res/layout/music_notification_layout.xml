@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/notify_music_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
@@ -16,7 +17,8 @@
         android:src="@drawable/ic_baseline_music_note_24" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical">
@@ -73,5 +75,14 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/notify_music_close"
+        android:layout_marginEnd="@dimen/small_margin"
+        android:contentDescription="@string/action"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_baseline_close_24"
+        android:layout_width="@dimen/smaller_Icon"
+        android:layout_height="@dimen/user_icon"/>
 
 </LinearLayout>

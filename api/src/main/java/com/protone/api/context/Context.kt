@@ -5,8 +5,6 @@ import android.content.Context
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import java.text.SimpleDateFormat
-import java.util.*
 
 val Context.layoutInflater: LayoutInflater
     get() = LayoutInflater.from(this)
@@ -20,6 +18,25 @@ val Context.root: ViewGroup?
             else -> null
         }
     }
+
+val Context.statuesBarHeight: Int
+    get() = resources.getDimensionPixelSize(
+        resources.getIdentifier(
+            "status_bar_height",
+            "dimen",
+            "android"
+        )
+
+    )
+
+val Context.navigationBarHeight: Int
+    get() = resources.getDimensionPixelSize(
+        resources.getIdentifier(
+            "navigation_bar_height",
+            "dimen",
+            "android"
+        )
+    )
 
 
 fun onBackground(function: () -> Unit) {

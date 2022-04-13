@@ -28,7 +28,10 @@ class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context) {
     override val viewRoot: View
         get() = binding.root
 
+    override fun getToolBar(): View = binding.root
+
     init {
+        initToolBar()
 
     }
 

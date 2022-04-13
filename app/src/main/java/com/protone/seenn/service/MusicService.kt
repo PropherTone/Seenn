@@ -20,9 +20,11 @@ import com.protone.mediamodle.Galley
 import com.protone.mediamodle.MusicState
 import com.protone.mediamodle.media.*
 import com.protone.seenn.R
+import com.protone.seenn.broadcast.ApplicationBroadCast
 import java.lang.Exception
 import java.util.*
 import kotlin.concurrent.timerTask
+import kotlin.system.exitProcess
 
 class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
 
@@ -40,6 +42,19 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
     private var notificationManager: NotificationManager? = null
 
     private var notification: Notification? = null
+
+    private val appReceiver =  object  : ApplicationBroadCast(){
+        override fun finish() {
+            notificationManager?.cancel(NOTIFICATION_ID)
+            this@MusicService.stopSelf()
+            exitProcess(0)
+        }
+
+        override fun music() {
+
+        }
+
+    }
 
     private val receiver = object : MusicReceiver() {
 
@@ -156,6 +171,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         Galley.musicBucket[userConfig.playedMusicBucket]?.let { setDate(it) }
         musicBroadCastManager.registerReceiver(receiver, musicIntentFilter)
         registerReceiver(receiver, musicIntentFilter)
+        registerReceiver(appReceiver, appIntentFilter)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -177,6 +193,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         notificationManager = null
         musicFinish()
         unregisterReceiver(receiver)
+        unregisterReceiver(appReceiver)
         musicBroadCastManager.unregisterReceiver(receiver)
     }
 
@@ -206,6 +223,20 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
                 Intent(MUSIC_NEXT),
                 intentFlags
             ).let { setOnClickPendingIntent(R.id.notify_music_next, it) }
+
+            PendingIntent.getBroadcast(
+                this@MusicService,
+                0,
+                Intent(MUSIC),
+                intentFlags
+            ).let { setOnClickPendingIntent(R.id.notify_music_parent, it) }
+
+            PendingIntent.getBroadcast(
+                this@MusicService,
+                0,
+                Intent(FINISH),
+                intentFlags
+            ).let { setOnClickPendingIntent(R.id.notify_music_close, it) }
         }
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

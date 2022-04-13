@@ -100,7 +100,6 @@ class MainActivity : BaseActivity<MainSeen>() {
                                 MUSIC_NEXT
                             )
                         )
-
                         MainSeen.Touch.PauseVideo -> {}
                     }
                 }

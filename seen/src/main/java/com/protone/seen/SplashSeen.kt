@@ -20,6 +20,7 @@ class SplashSeen(context: Context) : Seen<SplashSeen.Event>(context),
         get() = binding.root
 
     init {
+        initToolBar()
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(this)
     }
 
@@ -33,4 +34,6 @@ class SplashSeen(context: Context) : Seen<SplashSeen.Event>(context),
     override fun offer(event: Event) {
 
     }
+
+    override fun getToolBar(): View = binding.root
 }

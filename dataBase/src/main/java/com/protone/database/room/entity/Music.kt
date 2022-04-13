@@ -22,7 +22,7 @@ data class Music(
     val duration: Long,
     val year: Long,
     var uri: Uri,
-    var myBucket: List<String>?
+    var myBucket: List<String>
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0

@@ -104,15 +104,13 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                         when (d) {
                             is Animatable -> {
                                 d.start()
-                                val bucket = (music.myBucket ?: arrayListOf()).also { bs ->
-                                    (bs as ArrayList).add(bucket)
+                                val bucket = music.myBucket.apply {
+                                    (this as ArrayList).add(bucket)
                                 }
-                                DataBaseDAOHelper.updateMusicMyBucketCB(
-                                    music.title,
-                                    bucket
+                                DataBaseDAOHelper.updateMusicCB(
+                                    music
                                 ) { re ->
                                     if (re != -1 && re != 0) {
-                                        music.myBucket = bucket
                                         changeIconAni(musicListPlayState)
                                     } else {
                                         selectList.remove(music)
@@ -158,7 +156,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                     )
                 )
                 animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true)
-            })
+            }, play = true)
         }
     }
 

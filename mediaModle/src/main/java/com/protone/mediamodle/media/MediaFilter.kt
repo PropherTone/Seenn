@@ -181,7 +181,7 @@ fun scanAudio(): MutableList<Music> {
                     audioDuration,
                     audioYear,
                     uri,
-                    null
+                    arrayListOf()
                 )
             )
         }

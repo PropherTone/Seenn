@@ -86,7 +86,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/icon_50"
             android:background="@color/blue_1"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/view">
 
             <ImageView
                 android:id="@+id/toolbar_back"
@@ -103,10 +103,11 @@
         </LinearLayout>
 
         <View
+            android:id="@+id/view"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_width="match_parent"
-            android:background="@color/white"
-            android:layout_height="@dimen/small_elevation"/>
+            android:background="@color/blue_1"
+            android:layout_height="1dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

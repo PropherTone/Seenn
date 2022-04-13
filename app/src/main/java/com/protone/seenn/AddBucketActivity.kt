@@ -1,6 +1,7 @@
 package com.protone.seenn
 
 import android.content.Intent
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.intent
 import com.protone.api.json.toUri

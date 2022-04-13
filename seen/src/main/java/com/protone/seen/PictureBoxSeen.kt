@@ -22,7 +22,10 @@ class PictureBoxSeen(context: Context) : Seen<PictureBoxSeen.PictureBox>(context
     override val viewRoot: View
         get() = binding.root
 
+    override fun getToolBar(): View = binding.root
+
     init {
+        initToolBar()
         binding.self = this
     }
 

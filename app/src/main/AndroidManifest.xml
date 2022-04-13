@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.protone.seenn">
 
-    <uses-permission android:name="android.permission.INTERNET" /> <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE" /> -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE" /> -->
     <!-- <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" /> -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -22,7 +23,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SeennWithBar">
+        android:theme="@style/Theme.Seenn"
+        tools:ignore="DataExtractionRules">
         <activity
             android:name=".MainActivity"
             android:exported="false"
@@ -76,6 +78,16 @@
                 <action android:name="UPDATE_MUSIC" />
                 <action android:name="UPDATE_PHOTO" />
                 <action android:name="UPDATE_VIDEO" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.protone.seenn.broadcast.ApplicationBroadCast"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="MUSIC" />
+                <action android:name="FNINSH" />
             </intent-filter>
         </receiver>
     </application>

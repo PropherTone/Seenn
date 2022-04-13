@@ -1,15 +1,14 @@
 package com.protone.seen
 
 import android.content.Context
-import android.graphics.Color
 import android.net.Uri
 import android.view.View
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
+import com.protone.api.context.statuesBarHeight
 import com.protone.mediamodle.note.entity.RichNoteStates
-import com.protone.mediamodle.note.entity.RichPhotoStates
-import com.protone.mediamodle.note.entity.SpanStates
 import com.protone.mediamodle.note.spans.ISpan
 import com.protone.seen.adapter.RichNoteAdapter
 import com.protone.seen.customView.ColorPopWindow
@@ -30,7 +29,10 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
     override val viewRoot: View
         get() = binding.root
 
+    override fun getToolBar(): View = binding.toolbar
+
     init {
+        initToolBar()
         binding.self = this
         binding.noteEditRichView.apply {
             layoutManager = LinearLayoutManager(context)

@@ -26,7 +26,10 @@ class AddMusic2BucketSeen(context: Context) : Seen<AddMusic2BucketSeen.Event>(co
     override val viewRoot: View
         get() = binding.root
 
+    override fun getToolBar(): View = binding.view
+
     init {
+        setSettleToolBar()
         binding.self = this
     }
 

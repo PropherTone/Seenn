@@ -19,7 +19,7 @@ class GalleyOptionPop(val context: Context,val view: View) {
         popupWindow.apply {
             contentView = view
             height = ViewGroup.LayoutParams.WRAP_CONTENT
-            width = Config.screenWidth
+            width = ViewGroup.LayoutParams.MATCH_PARENT
             isOutsideTouchable = true
             isFocusable = true
             elevation = 10f

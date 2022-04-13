@@ -20,4 +20,9 @@ class NoteListSeen(context: Context) : Seen<NoteListSeen.NoteListEvent>(context)
     override fun offer(event: NoteListEvent) {
 
     }
+    override fun getToolBar(): View = binding.root
+
+    init {
+        initToolBar()
+    }
 }

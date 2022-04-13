@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.view.View
 import com.protone.api.Config
 import com.protone.api.checkNeededPermission
 import com.protone.api.context.intent

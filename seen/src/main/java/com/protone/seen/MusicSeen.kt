@@ -57,7 +57,10 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
 
     var bucket: String = ""
 
+    override fun getToolBar(): View = binding.view
+
     init {
+        setSettleToolBar()
         binding.self = this
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(this)
     }

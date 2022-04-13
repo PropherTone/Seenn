@@ -102,7 +102,7 @@ class GalleyFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        selectedBucket = getString(R.string.all_music)
+        selectedBucket = getString(R.string.all_galley)
         galleyView = GalleyFragmentLayoutBinding.inflate(inflater, container, false).apply {
             root.viewTreeObserver.addOnGlobalLayoutListener(this@GalleyFragment)
             galleyList.itemAnimator = null
@@ -213,16 +213,16 @@ class GalleyFragment(
     }
 
     private suspend fun updateBucket() = withContext(Dispatchers.Main) {
-        (galleyView.galleyBucket.adapter as GalleyBucketAdapter).noticeDataUpdate(getBucketData())
+        (galleyView.galleyBucket.adapter as GalleyBucketAdapter?)?.noticeDataUpdate(getBucketData())
     }
 
     private suspend fun updateGalley(name: String) = withContext(Dispatchers.Main) {
-        (galleyView.galleyList.adapter as GalleyListAdapter).noticeDataUpdate(getListData(name))
+        (galleyView.galleyList.adapter as GalleyListAdapter?)?.noticeDataUpdate(getListData(name))
     }
 
     private suspend fun updateGalley(item: MutableList<GalleyMedia>) =
         withContext(Dispatchers.Main) {
-            (galleyView.galleyList.adapter as GalleyListAdapter).noticeDataUpdate(item)
+            (galleyView.galleyList.adapter as GalleyListAdapter?)?.noticeDataUpdate(item)
         }
 
     override fun onGlobalLayout() {
