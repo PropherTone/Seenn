@@ -16,5 +16,4 @@ class RichPhotoView @JvmOverloads constructor(
     @StyleRes defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes){
     val binding = RichPhotoLayoutBinding.inflate(context.layoutInflater,this,true)
-
 }

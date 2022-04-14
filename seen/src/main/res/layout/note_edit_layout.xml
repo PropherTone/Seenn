@@ -71,13 +71,21 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.protone.seen.customView.InRecyclerView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/noteEdit_richView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="60dp"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
             app:layout_constraintBottom_toTopOf="@id/noteEdit_tool"
-            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+            <com.protone.seen.customView.richText.RichNoteView
+                android:id="@+id/noteEdit_richNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </androidx.core.widget.NestedScrollView>
 
         <ScrollView
             android:id="@+id/noteEdit_tool"

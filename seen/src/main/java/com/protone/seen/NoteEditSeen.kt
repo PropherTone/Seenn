@@ -9,6 +9,7 @@ import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.api.context.statuesBarHeight
 import com.protone.mediamodle.note.entity.RichNoteStates
+import com.protone.mediamodle.note.entity.RichPhotoStates
 import com.protone.mediamodle.note.spans.ISpan
 import com.protone.seen.adapter.RichNoteAdapter
 import com.protone.seen.customView.ColorPopWindow
@@ -34,8 +35,10 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
     init {
         initToolBar()
         binding.self = this
-        binding.noteEditRichView.apply {
-            layoutManager = LinearLayoutManager(context)
+        binding.noteEditRichNote.apply {
+            isEditable = true
+            insertText(RichNoteStates("", arrayListOf()))
+//            layoutManager = LinearLayoutManager(context)
 //            val listOf = listOf(
 //                SpanStates(1, 3, SpanStates.Spans.ForegroundColorSpan, iColor = "#48a1ff"),
 //                SpanStates(1, 3, SpanStates.Spans.StrikeThroughSpan),
@@ -44,12 +47,12 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
 //                SpanStates(13, 15, SpanStates.Spans.ForegroundColorSpan),
 //                SpanStates(16, 18, SpanStates.Spans.ForegroundColorSpan)
 //            )
-            richNoteAdapter = RichNoteAdapter(
-                context,
-                true,
-                arrayListOf(RichNoteStates("", arrayListOf()))
-            )
-            adapter = richNoteAdapter
+//            richNoteAdapter = RichNoteAdapter(
+//                context,
+//                true,
+//                arrayListOf(RichNoteStates("", arrayListOf()))
+//            )
+//            adapter = richNoteAdapter
         }
     }
 
@@ -88,10 +91,10 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
     }
 
     override fun setImage(uri: Uri, link: String?, name: String, date: String?) {
-        richNoteAdapter?.setImage(uri, link, name, date)
+        binding.noteEditRichNote.insertImage(RichPhotoStates(uri, link, name, date))
     }
 
-    suspend fun indexRichNote(){
+    suspend fun indexRichNote() {
         richNoteAdapter?.indexRichNote()
     }
 }
