@@ -4,11 +4,13 @@ import android.animation.ValueAnimator
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -17,6 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.Config
+import com.protone.api.TAG
 import com.protone.api.animation.AnimationHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.adapter.GalleyBucketAdapter

@@ -1,6 +1,7 @@
 package com.protone.mediamodle
 
 import android.util.Log
+import com.protone.api.TAG
 import com.protone.api.context.Global
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia

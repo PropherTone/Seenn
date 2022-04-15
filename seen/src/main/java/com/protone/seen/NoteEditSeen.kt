@@ -1,31 +1,29 @@
 package com.protone.seen
 
 import android.content.Context
-import android.net.Uri
+import android.graphics.Color
 import android.view.View
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
-import com.protone.api.context.statuesBarHeight
-import com.protone.mediamodle.note.entity.RichNoteStates
-import com.protone.mediamodle.note.entity.RichPhotoStates
-import com.protone.mediamodle.note.spans.ISpan
-import com.protone.seen.adapter.RichNoteAdapter
+import com.protone.api.json.jsonToList
+import com.protone.api.json.toEntity
+import com.protone.mediamodle.note.entity.*
+import com.protone.mediamodle.note.spans.ISpanForUse
 import com.protone.seen.customView.ColorPopWindow
+import com.protone.seen.customView.richText.RichNoteView
 import com.protone.seen.databinding.NoteEditLayoutBinding
 
-class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context), ISpan {
+class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context), ISpanForUse {
 
     enum class NoteEditEvent {
         Confirm,
         Finish,
-        PickImage
+        PickImage,
+        PickVideo,
+        PickMusic
     }
 
     private val binding = NoteEditLayoutBinding.inflate(context.layoutInflater, context.root, true)
-
-    private var richNoteAdapter: RichNoteAdapter? = null
 
     override val viewRoot: View
         get() = binding.root
@@ -37,22 +35,15 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
         binding.self = this
         binding.noteEditRichNote.apply {
             isEditable = true
-            insertText(RichNoteStates("", arrayListOf()))
-//            layoutManager = LinearLayoutManager(context)
-//            val listOf = listOf(
-//                SpanStates(1, 3, SpanStates.Spans.ForegroundColorSpan, iColor = "#48a1ff"),
-//                SpanStates(1, 3, SpanStates.Spans.StrikeThroughSpan),
-//                SpanStates(4, 7, SpanStates.Spans.ForegroundColorSpan, iColor = Color.RED),
-//                SpanStates(8, 12, SpanStates.Spans.UnderlineSpan),
-//                SpanStates(13, 15, SpanStates.Spans.ForegroundColorSpan),
-//                SpanStates(16, 18, SpanStates.Spans.ForegroundColorSpan)
-//            )
-//            richNoteAdapter = RichNoteAdapter(
-//                context,
-//                true,
-//                arrayListOf(RichNoteStates("", arrayListOf()))
-//            )
-//            adapter = richNoteAdapter
+            val listOf = arrayListOf(
+                SpanStates(1, 3, SpanStates.Spans.ForegroundColorSpan, iColor = "#48a1ff"),
+                SpanStates(1, 3, SpanStates.Spans.StrikeThroughSpan),
+                SpanStates(4, 7, SpanStates.Spans.ForegroundColorSpan, iColor = "#48a1ff"),
+                SpanStates(8, 12, SpanStates.Spans.UnderlineSpan),
+                SpanStates(13, 15, SpanStates.Spans.ForegroundColorSpan),
+                SpanStates(16, 18, SpanStates.Spans.ForegroundColorSpan)
+            )
+            setRichList(listOf(RichNoteStates(context.getString(R.string.huge_text), listOf)))
         }
     }
 
@@ -60,41 +51,64 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
         viewEvent.offer(event)
     }
 
-    override fun setBold() {
-        richNoteAdapter?.setBold()
-    }
+    override fun setBold() = binding.noteEditRichNote.setBold()
 
-    override fun setItalic() {
-        richNoteAdapter?.setItalic()
-    }
+    override fun setItalic() = binding.noteEditRichNote.setItalic()
 
-    override fun setSize() {
-        richNoteAdapter?.setSize(12)
-    }
+    override fun setSize() = binding.noteEditRichNote.setSize(12)
 
-    override fun setUnderlined() {
-        richNoteAdapter?.setUnderlined()
-    }
+    override fun setUnderlined() = binding.noteEditRichNote.setUnderlined()
 
-    override fun setStrikethrough() {
-        richNoteAdapter?.setStrikethrough()
+    override fun setStrikethrough() = binding.noteEditRichNote.setStrikethrough()
+
+    override fun insertImage() = offer(NoteEditEvent.PickImage)
+
+    fun insertImage(photo: RichPhotoStates) = binding.noteEditRichNote.insertImage(photo)
+
+    override fun insertVideo() = offer(NoteEditEvent.PickVideo)
+
+    fun insertVideo(video: RichVideoStates) = binding.noteEditRichNote.insertVideo(video)
+
+    override fun insertMusic() = offer(NoteEditEvent.PickMusic)
+
+    fun insertMusic(music: RichMusicStates) = binding.noteEditRichNote.insertMusic(music)
+
+    suspend fun indexRichNote() {
+        val indexRichNote = binding.noteEditRichNote.indexRichNote()
+        var first = indexRichNote.first
+        val second = indexRichNote.second
+        val jsonToList = second.jsonToList(String::class.java)
+        var listSize = jsonToList.size - 1
+        val richList = arrayListOf<RichStates>()
+        while (first > 0) {
+            richList.add(
+                when (first % 10) {
+                    RichNoteView.PHOTO -> {
+                        jsonToList[listSize--].toEntity(RichPhotoStates::class.java)
+                    }
+                    RichNoteView.MUSIC -> {
+                        jsonToList[listSize--].toEntity(RichMusicStates::class.java)
+                    }
+                    RichNoteView.VIDEO -> {
+                        jsonToList[listSize--].toEntity(RichVideoStates::class.java)
+                    }
+                    else -> {
+                        val toEntity = jsonToList[listSize--].toEntity(RichNoteSer::class.java)
+                        val toEntity1 = toEntity.spans.jsonToList(SpanStates::class.java)
+                        RichNoteStates(toEntity.text,toEntity1)
+                    }
+                }
+            )
+            first /= 10
+        }
+        //TODO Only string color span can be saved
+        binding.noteEditRichNote.setRichList(richList)
     }
 
     override fun setColor() {
         ColorPopWindow(context).startPopWindow(binding.noteEditTool) {
-            richNoteAdapter?.setColor(it)
+            binding.noteEditRichNote.setColor(it)
         }
     }
 
-    override fun setImage() {
-        offer(NoteEditEvent.PickImage)
-    }
-
-    override fun setImage(uri: Uri, link: String?, name: String, date: String?) {
-        binding.noteEditRichNote.insertImage(RichPhotoStates(uri, link, name, date))
-    }
-
-    suspend fun indexRichNote() {
-        richNoteAdapter?.indexRichNote()
-    }
 }

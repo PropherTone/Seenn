@@ -11,6 +11,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.database.room.entity.GalleyMedia

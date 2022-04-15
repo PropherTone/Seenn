@@ -156,7 +156,7 @@
                     android:layout_height="@dimen/small_Icon"
                     android:layout_marginStart="@dimen/icon_margin"
                     android:contentDescription="@string/action"
-                    android:onClick="@{()->self.setImage()}"
+                    android:onClick="@{()->self.insertImage()}"
                     android:padding="@dimen/texts_padding"
                     android:src="@drawable/ic_baseline_image_24_black" />
 

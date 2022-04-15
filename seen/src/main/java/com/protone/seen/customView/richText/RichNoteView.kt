@@ -1,73 +1,131 @@
 package com.protone.seen.customView.richText
 
+import android.animation.LayoutTransition
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
+import android.graphics.Color
+import android.graphics.Typeface
+import android.text.Spanned
+import android.text.style.*
 import android.util.AttributeSet
-import android.view.View
+import android.view.KeyEvent
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
+import androidx.core.widget.NestedScrollView
 import com.bumptech.glide.Glide
 import com.protone.api.context.layoutInflater
-import com.protone.mediamodle.note.entity.RichNoteStates
-import com.protone.mediamodle.note.entity.RichPhotoStates
-import com.protone.seen.adapter.RichNoteAdapter
-import com.protone.seen.databinding.NoteViewLayoutBinding
+import com.protone.api.json.listToJson
+import com.protone.api.json.toJson
+import com.protone.mediamodle.note.entity.*
+import com.protone.mediamodle.note.spans.ColorSpan
+import com.protone.mediamodle.note.spans.ISpanForEditor
+import com.protone.seen.databinding.RichMusicLayoutBinding
 import com.protone.seen.databinding.RichPhotoLayoutBinding
+import com.protone.seen.databinding.RichVideoLayoutBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 
+/**
+ * RichText editor by ProTone 2022/4/15
+ *
+ * Use [ScrollView] or [NestedScrollView] as editor's parent
+ * */
 class RichNoteView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     @AttrRes defStyleAttr: Int = 0,
     @StyleRes defStyleRes: Int = 0,
     var isEditable: Boolean = false
-) : LinearLayout(context, attrs, defStyleAttr, defStyleRes) {
+) : LinearLayout(context, attrs, defStyleAttr, defStyleRes), ISpanForEditor {
 
-    private val richList = arrayListOf<Any>()
+    companion object {
+        const val TEXT = 0X01
+        const val PHOTO = 0X02
+        const val MUSIC = 0x03
+        const val VIDEO = 0x04
+    }
 
-    private val richMap = mutableMapOf<Int, View>()
+    private val richList = arrayListOf<RichStates>()
+
+    private var curPosition = 0
+
+    private var inIndex = false
 
     init {
         orientation = VERTICAL
+        layoutTransition = LayoutTransition()
     }
 
-    fun setRichList(list: List<Any>) {
+    /**
+     * Generate rich text
+     *
+     * @param list List of [RichStates] use for generating
+     */
+    fun setRichList(list: List<RichStates>) {
         richList.clear()
+        removeAllViews()
         richList.addAll(list)
+
+        inIndex = true
+        richList.forEach {
+            when (it) {
+                is RichNoteStates -> insertText(it)
+                is RichVideoStates -> insertVideo(it)
+                is RichPhotoStates -> insertImage(it)
+                is RichMusicStates -> insertMusic(it)
+            }
+        }
+        inIndex = false
     }
 
     fun insertText(note: RichNoteStates) {
-        richList.add(note)
-        this.addView(when (isEditable) {
+        if (!inIndex) richList.add(note)
+        addView(when (isEditable) {
             true ->
                 EditText(context).apply {
                     layoutParams = LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
+                    setBackgroundColor(Color.WHITE)
                     setText(note.text)
-                    addTextChangedListener(object : TextWatcher {
-                        override fun beforeTextChanged(
-                            s: CharSequence?,
-                            start: Int,
-                            count: Int,
-                            after: Int
-                        ) = Unit
+                    setOnKeyListener { _, keyCode, event ->
+                        // Noticed if no text to delete while delete key pressed
+                        if (keyCode == KeyEvent.KEYCODE_DEL &&
+                            event.action == KeyEvent.ACTION_DOWN &&
+                            text.isEmpty()
+                        ) {
+                            var indexOfChild = indexOfChild(this@apply)
+                            if (indexOfChild > 0) {
+                                removeViewAt(indexOfChild)
+                                richList.remove(note)
+                                //Delete next view if it's not a edittext
+                                if (indexOfChild-- > 0 && getChildAt(indexOfChild) !is EditText) {
+                                    removeView(getChildAt(indexOfChild))
+                                    richList.removeAt(indexOfChild--)
+                                    //Insert new edittext when there has no place for input
+                                    if ((indexOfChild > 0 && indexOfChild in 0 until childCount && getChildAt(
+                                            indexOfChild
+                                        ) !is EditText) || childCount == 0
+                                    ) {
+                                        insertText(RichNoteStates("", arrayListOf()))
+                                    }
+                                }
 
-                        override fun onTextChanged(
-                            s: CharSequence?,
-                            start: Int,
-                            before: Int,
-                            count: Int
-                        ) = Unit
-
-                        override fun afterTextChanged(s: Editable?) {
-
+                            }
                         }
-
-                    })
+                        false
+                    }
+                    setOnFocusChangeListener { v, hasFocus ->
+                        if (hasFocus) {
+                            curPosition = this@RichNoteView.indexOfChild(v)
+                        }
+                    }
                 }
             else -> TextView(context).apply {
                 layoutParams = LayoutParams(
@@ -76,19 +134,210 @@ class RichNoteView @JvmOverloads constructor(
                 )
                 text = note.text
             }
-        }.also { richMap[if (richList.size > 0) richList.size - 1 else 0] = it })
+        })
     }
 
-    fun insertImage(note: RichPhotoStates) {
+    override fun insertVideo(video: RichVideoStates) = insertMedia {
+        addView(RichVideoLayoutBinding.inflate(context.layoutInflater, this, false).apply {
+
+        }.root, it + 1)
+        if (!inIndex) richList.add(video)
+    }
+
+    override fun insertMusic(music: RichMusicStates) = insertMedia {
+        addView(RichMusicLayoutBinding.inflate(context.layoutInflater, this, false).apply {
+
+        }.root, it + 1)
+        if (!inIndex) richList.add(music)
+    }
+
+    override fun insertImage(photo: RichPhotoStates) = insertMedia {
         addView(
             RichPhotoLayoutBinding
                 .inflate(context.layoutInflater, this, false)
                 .apply {
-                    Glide.with(this.richPhotoIv.context).load(note.uri)
+                    Glide.with(this.richPhotoIv.context).load(photo.uri)
                         .into(this.richPhotoIv)
-                    richPhotoTitle.text = note.name
-                    richPhotoDetail.text = note.date
-                }.root
+                    richPhotoTitle.text = photo.name
+                    richPhotoDetail.text = photo.date
+                }.root, it + 1
         )
+        if (!inIndex) richList.add(photo)
+    }
+
+    override fun setBold() {
+        setEditTextSpan(StyleSpan(Typeface.BOLD), SpanStates.Spans.StyleSpan, style = Typeface.BOLD)
+    }
+
+    override fun setItalic() {
+        setEditTextSpan(
+            StyleSpan(Typeface.ITALIC),
+            SpanStates.Spans.StyleSpan,
+            style = Typeface.ITALIC
+        )
+    }
+
+    override fun setSize(size: Int) {
+        setEditTextSpan(
+            AbsoluteSizeSpan(size),
+            SpanStates.Spans.AbsoluteSizeSpan,
+            absoluteSize = size
+        )
+    }
+
+    override fun setUnderlined() {
+        setEditTextSpan(UnderlineSpan(), SpanStates.Spans.UnderlineSpan)
+    }
+
+    override fun setStrikethrough() {
+        setEditTextSpan(StrikethroughSpan(), SpanStates.Spans.StrikeThroughSpan)
+    }
+
+    override fun setColor(color: Any) {
+        setEditTextSpan(
+            when (color) {
+                is Int -> ColorSpan(color)
+                is String -> ColorSpan(color)
+                else -> ColorSpan(Color.BLACK)
+            }, SpanStates.Spans.ForegroundColorSpan, iColor = color
+        )
+    }
+
+    /**
+     * Indexing rich note for database to store
+     *
+     * @return [Pair]
+     * <[Int],[String]>
+     *
+     * [Int] : A sort of number that from left to right market the [RichStates]
+     *
+     * [String] : Json of [RichStates]>
+     */
+    suspend fun indexRichNote(): Pair<Int, String> {
+        return withContext(Dispatchers.IO) {
+            suspendCancellableCoroutine<Pair<Int, String>> { co ->
+                val richSer = arrayListOf<String>()
+                var richStates = 0
+                richList.forEach {
+                    when (it) {
+                        is RichNoteStates -> richSer.add(
+                            RichNoteSer(
+                                getEdittext(richList.indexOf(it))?.text.toString(),
+                                it.spanStates.listToJson(SpanStates::class.java)
+                            ).toJson()
+                        ).apply { richStates = richStates * 10 + TEXT }
+                        is RichVideoStates -> richSer.add(it.toJson())
+                            .apply { richStates = richStates * 10 + VIDEO }
+                        is RichPhotoStates -> richSer.add(it.toJson())
+                            .apply { richStates = richStates * 10 + PHOTO }
+                        is RichMusicStates -> richSer.add(it.toJson())
+                            .apply { richStates = richStates * 10 + MUSIC }
+                    }
+                }
+                co.resumeWith(
+                    Result.success(Pair(richStates, richSer.listToJson(String::class.java)))
+                )
+            }
+        }
+    }
+
+    /**
+     * Function used for insert different type of media that done the basic work
+     *
+     * @param func Callback used for custom
+     */
+    private inline fun insertMedia(func: (Int) -> Unit) {
+        var insertPosition = curPosition
+        //While inserting a image,delete the empty edittext at the top of target(Image)
+        if (insertPosition in 0 until childCount) {
+            val child = getChildAt(insertPosition)
+            if (child is EditText && child.text.isEmpty()) {
+                removeView(child)
+                insertPosition--
+            }
+        }
+        func(insertPosition)
+        //Insert a edittext to make sure there have a place for input
+        insertText(RichNoteStates("", arrayListOf()).also { richList.add(it) })
+    }
+
+    /**
+     * Basic function for set span and update [RichNoteStates]
+     *
+     * @param span Target span
+     * @param targetSpan Enum that market the span
+     * @param iColor Use for [ForegroundColorSpan] and [BackgroundColorSpan],[String] and [Int] are Supported
+     * @param absoluteSize Use for [AbsoluteSizeSpan]
+     * @param relativeSize Use for [RelativeSizeSpan]
+     * @param scaleX Use for [ScaleXSpan]
+     * @param style Use for [StyleSpan]
+     * @param url Use for [URLSpan]
+     */
+    private fun setEditTextSpan(
+        span: Any,
+        targetSpan: SpanStates.Spans,
+        iColor: Any? = null,
+        absoluteSize: Int? = null,
+        relativeSize: Float? = null,
+        scaleX: Float? = null,
+        style: Int? = null,
+        url: String? = null
+    ) {
+        getEdittext(curPosition)?.also {
+            it.text.setSpan(
+                span,
+                it.selectionStart,
+                it.selectionEnd,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            when (getCurRichStates()) {
+                is RichNoteStates -> (getCurRichStates() as RichNoteStates?)?.apply {
+                    this.text = it.text
+                    (spanStates as ArrayList)
+                        .add(
+                            SpanStates(
+                                it.selectionStart,
+                                it.selectionEnd,
+                                targetSpan,
+                                iColor,
+                                absoluteSize,
+                                relativeSize,
+                                scaleX,
+                                style,
+                                url
+                            )
+                        )
+                }
+            }
+        }
+    }
+
+    /**
+     * Get edittext
+     *
+     * @param position target
+     * @return [EditText] or null when target is not [EditText] or caught [IndexOutOfBoundsException]
+     */
+    private fun getEdittext(position: Int): EditText? {
+        return try {
+            getChildAt(position).let {
+                if (it is EditText) it else null
+            }
+        } catch (e: IndexOutOfBoundsException) {
+            null
+        }
+    }
+
+    /**
+     * Get current [RichStates]
+     *
+     * @return [RichStates] or null when caught [IndexOutOfBoundsException]
+     */
+    private fun getCurRichStates(): RichStates? {
+        return try {
+            richList[curPosition]
+        } catch (e: IndexOutOfBoundsException) {
+            null
+        }
     }
 }

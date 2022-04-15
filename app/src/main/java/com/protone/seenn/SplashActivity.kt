@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import com.protone.api.Config
 import com.protone.api.checkNeededPermission
@@ -63,12 +64,6 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                 event.onReceive {
                     when (it) {
                         Event.OnStart -> {
-                            Config.apply {
-                                splashSeen.globalLayout = { height, width ->
-                                    screenHeight = height
-                                    screenWidth = width
-                                }
-                            }
                             checkNeededPermission({
                                 requestContentPermission()
                             }, {

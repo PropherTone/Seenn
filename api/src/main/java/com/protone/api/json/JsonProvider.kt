@@ -41,7 +41,6 @@ fun <T> List<*>.listToJson(clazz: Class<T>):String{
 }
 
 fun <T> String.jsonToList(clazz: Class<T>): List<T> {
-    Log.d(TAG, "jsonToList: $this")
     return GsonBuilder()
         .registerTypeAdapter(Uri::class.java, UriDeserializer())
         .create()

@@ -2,7 +2,7 @@ package com.protone.mediamodle.note.entity
 
 import com.protone.mediamodle.note.spans.indexSpan
 
-data class RichNoteStates(val spanStates: List<SpanStates>) {
+data class RichNoteStates(val spanStates: List<SpanStates>) : RichStates() {
     var text: CharSequence? = ""
         get() = spanStates.let { field?.indexSpan(it) }
 

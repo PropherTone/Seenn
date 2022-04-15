@@ -1,57 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
+        android:id="@+id/rich_photo_tv_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <RelativeLayout
-            android:id="@+id/rich_photo_tv_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/rich_photo_title"
-                android:textColor="@color/white"
-                android:background="@color/transparent_black"
-                android:letterSpacing="0.05"
-                android:textSize="@dimen/sub_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingTop="@dimen/texts_padding"
-                android:paddingBottom="@dimen/texts_padding"
-                android:layout_alignParentTop="true"
-                android:text="@string/test_title" />
-
-            <TextView
-                android:id="@+id/rich_photo_detail"
-                android:textColor="@color/white"
-                android:background="@color/transparent_black"
-                android:letterSpacing="0.05"
-                android:textSize="@dimen/sub_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingTop="@dimen/texts_padding"
-                android:paddingBottom="@dimen/texts_padding"
-                android:layout_alignParentBottom="true"
-                android:text="@string/test_title" />
-        </RelativeLayout>
 
         <ImageView
             android:id="@+id/rich_photo_iv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:contentDescription="@string/photo"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_centerInParent="true"
+            android:background="@color/white"
+            android:contentDescription="@string/photo" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/rich_photo_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:background="@color/transparent_black"
+            android:gravity="center"
+            android:letterSpacing="0.05"
+            android:paddingTop="@dimen/texts_padding"
+            android:paddingBottom="@dimen/texts_padding"
+            android:text="@string/test_title"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sub_text" />
+
+        <TextView
+            android:id="@+id/rich_photo_detail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/transparent_black"
+            android:gravity="center"
+            android:letterSpacing="0.05"
+            android:paddingTop="@dimen/texts_padding"
+            android:paddingBottom="@dimen/texts_padding"
+            android:text="@string/test_title"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sub_text" />
+
+    </RelativeLayout>
 
 </layout>

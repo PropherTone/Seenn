@@ -12,6 +12,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.protone.api.Config
+import com.protone.api.TAG
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.databinding.PictureBoxAdapterLayoutBinding
 
