@@ -75,7 +75,7 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
         }
     }
 
-    private fun AddBucketSeen.addMusicBucket(callBack: (result: Boolean, name: String) -> Unit) =
+    private inline fun AddBucketSeen.addMusicBucket(crossinline callBack: (result: Boolean, name: String) -> Unit) =
         DataBaseDAOHelper.addMusicBucketWithCallBack(
             MusicBucket(
                 name,

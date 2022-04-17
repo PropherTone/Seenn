@@ -39,10 +39,8 @@
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/musicplayer_layout.xml" value="0.23007246376811594" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/note_edit_layout.xml" value="0.22871376811594202" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/note_layout.xml" value="0.22871376811594202" />
-        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/rich_photo_layout.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/rich_text_layout.xml" value="0.23007246376811594" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/small_music_player_layout.xml" value="0.22826086956521738" />
-        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/splash_layout.xml" value="0.23007246376811594" />
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/activity_main.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/colors.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidStudioProject/Seenn/richNote/src/main/res/layout/activity_connect.xml" value="0.155622060709705" />
@@ -82,6 +80,7 @@
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/card.xml" value="0.1625" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/half_card.xml" value="0.1625" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_baseline_add_24.xml" value="0.2851851851851852" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_baseline_add_24_black.xml" value="0.2385" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_baseline_arrow_drop_down_24.xml" value="0.28703703703703703" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_baseline_arrow_drop_up_24.xml" value="0.262037037037037" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_baseline_arrow_left_24.xml" value="0.28703703703703703" />
@@ -93,6 +92,14 @@
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_baseline_keyboard_arrow_left_24.xml" value="0.28703703703703703" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_baseline_music_note_24.xml" value="0.1535" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_baseline_playing_24.xml" value="0.2345" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_baseline_rename_24_black.xml" value="0.2385" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_baseline_superscript_24_black.xml" value="0.2385" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_outline_category_24.xml" value="0.2385" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_outline_delete_24.xml" value="0.2385" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_outline_move_24.xml" value="0.2385" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_outline_rename_24_black.xml" value="0.2385" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_outline_select_all_24.xml" value="0.2385" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_outline_surfing_24.xml" value="0.2385" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/icon_add_back.xml" value="0.155" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/main_background.xml" value="0.24479166666666666" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/oval_background.xml" value="0.155" />

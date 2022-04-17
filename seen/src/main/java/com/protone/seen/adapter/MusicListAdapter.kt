@@ -24,7 +24,7 @@ class MusicListAdapter(context: Context) :
             notifyDataSetChanged()
         }
 
-    var clickCallback: (Int) -> Unit? = { }
+    var clickCallback: (Int) -> Unit? = {}
 
     private var playPosition = 0
 
@@ -32,25 +32,25 @@ class MusicListAdapter(context: Context) :
         { holder, isSelect ->
             holder.binding.apply {
                 if (isSelect) {
-                    musicListPlayState.visibility = View.VISIBLE
                     musicListContainer.setBackgroundColor(
                         ContextCompat.getColor(
                             context,
-                            R.color.blue_9
+                            R.color.zima_blue
                         )
                     )
+                    musicListPlayState.visibility = View.VISIBLE
                     musicListName.setTextColor(ContextCompat.getColor(context, R.color.white))
                     musicListTime.setTextColor(ContextCompat.getColor(context, R.color.white))
                     musicListDetail.setTextColor(ContextCompat.getColor(context, R.color.white))
                     startAnimation(musicListInContainer)
                 } else {
-                    musicListPlayState.visibility = View.GONE
                     musicListContainer.setBackgroundColor(
                         ContextCompat.getColor(
                             context,
                             R.color.white
                         )
                     )
+                    musicListPlayState.visibility = View.GONE
                     musicListName.setTextColor(ContextCompat.getColor(context, R.color.black))
                     musicListTime.setTextColor(ContextCompat.getColor(context, R.color.black))
                     musicListDetail.setTextColor(ContextCompat.getColor(context, R.color.black))
@@ -68,20 +68,6 @@ class MusicListAdapter(context: Context) :
                 animatorSet(x1, y1, play = true)
             })
         }
-//        val x = ObjectAnimator.ofFloat(target, "scaleX", 0.96f).apply { duration = 50 }
-//        val y = ObjectAnimator.ofFloat(target, "scaleY", 0.96f).apply { duration = 50 }
-//        val x1 = ObjectAnimator.ofFloat(target, "scaleX", 1f).apply { duration = 360 }
-//        val y2 = ObjectAnimator.ofFloat(target, "scaleY", 1f).apply { duration = 360 }
-//        AnimatorSet().apply {
-//            playTogether(x, y)
-//            start()
-//            doOnEnd {
-//                AnimatorSet().apply {
-//                    playTogether(x1, y2)
-//                    start()
-//                }
-//            }
-//        }
     }
 
     override fun itemIndex(path: Music): Int = musicList.indexOf(path)

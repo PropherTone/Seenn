@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.protone.api.Config
 import com.protone.api.context.Global
+import com.protone.database.room.config.UserConfig
 
 @Suppress("unused")
 class SeennApplication : Application() {

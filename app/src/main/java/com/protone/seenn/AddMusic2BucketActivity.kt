@@ -2,6 +2,7 @@ package com.protone.seenn
 
 import android.content.Intent
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
+import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.AddMusic2BucketSeen
 import kotlinx.coroutines.cancel
@@ -32,6 +33,7 @@ class AddMusic2BucketActivity : BaseActivity<AddMusic2BucketSeen>() {
                 addMusic2BucketSeen.viewEvent.onReceive{
                     when (it) {
                         AddMusic2BucketSeen.Event.Finished -> {
+                            workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
                             finish()
                         }
                     }

@@ -8,8 +8,8 @@ import com.protone.mediamodle.note.spans.BackColorSpan
 import com.protone.mediamodle.note.spans.ColorSpan
 
 data class SpanStates(
-    val start: Int,
-    val end: Int,
+    var start: Int,
+    var end: Int,
     val targetSpan: Spans,
     val iColor: Any? = Color.BLACK,
     val absoluteSize: Int? = 1,

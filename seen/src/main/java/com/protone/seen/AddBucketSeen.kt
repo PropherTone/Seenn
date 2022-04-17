@@ -46,7 +46,7 @@ class AddBucketSeen(context: Context) : Seen<AddBucketSeen.Event>(context) {
     }
 
     private fun loadIcon(model: ByteArray?) = binding.musicBucketIcon.apply {
-        Glide.with(context).load(model).into(this)
+        Glide.with(this@AddBucketSeen.context).load(model).into(this)
     }
 
 

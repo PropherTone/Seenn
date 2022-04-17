@@ -1,7 +1,6 @@
 package com.protone.seen
 
 import android.content.Context
-import android.graphics.Color
 import android.view.View
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
@@ -73,36 +72,38 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
 
     fun insertMusic(music: RichMusicStates) = binding.noteEditRichNote.insertMusic(music)
 
-    suspend fun indexRichNote() {
-        val indexRichNote = binding.noteEditRichNote.indexRichNote()
-        var first = indexRichNote.first
-        val second = indexRichNote.second
-        val jsonToList = second.jsonToList(String::class.java)
-        var listSize = jsonToList.size - 1
-        val richList = arrayListOf<RichStates>()
-        while (first > 0) {
-            richList.add(
-                when (first % 10) {
-                    RichNoteView.PHOTO -> {
-                        jsonToList[listSize--].toEntity(RichPhotoStates::class.java)
-                    }
-                    RichNoteView.MUSIC -> {
-                        jsonToList[listSize--].toEntity(RichMusicStates::class.java)
-                    }
-                    RichNoteView.VIDEO -> {
-                        jsonToList[listSize--].toEntity(RichVideoStates::class.java)
-                    }
-                    else -> {
-                        val toEntity = jsonToList[listSize--].toEntity(RichNoteSer::class.java)
-                        val toEntity1 = toEntity.spans.jsonToList(SpanStates::class.java)
-                        RichNoteStates(toEntity.text,toEntity1)
-                    }
-                }
-            )
-            first /= 10
-        }
+    suspend fun indexRichNote(): Pair<Int, String> {
+//        val indexRichNote = binding.noteEditRichNote.indexRichNote()
+//        var first = indexRichNote.first
+//        val second = indexRichNote.second
+//        val statesStrings = second.jsonToList(String::class.java)
+//        var listSize = statesStrings.size - 1
+//        val richList = arrayListOf<RichStates>()
+//        while (first > 0) {
+//            richList.add(
+//                when (first % 10) {
+//                    RichNoteView.PHOTO -> {
+//                        statesStrings[listSize--].toEntity(RichPhotoStates::class.java)
+//                    }
+//                    RichNoteView.MUSIC -> {
+//                        statesStrings[listSize--].toEntity(RichMusicStates::class.java)
+//                    }
+//                    RichNoteView.VIDEO -> {
+//                        statesStrings[listSize--].toEntity(RichVideoStates::class.java)
+//                    }
+//                    else -> {
+//                        val toEntity = statesStrings[listSize--].toEntity(RichNoteSer::class.java)
+//                        val toEntity1 = toEntity.spans.jsonToList(SpanStates::class.java)
+//                        RichNoteStates(toEntity.text,toEntity1)
+//                    }
+//                }
+//            )
+//            first /= 10
+//        }
         //TODO Only string color span can be saved
-        binding.noteEditRichNote.setRichList(richList)
+//        binding.noteEditRichNote.setRichList(richList)
+
+        return binding.noteEditRichNote.indexRichNote()
     }
 
     override fun setColor() {

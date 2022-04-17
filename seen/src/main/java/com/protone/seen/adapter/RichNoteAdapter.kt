@@ -208,7 +208,7 @@ class RichNoteAdapter(
 
     private fun glideIv(iv: ImageView, uri: Uri) {
         val toMediaBitmapByteArray = uri.toMediaBitmapByteArray()
-        Glide.with(iv.context).load(toMediaBitmapByteArray).into(iv)
+        Glide.with(context).load(toMediaBitmapByteArray).into(iv)
     }
 
     class RichTextHolder(val binding: RichTextLayoutBinding) :

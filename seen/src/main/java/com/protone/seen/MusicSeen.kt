@@ -1,15 +1,26 @@
 package com.protone.seen
 
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.util.Log
+import android.os.SystemClock
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
+import androidx.core.animation.doOnEnd
+import androidx.core.animation.doOnStart
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
+import com.protone.api.context.navigationBarHeight
 import com.protone.api.context.root
+import com.protone.api.context.statuesBarHeight
 import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.adapter.MusicBucketAdapter
@@ -20,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.stream.Collectors
 
+@SuppressLint("ClickableViewAccessibility")
 class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageView.StateListener,
     ViewTreeObserver.OnGlobalLayoutListener {
 
@@ -57,12 +69,21 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
 
     var bucket: String = ""
 
-    override fun getToolBar(): View = binding.view
+    override fun getToolBar(): View = binding.appToolbar
 
     init {
-        setSettleToolBar()
-        binding.self = this
-        binding.root.viewTreeObserver.addOnGlobalLayoutListener(this)
+        setNavigation()
+        binding.apply {
+            self = this@MusicSeen
+            root.viewTreeObserver.addOnGlobalLayoutListener(this@MusicSeen)
+            binding.toolbar.progress = 1f
+            appToolbar.addOnOffsetChangedListener(
+                AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+                    binding.toolbar.progress =
+                        -verticalOffset / appBarLayout?.totalScrollRange?.toFloat()!!
+                })
+        }
+
     }
 
     override fun offer(event: Event) {
@@ -108,6 +129,32 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
         }
     }
 
+    suspend fun setBucket(bitArray: ByteArray?, bucketName: String, detail: String) =
+        withContext(Dispatchers.Main) {
+            binding.apply {
+                if (bitArray != null) {
+                    Glide.with(context).asDrawable().load(bitArray)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .skipMemoryCache(true)
+                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+                        .override(musicBucketIcon.measuredWidth, musicBucketIcon.measuredHeight)
+                        .into(musicBucketIcon)
+                } else {
+                    musicBucketIcon.setImageDrawable(
+                        ResourcesCompat
+                            .getDrawable(
+                                context.resources,
+                                R.drawable.ic_baseline_music_note_24,
+                                null
+                            )
+                    )
+                }
+                
+                musicBucketName.text = bucketName
+                musicBucketMsg.text = detail
+            }
+        }
+
     fun mbClickCallBack(callback: (String) -> Unit) {
         (binding.musicBucket.adapter as MusicBucketAdapter?)?.clickCallback = callback
     }
@@ -141,21 +188,52 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
     }
 
     override fun onGlobalLayout() {
-        binding.musicBucketContainer.height.toFloat().let {
-            containerAnimator = AnimationHelper.translationY(
-                binding.musicBucketContainer,
-                it - binding.mySmallMusicPlayer.height
-            )
-//            containerAnimator = ObjectAnimator.ofFloat(
-//                binding.musicBucketContainer,
-//                "translationY",
-//                it - binding.mySmallMusicPlayer.height
-//            )
+        binding.apply {
+            musicBucketContainer.let {
+                it.setPadding(
+                    it.paddingLeft,
+                    it.paddingTop,
+                    it.paddingRight,
+                    context.navigationBarHeight + musicAddBucket.measuredHeight - musicAddBucket.paddingBottom
+                )
+                it.setOnTouchListener { _, _ -> false }
+                it.setOnClickListener { }
+                containerAnimator = AnimationHelper.translationY(
+                    it,
+                    it.height.toFloat() - mySmallMusicPlayer.height
+                ).also { ani ->
+                    ani.doOnStart {
+                        val event = MotionEvent.obtain(
+                            SystemClock.uptimeMillis(),
+                            SystemClock.uptimeMillis(),
+                            MotionEvent.ACTION_DOWN,
+                            binding.root.width / 2f,
+                            binding.root.height / 2f,
+                            0
+                        )
+                        binding.musicMusicList.dispatchTouchEvent(event)
+                        ani.addUpdateListener { va ->
+                            event.setLocation(binding.root.width / 2f, (va.animatedValue as Float) / 2)
+                            event.action = MotionEvent.ACTION_MOVE
+                            binding.musicMusicList.dispatchTouchEvent(event)
+                        }
+                        ani.doOnEnd {
+                            event.action = MotionEvent.ACTION_UP
+                            binding.musicMusicList.dispatchTouchEvent(event)
+                        }
+                        event.recycle()
+                    }
+                }
+
+                it.y = toolbar.minHeight + context.statuesBarHeight.toFloat()
+            }
+            musicShowBucket.setOnStateListener(this@MusicSeen)
+            musicMusicList.setPadding(0, 0, 0, mySmallMusicPlayer.height)
+            root.viewTreeObserver.removeOnGlobalLayoutListener(this@MusicSeen)
         }
-        binding.musicShowBucket.setOnStateListener(this)
+    }
 
-        binding.musicMusicList.setPadding(0, 0, 0, binding.mySmallMusicPlayer.height)
-
-        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+    fun clearMer() {
+        Glide.get(context).clearMemory()
     }
 }

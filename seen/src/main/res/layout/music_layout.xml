@@ -12,15 +12,120 @@
         <import type="com.protone.seen.MusicSeen.Event" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/main_background"
+            android:fitsSystemWindows="true">
+
+            <androidx.constraintlayout.motion.widget.MotionLayout
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                app:layoutDescription="@xml/music_layout_scene"
+                app:layout_scrollFlags="scroll|enterAlways|snap|exitUntilCollapsed">
+
+                <ImageView
+                    android:id="@+id/music_finish"
+                    android:layout_width="?attr/actionBarSize"
+                    android:layout_height="?attr/actionBarSize"
+                    android:contentDescription="@string/action"
+                    android:elevation="@dimen/small_elevation"
+                    android:onClick="@{()->self.offer(Event.Finish)}"
+                    android:padding="@dimen/icon_padding_mid"
+                    android:src="@drawable/ic_baseline_arrow_left_24_white"
+                    app:layout_collapseMode="pin"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/music_bucketIcon"
+                    android:layout_width="@dimen/huge_icon"
+                    android:layout_height="@dimen/huge_icon"
+                    android:layout_marginTop="@dimen/icon_margin"
+                    android:background="@color/glass"
+                    android:contentDescription="@string/icon"
+                    android:padding="@dimen/icon_padding"
+                    android:src="@drawable/ic_baseline_music_note_24"
+                    app:layout_constraintBottom_toTopOf="@id/music_bucketName"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/music_bucketName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/texts_margin"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/title_text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/music_bucketIcon" />
+
+                <TextView
+                    android:id="@+id/music_bucketMsg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/subContent_text"
+                    app:layout_constraintBottom_toTopOf="@+id/music_bucketDelete"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/music_bucketName" />
+
+                <ImageView
+                    android:id="@+id/music_bucketEdit"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:padding="@dimen/icon_padding_mid"
+                    android:src="@drawable/ic_baseline_edit_24_white"
+                    app:layout_constraintEnd_toStartOf="@id/music_bucketDelete"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/music_bucketMsg" />
+
+                <ImageView
+                    android:id="@+id/music_bucketDelete"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/action"
+                    android:padding="@dimen/icon_padding_mid"
+                    android:src="@drawable/ic_baseline_delete_24_white"
+                    app:layout_constraintEnd_toStartOf="@id/music_bucketAddList"
+                    app:layout_constraintStart_toEndOf="@id/music_bucketEdit"
+                    app:layout_constraintTop_toBottomOf="@id/music_bucketMsg" />
+
+                <ImageView
+                    android:id="@+id/music_bucketAddList"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:padding="@dimen/icon_padding_mid"
+                    android:src="@drawable/ic_baseline_more_24_white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/music_bucketDelete"
+                    app:layout_constraintTop_toBottomOf="@id/music_bucketMsg" />
+
+            </androidx.constraintlayout.motion.widget.MotionLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/music_musicList"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:background="@color/white"
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,19 +134,16 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/music_bucketContainer"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@color/white"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar">
+            android:layout_height="match_parent"
+            android:background="@color/zima_blue"
+            android:orientation="vertical">
 
             <com.protone.seen.customView.StateImageView
                 android:id="@+id/music_showBucket"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/smaller_Icon"
                 android:clickable="true"
+                android:elevation="1dp"
                 android:focusable="true"
                 app:ActiveDrawable="@drawable/ic_baseline_arrow_drop_up_24"
                 app:NegativeDrawable="@drawable/ic_baseline_arrow_drop_down_24"
@@ -52,14 +154,17 @@
 
             <com.protone.seen.customView.MySmallMusicPlayer
                 android:id="@+id/mySmallMusicPlayer"
+                android:background="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@id/music_bucket"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/music_bucket"
+                android:background="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toTopOf="@id/music_addBucket"
@@ -71,44 +176,25 @@
                 android:id="@+id/music_addBucket"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/white"
                 android:contentDescription="@string/action"
                 android:onClick="@{()->self.offer(Event.AddBucket)}"
                 android:padding="@dimen/main_padding"
                 android:src="@drawable/ic_baseline_add_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/music_bucket" />
+
+            <View
+                android:id="@+id/bottom_view"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/small_elevation"
+                android:background="@color/zima_blue"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <LinearLayout
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/icon_50"
-            android:background="@color/blue_1"
-            app:layout_constraintTop_toBottomOf="@id/view">
-
-            <ImageView
-                android:id="@+id/toolbar_back"
-                android:layout_width="@dimen/small_Icon"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/action"
-                android:onClick="@{()->(self.offer(Event.Finish))}"
-                android:paddingStart="@dimen/main_padding"
-                android:paddingTop="@dimen/main_margin"
-                android:paddingEnd="0dp"
-                android:paddingBottom="@dimen/main_margin"
-                android:src="@drawable/ic_baseline_arrow_left_24_white" />
-
-        </LinearLayout>
-
-        <View
-            android:id="@+id/view"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_width="match_parent"
-            android:background="@color/blue_1"
-            android:layout_height="1dp"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>

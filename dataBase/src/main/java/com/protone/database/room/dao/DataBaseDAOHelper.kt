@@ -1,6 +1,5 @@
 package com.protone.database.room.dao
 
-import android.util.Log
 import com.protone.database.room.SeennDataBase
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
@@ -39,6 +38,10 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun addMusicBucket(musicBucket: MusicBucket) {
+        musicBucketDAO?.addMusicBucket(musicBucket)
+    }
+
+    fun addMusicBucketThread(musicBucket: MusicBucket) {
         runnableFunc = {
             musicBucketDAO?.addMusicBucket(musicBucket)
         }
@@ -62,7 +65,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
                 musicBucket.name = "${name}(${++count})"
             }
             addMusicBucket(musicBucket)
-            callBack(getMusicBucketByName(musicBucket.name) == null, musicBucket.name)
+            callBack(getMusicBucketByName(musicBucket.name) != null, musicBucket.name)
         }
 
     }
@@ -76,6 +79,12 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     override fun updateMusicBucketIcon(bucketName: String, icon: ByteArray) {
         runnableFunc = {
             musicBucketDAO?.updateMusicBucketIcon(bucketName, icon)
+        }
+    }
+
+    override fun updateMusicBucket(bucket: MusicBucket) {
+        runnableFunc = {
+            musicBucketDAO?.updateMusicBucket(bucket)
         }
     }
 

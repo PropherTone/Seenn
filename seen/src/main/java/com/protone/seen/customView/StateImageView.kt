@@ -2,13 +2,9 @@ package com.protone.seen.customView
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
-import android.view.MotionEvent
-import android.widget.ImageView
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.content.res.ResourcesCompat
-import com.protone.api.TAG
 import com.protone.seen.R
 
 class StateImageView @JvmOverloads constructor(
@@ -52,12 +48,14 @@ class StateImageView @JvmOverloads constructor(
         this.stateListener = l
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun active() {
         setImageDrawable(negativeDrawable)
         positive = false
         stateListener?.onActive()
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     fun negative() {
         setImageDrawable(activeDrawable)
         positive = true

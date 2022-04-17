@@ -3,31 +3,31 @@ package com.protone.seen.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Animatable
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import com.protone.api.TAG
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.api.toStringMinuteTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Music
+import com.protone.mediamodle.Galley
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.collections.ArrayList
 
 class AddMusicListAdapter(context: Context, private val bucket: String) :
     SelectListAdapter<MusicListLayoutBinding, Music>(context) {
 
     init {
         multiChoose = true
+        Galley.musicBucket[bucket]?.let { selectList.addAll(it) }
+
     }
 
     var musicList = mutableListOf<Music>()
@@ -104,7 +104,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                         when (d) {
                             is Animatable -> {
                                 d.start()
-                                val bucket = music.myBucket.apply {
+                                music.myBucket.apply {
                                     (this as ArrayList).add(bucket)
                                 }
                                 DataBaseDAOHelper.updateMusicCB(

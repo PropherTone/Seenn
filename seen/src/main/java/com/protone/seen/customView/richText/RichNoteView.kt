@@ -4,7 +4,9 @@ import android.animation.LayoutTransition
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
+import android.text.Editable
 import android.text.Spanned
+import android.text.TextWatcher
 import android.text.style.*
 import android.util.AttributeSet
 import android.view.KeyEvent
@@ -20,6 +22,7 @@ import com.bumptech.glide.Glide
 import com.protone.api.context.layoutInflater
 import com.protone.api.json.listToJson
 import com.protone.api.json.toJson
+import com.protone.mediamodle.note.MyTextWatcher
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ColorSpan
 import com.protone.mediamodle.note.spans.ISpanForEditor
@@ -121,6 +124,23 @@ class RichNoteView @JvmOverloads constructor(
                         }
                         false
                     }
+                    addTextChangedListener(object : MyTextWatcher {
+                        override fun afterTextChanged(s: Editable?) {
+                            (getCurRichStates() as RichNoteStates?)?.apply {
+                                text = s
+                                if (s?.isEmpty() == true) (spanStates as ArrayList?)?.clear()
+                                val iterator = (spanStates as ArrayList?)?.iterator()
+                                while (iterator?.hasNext() == true) {
+                                    iterator.next().let {
+                                        if (it.end > s?.length ?: 0) it.end = s?.length ?: 0
+                                        if (it.end <= it.start) iterator.remove()
+                                    }
+                                }
+                                sortSpanStates()
+                            }
+
+                        }
+                    })
                     setOnFocusChangeListener { v, hasFocus ->
                         if (hasFocus) {
                             curPosition = this@RichNoteView.indexOfChild(v)
@@ -135,6 +155,10 @@ class RichNoteView @JvmOverloads constructor(
                 text = note.text
             }
         })
+    }
+
+    private fun sortSpanStates() {
+
     }
 
     override fun insertVideo(video: RichVideoStates) = insertMedia {
@@ -156,7 +180,7 @@ class RichNoteView @JvmOverloads constructor(
             RichPhotoLayoutBinding
                 .inflate(context.layoutInflater, this, false)
                 .apply {
-                    Glide.with(this.richPhotoIv.context).load(photo.uri)
+                    Glide.with(context).load(photo.uri)
                         .into(this.richPhotoIv)
                     richPhotoTitle.text = photo.name
                     richPhotoDetail.text = photo.date

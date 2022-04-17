@@ -3,7 +3,9 @@ package com.protone.seen
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.protone.api.context.hasNavigationBar
 import com.protone.api.context.navigationBarHeight
 import com.protone.api.context.statuesBarHeight
 import kotlinx.coroutines.CoroutineScope
@@ -40,8 +42,9 @@ abstract class Seen<C>(val context: Context) :
         setNavigation()
     }
 
-    private fun setNavigation() {
-        viewRoot.apply {
+
+    fun setNavigation() {
+        if (context.hasNavigationBar) viewRoot.apply {
             setPadding(
                 paddingLeft,
                 paddingTop,

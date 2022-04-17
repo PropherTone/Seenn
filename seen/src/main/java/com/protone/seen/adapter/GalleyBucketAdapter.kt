@@ -44,7 +44,7 @@ class GalleyBucketAdapter(
             setSelect(holder, selectList.contains(data))
             holder.binding.apply {
                 bucketThumb.let { thumb ->
-                    Glide.with(thumb.context).load(data.first)
+                    Glide.with(context).load(data.first)
                         .into(thumb)
                 }
                 data.second.also { sec ->

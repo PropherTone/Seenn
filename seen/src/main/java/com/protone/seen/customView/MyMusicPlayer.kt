@@ -109,7 +109,7 @@ class MyMusicPlayer @JvmOverloads constructor(
     var musicNext: () -> Unit = {}
 
     private fun loadAlbum(embeddedPicture: ByteArray?) {
-        Glide.with(binding.musicIcon.context).load(embeddedPicture)
+        Glide.with(context).load(embeddedPicture)
             .error(R.drawable.ic_baseline_music_note_24)
             .circleCrop().transition(withCrossFade())
             .into(binding.musicIcon)

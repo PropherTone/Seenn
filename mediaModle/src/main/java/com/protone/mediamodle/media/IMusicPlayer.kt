@@ -5,7 +5,7 @@ import com.protone.database.room.entity.Music
 import com.protone.mediamodle.MusicState
 
 interface IMusicPlayer {
-    fun setDate(list: MutableList<Music>)
+    fun setDate(list: MutableList<Music>){}
     fun play()
     fun pause()
     fun next()

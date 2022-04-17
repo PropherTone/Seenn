@@ -36,7 +36,7 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galley
     override fun onBindViewHolder(holder: Holder<PictureBoxAdapterLayoutBinding>, position: Int) {
         holder.binding.imageView.let { image ->
             image.scaleType = ImageView.ScaleType.FIT_XY
-            Glide.with(image.context).load(picUri[position].uri)
+            Glide.with(context).load(picUri[position].uri)
                 .addListener(object : RequestListener<Drawable>{
                     override fun onResourceReady(
                         resource: Drawable?,

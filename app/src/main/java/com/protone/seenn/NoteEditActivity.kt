@@ -26,7 +26,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                 noteEditSeen.viewEvent.onReceive {
                     when (it) {
                         NoteEditSeen.NoteEditEvent.Confirm -> {
-                            noteEditSeen.indexRichNote()
+                            val indexedRichNote = noteEditSeen.indexRichNote()
                         }
                         NoteEditSeen.NoteEditEvent.Finish -> finish()
                         NoteEditSeen.NoteEditEvent.PickImage -> startActivityForResult(

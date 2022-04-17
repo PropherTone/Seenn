@@ -10,7 +10,7 @@ import com.protone.api.context.*
 
 val workLocalBroadCast by lazy { LocalBroadcastManager.getInstance(Global.application) }
 
-abstract class WorkReceiver : BroadcastReceiver() {
+abstract class WorkReceiver : BroadcastReceiver() ,IWorkService {
 
     override fun onReceive(p0: Context?, p1: Intent?) {
         Log.d(TAG, "onReceive: ")
@@ -21,9 +21,4 @@ abstract class WorkReceiver : BroadcastReceiver() {
             UPDATE_VIDEO -> updateVideo()
         }
     }
-
-    abstract fun updateMusicBucket()
-    abstract fun updateMusic()
-    abstract fun updatePhoto()
-    abstract fun updateVideo()
 }

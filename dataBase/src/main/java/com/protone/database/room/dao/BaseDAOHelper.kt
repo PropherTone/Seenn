@@ -8,28 +8,31 @@ abstract class BaseDAOHelper {
     private val executorService by lazy { Executors.newSingleThreadExecutor() }
 
     private val runnable = Runnable {
-        runnableFunc()
-    }
-
-    var runnableFunc : ()->Unit = {}
-    set(value) {
-        synchronized(this) {
-            field = value
-            execute()
+        if (runnableFunc != null) {
+            runnableFunc?.invoke()
+            runnableFunc = null
         }
     }
 
-    fun execute(){
+    var runnableFunc: (() -> Unit)? = null
+        set(value) {
+            synchronized(this) {
+                field = value
+                execute()
+            }
+        }
+
+    fun execute() {
         executorService.execute(runnable)
     }
 
-    fun shutdown(){
+    fun shutdown() {
         if (executorService.isShutdown) {
             executorService.shutdown()
         }
     }
 
-    fun shutdownNow(){
+    fun shutdownNow() {
         if (executorService.isShutdown) {
             executorService.shutdownNow()
         }

@@ -6,9 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import android.util.Log
-import android.view.View
-import com.protone.api.Config
 import com.protone.api.checkNeededPermission
 import com.protone.api.context.intent
 import com.protone.api.requestContentPermission
@@ -30,7 +27,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
         when (it.what) {
             1 -> {
                 if (!userConfig.isFirstBoot && Galley.music.size > 0) {
-                    DataBaseDAOHelper.addMusicBucket(
+                    DataBaseDAOHelper.addMusicBucketThread(
                         MusicBucket(
                             getString(R.string.all_music),
                             Galley.music[0].uri.toBitmapByteArray(),

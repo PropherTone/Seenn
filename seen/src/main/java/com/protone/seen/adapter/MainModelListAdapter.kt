@@ -121,7 +121,7 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
                 holder.binding.photoCard.apply {
                     title = media.name
                     photo.let {
-                        Glide.with(it.context).load(media.uri).into(it)
+                        Glide.with(context).load(media.uri).into(it)
                     }
                 }
             }

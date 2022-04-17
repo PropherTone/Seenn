@@ -105,7 +105,7 @@ class PictureListScrollView @JvmOverloads constructor(
                     withContext(Dispatchers.Main) {
                         it.imageView.visibility = if (localVisibleRect) {
                             Log.d(TAG, "checkState: ${it.position}")
-                            Glide.with(it.imageView.context).load(dataList?.get(it.position)!!).into(it.imageView)
+                            Glide.with(context).load(dataList?.get(it.position)!!).into(it.imageView)
 //                            it.imageView.setImageBitmap(decodeBitmap(dataList?.get(it.position)!!))
 //                            visibleIndex = it.position
                             View.VISIBLE

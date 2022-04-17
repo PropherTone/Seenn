@@ -1,6 +1,9 @@
 package com.protone.database.room.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 import com.protone.database.room.entity.MusicBucket
 
 @Dao
@@ -20,5 +23,8 @@ interface MusicBucketDAO {
 
     @Query("UPDATE MusicBucket SET icon = :icon WHERE name LIKE :bucketName")
     fun updateMusicBucketIcon(bucketName: String, icon: ByteArray)
+
+    @Update
+    fun updateMusicBucket(bucket: MusicBucket)
 
 }

@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.MutableLiveData
 import com.protone.api.context.*
@@ -21,7 +20,6 @@ import com.protone.mediamodle.MusicState
 import com.protone.mediamodle.media.*
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.ApplicationBroadCast
-import java.lang.Exception
 import java.util.*
 import kotlin.concurrent.timerTask
 import kotlin.system.exitProcess
@@ -43,7 +41,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
 
     private var notification: Notification? = null
 
-    private val appReceiver =  object  : ApplicationBroadCast(){
+    private val appReceiver = object : ApplicationBroadCast() {
         override fun finish() {
             notificationManager?.cancel(NOTIFICATION_ID)
             this@MusicService.stopSelf()
@@ -121,11 +119,8 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
 
     private var playPosition = MutableLiveData<Long>()
     private var playState = MutableLiveData<Boolean>()
-    private var musicLists: MutableList<Music> = mutableListOf()
-        set(value) {
-            field.clear()
-            field.addAll(value)
-        }
+    private val musicLists: MutableList<Music>
+        get() = Galley.musicBucket[userConfig.playedMusicBucket] ?: Galley.music
 
     private var musicPlayer: MediaPlayer? = null
         get() {
@@ -168,7 +163,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
 
     override fun onCreate() {
         super.onCreate()
-        Galley.musicBucket[userConfig.playedMusicBucket]?.let { setDate(it) }
         musicBroadCastManager.registerReceiver(receiver, musicIntentFilter)
         registerReceiver(receiver, musicIntentFilter)
         registerReceiver(appReceiver, appIntentFilter)
@@ -268,8 +262,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
     }
 
     private fun musicFinish() {
-//        musicTimer?.cancel()
-//        musicTimer = null
         musicPlayer?.apply {
             stop()
             reset()
@@ -278,9 +270,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         musicPlayer = null
     }
 
-    override fun setDate(list: MutableList<Music>) {
-        this.musicLists = list
-    }
+//    override fun setDate(list: MutableList<Music>) = Unit
 
     override fun play() {
         if (musicLists.size <= 0) {
@@ -408,6 +398,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         override fun getData() = this@MusicService.getData()
         override fun setPlayMusicPosition(position: Int) =
             this@MusicService.setPlayMusicPosition(position)
+
         override fun seekTo(position: Long) = this@MusicService.seekTo(position)
         override fun getPlayState(): MutableLiveData<Boolean> = this@MusicService.getPlayState()
         override fun getPlayPosition(): Int = this@MusicService.getPlayPosition()

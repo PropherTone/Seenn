@@ -94,7 +94,7 @@ fun Long.toDate(): Date? {
 fun Long.toStringMinuteTime(): String {
     val musicTime: Long = this / 1000
     val sec = musicTime % 60
-    return "${musicTime / 60}:${if (sec > 10) sec else "0$sec"}"
+    return "${musicTime / 60}:${if (sec >= 10) sec else "0$sec"}"
 }
 
 fun dateToString(data: Date?, formatType: String?): String? {

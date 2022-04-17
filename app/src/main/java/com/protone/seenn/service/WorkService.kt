@@ -5,16 +5,15 @@ import android.content.BroadcastReceiver
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import android.util.Log
-import com.protone.api.TAG
 import com.protone.api.context.Global
 import com.protone.api.context.workIntentFilter
 import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMulti
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusic
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusicBucket
+import com.protone.database.room.dao.DataBaseDAOHelper.getMusicBucketByName
 import com.protone.database.room.dao.DataBaseDAOHelper.insertMusicMulti
+import com.protone.database.room.dao.DataBaseDAOHelper.updateMusicBucket
 import com.protone.database.room.entity.Music
-import com.protone.mediamodle.Galley
 import com.protone.mediamodle.Galley.music
 import com.protone.mediamodle.Galley.musicBucket
 import com.protone.mediamodle.IWorkService
@@ -26,6 +25,7 @@ import java.util.concurrent.Executors
 import java.util.function.Consumer
 
 class WorkService : Service() {
+
     private val workReceiver: BroadcastReceiver = object : WorkReceiver() {
         override fun updateMusicBucket() {
             this@WorkService.updateMusicBucket()
@@ -43,6 +43,7 @@ class WorkService : Service() {
             this@WorkService.updateVideo()
         }
     }
+
     private val executor: Executor = Executors.newCachedThreadPool()
 
     override fun onCreate() {
@@ -70,15 +71,12 @@ class WorkService : Service() {
                 }
             }
             allMusicBucket?.forEach { (name) -> musicBucket[name] = ArrayList() }
-            Log.d(TAG, "updateMusicBucket: update")
             allMusic?.forEach { music ->
-                music.myBucket?.forEach(Consumer {
-                    Log.d(TAG, "updateMusicBucket: ${music.title}")
-                    Log.d(TAG, "updateMusicBucket: $it")
+                music.myBucket.forEach(Consumer {
                     musicBucket[it]?.add(music)
                 })
-                cacheList.stream().filter { it.title != music.title }
-                if (cacheList.size > 0) {
+                if (cacheList.contains(music)) {
+                    cacheList.remove(music)
                     cacheAllMusic.remove(music)
                 }
             }
@@ -88,27 +86,36 @@ class WorkService : Service() {
                 deleteMusicMulti(cacheAllMusic)
             }
             getAllMusic { music = it as MutableList<Music> }
+            musicBucket.keys.forEach {
+                getMusicBucketByName(it)?.let { mb ->
+                    musicBucket[it]?.size?.let { size ->
+                        mb.size = size
+                        updateMusicBucket(mb)
+                    }
+                }
+            }
         }
     }
 
     private fun updateMusic() {}
     private fun updatePhoto() {}
     private fun updateVideo() {}
+
     private inner class WorkBinder : Binder(), IWorkService {
-        override fun UpdateMusicBucket() {
-            updateMusicBucket()
+        override fun updateMusicBucket() {
+            this@WorkService.updateMusicBucket()
         }
 
-        override fun UpdateMusic() {
-            updateMusic()
+        override fun updateMusic() {
+            this@WorkService.updateMusic()
         }
 
-        override fun UpdatePhoto() {
-            updatePhoto()
+        override fun updatePhoto() {
+            this@WorkService.updatePhoto()
         }
 
-        override fun UpdateVideo() {
-            updateVideo()
+        override fun updateVideo() {
+            this@WorkService.updateVideo()
         }
     }
 }

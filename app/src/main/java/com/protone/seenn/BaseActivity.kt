@@ -11,6 +11,7 @@ import android.widget.Toast
 import android.widget.Toolbar
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.protone.api.ActivityLifecycleOwner
 import com.protone.api.context.intent
 import com.protone.api.context.musicIntentFilter
@@ -141,10 +142,11 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     override fun finish() {
         try {
             contentResolver.unregisterContentObserver(mediaContentObserver)
-            event.offer(Event.OnDestroy)
+
             launch {
                 onFinish()
             }
+
         } finally {
             super.finish()
         }
@@ -170,6 +172,20 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
         cancel()
         serviceConnection?.let { unbindService(it) }
         musicReceiver?.let { unregisterReceiver(it) }
+        Glide.get(this).clearMemory()
         super.onDestroy()
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (level == TRIM_MEMORY_UI_HIDDEN) {
+            Glide.get(this).clearMemory()
+        }
+        Glide.get(this).onTrimMemory(level)
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        Glide.get(this).clearMemory()
     }
 }

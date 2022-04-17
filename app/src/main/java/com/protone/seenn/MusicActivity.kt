@@ -2,6 +2,8 @@ package com.protone.seenn
 
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.Toolbar
+import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.context.MUSIC_PLAY
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.intent
@@ -25,9 +27,13 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
         cacheMusicBucketName = userConfig.playedMusicBucket
 
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.title = null
+
         setContentSeen(musicSeen)
 
         musicSeen.initSeen()
+        musicSeen.setBucket()
 
         bindMusicService {
             musicReceiver = object : MusicReceiver() {
@@ -46,7 +52,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                 }
 
             }
-            setMusicList(Galley.music)
+            setMusicList(Galley.musicBucket[cacheMusicBucketName] ?: Galley.music)
             binder.getData().apply {
                 musicSeen.musicName = name
                 musicSeen.icon = albumUri
@@ -54,6 +60,11 @@ class MusicActivity : BaseActivity<MusicSeen>() {
             musicSeen.isPlaying = binder.getPlayState().value == true
             musicSeen.playPosition()
             musicSeen.observeMusicUpdate()
+        }
+
+
+        doOnFinish {
+            musicSeen.clearMer()
         }
 
         while (isActive) {
@@ -93,14 +104,13 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                         )
                         MusicSeen.Event.Finish -> cancel()
                         MusicSeen.Event.AddList -> startActivity(AddMusic2BucketActivity::class.intent.also {
-                            it.putExtra("BUCKET",musicSeen.bucket)
+                            it.putExtra("BUCKET", musicSeen.bucket)
                         })
                     }
                 }
 
             }
         }
-
     }
 
     private suspend fun MusicSeen.initSeen() {
@@ -119,6 +129,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         mbClickCallBack { name ->
             cacheMusicBucketName = name
             hideBucket()
+            setBucket()
             updateMusicList(Galley.musicBucket[cacheMusicBucketName] ?: mutableListOf())
         }
         mlClickCallBack { position ->
@@ -140,11 +151,17 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
     private fun MusicSeen.observeMusicUpdate() {
         Galley.musicState.observe(this@MusicActivity) {
-            musicName = it.name
-            icon = it.albumUri
+            if (musicName != it.name) musicName = it.name
+            if (icon != it.albumUri) icon = it.albumUri
         }
         binder.getPlayState().observe(this@MusicActivity) {
             isPlaying = it
+        }
+    }
+
+    private fun MusicSeen.setBucket() = launch(Dispatchers.IO) {
+        DataBaseDAOHelper.getMusicBucketByName(cacheMusicBucketName)?.let {
+            setBucket(it.icon, it.name, "${it.date} ${it.detail}")
         }
     }
 }

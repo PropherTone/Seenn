@@ -13,7 +13,7 @@ import kotlin.collections.ArrayList
 
 object Galley {
 
-    val photoLive = MutableLiveData<MutableMap<String, MutableList<GalleyMedia>>>()
+//    val photoLive = MutableLiveData<MutableMap<String, MutableList<GalleyMedia>>>()
 
     var photo: MutableMap<String, MutableList<GalleyMedia>> = mutableMapOf()
         set(value) {
@@ -23,10 +23,10 @@ object Galley {
             }
             value[Global.application.getString(R.string.all_galley)] = ap
             field = value
-            photoLive.postValue(field)
+//            photoLive.postValue(field)
         }
 
-    val videoLive = MutableLiveData<MutableMap<String, MutableList<GalleyMedia>>>()
+//    val videoLive = MutableLiveData<MutableMap<String, MutableList<GalleyMedia>>>()
 
     var video: MutableMap<String, MutableList<GalleyMedia>> = mutableMapOf()
         set(value) {
@@ -36,23 +36,18 @@ object Galley {
             }
             value[Global.application.getString(R.string.all_galley)] = ap
             field = value
-            videoLive.postValue(field)
+//            videoLive.postValue(field)
         }
 
-    val musicLive = MutableLiveData<MutableList<Music>>()
+//    val musicLive = MutableLiveData<MutableList<Music>>()
 
     var music: MutableList<Music> = mutableListOf()
         set(value) {
             musicBucket[Global.application.getString(R.string.all_music)] = value
-            musicLive.postValue(field)
+            field = value
+//            musicLive.postValue(field)
         }
-        get() {
-            var lists = mutableListOf<Music>()
-            musicBucket[Global.application.getString(R.string.all_music)]?.let {
-                lists = it
-            }
-            return lists
-        }
+        get() = musicBucket[Global.application.getString(R.string.all_music)] ?: mutableListOf()
 
     val musicBucket = mutableMapOf<String, MutableList<Music>>()
 

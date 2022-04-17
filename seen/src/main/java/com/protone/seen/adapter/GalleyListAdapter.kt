@@ -69,7 +69,7 @@ class GalleyListAdapter(
     override fun onBindViewHolder(holder: Holder<PictureBoxAdapterLayoutBinding>, position: Int) {
         setSelect(holder, selectList.contains(media[position]))
         holder.binding.imageView.let { image ->
-            Glide.with(image.context).load(media[position].thumbnailUri).into(image)
+            Glide.with(context).load(media[position].thumbnailUri).into(image)
             image.setOnClickListener {
                 if (onSelectMod) {
                     checkSelect(holder, media[position])

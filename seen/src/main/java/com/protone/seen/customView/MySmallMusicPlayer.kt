@@ -12,8 +12,10 @@ import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.protone.api.context.layoutInflater
+import com.protone.api.toBitmapByteArray
 import com.protone.seen.R
 import com.protone.seen.databinding.SmallMusicPlayerLayoutBinding
 
@@ -63,9 +65,7 @@ class MySmallMusicPlayer @JvmOverloads constructor(
     var icon: Uri = Uri.EMPTY
         set(value) {
             if (value != Uri.EMPTY) {
-                val mediaMetadataRetriever = MediaMetadataRetriever()
-                mediaMetadataRetriever.setDataSource(context, value)
-                loadAlbum(mediaMetadataRetriever.embeddedPicture)
+                loadAlbum(value.toBitmapByteArray())
                 field = value
             }
         }
@@ -84,9 +84,12 @@ class MySmallMusicPlayer @JvmOverloads constructor(
     var pauseMusic: () -> Unit = {}
 
     private fun loadAlbum(embeddedPicture: ByteArray?) {
-        Glide.with(binding.smallMusicIcon.context).load(embeddedPicture)
+        Glide.with(context).asDrawable().load(embeddedPicture)
             .error(R.drawable.ic_baseline_music_note_24)
             .circleCrop().transition(DrawableTransitionOptions.withCrossFade())
+            .skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .override(binding.smallMusicIcon.measuredWidth, binding.smallMusicIcon.measuredHeight)
             .into(binding.smallMusicIcon)
     }
 

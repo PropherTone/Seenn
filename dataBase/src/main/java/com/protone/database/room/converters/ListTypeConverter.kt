@@ -2,7 +2,6 @@ package com.protone.database.room.converters
 
 import androidx.room.TypeConverter
 
-@Suppress("RedundantNullableReturnType")
 class ListTypeConverter {
 
     @TypeConverter
