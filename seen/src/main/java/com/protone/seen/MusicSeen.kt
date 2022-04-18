@@ -80,7 +80,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             appToolbar.addOnOffsetChangedListener(
                 AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
                     binding.toolbar.progress =
-                        -verticalOffset / appBarLayout?.totalScrollRange?.toFloat()!!
+                        -verticalOffset / appBarLayout.totalScrollRange.toFloat()
                 })
         }
 

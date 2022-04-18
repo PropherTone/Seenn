@@ -16,6 +16,7 @@ import com.protone.database.room.dao.DataBaseDAOHelper.updateMusicBucket
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Galley.music
 import com.protone.mediamodle.Galley.musicBucket
+import com.protone.mediamodle.Galley.musicBucketLive
 import com.protone.mediamodle.IWorkService
 import com.protone.mediamodle.WorkReceiver
 import com.protone.mediamodle.workLocalBroadCast
@@ -94,6 +95,7 @@ class WorkService : Service() {
                     }
                 }
             }
+            musicBucketLive.postValue(musicBucket.keys)
         }
     }
 

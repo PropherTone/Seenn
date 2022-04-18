@@ -39,13 +39,12 @@ object Galley {
 //            videoLive.postValue(field)
         }
 
-//    val musicLive = MutableLiveData<MutableList<Music>>()
+    val musicBucketLive = MutableLiveData<Set<String>>()
 
     var music: MutableList<Music> = mutableListOf()
         set(value) {
             musicBucket[Global.application.getString(R.string.all_music)] = value
             field = value
-//            musicLive.postValue(field)
         }
         get() = musicBucket[Global.application.getString(R.string.all_music)] ?: mutableListOf()
 

@@ -4,9 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.appbar.AppBarLayout
+import com.protone.api.TAG
 import com.protone.api.context.Global
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
@@ -74,6 +77,13 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
         initToolBar()
         binding.apply {
             self = this@MainSeen
+            toolbar.addOnOffsetChangedListener(
+                AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+                    Log.d(TAG, "$verticalOffset: ${appBarLayout.totalScrollRange.toFloat()}")
+                    binding.toolMotion.progress =
+                        -verticalOffset / appBarLayout.totalScrollRange.toFloat()
+                    Log.d(TAG, "${binding.toolMotion.progress}: ")
+                })
             musicPlayer.apply {
                 duration
                 playMusic = {
@@ -103,10 +113,6 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
 
     fun musicSeek(listener: Progress) {
         binding.musicPlayer.seekTo = listener
-    }
-
-    fun setBackGround(dr: Drawable) {
-        binding.model.background = dr
     }
 
 

@@ -92,6 +92,19 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
+    fun deleteMusicBucketCB(bucket: MusicBucket, callBack: (Boolean) -> Unit) {
+        execute {
+            musicBucketDAO?.deleteMusicBucket(bucket)
+            callBack(musicBucketDAO?.getMusicBucketByName(bucket.name) == null)
+        }
+    }
+
+    override fun deleteMusicBucket(bucket: MusicBucket) {
+        execute {
+            musicBucketDAO?.deleteMusicBucket(bucket)
+        }
+    }
+
 
     //Music
     private var musicDAO: MusicDAO? = null

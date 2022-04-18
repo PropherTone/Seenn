@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
@@ -12,6 +13,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
+import com.protone.api.context.onUiThread
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.R
@@ -128,7 +130,22 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 }
             }
             musicBucketEdit.setOnClickListener { closeMusicBucketBack() }
-            musicBucketDelete.setOnClickListener { closeMusicBucketBack() }
+            musicBucketDelete.setOnClickListener {
+                DataBaseDAOHelper.deleteMusicBucketCB(musicBuckets[holder.layoutPosition]) { re ->
+                    if (re && musicBuckets.remove(musicBuckets[holder.layoutPosition])) {
+                        context.onUiThread { ui -> if (ui) notifyItemRemoved(holder.layoutPosition) }
+                    } else {
+                        context.onUiThread { ui ->
+                            if (ui) Toast.makeText(
+                                context,
+                                context.getString(R.string.failed_msg),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+                closeMusicBucketBack()
+            }
             musicBucketAddList.setOnClickListener {
                 closeMusicBucketBack()
                 addList(musicBuckets[holder.layoutPosition].name, addList)

@@ -1,9 +1,6 @@
 package com.protone.database.room.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.protone.database.room.entity.MusicBucket
 
 @Dao
@@ -26,5 +23,8 @@ interface MusicBucketDAO {
 
     @Update
     fun updateMusicBucket(bucket: MusicBucket)
+
+    @Delete
+    fun deleteMusicBucket(bucket: MusicBucket)
 
 }

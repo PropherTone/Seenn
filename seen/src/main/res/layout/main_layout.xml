@@ -11,76 +11,134 @@
         <import type="com.protone.seen.MainSeen.Touch" />
     </data>
 
-    <LinearLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/main_group"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/main_background"
-        android:orientation="vertical">
+        android:background="@drawable/main_background">
 
-        <com.protone.seen.customView.UserCard
-            android:id="@+id/userCard"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:elevation="10dp" />
+            android:background="@color/transparent">
 
-        <LinearLayout
-            android:id="@+id/model"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/glass"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="@dimen/main_padding"
-            app:layout_behavior="@string/behavior_userCard">
+            <androidx.constraintlayout.motion.widget.MotionLayout
+                android:id="@+id/tool_motion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                app:layoutDescription="@xml/main_layout_scene"
+                app:layout_scrollFlags="scroll|enterAlways|snap|exitUntilCollapsed">
 
-            <ImageView
-                android:onClick="@{()->self.offer(Touch.GALLEY)}"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/small_Icon"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:contentDescription="@string/model_Galley"
-                android:src="@drawable/ic_baseline_image_24_white" />
+                <View
+                    android:id="@+id/userCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/huge_icon"
+                    android:background="@color/white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:onClick="@{()->self.offer(Touch.NOTE)}"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/small_Icon"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:contentDescription="@string/model_noteBook"
-                android:src="@drawable/ic_baseline_book_24_white" />
+                <TextView
+                    android:id="@+id/user_welcome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Hello,Eqi"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/hug_title_text"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:onClick="@{()->self.offer(Touch.MUSIC)}"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/small_Icon"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:contentDescription="@string/model_music"
-                android:src="@drawable/ic_baseline_album_24_white" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/user_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jan,21"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/sub_text"
+                    app:layout_constraintStart_toStartOf="@id/user_welcome"
+                    app:layout_constraintTop_toBottomOf="@+id/user_welcome" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/glass" />
+                <ImageView
+                    android:id="@+id/user_icon"
+                    android:layout_width="@dimen/user_icon"
+                    android:layout_height="@dimen/user_icon"
+                    android:layout_marginTop="@dimen/main_margin"
+                    android:contentDescription="@string/icon"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/user_welcome"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <com.protone.seen.customView.MyMusicPlayer
-            android:id="@+id/musicPlayer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/glass" />
+                <ImageView
+                    android:id="@+id/galley"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/icon_50"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@color/glass"
+                    android:contentDescription="@string/model_Galley"
+                    android:onClick="@{()->self.offer(Touch.GALLEY)}"
+                    android:paddingTop="@dimen/main_padding"
+                    android:paddingBottom="@dimen/main_padding"
+                    android:src="@drawable/ic_baseline_image_24_white"
+                    app:layout_constraintEnd_toStartOf="@id/noteBook"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/userCard" />
 
+                <ImageView
+                    android:id="@+id/noteBook"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/icon_50"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@color/glass"
+                    android:contentDescription="@string/model_noteBook"
+                    android:onClick="@{()->self.offer(Touch.NOTE)}"
+                    android:paddingTop="@dimen/main_padding"
+                    android:paddingBottom="@dimen/main_padding"
+                    android:src="@drawable/ic_baseline_book_24_white"
+                    app:layout_constraintEnd_toStartOf="@id/music"
+                    app:layout_constraintStart_toEndOf="@id/galley"
+                    app:layout_constraintTop_toBottomOf="@id/userCard" />
+
+                <ImageView
+                    android:id="@+id/music"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/icon_50"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@color/glass"
+                    android:contentDescription="@string/model_music"
+                    android:onClick="@{()->self.offer(Touch.MUSIC)}"
+                    android:paddingTop="@dimen/main_padding"
+                    android:paddingBottom="@dimen/main_padding"
+                    android:src="@drawable/ic_baseline_album_24_white"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/noteBook"
+                    app:layout_constraintTop_toBottomOf="@id/userCard" />
+
+
+                <com.protone.seen.customView.MyMusicPlayer
+                    android:id="@+id/musicPlayer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/glass"
+                    app:layout_constraintTop_toBottomOf="@id/noteBook" />
+
+            </androidx.constraintlayout.motion.widget.MotionLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/model_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
+            android:elevation="0dp"
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"/>
 
-    </LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </layout>
