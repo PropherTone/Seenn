@@ -26,14 +26,9 @@ data class MusicBucket(
         other as MusicBucket
 
         if (name != other.name) return false
-        if (icon != null) {
-            if (other.icon == null) return false
-            if (!icon.contentEquals(other.icon)) return false
-        } else if (other.icon != null) return false
         if (size != other.size) return false
         if (detail != other.detail) return false
         if (date != other.date) return false
-        if (id != other.id) return false
 
         return true
     }
@@ -47,4 +42,10 @@ data class MusicBucket(
         result = 31 * result + id.hashCode()
         return result
     }
+
+    override fun toString(): String {
+        return "MusicBucket(name='$name', icon=${icon?.contentToString()}, size=$size, detail=$detail, date=$date, id=$id)"
+    }
+
+
 }

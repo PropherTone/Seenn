@@ -16,16 +16,11 @@ abstract class BaseDAOHelper {
 
     var runnableFunc: (() -> Unit)? = null
         set(value) {
-            synchronized(this) {
-                field = value
-                execute()
-            }
+            field = value
         }
 
-    fun execute() {
-        executorService.execute(runnable)
-    }
-
+    fun execute(runnable: Runnable) = executorService.execute(runnable)
+    
     fun shutdown() {
         if (executorService.isShutdown) {
             executorService.shutdown()

@@ -71,6 +71,9 @@ fun Uri.toBitmapByteArray(): ByteArray? {
     try {
         mediaMetadataRetriever.setDataSource(Global.application, this)
         embeddedPicture = mediaMetadataRetriever.embeddedPicture
+        embeddedPicture?.let {
+            BitmapFactory.decodeByteArray(it, 0, it.size)
+        }
     } catch (e: Exception) {
         e.printStackTrace()
     } finally {

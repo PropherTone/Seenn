@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.api.toStringMinuteTime
@@ -97,7 +98,9 @@ class MusicListAdapter(context: Context) :
                     clickCallback(holder.layoutPosition)
                 }
                 musicListName.text = music.title
-                musicListDetail.text = "${music.artist} · ${music.album}"
+                if (music.artist != null && music.album != null) {
+                    musicListDetail.text = "${music.artist} · ${music.album}"
+                } else musicListDetail.isGone = true
                 musicListTime.text = music.duration.toStringMinuteTime()
             }
         }

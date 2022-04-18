@@ -10,6 +10,7 @@ import com.protone.api.checkNeededPermission
 import com.protone.api.context.intent
 import com.protone.api.requestContentPermission
 import com.protone.api.toBitmapByteArray
+import com.protone.api.todayTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
@@ -26,14 +27,14 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     private val mHandler: Handler = Handler(Looper.getMainLooper()) {
         when (it.what) {
             1 -> {
-                if (!userConfig.isFirstBoot && Galley.music.size > 0) {
+                if (!userConfig.isFirstBoot) {
                     DataBaseDAOHelper.addMusicBucketThread(
                         MusicBucket(
                             getString(R.string.all_music),
-                            Galley.music[0].uri.toBitmapByteArray(),
+                            if (Galley.music.size > 0) Galley.music[0].uri.toBitmapByteArray() else null,
                             Galley.music.size,
                             null,
-                            null
+                            todayTime
                         )
                     )
                     DataBaseDAOHelper.insertMusicMulti(Galley.music)

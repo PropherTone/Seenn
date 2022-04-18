@@ -149,7 +149,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
                             )
                     )
                 }
-                
+
                 musicBucketName.text = bucketName
                 musicBucketMsg.text = detail
             }
@@ -157,6 +157,13 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
 
     fun mbClickCallBack(callback: (String) -> Unit) {
         (binding.musicBucket.adapter as MusicBucketAdapter?)?.clickCallback = callback
+    }
+
+    suspend fun refreshBucket(bucket: MusicBucket) = withContext(Dispatchers.Main) {
+        (binding.musicBucket.adapter as MusicBucketAdapter?)?.refreshBucket(
+            this@MusicSeen.bucket,
+            bucket
+        )
     }
 
     fun mlClickCallBack(callback: (Int) -> Unit) {
@@ -213,7 +220,10 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
                         )
                         binding.musicMusicList.dispatchTouchEvent(event)
                         ani.addUpdateListener { va ->
-                            event.setLocation(binding.root.width / 2f, (va.animatedValue as Float) / 2)
+                            event.setLocation(
+                                binding.root.width / 2f,
+                                (va.animatedValue as Float) / 2
+                            )
                             event.action = MotionEvent.ACTION_MOVE
                             binding.musicMusicList.dispatchTouchEvent(event)
                         }

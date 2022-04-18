@@ -1,5 +1,7 @@
 package com.protone.mediamodle
 
+import android.graphics.BitmapFactory
+import android.os.Environment
 import android.util.Log
 import com.protone.api.TAG
 import com.protone.api.context.Global
@@ -9,6 +11,8 @@ import com.protone.mediamodle.media.scanAudio
 import com.protone.mediamodle.media.scanPicture
 import com.protone.mediamodle.media.scanVideo
 import kotlinx.coroutines.*
+import java.io.File
+import java.io.FileOutputStream
 import java.lang.Runnable
 import java.util.concurrent.Executors
 
@@ -28,6 +32,23 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
     private val updateMusic = Runnable {
         Galley.music = scanAudio()
+    }
+
+    fun saveBucketIcon(bucketName: String, byteArray: ByteArray?) = launch {
+        suspendCancellableCoroutine<String> { co->
+            var path : String? = null
+            byteArray?.let {
+                val tempPath = "${Environment.getDataDirectory().path}/$bucketName/.jpg"
+                val file = File(tempPath)
+                if (file.exists()) {
+                    co.resumeWith(Result.success(tempPath))
+                } else if (file.createNewFile()){
+                    val fileOutputStream = FileOutputStream(file)
+                    fileOutputStream.write(it)
+                }
+            }
+//            co.resumeWith()
+        }
     }
 
     suspend fun updatePictureCO() = withContext(Dispatchers.IO) {

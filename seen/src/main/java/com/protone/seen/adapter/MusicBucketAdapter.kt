@@ -12,11 +12,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
+import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicBucketAdapterLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.stream.Collectors
 
 
 class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
@@ -155,9 +157,15 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
 
     override fun getItemCount(): Int = musicBuckets.size
 
-    suspend fun addBucket(musicBucket: MusicBucket) = withContext(Dispatchers.Main) {
+    fun addBucket(musicBucket: MusicBucket) {
         musicBuckets.add(musicBucket)
         notifyItemInserted(musicBuckets.indexOf(musicBucket))
+    }
+
+    fun refreshBucket(name: String, bucket: MusicBucket) {
+        val indexOfFirst = musicBuckets.indexOfFirst { it.name == name }
+        musicBuckets[indexOfFirst] = bucket
+        notifyItemChanged(indexOfFirst)
     }
 
 }

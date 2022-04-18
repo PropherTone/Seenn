@@ -34,6 +34,7 @@ class AddMusic2BucketActivity : BaseActivity<AddMusic2BucketSeen>() {
                     when (it) {
                         AddMusic2BucketSeen.Event.Finished -> {
                             workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
+                            setResult(RESULT_OK)
                             finish()
                         }
                     }

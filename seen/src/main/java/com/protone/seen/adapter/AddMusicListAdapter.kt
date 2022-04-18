@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isGone
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.api.toStringMinuteTime
@@ -128,7 +129,9 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
                 }
 
                 musicListName.text = music.title
-                musicListDetail.text = "${music.artist} · ${music.album}"
+                if (music.artist != null && music.album != null) {
+                    musicListDetail.text = "${music.artist} · ${music.album}"
+                } else musicListDetail.isGone = true
                 musicListTime.text = music.duration.toStringMinuteTime()
             }
         }

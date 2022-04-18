@@ -1,5 +1,7 @@
 package com.protone.database.room.dao
 
+import android.util.Log
+import com.protone.api.TAG
 import com.protone.database.room.SeennDataBase
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
@@ -22,9 +24,11 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     inline fun getAllMusicBucket(crossinline callBack: (result: List<MusicBucket>?) -> Unit) {
-        runnableFunc = {
-            getAllMusicBucket()?.apply {
-                callBack(this)
+        execute {
+            Log.d(TAG, "getAllMusicBucket: exe")
+            getAllMusicBucket()?.let {
+                Log.d(TAG, "getAllMusicBucket: $it")
+                callBack(it)
             }
         }
     }
@@ -42,7 +46,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     fun addMusicBucketThread(musicBucket: MusicBucket) {
-        runnableFunc = {
+        execute {
             musicBucketDAO?.addMusicBucket(musicBucket)
         }
     }
@@ -51,7 +55,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         musicBucket: MusicBucket,
         crossinline callBack: (result: Boolean, name: String) -> Unit
     ) {
-        runnableFunc = {
+        execute {
             var count = 0
             val name = musicBucket.name
             val names = mutableMapOf<String, Int>()
@@ -71,19 +75,19 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun updateMusicBucketName(oldName: String, name: String) {
-        runnableFunc = {
+        execute {
             musicBucketDAO?.updateMusicBucketName(oldName, name)
         }
     }
 
     override fun updateMusicBucketIcon(bucketName: String, icon: ByteArray) {
-        runnableFunc = {
+        execute {
             musicBucketDAO?.updateMusicBucketIcon(bucketName, icon)
         }
     }
 
     override fun updateMusicBucket(bucket: MusicBucket) {
-        runnableFunc = {
+        execute {
             musicBucketDAO?.updateMusicBucket(bucket)
         }
     }
@@ -99,7 +103,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     fun insertMusicMulti(music: List<Music>) {
-        runnableFunc = {
+        execute {
             music.forEach {
                 musicDAO?.insertMusic(it)
             }
@@ -107,7 +111,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     fun deleteMusicMulti(music: List<Music>) {
-        runnableFunc = {
+        execute {
             music.forEach {
                 musicDAO?.deleteMusic(it)
             }
@@ -116,7 +120,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
 
     inline fun getAllMusic(crossinline callBack: (List<Music>) -> Unit) {
-        runnableFunc = {
+        execute {
             getAllMusic()?.let {
                 callBack(it)
             }
@@ -124,7 +128,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun insertMusic(music: Music) {
-        runnableFunc = {
+        execute {
             musicDAO?.insertMusic(music)
         }
     }
@@ -132,7 +136,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     override fun getAllMusic(): List<Music>? = musicDAO?.getAllMusic()
 
     override fun deleteMusic(music: Music) {
-        runnableFunc = {
+        execute {
             musicDAO?.deleteMusic(music)
         }
     }
@@ -143,7 +147,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         musicDAO?.updateMusicMyBucket(name, bucket) ?: -1
 
     inline fun updateMusicCB(music: Music, crossinline callBack: (Int) -> Unit) {
-        runnableFunc = {
+        execute {
             callBack(updateMusic(music))
         }
     }
@@ -153,7 +157,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         bucket: List<String>,
         crossinline callBack: (Int) -> Unit
     ) {
-        runnableFunc = {
+        execute {
             callBack(updateMusicMyBucket(name, bucket))
         }
     }
@@ -168,7 +172,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     inline fun getAllSignedMedia(crossinline callBack: (List<GalleyMedia>) -> Unit) {
-        runnableFunc = {
+        execute {
             getAllSignedMedia()?.let {
                 callBack(it)
             }
@@ -178,13 +182,13 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     override fun getAllSignedMedia(): List<GalleyMedia>? = signedGalleyDAO?.getAllSignedMedia()
 
     override fun deleteSignedMedia(media: GalleyMedia) {
-        runnableFunc = {
+        execute {
             signedGalleyDAO?.deleteSignedMedia(media)
         }
     }
 
     override fun insertSignedMedia(media: GalleyMedia) {
-        runnableFunc = {
+        execute {
             signedGalleyDAO?.insertSignedMedia(media)
         }
     }

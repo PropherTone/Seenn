@@ -2,21 +2,19 @@ package com.protone.seenn
 
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.Toolbar
-import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.context.MUSIC_PLAY
-import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.intent
+import com.protone.api.toBitmapByteArray
+import com.protone.api.todayTime
 import com.protone.database.room.dao.DataBaseDAOHelper
-import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.media.MusicReceiver
 import com.protone.mediamodle.media.musicBroadCastManager
-import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.MusicSeen
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
+import kotlin.coroutines.suspendCoroutine
 
 class MusicActivity : BaseActivity<MusicSeen>() {
 
@@ -69,9 +67,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
         while (isActive) {
             select<Unit> {
-                event.onReceive {
-
-                }
+                event.onReceive {}
                 musicSeen.viewEvent.onReceive { event ->
                     when (event) {
                         MusicSeen.Event.AddBucket -> {
@@ -103,9 +99,20 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                             )
                         )
                         MusicSeen.Event.Finish -> cancel()
-                        MusicSeen.Event.AddList -> startActivity(AddMusic2BucketActivity::class.intent.also {
-                            it.putExtra("BUCKET", musicSeen.bucket)
-                        })
+                        MusicSeen.Event.AddList -> startActivityForResult(
+                            ActivityResultContracts.StartActivityForResult(),
+                            AddMusic2BucketActivity::class.intent.also {
+                                it.putExtra("BUCKET", musicSeen.bucket)
+                            }).let {
+                            if (it?.resultCode == RESULT_OK) {
+                                withContext(Dispatchers.IO) {
+                                    DataBaseDAOHelper.getMusicBucketByName(musicSeen.bucket)
+                                        ?.let { bucket ->
+                                            musicSeen.refreshBucket(bucket)
+                                        }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -114,18 +121,36 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     }
 
     private suspend fun MusicSeen.initSeen() {
-        initList(
-            suspendCancellableCoroutine { co ->
-                DataBaseDAOHelper.getAllMusicBucket { list ->
-                    list?.let { lm ->
-                        co.resumeWith(Result.success(lm as MutableList<MusicBucket>))
+        val buckets = suspendCoroutine<MutableList<MusicBucket>> { co ->
+            DataBaseDAOHelper.getAllMusicBucket { list ->
+                if (list == null || list.isEmpty()) {
+                    DataBaseDAOHelper.addMusicBucketWithCallBack(
+                        MusicBucket(
+                            getString(R.string.all_music),
+                            if (Galley.music.size > 0) Galley.music[0].uri.toBitmapByteArray() else null,
+                            Galley.music.size,
+                            null,
+                            todayTime
+                        )
+                    ) { re, _ ->
+                        if (re) {
+                            DataBaseDAOHelper.getAllMusicBucket {
+                                co.resumeWith(Result.success(it as MutableList<MusicBucket>))
+                            }
+                        }
                     }
-                    co.cancel()
+                } else {
+                    co.resumeWith(Result.success(list as MutableList<MusicBucket>))
                 }
-            },
+            }
+        }
+
+        initList(
+            buckets,
             Galley.musicBucket[userConfig.playedMusicBucket] ?: Galley.music,
             userConfig.playedMusicBucket
         )
+
         mbClickCallBack { name ->
             cacheMusicBucketName = name
             hideBucket()
@@ -161,7 +186,11 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
     private fun MusicSeen.setBucket() = launch(Dispatchers.IO) {
         DataBaseDAOHelper.getMusicBucketByName(cacheMusicBucketName)?.let {
-            setBucket(it.icon, it.name, "${it.date} ${it.detail}")
+            setBucket(
+                it.icon,
+                it.name,
+                if (it.date != null && it.detail != null) "${it.date} ${it.detail}" else getString(R.string.none)
+            )
         }
     }
 }

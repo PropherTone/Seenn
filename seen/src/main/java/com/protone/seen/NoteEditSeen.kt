@@ -4,13 +4,11 @@ import android.content.Context
 import android.view.View
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
-import com.protone.api.json.jsonToList
-import com.protone.api.json.toEntity
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ISpanForUse
 import com.protone.seen.customView.ColorPopWindow
-import com.protone.seen.customView.richText.RichNoteView
 import com.protone.seen.databinding.NoteEditLayoutBinding
+import com.protone.mediamodle.note.entity.SpanStates
 
 class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context), ISpanForUse {
 
