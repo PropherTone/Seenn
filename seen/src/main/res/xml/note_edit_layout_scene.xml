@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ConstraintSet android:id="@+id/start">
+
+        <Constraint
+            android:id="@+id/noteEdit_icon"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/huge_icon" />
+
+        <Constraint
+            android:id="@+id/toolbar_action"
+            android:layout_width="match_parent"
+            android:paddingTop="@dimen/icon_padding_lite"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/end">
+
+        <Constraint
+            android:id="@+id/noteEdit_icon"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/huge_icon" />
+
+        <Constraint
+            android:id="@+id/toolbar_action"
+            android:layout_width="match_parent"
+            android:paddingTop="@dimen/icon_padding_lite"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </ConstraintSet>
+
+    <Transition
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@+id/start" />
+</MotionScene>

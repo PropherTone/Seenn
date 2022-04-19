@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.protone.database.room.entity.NoteType
 import com.protone.seen.R
-import com.protone.seen.databinding.MainLayoutBinding
 import com.protone.seen.databinding.NoteTpyeListAdapterBinding
 
 class NoteTypeListAdapter(
@@ -32,7 +31,7 @@ class NoteTypeListAdapter(
         )
     }
 
-    var addNoteType: ((String?) -> Unit)? = null
+    var addNote: ((String?) -> Unit)? = null
     var onTypeSelected: ((String?) -> Unit)? = null
 
     override fun onBindViewHolder(holder: Holder<NoteTpyeListAdapterBinding>, position: Int) {
@@ -42,7 +41,7 @@ class NoteTypeListAdapter(
             }
             noteTypeName.text = noteTypeList[holder.layoutPosition].type
             noteTypeAddNote.setOnClickListener {
-                addNoteType?.invoke(noteTypeName.text.toString())
+                addNote?.invoke(noteTypeName.text.toString())
             }
         }
     }

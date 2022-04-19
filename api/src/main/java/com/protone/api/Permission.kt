@@ -15,8 +15,8 @@ fun Activity.requestContentPermission() {
 
 inline fun Activity.checkNeededPermission(onFailed : ()->Unit, onSucceed : ()->Unit){
     val read = this.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-//    val write = this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    if ((read) == PackageManager.PERMISSION_GRANTED){
+    val write = this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    if ((read) == PackageManager.PERMISSION_GRANTED && (write) == PackageManager.PERMISSION_GRANTED){
         onSucceed()
     }else onFailed()
 }

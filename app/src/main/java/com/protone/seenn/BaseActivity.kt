@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide
 import com.protone.api.ActivityLifecycleOwner
 import com.protone.api.context.intent
 import com.protone.api.context.musicIntentFilter
+import com.protone.api.context.onUiThread
 import com.protone.api.context.statuesBarHeight
 import com.protone.database.room.config.UserConfig
 import com.protone.database.room.entity.Music
@@ -136,7 +137,9 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     }
 
     fun toast(msg: CharSequence) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        runOnUiThread {
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun finish() {

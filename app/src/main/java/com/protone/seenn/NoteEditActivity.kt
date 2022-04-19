@@ -2,10 +2,9 @@ package com.protone.seenn
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
+import com.protone.api.*
 import com.protone.api.context.intent
 import com.protone.api.json.toEntity
-import com.protone.api.toBitmapByteArray
-import com.protone.api.toDate
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
@@ -19,6 +18,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 
 class NoteEditActivity : BaseActivity<NoteEditSeen>() {
+
+    private var savedIconPath: String = ""
 
     companion object {
         const val NOTE_TYPE = "NoteType"
@@ -35,35 +36,53 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                 noteEditSeen.viewEvent.onReceive {
                     when (it) {
                         NoteEditSeen.NoteEditEvent.Confirm -> {
-                            DataBaseDAOHelper.insertNoteCB(Note()) {
-                                finish()
-                            }
                             val indexedRichNote = noteEditSeen.indexRichNote()
+                            if (noteEditSeen.title.isEmpty()) {
+                                toast(getString(R.string.enter_title))
+                                return@onReceive
+                            }
+                            DataBaseDAOHelper.insertNoteCB(
+                                Note(
+                                    noteEditSeen.title,
+                                    indexedRichNote.second,
+                                    savedIconPath,
+                                    todayTime,
+                                    intent.getStringExtra(NOTE_TYPE),
+                                    indexedRichNote.first
+                                )
+                            ) { re ->
+                                if (re) finish() else toast(getString(R.string.failed_msg))
+                            }
                         }
                         NoteEditSeen.NoteEditEvent.Finish -> finish()
-                        NoteEditSeen.NoteEditEvent.PickImage -> startGalleyPick(true).let { re ->
-                            re?.data?.getStringExtra("GalleyData")
-                                ?.toEntity(GalleyMedia::class.java)?.apply {
-                                    noteEditSeen.insertImage(
-                                        RichPhotoStates(uri, null, name, date.toDate().toString())
-                                    )
-                                }
+                        NoteEditSeen.NoteEditEvent.PickImage -> startGalleyPick(true)?.let { re ->
+                            noteEditSeen.insertImage(
+                                RichPhotoStates(
+                                    re.uri,
+                                    null,
+                                    re.name,
+                                    re.date.toDate().toString()
+                                )
+                            )
                         }
-                        NoteEditSeen.NoteEditEvent.PickVideo -> startGalleyPick(false).let { re ->
-                            re?.data?.getStringExtra("GalleyData")
-                                ?.toEntity(GalleyMedia::class.java)?.apply {
-                                    noteEditSeen.insertVideo(RichVideoStates(uri, null))
-                                }
+                        NoteEditSeen.NoteEditEvent.PickVideo -> startGalleyPick(false)?.let { re ->
+                            noteEditSeen.insertVideo(RichVideoStates(re.uri, null))
                         }
                         NoteEditSeen.NoteEditEvent.PickMusic -> {
                             noteEditSeen.insertMusic(RichMusicStates(Uri.EMPTY, null))
                         }
-                        NoteEditSeen.NoteEditEvent.PickIcon -> startGalleyPick(true).let { re ->
-                            re?.data?.getStringExtra("GalleyData")
-                                ?.toEntity(GalleyMedia::class.java)?.apply {
-//                                    GalleyHelper.saveIconToLocal()
-                                    this.uri.toBitmapByteArray()
+                        NoteEditSeen.NoteEditEvent.PickIcon -> startGalleyPick(true)?.let { re ->
+                            GalleyHelper.saveIconToLocal(re.name, re.uri.toMediaBitmapByteArray()) { s ->
+                                if (!s.isNullOrEmpty()) {
+                                    savedIconPath = s
+                                    savedIconPath.toDrawable(this@NoteEditActivity) { dra ->
+                                        noteEditSeen.setNoteIcon(dra)
+                                    }
+                                } else {
+                                    toast(getString(R.string.failed_msg))
                                 }
+                            }
+
                         }
 
                     }
@@ -82,7 +101,8 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                 GalleyActivity.CHOOSE_MODE,
                 if (isPhoto) GalleySeen.CHOOSE_PHOTO else GalleySeen.CHOOSE_VIDEO
             )
-        }
-    )
+        }).let { re ->
+        re?.data?.getStringExtra("GalleyData")?.toEntity(GalleyMedia::class.java)
+    }
 
 }

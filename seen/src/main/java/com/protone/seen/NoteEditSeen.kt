@@ -3,6 +3,8 @@ package com.protone.seen
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.View
+import androidx.core.view.isVisible
+import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.mediamodle.note.entity.*
@@ -22,6 +24,8 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
         PickIcon
     }
 
+    val title: String get() = binding.noteEditTitle.toString()
+
     private val binding = NoteEditLayoutBinding.inflate(context.layoutInflater, context.root, true)
 
     override val viewRoot: View
@@ -30,19 +34,16 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
     override fun getToolBar(): View = binding.toolbar
 
     init {
-        initToolBar()
+        setNavigation()
+        binding.noteEditToolbar.addOnOffsetChangedListener(
+            AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+                binding.toolbar.progress =
+                    -verticalOffset / appBarLayout.totalScrollRange.toFloat()
+            })
         binding.self = this
         binding.noteEditRichNote.apply {
             isEditable = true
-            val listOf = arrayListOf(
-                SpanStates(1, 3, SpanStates.Spans.ForegroundColorSpan, iColor = "#48a1ff"),
-                SpanStates(1, 3, SpanStates.Spans.StrikeThroughSpan),
-                SpanStates(4, 7, SpanStates.Spans.ForegroundColorSpan, iColor = "#48a1ff"),
-                SpanStates(8, 12, SpanStates.Spans.UnderlineSpan),
-                SpanStates(13, 15, SpanStates.Spans.ForegroundColorSpan),
-                SpanStates(16, 18, SpanStates.Spans.ForegroundColorSpan)
-            )
-            setRichList(listOf(RichNoteStates(context.getString(R.string.huge_text), listOf)))
+            setRichList(listOf(RichNoteStates("", arrayListOf())))
         }
     }
 
@@ -112,7 +113,7 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
         }
     }
 
-    fun setNoteIcon(drawable: Drawable) {
+    fun setNoteIcon(drawable: Drawable?) {
         binding.noteEditIcon.setImageDrawable(drawable)
     }
 

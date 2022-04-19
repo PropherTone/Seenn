@@ -2,23 +2,13 @@ package com.protone.seen
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Color
-import android.net.Uri
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.database.room.entity.Note
-import com.protone.mediamodle.note.entity.RichNoteStates
-import com.protone.mediamodle.note.entity.RichPhotoStates
-import com.protone.mediamodle.note.entity.SpanStates
 import com.protone.seen.adapter.NoteListAdapter
 import com.protone.seen.adapter.NoteTypeListAdapter
-import com.protone.seen.adapter.RichNoteAdapter
 import com.protone.seen.databinding.NoteLayoutBinding
 import kotlin.math.abs
 
@@ -60,7 +50,7 @@ class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context), View.OnCli
     }
 
     fun addNoteType(it: ((String?) -> Unit)?) {
-        (binding.noteBucketList.adapter as NoteTypeListAdapter?)?.addNoteType = it
+        (binding.noteBucketList.adapter as NoteTypeListAdapter?)?.addNote = it
     }
 
     fun onTypeSelected(it: ((String?) -> Unit)?) {

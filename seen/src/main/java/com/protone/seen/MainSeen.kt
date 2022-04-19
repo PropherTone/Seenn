@@ -37,7 +37,7 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
     var userName: String = ""
         set(value) {
             binding.userWelcome.text =
-                String.format(context.getString(R.string.welcome_msg), value)
+                String.format(context.getString(R.string.welcome_msg), "\n$value")
             binding.userDate.text = todayTime
             field = value
         }

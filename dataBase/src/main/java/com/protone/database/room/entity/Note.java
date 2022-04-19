@@ -2,6 +2,7 @@ package com.protone.database.room.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity
@@ -25,15 +26,19 @@ public class Note {
 
     public String type;
 
+    public int richCode;
+
+    @Ignore
     public Note() {
     }
 
-    public Note(String title, String text, String imagePath, String time, String type) {
+    public Note(String title, String text, String imagePath, String time, String type, int richCode) {
         this.title = title;
         this.text = text;
         this.imagePath = imagePath;
         this.time = time;
         this.type = type;
+        this.richCode = richCode;
     }
 
     public String getType() {
@@ -84,6 +89,14 @@ public class Note {
         this.time = time;
     }
 
+    public int getRichCode() {
+        return richCode;
+    }
+
+    public void setRichCode(int richCode) {
+        this.richCode = richCode;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -92,6 +105,7 @@ public class Note {
         Note note = (Note) o;
 
         if (id != note.id) return false;
+        if (richCode != note.richCode) return false;
         if (!title.equals(note.title)) return false;
         if (!text.equals(note.text)) return false;
         if (!imagePath.equals(note.imagePath)) return false;
@@ -107,6 +121,7 @@ public class Note {
         result = 31 * result + imagePath.hashCode();
         result = 31 * result + time.hashCode();
         result = 31 * result + type.hashCode();
+        result = 31 * result + richCode;
         return result;
     }
 
@@ -119,6 +134,7 @@ public class Note {
                 ", imagePath='" + imagePath + '\'' +
                 ", time='" + time + '\'' +
                 ", type='" + type + '\'' +
+                ", richCode=" + richCode +
                 '}';
     }
 }

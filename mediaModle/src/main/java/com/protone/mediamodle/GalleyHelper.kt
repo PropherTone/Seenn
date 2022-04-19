@@ -1,6 +1,7 @@
 package com.protone.mediamodle
 
 import android.os.Environment
+import android.util.Log
 import com.protone.api.context.Global
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
@@ -33,37 +34,39 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
         Galley.music = scanAudio()
     }
 
-    fun saveIconToLocal(fileName: String, byteArray: ByteArray?) = launch {
-        suspendCancellableCoroutine<String?> { co ->
+    inline fun saveIconToLocal(
+        fileName: String, byteArray: ByteArray?,
+        crossinline callBack: (String?) -> Unit
+    ) = launch {
+        suspendCancellableCoroutine<String?> {
             var fileOutputStream: FileOutputStream? = null
             try {
                 byteArray?.let {
-                    val tempPath = "${Environment.getDataDirectory().path}/$fileName/.jpg"
+                    val tempPath = "${Global.application.filesDir.absolutePath}/$fileName.jpg"
+                    Log.d("TAG", "saveIconToLocal: $tempPath")
                     val file = File(tempPath)
-                    co.resumeWith(
-                        Result.success(
-                            when {
-                                file.exists() -> tempPath
-                                file.createNewFile() -> {
-                                    fileOutputStream = FileOutputStream(file)
-                                    fileOutputStream?.write(it)
-                                    tempPath
-                                }
-                                else -> null
+                    callBack.invoke(
+                        when {
+                            file.exists() -> tempPath
+                            file.createNewFile() -> {
+                                fileOutputStream = FileOutputStream(file)
+                                fileOutputStream?.write(it)
+                                tempPath
                             }
-                        )
+                            else -> null
+                        }
                     )
+                    cancel()
                 }
             } catch (e: IOException) {
+                e.printStackTrace()
                 try {
                     fileOutputStream?.flush()
                     fileOutputStream?.close()
-                } catch (e: IOException) {
-                    co.resumeWith(Result.success(null))
-                }
-                co.resumeWith(Result.success(null))
+                } catch (e: IOException) {}
             }
-            co.resumeWith(Result.success(null))
+            callBack.invoke(null)
+            cancel()
         }
     }
 

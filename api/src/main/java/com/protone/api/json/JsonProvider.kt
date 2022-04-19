@@ -1,14 +1,10 @@
 package com.protone.api.json
 
 import android.net.Uri
-import android.util.Log
 import com.google.gson.*
-import com.google.gson.reflect.TypeToken
-import com.protone.api.TAG
 import com.protone.api.imageContent
 import com.protone.api.musicContent
 import com.protone.api.videoContent
-import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 fun Any.toJson(): String {
@@ -18,7 +14,7 @@ fun Any.toJson(): String {
         .toJson(this,this::class.java)
 }
 
-fun Uri.toJson():String{
+fun Uri.toUriJson():String{
     return this.toString()
 }
 
@@ -53,7 +49,6 @@ private class UriSerializer : JsonSerializer<Uri> {
         typeOfSrc: Type?,
         context: JsonSerializationContext?
     ): JsonElement {
-        Log.d("TAG", "serialize: ${src.toString()}")
         return JsonPrimitive(src?.toString())
     }
 }

@@ -239,7 +239,7 @@ class RichNoteView @JvmOverloads constructor(
      */
     suspend fun indexRichNote(): Pair<Int, String> {
         return withContext(Dispatchers.IO) {
-            suspendCancellableCoroutine<Pair<Int, String>> { co ->
+            suspendCancellableCoroutine { co ->
                 val richSer = arrayListOf<String>()
                 var richStates = 0
                 richList.forEach {
