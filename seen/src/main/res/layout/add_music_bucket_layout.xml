@@ -21,7 +21,7 @@
         <EditText
             android:id="@+id/addMB_search"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/icon_50"
+            android:layout_height="@dimen/action_icon"
             android:background="@color/blue_1"
             android:drawableStart="@drawable/ic_baseline_search_24_white"
             android:hint="@string/search"
@@ -55,7 +55,7 @@
         <ImageView
             android:id="@+id/addMB_leave"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/icon_58"
+            android:layout_height="@dimen/action_icon_p"
             android:background="@drawable/background_ripple_blue"
             android:contentDescription="@string/action"
             android:onClick="@{()-> self.offer(Event.Finished)}"

@@ -77,6 +77,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             self = this@MusicSeen
             root.viewTreeObserver.addOnGlobalLayoutListener(this@MusicSeen)
             binding.toolbar.progress = 1f
+            binding.toolbar.transitionToEnd()
             appToolbar.addOnOffsetChangedListener(
                 AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
                     binding.toolbar.progress =

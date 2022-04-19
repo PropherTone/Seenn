@@ -8,7 +8,11 @@
             android:id="@+id/userCard"
             android:layout_width="match_parent"
             android:layout_height="@dimen/huge_icon"
+            android:alpha="1"
             android:background="@color/white"
+            android:elevation="@dimen/small_elevation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
@@ -18,7 +22,6 @@
             android:layout_marginStart="40dp"
             android:layout_marginTop="20dp"
             android:alpha="1"
-            android:text="Hello,Eqi"
             android:textColor="@color/black"
             android:textSize="@dimen/hug_title_text"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,19 +32,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:alpha="1"
-            android:text="Jan,21"
             android:textColor="@color/black"
             android:textSize="@dimen/sub_text"
             app:layout_constraintStart_toStartOf="@id/user_welcome"
             app:layout_constraintTop_toBottomOf="@+id/user_welcome" />
 
         <Constraint
+            android:id="@+id/user_icon"
+            android:layout_width="@dimen/user_icon"
+            android:layout_height="@dimen/user_icon"
+            android:layout_marginTop="@dimen/main_margin"
+            android:alpha="1"
+            android:background="@color/background_white"
+            android:contentDescription="@string/icon"
+            android:elevation="@dimen/small_elevation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/user_welcome"
+            app:layout_constraintTop_toTopOf="@+id/user_welcome" />
+
+        <Constraint
             android:id="@+id/galley"
             android:layout_width="0dp"
-            android:layout_height="@dimen/icon_50"
+            android:layout_height="@dimen/action_icon"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@color/glass"
             android:contentDescription="@string/model_Galley"
             android:paddingTop="@dimen/main_padding"
             android:paddingBottom="@dimen/main_padding"
@@ -53,10 +66,8 @@
         <Constraint
             android:id="@+id/noteBook"
             android:layout_width="0dp"
-            android:layout_height="@dimen/icon_50"
+            android:layout_height="@dimen/action_icon"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@color/glass"
             android:contentDescription="@string/model_noteBook"
             android:paddingTop="@dimen/main_padding"
             android:paddingBottom="@dimen/main_padding"
@@ -68,10 +79,8 @@
         <Constraint
             android:id="@+id/music"
             android:layout_width="0dp"
-            android:layout_height="@dimen/icon_50"
+            android:layout_height="@dimen/action_icon"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@color/glass"
             android:contentDescription="@string/model_music"
             android:paddingTop="@dimen/main_padding"
             android:paddingBottom="@dimen/main_padding"
@@ -84,17 +93,21 @@
             android:id="@+id/musicPlayer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/glass"
+            android:alpha="1"
             app:layout_constraintTop_toBottomOf="@id/noteBook" />
 
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
+
         <Constraint
             android:id="@+id/userCard"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="@dimen/huge_icon"
+            android:alpha="1"
             android:background="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
@@ -104,7 +117,6 @@
             android:layout_marginStart="40dp"
             android:layout_marginTop="20dp"
             android:alpha="0"
-            android:text="Hello,Eqi"
             android:textColor="@color/black"
             android:textSize="@dimen/hug_title_text"
             app:layout_constraintStart_toStartOf="parent"
@@ -115,19 +127,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:alpha="0"
-            android:text="Jan,21"
             android:textColor="@color/black"
             android:textSize="@dimen/sub_text"
             app:layout_constraintStart_toEndOf="@id/user_welcome"
             app:layout_constraintTop_toTopOf="@+id/user_welcome" />
 
         <Constraint
+            android:id="@+id/user_icon"
+            android:layout_width="@dimen/user_icon"
+            android:layout_height="@dimen/user_icon"
+            android:layout_marginTop="@dimen/main_margin"
+            android:alpha="0"
+            android:contentDescription="@string/icon"
+            app:layout_constraintBottom_toBottomOf="@id/userCard"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/user_welcome"
+            app:layout_constraintTop_toTopOf="@+id/user_welcome" />
+
+        <Constraint
             android:id="@+id/galley"
             android:layout_width="0dp"
-            android:layout_height="@dimen/icon_50"
+            android:layout_height="@dimen/action_icon"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@color/glass"
             android:contentDescription="@string/model_Galley"
             android:paddingTop="@dimen/main_padding"
             android:paddingBottom="@dimen/main_padding"
@@ -139,10 +160,8 @@
         <Constraint
             android:id="@+id/noteBook"
             android:layout_width="0dp"
-            android:layout_height="@dimen/icon_50"
+            android:layout_height="@dimen/action_icon"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@color/glass"
             android:contentDescription="@string/model_noteBook"
             android:paddingTop="@dimen/main_padding"
             android:paddingBottom="@dimen/main_padding"
@@ -154,10 +173,8 @@
         <Constraint
             android:id="@+id/music"
             android:layout_width="0dp"
-            android:layout_height="@dimen/icon_50"
+            android:layout_height="@dimen/action_icon"
             android:layout_gravity="center"
-            android:layout_weight="1"
-            android:background="@color/glass"
             android:contentDescription="@string/model_music"
             android:paddingTop="@dimen/main_padding"
             android:paddingBottom="@dimen/main_padding"
@@ -169,9 +186,10 @@
         <Constraint
             android:id="@+id/musicPlayer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/glass"
-            app:layout_constraintTop_toBottomOf="@id/noteBook" />
+            android:layout_height="0dp"
+            android:alpha="0"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@id/userCard" />
 
     </ConstraintSet>
 
@@ -179,4 +197,5 @@
         app:constraintSetEnd="@id/end"
         app:constraintSetStart="@+id/start"
         app:motionInterpolator="linear" />
+
 </MotionScene>

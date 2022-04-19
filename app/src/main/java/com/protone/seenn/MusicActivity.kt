@@ -1,6 +1,7 @@
 package com.protone.seenn
 
 import android.content.Intent
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.MUSIC_PLAY
 import com.protone.api.context.intent
@@ -105,12 +106,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                                 it.putExtra("BUCKET", musicSeen.bucket)
                             }).let {
                             if (it?.resultCode == RESULT_OK) {
-                                withContext(Dispatchers.IO) {
-                                    DataBaseDAOHelper.getMusicBucketByName(musicSeen.bucket)
-                                        ?.let { bucket ->
-                                            musicSeen.refreshBucket(bucket)
-                                        }
-                                }
+
                             }
                         }
                     }
@@ -161,6 +157,15 @@ class MusicActivity : BaseActivity<MusicSeen>() {
             binder.setDate(Galley.musicBucket[cacheMusicBucketName] ?: mutableListOf())
             binder.setPlayMusicPosition(position)
             userConfig.playedMusicBucket = cacheMusicBucketName
+        }
+
+        Galley.musicBucketLive.observe(this@MusicActivity) {
+            launch(Dispatchers.IO) {
+                DataBaseDAOHelper.getMusicBucketByName(bucket)
+                    ?.let { bucket ->
+                        refreshBucket(bucket)
+                    }
+            }
         }
 
         initSmallMusic()

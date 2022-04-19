@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/music_root"
-    android:paddingStart="@dimen/main_padding"
-    android:paddingEnd="@dimen/main_padding"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingStart="@dimen/main_padding"
+    android:paddingEnd="@dimen/main_padding">
 
     <ImageView
         android:id="@+id/music_icon"
@@ -43,6 +43,7 @@
             android:scrollHorizontally="true"
             android:singleLine="true"
             android:text="@string/no_music_is_playing"
+            android:textColor="@color/black"
             android:textSize="@dimen/sub_text"
             android:textStyle="bold" />
 

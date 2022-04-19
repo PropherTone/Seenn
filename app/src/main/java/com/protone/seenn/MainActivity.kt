@@ -38,7 +38,7 @@ class MainActivity : BaseActivity<MainSeen>() {
                 event.onReceive {
                     when (it) {
                         Event.OnStart -> {
-
+                            mainSeen.userName = userConfig.userName
                         }
                         else -> {}
                     }
@@ -79,7 +79,7 @@ class MainActivity : BaseActivity<MainSeen>() {
 //                            )
                         }
                         MainSeen.Touch.MUSIC -> startActivity(MusicActivity::class.intent)
-                        MainSeen.Touch.NOTE -> startActivity(NoteEditActivity::class.intent)
+                        MainSeen.Touch.NOTE -> startActivity(NoteActivity::class.intent)
                         MainSeen.Touch.PlayMusic -> musicBroadCastManager.sendBroadcast(
                             Intent().setAction(
                                 MUSIC_PLAY

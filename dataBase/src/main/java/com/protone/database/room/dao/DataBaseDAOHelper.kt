@@ -6,9 +6,10 @@ import com.protone.database.room.SeennDataBase
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.MusicBucket
+import com.protone.database.room.entity.Note
 import com.protone.database.room.getMusicBucketDAO
 
-object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGalleyDAO {
+object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGalleyDAO, NoteDAO {
 
     //MusicBucket
     private var musicBucketDAO: MusicBucketDAO? = null
@@ -203,6 +204,34 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     override fun insertSignedMedia(media: GalleyMedia) {
         execute {
             signedGalleyDAO?.insertSignedMedia(media)
+        }
+    }
+
+    //Note
+    private var noteDAO: NoteDAO? = null
+
+    init {
+        if (noteDAO == null) {
+            noteDAO = SeennDataBase.database.getNoteDAO()
+        }
+    }
+
+    override fun getAllNote(): List<Note>? {
+        return noteDAO?.getAllNote()
+    }
+
+    override fun getNoteByName(name: String): Note? {
+        return noteDAO?.getNoteByName(name)
+    }
+
+    override fun insertNote(note: Note) {
+        noteDAO?.insertNote(note)
+    }
+
+    inline fun insertNoteCB(note: Note, crossinline callBack: (Boolean) -> Unit) {
+        execute {
+            insertNote(note)
+            callBack.invoke(getNoteByName(note.title) != null)
         }
     }
 

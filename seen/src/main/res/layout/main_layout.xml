@@ -15,19 +15,21 @@
         android:id="@+id/main_group"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/main_background">
+        android:background="@drawable/main_background"
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/transparent">
+            android:background="@color/glass"
+            android:elevation="0dp">
 
             <androidx.constraintlayout.motion.widget.MotionLayout
                 android:id="@+id/tool_motion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="?attr/actionBarSize"
+                android:minHeight="@dimen/action_icon"
                 app:layoutDescription="@xml/main_layout_scene"
                 app:layout_scrollFlags="scroll|enterAlways|snap|exitUntilCollapsed">
 
@@ -36,6 +38,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/huge_icon"
                     android:background="@color/white"
+                    android:elevation="@dimen/small_elevation"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -46,6 +49,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="40dp"
                     android:layout_marginTop="20dp"
+                    android:elevation="@dimen/small_elevation"
                     android:text="Hello,Eqi"
                     android:textColor="@color/black"
                     android:textSize="@dimen/hug_title_text"
@@ -56,29 +60,33 @@
                     android:id="@+id/user_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:elevation="@dimen/small_elevation"
                     android:text="Jan,21"
                     android:textColor="@color/black"
                     android:textSize="@dimen/sub_text"
                     app:layout_constraintStart_toStartOf="@id/user_welcome"
                     app:layout_constraintTop_toBottomOf="@+id/user_welcome" />
 
-                <ImageView
+                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/user_icon"
+                    app:shapeAppearanceOverlay="@style/roundCornerImage"
+                    android:src="@drawable/ic_outline_account_circle_24"
                     android:layout_width="@dimen/user_icon"
                     android:layout_height="@dimen/user_icon"
                     android:layout_marginTop="@dimen/main_margin"
+                    android:background="@color/background_white"
                     android:contentDescription="@string/icon"
+                    android:elevation="@dimen/small_elevation"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/user_welcome"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="@+id/user_welcome" />
 
                 <ImageView
                     android:id="@+id/galley"
                     android:layout_width="0dp"
-                    android:layout_height="@dimen/icon_50"
+                    android:layout_height="@dimen/action_icon"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="@color/glass"
                     android:contentDescription="@string/model_Galley"
                     android:onClick="@{()->self.offer(Touch.GALLEY)}"
                     android:paddingTop="@dimen/main_padding"
@@ -91,10 +99,9 @@
                 <ImageView
                     android:id="@+id/noteBook"
                     android:layout_width="0dp"
-                    android:layout_height="@dimen/icon_50"
+                    android:layout_height="@dimen/action_icon"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="@color/glass"
                     android:contentDescription="@string/model_noteBook"
                     android:onClick="@{()->self.offer(Touch.NOTE)}"
                     android:paddingTop="@dimen/main_padding"
@@ -107,10 +114,9 @@
                 <ImageView
                     android:id="@+id/music"
                     android:layout_width="0dp"
-                    android:layout_height="@dimen/icon_50"
+                    android:layout_height="@dimen/action_icon"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="@color/glass"
                     android:contentDescription="@string/model_music"
                     android:onClick="@{()->self.offer(Touch.MUSIC)}"
                     android:paddingTop="@dimen/main_padding"
@@ -125,7 +131,6 @@
                     android:id="@+id/musicPlayer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/glass"
                     app:layout_constraintTop_toBottomOf="@id/noteBook" />
 
             </androidx.constraintlayout.motion.widget.MotionLayout>
@@ -137,7 +142,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:elevation="0dp"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"/>
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

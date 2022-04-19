@@ -22,7 +22,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/main_background"
-            android:fitsSystemWindows="true">
+            android:fitsSystemWindows="true"
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$Behavior">
 
             <androidx.constraintlayout.motion.widget.MotionLayout
                 android:id="@+id/toolbar"
@@ -53,6 +54,7 @@
                     android:background="@color/glass"
                     android:contentDescription="@string/icon"
                     android:padding="@dimen/icon_padding"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_baseline_music_note_24"
                     app:layout_constraintBottom_toTopOf="@id/music_bucketName"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -125,6 +127,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
+            app:layout_anchor="@id/appToolbar"
+            app:layout_anchorGravity="bottom"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -154,9 +158,9 @@
 
             <com.protone.seen.customView.MySmallMusicPlayer
                 android:id="@+id/mySmallMusicPlayer"
-                android:background="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/white"
                 app:layout_constraintBottom_toTopOf="@id/music_bucket"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -164,9 +168,9 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/music_bucket"
-                android:background="@color/white"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:background="@color/white"
                 app:layout_constraintBottom_toTopOf="@id/music_addBucket"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

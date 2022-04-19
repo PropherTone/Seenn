@@ -1,12 +1,19 @@
 package com.protone.api
 
+import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.util.Log
 import com.protone.api.context.Global
+import com.protone.api.context.onBackground
+import com.protone.api.context.onUiThread
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
@@ -14,6 +21,19 @@ import java.util.*
 fun String.getFileName(): String {
     return this.split("/").run {
         this[this.size - 1]
+    }
+}
+
+fun String.toDrawable(context: Context, callBack: (Drawable?) -> Unit) {
+    onBackground {
+        val file = File(this)
+        if (!file.isFile || !file.exists()) callBack.invoke(null)
+        when (context) {
+            is Activity -> context.onUiThread {
+                if (it) callBack.invoke(BitmapDrawable.createFromPath(this))
+            }
+            else -> callBack.invoke(null)
+        }
     }
 }
 

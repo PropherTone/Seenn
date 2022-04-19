@@ -18,17 +18,20 @@ public class Note {
     public String text;
 
     @ColumnInfo(name = "TitleImage")
-    public String iMGUri;
+    public String imagePath;
 
     @ColumnInfo(name = "Time")
     public String time;
 
     public String type;
 
-    public Note(String title, String text, String iMGUri, String time, String type) {
+    public Note() {
+    }
+
+    public Note(String title, String text, String imagePath, String time, String type) {
         this.title = title;
         this.text = text;
-        this.iMGUri = iMGUri;
+        this.imagePath = imagePath;
         this.time = time;
         this.type = type;
     }
@@ -65,12 +68,12 @@ public class Note {
         this.text = text;
     }
 
-    public String getiMGUri() {
-        return iMGUri;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public void setiMGUri(String iMGUri) {
-        this.iMGUri = iMGUri;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 
     public String getTime() {
@@ -79,5 +82,43 @@ public class Note {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Note note = (Note) o;
+
+        if (id != note.id) return false;
+        if (!title.equals(note.title)) return false;
+        if (!text.equals(note.text)) return false;
+        if (!imagePath.equals(note.imagePath)) return false;
+        if (!time.equals(note.time)) return false;
+        return type.equals(note.type);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + title.hashCode();
+        result = 31 * result + text.hashCode();
+        result = 31 * result + imagePath.hashCode();
+        result = 31 * result + time.hashCode();
+        result = 31 * result + type.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Note{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", text='" + text + '\'' +
+                ", imagePath='" + imagePath + '\'' +
+                ", time='" + time + '\'' +
+                ", type='" + type + '\'' +
+                '}';
     }
 }

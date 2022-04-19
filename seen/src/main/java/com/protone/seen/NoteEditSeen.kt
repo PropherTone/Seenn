@@ -1,6 +1,7 @@
 package com.protone.seen
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.View
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
@@ -17,7 +18,8 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
         Finish,
         PickImage,
         PickVideo,
-        PickMusic
+        PickMusic,
+        PickIcon
     }
 
     private val binding = NoteEditLayoutBinding.inflate(context.layoutInflater, context.root, true)
@@ -108,6 +110,10 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
         ColorPopWindow(context).startPopWindow(binding.noteEditTool) {
             binding.noteEditRichNote.setColor(it)
         }
+    }
+
+    fun setNoteIcon(drawable: Drawable) {
+        binding.noteEditIcon.setImageDrawable(drawable)
     }
 
 }

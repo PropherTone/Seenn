@@ -7,12 +7,14 @@ import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.TAG
 import com.protone.api.context.Global
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
+import com.protone.api.todayTime
 import com.protone.seen.adapter.MainModelListAdapter
 import com.protone.seen.databinding.MainLayoutBinding
 
@@ -31,6 +33,16 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
 
     //    val mainTheme by lazy { MainThemeStore() }
     private val binding = MainLayoutBinding.inflate(context.layoutInflater, context.root, false)
+
+    var userName: String = ""
+        set(value) {
+            binding.userWelcome.text =
+                String.format(context.getString(R.string.welcome_msg), value)
+            binding.userDate.text = todayTime
+            field = value
+        }
+        get() = binding.userWelcome.text.toString()
+
     var progress: Long = 0
         set(value) {
             binding.musicPlayer.progress = value
@@ -74,15 +86,15 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
     override fun getToolBar(): View = binding.mainGroup
 
     init {
-        initToolBar()
+        setNavigation()
         binding.apply {
             self = this@MainSeen
             toolbar.addOnOffsetChangedListener(
                 AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-                    Log.d(TAG, "$verticalOffset: ${appBarLayout.totalScrollRange.toFloat()}")
                     binding.toolMotion.progress =
-                        -verticalOffset / appBarLayout.totalScrollRange.toFloat()
-                    Log.d(TAG, "${binding.toolMotion.progress}: ")
+                        -verticalOffset / appBarLayout.totalScrollRange.toFloat().also {
+                            binding.musicPlayer.isVisible = it > 0.7f
+                        }
                 })
             musicPlayer.apply {
                 duration

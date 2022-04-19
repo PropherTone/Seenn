@@ -29,9 +29,11 @@
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <ImageView
+                    android:id="@+id/noteEdit_icon"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/huge_icon"
                     android:contentDescription="@string/icon"
+                    android:onClick="@{()->self.offer(NoteEditEvent.PickIcon)}"
                     app:layout_collapseMode="parallax" />
 
                 <androidx.appcompat.widget.Toolbar

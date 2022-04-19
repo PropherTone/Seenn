@@ -7,7 +7,7 @@
         </shape>
     </item>
     <item>
-        <color android:color="@color/background_white" />
+        <color android:color="@color/white" />
     </item>
     <item android:drawable="@drawable/ic_baseline_add_24" />
 </ripple>

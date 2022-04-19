@@ -1,9 +1,6 @@
 package com.protone.mediamodle
 
-import android.graphics.BitmapFactory
 import android.os.Environment
-import android.util.Log
-import com.protone.api.TAG
 import com.protone.api.context.Global
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
@@ -13,6 +10,8 @@ import com.protone.mediamodle.media.scanVideo
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOError
+import java.io.IOException
 import java.lang.Runnable
 import java.util.concurrent.Executors
 
@@ -34,20 +33,37 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
         Galley.music = scanAudio()
     }
 
-    fun saveBucketIcon(bucketName: String, byteArray: ByteArray?) = launch {
-        suspendCancellableCoroutine<String> { co->
-            var path : String? = null
-            byteArray?.let {
-                val tempPath = "${Environment.getDataDirectory().path}/$bucketName/.jpg"
-                val file = File(tempPath)
-                if (file.exists()) {
-                    co.resumeWith(Result.success(tempPath))
-                } else if (file.createNewFile()){
-                    val fileOutputStream = FileOutputStream(file)
-                    fileOutputStream.write(it)
+    fun saveIconToLocal(fileName: String, byteArray: ByteArray?) = launch {
+        suspendCancellableCoroutine<String?> { co ->
+            var fileOutputStream: FileOutputStream? = null
+            try {
+                byteArray?.let {
+                    val tempPath = "${Environment.getDataDirectory().path}/$fileName/.jpg"
+                    val file = File(tempPath)
+                    co.resumeWith(
+                        Result.success(
+                            when {
+                                file.exists() -> tempPath
+                                file.createNewFile() -> {
+                                    fileOutputStream = FileOutputStream(file)
+                                    fileOutputStream?.write(it)
+                                    tempPath
+                                }
+                                else -> null
+                            }
+                        )
+                    )
                 }
+            } catch (e: IOException) {
+                try {
+                    fileOutputStream?.flush()
+                    fileOutputStream?.close()
+                } catch (e: IOException) {
+                    co.resumeWith(Result.success(null))
+                }
+                co.resumeWith(Result.success(null))
             }
-//            co.resumeWith()
+            co.resumeWith(Result.success(null))
         }
     }
 
