@@ -3,6 +3,7 @@ package com.protone.mediamodle
 import android.os.Environment
 import android.util.Log
 import com.protone.api.context.Global
+import com.protone.api.getFileName
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.mediamodle.media.scanAudio
@@ -42,7 +43,7 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
             var fileOutputStream: FileOutputStream? = null
             try {
                 byteArray?.let {
-                    val tempPath = "${Global.application.filesDir.absolutePath}/$fileName.jpg"
+                    val tempPath = "${Global.application.filesDir.absolutePath}/${fileName.getFileName()}.jpg"
                     Log.d("TAG", "saveIconToLocal: $tempPath")
                     val file = File(tempPath)
                     callBack.invoke(
@@ -56,7 +57,6 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
                             else -> null
                         }
                     )
-                    cancel()
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
@@ -64,9 +64,9 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
                     fileOutputStream?.flush()
                     fileOutputStream?.close()
                 } catch (e: IOException) {}
+                callBack.invoke(null)
             }
-            callBack.invoke(null)
-            cancel()
+            this.cancel()
         }
     }
 

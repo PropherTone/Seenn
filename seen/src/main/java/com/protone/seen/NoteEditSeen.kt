@@ -1,11 +1,21 @@
 package com.protone.seen
 
 import android.content.Context
+import android.graphics.drawable.Animatable
+import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.view.View
+import android.widget.ImageView
+import androidx.core.animation.doOnEnd
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.appbar.AppBarLayout
+import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
+import com.protone.api.context.onUiThread
 import com.protone.api.context.root
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ISpanForUse
@@ -24,7 +34,7 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
         PickIcon
     }
 
-    val title: String get() = binding.noteEditTitle.toString()
+    val title: String get() = binding.noteEditTitle.text.toString()
 
     private val binding = NoteEditLayoutBinding.inflate(context.layoutInflater, context.root, true)
 
@@ -35,6 +45,7 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
 
     init {
         setNavigation()
+        binding.noteEditTitle.requestFocus()
         binding.noteEditToolbar.addOnOffsetChangedListener(
             AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
                 binding.toolbar.progress =
@@ -115,6 +126,41 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
 
     fun setNoteIcon(drawable: Drawable?) {
         binding.noteEditIcon.setImageDrawable(drawable)
+    }
+
+    fun setNoteIconCache(uri: Uri?) {
+        Glide.with(context).asDrawable().load(uri).skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.NONE).into(binding.noteEditIcon)
+    }
+
+    fun showProgress(isShow: Boolean) =
+        context.onUiThread {
+            (binding.toolbar.getViewById(R.id.noteEdit_progress) as ImageView?)?.apply {
+                drawable.let {
+                    when (it) {
+                        is Animatable ->
+                            if (isShow) it.start().also { isVisible = true }
+                            else it.stop().also { changeIconAni(binding.noteEditProgress) }
+                    }
+                }
+            }
+        }
+
+    private fun changeIconAni(view: ImageView) = context.onUiThread {
+        AnimationHelper.apply {
+            animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
+                view.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        context.resources,
+                        R.drawable.ic_baseline_check_24,
+                        null
+                    )
+                )
+                animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true, doOnEnd = {
+                    alpha(view, 0f, play = true, doOnEnd = { view.isVisible = false })
+                })
+            }, play = true)
+        }
     }
 
 }

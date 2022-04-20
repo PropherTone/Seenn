@@ -27,13 +27,9 @@ fun String.getFileName(): String {
 fun String.toDrawable(context: Context, callBack: (Drawable?) -> Unit) {
     onBackground {
         val file = File(this)
-        if (!file.isFile || !file.exists()) callBack.invoke(null)
-        when (context) {
-            is Activity -> context.onUiThread {
-                if (it) callBack.invoke(BitmapDrawable.createFromPath(this))
-            }
-            else -> callBack.invoke(null)
-        }
+        val drawable: Drawable? = if (!file.isFile || !file.exists()) null
+        else BitmapDrawable.createFromPath(this)
+        context.onUiThread { callBack.invoke(drawable) }
     }
 }
 

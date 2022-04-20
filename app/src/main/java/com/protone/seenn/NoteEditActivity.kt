@@ -5,6 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.*
 import com.protone.api.context.intent
 import com.protone.api.json.toEntity
+import com.protone.api.json.toUriJson
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
@@ -16,10 +17,13 @@ import com.protone.seen.GalleySeen
 import com.protone.seen.NoteEditSeen
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 class NoteEditActivity : BaseActivity<NoteEditSeen>() {
 
     private var savedIconPath: String = ""
+    private var iconUri: Uri? = null
 
     companion object {
         const val NOTE_TYPE = "NoteType"
@@ -41,16 +45,34 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                 toast(getString(R.string.enter_title))
                                 return@onReceive
                             }
+                            noteEditSeen.showProgress(true)
                             DataBaseDAOHelper.insertNoteCB(
                                 Note(
                                     noteEditSeen.title,
                                     indexedRichNote.second,
-                                    savedIconPath,
+                                    if (iconUri != null) suspendCancellableCoroutine { co ->
+                                        GalleyHelper.saveIconToLocal(
+                                            noteEditSeen.title,
+                                            iconUri?.toMediaBitmapByteArray()
+                                        ) { s ->
+                                            if (!s.isNullOrEmpty()) {
+                                                savedIconPath = s
+                                                savedIconPath.toDrawable(this@NoteEditActivity) { dra ->
+                                                    noteEditSeen.setNoteIcon(dra)
+                                                    co.resumeWith(Result.success(savedIconPath))
+                                                }
+                                            } else {
+                                                toast(getString(R.string.failed_upload_image))
+                                                co.resumeWith(Result.success(iconUri!!.toUriJson()))
+                                            }
+                                            noteEditSeen.showProgress(false)
+                                        }
+                                    } else "",
                                     todayTime,
                                     intent.getStringExtra(NOTE_TYPE),
                                     indexedRichNote.first
                                 )
-                            ) { re ->
+                            ) { re, _ ->
                                 if (re) finish() else toast(getString(R.string.failed_msg))
                             }
                         }
@@ -72,17 +94,8 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                             noteEditSeen.insertMusic(RichMusicStates(Uri.EMPTY, null))
                         }
                         NoteEditSeen.NoteEditEvent.PickIcon -> startGalleyPick(true)?.let { re ->
-                            GalleyHelper.saveIconToLocal(re.name, re.uri.toMediaBitmapByteArray()) { s ->
-                                if (!s.isNullOrEmpty()) {
-                                    savedIconPath = s
-                                    savedIconPath.toDrawable(this@NoteEditActivity) { dra ->
-                                        noteEditSeen.setNoteIcon(dra)
-                                    }
-                                } else {
-                                    toast(getString(R.string.failed_msg))
-                                }
-                            }
-
+                            noteEditSeen.setNoteIconCache(re.uri)
+                            iconUri = re.uri
                         }
 
                     }

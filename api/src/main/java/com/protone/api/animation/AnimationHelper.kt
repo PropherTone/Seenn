@@ -112,6 +112,26 @@ object AnimationHelper {
         if (play) start()
     }
 
+    inline fun alpha(
+        view: View,
+        var1: Float,
+        duration: Long? = null,
+        play: Boolean = false,
+        crossinline doOnEnd: () -> Unit = {},
+        crossinline doOnStart: () -> Unit = {}
+    ): ObjectAnimator = ObjectAnimator.ofFloat(
+        view,
+        "alpha",
+        var1
+    ).apply {
+        if (duration != null) {
+            this.duration = duration
+        }
+        doOnEnd { doOnEnd() }
+        doOnStart { doOnStart() }
+        if (play) start()
+    }
+
     inline fun scaleX(
         view: View,
         var1: Float,

@@ -29,7 +29,7 @@ class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBindi
                 it.imagePath.toDrawable(context) { drawable ->
                     noteBack.background = drawable
                 }
-                noteTitle.text = it.text
+                noteTitle.text = it.title
                 noteDate.text = it.time
             }
         }

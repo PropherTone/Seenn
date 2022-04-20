@@ -31,13 +31,26 @@
                 app:layout_scrollFlags="scroll|enterAlways|snap|exitUntilCollapsed">
 
                 <ImageView
+                    android:scaleType="centerCrop"
                     android:id="@+id/noteEdit_icon"
                     android:layout_width="match_parent"
-                    android:src="@drawable/main_background"
                     android:layout_height="@dimen/huge_icon"
                     android:contentDescription="@string/icon"
                     android:onClick="@{()->self.offer(NoteEditEvent.PickIcon)}"
+                    android:src="@drawable/main_background"
                     app:layout_collapseMode="parallax" />
+
+                <ImageView
+                    android:id="@+id/noteEdit_progress"
+                    android:layout_width="@dimen/icon"
+                    android:layout_height="@dimen/icon"
+                    android:contentDescription="@string/action"
+                    android:src="@drawable/load_animation"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="@id/noteEdit_icon"
+                    app:layout_constraintEnd_toEndOf="@id/noteEdit_icon"
+                    app:layout_constraintStart_toStartOf="@id/noteEdit_icon"
+                    app:layout_constraintTop_toTopOf="@id/noteEdit_icon" />
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar_action"
@@ -87,7 +100,7 @@
                         android:paddingTop="@dimen/main_margin"
                         android:paddingEnd="@dimen/main_padding"
                         android:paddingBottom="@dimen/main_margin"
-                        android:src="@drawable/ic_baseline_check_24" />
+                        android:src="@drawable/ic_baseline_check_24_white" />
 
                 </androidx.appcompat.widget.Toolbar>
 

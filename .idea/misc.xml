@@ -10,6 +10,7 @@
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_arrow_drop_down_24.xml" value="0.155" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_arrow_left_24.xml" value="0.1315" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_arrow_right_24.xml" value="0.1315" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_check_24.xml" value="0.185" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_format_align_center_24.xml" value="0.155" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_format_align_left_24_black.xml" value="0.155" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/ic_baseline_format_list_bulleted_24_black.xml" value="0.155" />
@@ -43,7 +44,7 @@
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/music_list_layout.xml" value="0.22871376811594202" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/music_notification_layout.xml" value="0.22826086956521738" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/musicplayer_layout.xml" value="0.23007246376811594" />
-        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/note_edit_layout.xml" value="0.22871376811594202" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/note_edit_layout.xml" value="0.176" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/note_layout.xml" value="0.16799999999999998" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/note_list_adapter_layout.xml" value="0.264" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/note_tpye_list_adapter.xml" value="0.25364583333333335" />
@@ -146,7 +147,6 @@
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/note_edit_layout.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/note_layout.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/note_sync_layout.xml" value="0.16944444444444445" />
-        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/note_tpye_list_adapter.xml" value="0.2902949978623343" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/note_view_layout.xml" value="0.18307291666666667" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/photo_card.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/photo_card_layout.xml" value="0.22" />

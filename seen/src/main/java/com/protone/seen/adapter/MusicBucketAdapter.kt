@@ -135,10 +135,10 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
             musicBucketDelete.setOnClickListener {
                 DataBaseDAOHelper.deleteMusicBucketCB(musicBuckets[holder.layoutPosition]) { re ->
                     if (re && musicBuckets.remove(musicBuckets[holder.layoutPosition])) {
-                        context.onUiThread { ui -> if (ui) notifyItemRemoved(holder.layoutPosition) }
+                        context.onUiThread { notifyItemRemoved(holder.layoutPosition) }
                     } else {
-                        context.onUiThread { ui ->
-                            if (ui) Toast.makeText(
+                        context.onUiThread {
+                             Toast.makeText(
                                 context,
                                 context.getString(R.string.failed_msg),
                                 Toast.LENGTH_SHORT

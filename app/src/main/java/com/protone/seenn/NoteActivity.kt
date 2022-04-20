@@ -50,12 +50,12 @@ class NoteActivity : BaseActivity<NoteSeen>() {
     private suspend fun queryAllNote() = withContext(Dispatchers.IO) {
         suspendCoroutine<MutableList<Note>> { co ->
             DataBaseDAOHelper.getAllNote()?.let {
-                noteList[getString(R.string.all)] = it as MutableList<Note>
+                noteList[getString(R.string.all)] = mutableListOf<Note>().apply { addAll(it) }
                 it.forEach { note ->
                     if (noteList[note.type] == null) {
                         noteList[note.type] = mutableListOf()
                     }
-                    noteList[note.type]?.add(note)
+                    if (note.type != getString(R.string.all)) noteList[note.type]?.add(note)
                 }
                 co.resumeWith(Result.success(noteList[getString(R.string.all)] ?: mutableListOf()))
             }

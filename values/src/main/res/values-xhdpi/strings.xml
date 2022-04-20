@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="none">无</string>
-    <string name="welcome_msg">Hello%s</string>
-    <string name="all">全部</string>
-</resources>

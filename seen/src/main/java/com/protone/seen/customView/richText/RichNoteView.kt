@@ -6,9 +6,9 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.text.Editable
 import android.text.Spanned
-import android.text.TextWatcher
 import android.text.style.*
 import android.util.AttributeSet
+import android.util.Log
 import android.view.KeyEvent
 import android.view.ViewGroup
 import android.widget.EditText
@@ -86,7 +86,7 @@ class RichNoteView @JvmOverloads constructor(
         inIndex = false
     }
 
-    fun insertText(note: RichNoteStates) {
+    private fun insertText(note: RichNoteStates) {
         if (!inIndex) richList.add(note)
         addView(when (isEditable) {
             true ->
@@ -111,7 +111,7 @@ class RichNoteView @JvmOverloads constructor(
                                 if (indexOfChild-- > 0 && getChildAt(indexOfChild) !is EditText) {
                                     removeView(getChildAt(indexOfChild))
                                     richList.removeAt(indexOfChild--)
-                                    //Insert new edittext when there has no place for input
+                                    //Insert new edittext when there is no place for input
                                     if ((indexOfChild > 0 && indexOfChild in 0 until childCount && getChildAt(
                                             indexOfChild
                                         ) !is EditText) || childCount == 0
@@ -126,26 +126,36 @@ class RichNoteView @JvmOverloads constructor(
                     }
                     addTextChangedListener(object : MyTextWatcher {
                         override fun afterTextChanged(s: Editable?) {
-                            (getCurRichStates() as RichNoteStates?)?.apply {
-                                text = s
-                                if (s?.isEmpty() == true) (spanStates as ArrayList?)?.clear()
-                                val iterator = (spanStates as ArrayList?)?.iterator()
-                                while (iterator?.hasNext() == true) {
-                                    iterator.next().let {
-                                        if (it.end > s?.length ?: 0) it.end = s?.length ?: 0
-                                        if (it.end <= it.start) iterator.remove()
+                            curPosition = this@RichNoteView.indexOfChild(this@apply)
+                            getCurRichStates().let {
+                                if (it is RichNoteStates) it.apply {
+                                    text = s
+                                    if (s?.isEmpty() == true) (spanStates as ArrayList?)?.clear()
+                                    val iterator = (spanStates as ArrayList?)?.iterator()
+                                    while (iterator?.hasNext() == true) {
+                                        iterator.next().let { ss ->
+                                            if (ss.end > s?.length ?: 0) ss.end = s?.length ?: 0
+                                            if (ss.end <= ss.start) iterator.remove()
+                                        }
                                     }
+                                    sortSpanStates()
                                 }
-                                sortSpanStates()
                             }
-
                         }
                     })
-                    setOnFocusChangeListener { v, hasFocus ->
+                    setOnFocusChangeListener { _, hasFocus ->
                         if (hasFocus) {
-                            curPosition = this@RichNoteView.indexOfChild(v)
+                            curPosition = this@RichNoteView.indexOfChild(this)
                         }
                     }
+                    setOnClickListener { curPosition = this@RichNoteView.indexOfChild(this) }
+                    setOnTouchListener { _, _ ->
+                        this@RichNoteView.indexOfChild(this)
+                        performClick()
+                        false
+                    }
+                    this@RichNoteView.requestFocus()
+                    this.requestFocus()
                 }
             else -> TextView(context).apply {
                 layoutParams = LayoutParams(
@@ -272,7 +282,7 @@ class RichNoteView @JvmOverloads constructor(
      */
     private inline fun insertMedia(func: (Int) -> Unit) {
         var insertPosition = curPosition
-        //While inserting a image,delete the empty edittext at the top of target(Image)
+        //While inserting a view,delete the empty edittext at the top of target(Image)
         if (insertPosition in 0 until childCount) {
             val child = getChildAt(insertPosition)
             if (child is EditText && child.text.isEmpty()) {
@@ -314,8 +324,8 @@ class RichNoteView @JvmOverloads constructor(
                 it.selectionEnd,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
-            when (getCurRichStates()) {
-                is RichNoteStates -> (getCurRichStates() as RichNoteStates?)?.apply {
+            getCurRichStates().let { rs ->
+                if (rs is RichNoteStates?) rs?.apply {
                     this.text = it.text
                     (spanStates as ArrayList)
                         .add(
@@ -359,6 +369,7 @@ class RichNoteView @JvmOverloads constructor(
      */
     private fun getCurRichStates(): RichStates? {
         return try {
+            Log.d("TAG", "getCurRichStates: $richList")
             richList[curPosition]
         } catch (e: IndexOutOfBoundsException) {
             null

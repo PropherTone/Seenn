@@ -9,6 +9,9 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.WindowManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 val Context.layoutInflater: LayoutInflater
     get() = LayoutInflater.from(this)
@@ -60,10 +63,10 @@ val Context.getHeight: Int
 val Context.hasNavigationBar: Boolean
     get() = currentHeight > getHeight
 
-inline fun Context.onUiThread(crossinline function: (Boolean) -> Unit) {
+inline fun Context.onUiThread(crossinline function: () -> Unit) {
     when (this) {
-        is Activity -> runOnUiThread { function.invoke(true) }
-        else -> function.invoke(false)
+        is Activity -> runOnUiThread { function.invoke() }
+        else -> CoroutineScope(Dispatchers.Main).launch { function.invoke() }
     }
 }
 

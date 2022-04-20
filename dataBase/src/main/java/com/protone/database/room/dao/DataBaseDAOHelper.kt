@@ -58,16 +58,16 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     ) {
         execute {
             var count = 0
-            val name = musicBucket.name
+            val tempName = musicBucket.name
             val names = mutableMapOf<String, Int>()
             getAllMusicBucket()?.forEach {
                 names[it.name] = 1
                 if (it.name == musicBucket.name) {
-                    musicBucket.name = "${name}(${++count})"
+                    musicBucket.name = "${tempName}(${++count})"
                 }
             }
             while (names[musicBucket.name] != null) {
-                musicBucket.name = "${name}(${++count})"
+                musicBucket.name = "${tempName}(${++count})"
             }
             addMusicBucket(musicBucket)
             callBack(getMusicBucketByName(musicBucket.name) != null, musicBucket.name)
@@ -228,10 +228,22 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         noteDAO?.insertNote(note)
     }
 
-    inline fun insertNoteCB(note: Note, crossinline callBack: (Boolean) -> Unit) {
+    inline fun insertNoteCB(note: Note, crossinline callBack: (Boolean, String) -> Unit) {
         execute {
+            var count = 0
+            val tempName = note.title
+            val names = mutableMapOf<String, Int>()
+            getAllNote()?.forEach {
+                names[it.title] = 1
+                if (it.title == note.title) {
+                    note.title = "${tempName}(${++count})"
+                }
+            }
+            while (names[note.title] != null) {
+                note.title = "${tempName}(${++count})"
+            }
             insertNote(note)
-            callBack.invoke(getNoteByName(note.title) != null)
+            callBack.invoke(getNoteByName(note.title) != null, note.title)
         }
     }
 

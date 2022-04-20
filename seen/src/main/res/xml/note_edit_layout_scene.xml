@@ -5,9 +5,22 @@
     <ConstraintSet android:id="@+id/start">
 
         <Constraint
+            android:scaleX="1.1"
+            android:scaleY="1.1"
             android:id="@+id/noteEdit_icon"
             android:layout_width="match_parent"
             android:layout_height="@dimen/huge_icon" />
+
+        <Constraint
+            android:id="@+id/noteEdit_progress"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="@dimen/icon"
+            android:layout_height="@dimen/icon"
+            app:visibilityMode="ignore"
+            app:layout_constraintBottom_toBottomOf="@id/noteEdit_icon"
+            app:layout_constraintEnd_toEndOf="@id/noteEdit_icon"
+            app:layout_constraintStart_toStartOf="@id/noteEdit_icon"
+            app:layout_constraintTop_toTopOf="@id/noteEdit_icon" />
 
         <Constraint
             android:id="@+id/toolbar_action"
@@ -15,16 +28,28 @@
             android:paddingTop="@dimen/icon_padding_lite"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
 
         <Constraint
+            android:scaleX="1"
+            android:scaleY="1"
             android:id="@+id/noteEdit_icon"
             android:layout_width="match_parent"
             android:layout_height="@dimen/huge_icon" />
+
+        <Constraint
+            android:id="@+id/noteEdit_progress"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:layout_width="@dimen/icon"
+            android:layout_height="@dimen/icon"
+            app:layout_constraintBottom_toBottomOf="@id/noteEdit_icon"
+            app:layout_constraintEnd_toEndOf="@id/noteEdit_icon"
+            app:layout_constraintStart_toStartOf="@id/noteEdit_icon"
+            app:layout_constraintTop_toTopOf="@id/noteEdit_icon" />
 
         <Constraint
             android:id="@+id/toolbar_action"

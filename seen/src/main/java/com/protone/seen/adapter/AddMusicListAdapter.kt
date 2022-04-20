@@ -11,6 +11,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
+import com.protone.api.context.onUiThread
 import com.protone.api.toStringMinuteTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Music
@@ -141,14 +142,14 @@ class AddMusicListAdapter(context: Context, private val bucket: String) :
         while (!viewQueue.isNullOrEmpty()) {
             val poll = viewQueue.poll()
             if (poll != null) {
-                CoroutineScope(Dispatchers.Main).launch {
+                context.onUiThread {
                     notifyItemChanged(poll)
                 }
             }
         }
     }
 
-    private fun changeIconAni(view: ImageView) = CoroutineScope(Dispatchers.Main).launch {
+    private fun changeIconAni(view: ImageView) = context.onUiThread {
         AnimationHelper.apply {
             animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
                 view.setImageDrawable(
