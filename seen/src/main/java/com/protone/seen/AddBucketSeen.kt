@@ -2,8 +2,10 @@ package com.protone.seen
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import com.bumptech.glide.Glide
+import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.api.toMediaBitmapByteArray
@@ -27,6 +29,7 @@ class AddBucketSeen(context: Context) : Seen<AddBucketSeen.Event>(context) {
 
     var uri: Uri? = null
         set(value) {
+            Log.d(TAG, "$value: ")
             loadIcon(value?.toMediaBitmapByteArray())
             field = value
         }

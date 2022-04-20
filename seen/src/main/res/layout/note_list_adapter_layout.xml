@@ -4,10 +4,16 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/note_back"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/user_icon"
-        android:background="@drawable/main_background">
+        android:layout_marginBottom="@dimen/small_elevation"
+        android:layout_height="@dimen/user_icon">
+
+        <ImageView
+            android:id="@+id/note_back"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/icon"
+            android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/note_title"
@@ -15,8 +21,9 @@
             android:layout_height="wrap_content"
             android:background="@color/transparent_black"
             android:letterSpacing="0.2"
-            android:text="@string/none"
+            android:lines="1"
             android:padding="@dimen/title_texts_padding"
+            android:text="@string/none"
             android:textColor="@color/white"
             android:textSize="@dimen/small_title_text"
             android:textStyle="bold"

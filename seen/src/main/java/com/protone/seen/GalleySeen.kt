@@ -121,7 +121,7 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
                     context as FragmentActivity,
                     galleyMediaList,
                     chooseData,
-                    multiChoose = chooseType.isEmpty()
+                    multiChoose = chooseType.isNotEmpty()
                 )
             }
             val videoFragment by lazy {
@@ -129,7 +129,7 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
                     context as FragmentActivity,
                     videoMediaList,
                     chooseData,
-                    multiChoose = chooseType.isEmpty(),
+                    multiChoose = chooseType.isNotEmpty(),
                     isVideo = true
                 )
             }

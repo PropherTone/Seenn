@@ -6,6 +6,7 @@ import com.protone.api.context.deleteMedia
 import com.protone.api.context.renameMedia
 import com.protone.api.context.showFailedToast
 import com.protone.api.json.toJson
+import com.protone.api.json.toUriJson
 import com.protone.api.toBitmapByteArray
 import com.protone.api.toMediaBitmapByteArray
 import com.protone.mediamodle.Galley
@@ -92,7 +93,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                             galleySeen.chooseData.value?.let { list ->
                                 if (list.size > 0) {
                                     setResult(RESULT_OK, Intent().apply {
-                                        putExtra("Uri",list[0].uri.toJson())
+                                        putExtra("Uri",list[0].uri.toUriJson())
                                         putExtra("GalleyData",list[0].toJson())
                                     })
                                 }

@@ -2,8 +2,10 @@ package com.protone.seen
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.database.room.entity.Note
@@ -15,7 +17,7 @@ import kotlin.math.abs
 class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context), View.OnClickListener {
 
     enum class NoteEvent {
-
+        Finish
     }
 
     val binding = NoteLayoutBinding.inflate(context.layoutInflater, context.root, true)
@@ -28,12 +30,13 @@ class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context), View.OnCli
     init {
         setNavigation()
         binding.apply {
+            self = this@NoteSeen
             noteAction.setOnClickListener(this@NoteSeen)
         }
     }
 
     override fun offer(event: NoteEvent) {
-        offer(event)
+        viewEvent.offer(event)
     }
 
     fun initList() {

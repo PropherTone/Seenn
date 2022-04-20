@@ -16,6 +16,8 @@ class NoteActivity : BaseActivity<NoteSeen>() {
 
     private val noteList = mutableMapOf<String, MutableList<Note>>()
 
+    private var selected: String? = null
+
     override suspend fun main() {
 
         val noteSeen = NoteSeen(this)
@@ -25,39 +27,49 @@ class NoteActivity : BaseActivity<NoteSeen>() {
         while (isActive) {
             select<Unit> {
                 event.onReceive {
-
+                    when (it) {
+                        Event.OnResume -> {
+                            queryAllNote().let { list ->
+                                noteSeen.refreshNoteList(list)
+                            }
+                        }
+                        else -> {}
+                    }
                 }
                 noteSeen.viewEvent.onReceive {
-
+                    when (it) {
+                        NoteSeen.NoteEvent.Finish -> finish()
+                    }
                 }
             }
         }
     }
 
-    private suspend fun NoteSeen.initSeen() {
+    private fun NoteSeen.initSeen() {
         initList()
-        refreshNoteList(queryAllNote())
         addNoteType {
             startActivity(NoteEditActivity::class.intent.also { intent ->
                 intent.putExtra(NoteEditActivity.NOTE_TYPE, it)
             })
         }
-        onTypeSelected {
-            refreshNoteList(noteList[it] ?: mutableListOf())
+        onTypeSelected { type ->
+            refreshNoteList(noteList[type.also { selected = it }] ?: mutableListOf())
         }
     }
 
     private suspend fun queryAllNote() = withContext(Dispatchers.IO) {
         suspendCoroutine<MutableList<Note>> { co ->
             DataBaseDAOHelper.getAllNote()?.let {
-                noteList[getString(R.string.all)] = mutableListOf<Note>().apply { addAll(it) }
+                noteList[getString(R.string.all).also { s->
+                    selected = s
+                }] = mutableListOf<Note>().apply { addAll(it) }
                 it.forEach { note ->
                     if (noteList[note.type] == null) {
                         noteList[note.type] = mutableListOf()
                     }
                     if (note.type != getString(R.string.all)) noteList[note.type]?.add(note)
                 }
-                co.resumeWith(Result.success(noteList[getString(R.string.all)] ?: mutableListOf()))
+                co.resumeWith(Result.success(noteList[selected] ?: mutableListOf()))
             }
         }
     }

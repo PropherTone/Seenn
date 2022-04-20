@@ -2,66 +2,22 @@
 <MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ConstraintSet android:id="@+id/start">
+    <ConstraintSet android:id="@+id/end">
+
         <Constraint
             android:id="@+id/note_bucketList"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <Constraint
-            android:id="@+id/note_addBucket"
-            android:layout_width="@dimen/action_icon"
-            android:layout_height="@dimen/action_icon"
-            android:layout_marginEnd="@dimen/action_icon"
-            android:background="@color/glass"
-            android:contentDescription="@string/action"
-            android:padding="@dimen/icon_padding_lite"
-            android:src="@drawable/icon_add_back"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <Constraint
-            android:id="@+id/note_refreshBucket"
-            android:layout_width="@dimen/action_icon"
-            android:layout_height="@dimen/action_icon"
-            android:layout_marginEnd="@dimen/main_margin"
-            android:background="@color/glass"
-            android:contentDescription="@string/action"
-            android:padding="@dimen/icon_padding_lite"
-            android:src="@drawable/refresh_back"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/note_addBucket" />
     </ConstraintSet>
 
-    <ConstraintSet android:id="@+id/end">
+    <ConstraintSet android:id="@+id/start">
+
         <Constraint
             android:id="@+id/note_bucketList"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <Constraint
-            android:id="@+id/note_addBucket"
-            android:layout_width="@dimen/action_icon"
-            android:layout_height="@dimen/action_icon"
-            android:layout_marginEnd="0dp"
-            android:background="@color/glass"
-            android:contentDescription="@string/action"
-            android:padding="@dimen/icon_padding_lite"
-            android:src="@drawable/icon_add_back"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <Constraint
-            android:id="@+id/note_refreshBucket"
-            android:layout_width="@dimen/action_icon"
-            android:layout_height="@dimen/action_icon"
-            android:layout_marginEnd="0dp"
-            android:background="@color/glass"
-            android:contentDescription="@string/action"
-            android:padding="@dimen/icon_padding_lite"
-            android:src="@drawable/refresh_back"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
     </ConstraintSet>
 
     <Transition
