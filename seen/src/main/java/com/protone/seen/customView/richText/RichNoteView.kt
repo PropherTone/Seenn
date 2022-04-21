@@ -19,8 +19,13 @@ import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.widget.NestedScrollView
 import com.bumptech.glide.Glide
+import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
+import com.protone.api.context.onBackground
+import com.protone.api.context.onUiThread
+import com.protone.api.json.jsonToList
 import com.protone.api.json.listToJson
+import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.mediamodle.note.MyTextWatcher
 import com.protone.mediamodle.note.entity.*
@@ -82,8 +87,43 @@ class RichNoteView @JvmOverloads constructor(
                 is RichPhotoStates -> insertImage(it)
                 is RichMusicStates -> insertMusic(it)
             }
+            curPosition++
         }
         inIndex = false
+    }
+
+    fun setRichList(richCode: Int, text: String) {
+        onBackground {
+            var code = richCode
+            val statesStrings = text.jsonToList(String::class.java)
+            var listSize = statesStrings.size - 1
+            val richList = arrayListOf<RichStates>()
+            while (code > 0) {
+                richList.add(
+                    when (code % 10) {
+                        PHOTO -> {
+                            statesStrings[listSize--].toEntity(RichPhotoStates::class.java)
+                        }
+                        MUSIC -> {
+                            statesStrings[listSize--].toEntity(RichMusicStates::class.java)
+                        }
+                        VIDEO -> {
+                            statesStrings[listSize--].toEntity(RichVideoStates::class.java)
+                        }
+                        else -> {
+                            val toEntity =
+                                statesStrings[listSize--].toEntity(RichNoteSer::class.java)
+                            val toEntity1 = toEntity.spans.jsonToList(SpanStates::class.java)
+                            RichNoteStates(toEntity.text, toEntity1)
+                        }
+                    }
+                )
+                code /= 10
+            }
+            context.onUiThread {
+                setRichList(richList)
+            }
+        }
     }
 
     private fun insertText(note: RichNoteStates) {
@@ -154,8 +194,7 @@ class RichNoteView @JvmOverloads constructor(
                         performClick()
                         false
                     }
-                    this@RichNoteView.requestFocus()
-                    this.requestFocus()
+                    getEdittext(curPosition)?.requestFocus()
                 }
             else -> TextView(context).apply {
                 layoutParams = LayoutParams(
@@ -194,9 +233,9 @@ class RichNoteView @JvmOverloads constructor(
                         .into(this.richPhotoIv)
                     richPhotoTitle.text = photo.name
                     richPhotoDetail.text = photo.date
-                }.root, it + 1
+                }.root, it + if (!inIndex) 1 else 0
         )
-        if (!inIndex) richList.add(photo)
+        if (!inIndex) richList.add(it + 1, photo)
     }
 
     override fun setBold() {
@@ -252,11 +291,12 @@ class RichNoteView @JvmOverloads constructor(
             suspendCancellableCoroutine { co ->
                 val richSer = arrayListOf<String>()
                 var richStates = 0
+                var index = 0
                 richList.forEach {
                     when (it) {
                         is RichNoteStates -> richSer.add(
                             RichNoteSer(
-                                getEdittext(richList.indexOf(it))?.text.toString(),
+                                getEdittext(index++)?.text.toString(),
                                 it.spanStates.listToJson(SpanStates::class.java)
                             ).toJson()
                         ).apply { richStates = richStates * 10 + TEXT }
@@ -282,17 +322,25 @@ class RichNoteView @JvmOverloads constructor(
      */
     private inline fun insertMedia(func: (Int) -> Unit) {
         var insertPosition = curPosition
-        //While inserting a view,delete the empty edittext at the top of target(Image)
-        if (insertPosition in 0 until childCount) {
-            val child = getChildAt(insertPosition)
-            if (child is EditText && child.text.isEmpty()) {
-                removeView(child)
-                insertPosition--
+        if (!inIndex) {
+            //While inserting a view,delete the empty edittext at the top of target(Image)
+            if (isEditable && insertPosition in 0 until childCount) {
+                val child = getChildAt(insertPosition)
+                if (child is EditText && child.text.isEmpty()) {
+                    richList.removeAt(insertPosition)
+                    removeView(child)
+                    insertPosition--
+                }
             }
         }
         func(insertPosition)
         //Insert a edittext to make sure there have a place for input
-        insertText(RichNoteStates("", arrayListOf()).also { richList.add(it) })
+        if (isEditable && !inIndex) insertText(
+            RichNoteStates(
+                "",
+                arrayListOf()
+            )
+        )
     }
 
     /**
@@ -369,7 +417,6 @@ class RichNoteView @JvmOverloads constructor(
      */
     private fun getCurRichStates(): RichStates? {
         return try {
-            Log.d("TAG", "getCurRichStates: $richList")
             richList[curPosition]
         } catch (e: IndexOutOfBoundsException) {
             null

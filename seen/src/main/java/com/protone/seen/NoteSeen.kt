@@ -52,6 +52,10 @@ class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context), View.OnCli
         }
     }
 
+    fun setNoteClk(it: ((String) -> Unit)?) {
+        (binding.noteList.adapter as NoteListAdapter?)?.noteClk = it
+    }
+
     fun addNoteType(it: ((String?) -> Unit)?) {
         (binding.noteBucketList.adapter as NoteTypeListAdapter?)?.addNote = it
     }

@@ -55,12 +55,17 @@ class NoteActivity : BaseActivity<NoteSeen>() {
         onTypeSelected { type ->
             refreshNoteList(noteList[type.also { selected = it }] ?: mutableListOf())
         }
+        setNoteClk { s ->
+            startActivity(NoteViewActivity::class.intent.also {
+                it.putExtra(NoteViewActivity.NOTE_NAME, s)
+            })
+        }
     }
 
     private suspend fun queryAllNote() = withContext(Dispatchers.IO) {
         suspendCoroutine<MutableList<Note>> { co ->
             DataBaseDAOHelper.getAllNote()?.let {
-                noteList[getString(R.string.all).also { s->
+                noteList[getString(R.string.all).also { s ->
                     selected = s
                 }] = mutableListOf<Note>().apply { addAll(it) }
                 it.forEach { note ->

@@ -2,12 +2,10 @@ package com.protone.seen
 
 import android.content.Context
 import android.graphics.drawable.Animatable
-import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.widget.ImageView
-import androidx.core.animation.doOnEnd
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
@@ -21,7 +19,6 @@ import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ISpanForUse
 import com.protone.seen.customView.ColorPopWindow
 import com.protone.seen.databinding.NoteEditLayoutBinding
-import com.protone.mediamodle.note.entity.SpanStates
 
 class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context), ISpanForUse {
 
@@ -33,6 +30,9 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
         PickMusic,
         PickIcon
     }
+
+    private var numberPopWindows: ColorPopWindow? = null
+    private var colorPopWindow: ColorPopWindow? = null
 
     val title: String get() = binding.noteEditTitle.text.toString()
 
@@ -66,7 +66,15 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
 
     override fun setItalic() = binding.noteEditRichNote.setItalic()
 
-    override fun setSize() = binding.noteEditRichNote.setSize(12)
+    override fun setSize() {
+        if (numberPopWindows != null) {
+            numberPopWindows?.dismiss()
+            numberPopWindows = null
+        } else ColorPopWindow(context).also {
+            numberPopWindows = it
+            it.setOnDismissListener { numberPopWindows = null }
+        }.startNumberPickerPopup(binding.noteEditTool) { binding.noteEditRichNote.setSize(it) }
+    }
 
     override fun setUnderlined() = binding.noteEditRichNote.setUnderlined()
 
@@ -119,8 +127,14 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
     }
 
     override fun setColor() {
-        ColorPopWindow(context).startPopWindow(binding.noteEditTool) {
-            binding.noteEditRichNote.setColor(it)
+        if (colorPopWindow != null) {
+            colorPopWindow?.dismiss()
+            colorPopWindow = null
+        } else ColorPopWindow(context).also {
+            colorPopWindow = it
+            it.setOnDismissListener { colorPopWindow = null }
+        }.startColorPickerPopup(binding.noteEditTool) {
+            binding.noteEditRichNote.setColor(String.format("#%06X", 0xFFFFFF and it))
         }
     }
 

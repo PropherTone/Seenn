@@ -65,7 +65,7 @@ public class MyColorPicker extends ViewGroup {
     private int mPaddingTop;
     private int mPaddingBottom;
     private float mStrokeWidth;
-    private int mElevation;
+    private float mElevation;
 
     private colorListener onColorChangeListener;
 
@@ -88,7 +88,7 @@ public class MyColorPicker extends ViewGroup {
         isRound = array.getBoolean(R.styleable.DragBar_roundStyle, true);
         blurRadius = array.getFloat(R.styleable.DragBar_blurRadius, 20);
         mStrokeWidth = array.getInteger(R.styleable.DragBar_barStrokeWidth, 30);
-        mElevation = array.getInteger(R.styleable.DragBar_buttonElevation, 5);
+        mElevation = array.getFloat(R.styleable.DragBar_buttonElevation, 5);
         array.recycle();
         Init();
     }
@@ -214,14 +214,14 @@ public class MyColorPicker extends ViewGroup {
         float rectB = mBarHeight + mPaddingBottom;
         rectR = getRight() - mStrokeWidth;
 
-        mT = (int) (rectT - mStrokeWidth / 2) - mElevation;
-        mB = (int) (rectB + mStrokeWidth / 2) + mElevation;
+        mT = (int) ((rectT - mStrokeWidth / 2) - mElevation);
+        mB = (int) ((rectB + mStrokeWidth / 2) + mElevation);
         mR = mB - mT;
 
         linearGradient = new LinearGradient(0, 0,
                 getMeasuredWidth(), 0,
                 colors, null, Shader.TileMode.MIRROR);
-        colorBarBitmap = Bitmap.createBitmap(w,h, Bitmap.Config.ARGB_8888);
+        colorBarBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
     }
 
     @Override
@@ -239,7 +239,7 @@ public class MyColorPicker extends ViewGroup {
             barCanvas.drawPath(mBarPath, mBarPaint);
             isBarDrawn = true;
         }
-        canvas.drawBitmap(colorBarBitmap,0,0,null);
+        canvas.drawBitmap(colorBarBitmap, 0, 0, null);
     }
 
     public interface colorListener {

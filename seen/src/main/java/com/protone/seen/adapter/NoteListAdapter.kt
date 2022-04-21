@@ -15,6 +15,8 @@ class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBindi
 
     private val noteList = arrayListOf<Note>()
 
+    var noteClk: ((String) -> Unit)? = null
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -25,6 +27,9 @@ class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBindi
 
     override fun onBindViewHolder(holder: Holder<NoteListAdapterLayoutBinding>, position: Int) {
         holder.binding.apply {
+            root.setOnClickListener {
+                noteClk?.invoke(noteList[holder.layoutPosition].title)
+            }
             noteList[holder.layoutPosition].let {
                 it.imagePath.toDrawable(context) { drawable ->
                     noteBack.background = drawable

@@ -350,4 +350,5 @@ II. 幂等 的意味着对同一URL的多个请求应该返回同样的结果。
 4）客户端的链路层，包通过链路层发送到路由器，通过邻居协议查找给定IP地址的MAC地址，然后发送ARP请求查找目的地址，如果得到回应后就可以使用ARP的请求应答交换的IP数据包现在就可以传输了，然后发送IP数据包到达服务器的地址。</string>
     <string name="all">全部</string>
     <string name="failed_upload_image">图片保存失败</string>
+    <string name="come_up_unknown_error">发生未知错误</string>
 </resources>

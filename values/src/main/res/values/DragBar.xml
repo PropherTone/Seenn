@@ -13,7 +13,7 @@
         <attr name="barAnimator" format="boolean"/>
         <attr name="barColor" format="color"/>
         <attr name="shadowRadius" format="float"/>
-        <attr name="buttonElevation" format="integer"/>
+        <attr name="buttonElevation" format="float"/>
     </declare-styleable>
 
 </resources>
