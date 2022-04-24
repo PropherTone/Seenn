@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
         android:id="@+id/rich_photo_tv_container"
@@ -41,6 +42,49 @@
             android:text="@string/test_title"
             android:textColor="@color/white"
             android:textSize="@dimen/sub_text" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/drag"
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/top_left"
+                android:layout_width="@dimen/smaller_Icon"
+                android:layout_height="@dimen/smaller_Icon"
+                android:background="@color/glass"
+                android:contentDescription="@string/action"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/top_right"
+                android:layout_width="@dimen/smaller_Icon"
+                android:layout_height="@dimen/smaller_Icon"
+                android:background="@color/glass"
+                android:contentDescription="@string/action"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/bot_left"
+                android:layout_width="@dimen/smaller_Icon"
+                android:layout_height="@dimen/smaller_Icon"
+                android:background="@color/glass"
+                android:contentDescription="@string/action"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageView
+                android:id="@+id/bot_right"
+                android:layout_width="@dimen/smaller_Icon"
+                android:layout_height="@dimen/smaller_Icon"
+                android:background="@color/glass"
+                android:contentDescription="@string/action"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </RelativeLayout>
 

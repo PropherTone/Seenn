@@ -57,7 +57,7 @@
                         android:paddingTop="@dimen/main_margin"
                         android:paddingEnd="0dp"
                         android:paddingBottom="@dimen/main_margin"
-                        android:src="@drawable/ic_baseline_arrow_back_24_white" />
+                        android:src="@drawable/ic_baseline_arrow_left_24_white" />
 
                     <TextView
                         android:id="@+id/noteEdit_title"
