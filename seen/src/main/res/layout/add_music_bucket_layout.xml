@@ -38,10 +38,10 @@
 
         <View
             android:id="@+id/view"
-            app:layout_constraintTop_toTopOf="parent"
             android:layout_width="match_parent"
+            android:layout_height="1dp"
             android:background="@color/blue_1"
-            android:layout_height="1dp"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/addMB_list"
@@ -61,6 +61,21 @@
             android:onClick="@{()-> self.offer(Event.Finished)}"
             android:padding="@dimen/icon_padding_lite"
             android:src="@drawable/ic_baseline_keyboard_backspace_24"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/addMB_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/action_icon_p"
+            android:background="@drawable/background_ripple_blue"
+            android:contentDescription="@string/action"
+            android:onClick="@{()-> self.offer(Event.Confirm)}"
+            android:padding="@dimen/icon_padding_lite"
+            android:src="@drawable/ic_baseline_check_24"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

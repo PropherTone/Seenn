@@ -1,5 +1,6 @@
 package com.protone.database.room.dao
 
+import android.net.Uri
 import android.util.Log
 import com.protone.api.TAG
 import com.protone.database.room.SeennDataBase
@@ -159,6 +160,8 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     override fun updateMusicMyBucket(name: String, bucket: List<String>): Int =
         musicDAO?.updateMusicMyBucket(name, bucket) ?: -1
+
+    override fun getMusicByUri(uri: Uri): Music? = musicDAO?.getMusicByUri(uri)
 
     inline fun updateMusicCB(music: Music, crossinline callBack: (Int) -> Unit) {
         execute {

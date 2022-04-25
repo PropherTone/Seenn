@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 app:layoutDescription="@xml/music_layout_scene"
-                app:layout_scrollFlags="scroll|enterAlways|snap|exitUntilCollapsed">
+                app:layout_scrollFlags="scroll|snap|exitUntilCollapsed">
 
                 <ImageView
                     android:id="@+id/music_finish"

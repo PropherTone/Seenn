@@ -1,21 +1,25 @@
 package com.protone.seen.customView
 
 import android.content.Context
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.PopupWindow
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.seen.R
+import com.protone.seen.adapter.CheckListAdapter
 import com.protone.seen.customView.colorPicker.MyColorPicker
 import com.protone.seen.databinding.ColorPopLayoutBinding
+import com.protone.seen.databinding.ListPopWindowsLayoutBinding
 import com.protone.seen.databinding.NumberPickerPopLayoutBinding
 import java.lang.ref.WeakReference
 
-class ColorPopWindow(context: Context) : PopupWindow(context) {
+class ColorfulPopWindow(context: Context) : PopupWindow(context) {
 
     var weakContext: WeakReference<Context> = WeakReference(context)
 
@@ -40,6 +44,29 @@ class ColorPopWindow(context: Context) : PopupWindow(context) {
                     onCall.invoke(newVal)
                 }
             }
+        }
+
+    inline fun startListPopup(
+        anchor: View,
+        dataList: MutableList<String>,
+        crossinline onCall: (String) -> Unit
+    ) =
+        weakContext.get()?.let { context ->
+            val binder =
+                ListPopWindowsLayoutBinding.inflate(context.layoutInflater, context.root, false)
+            binder.listList.apply {
+                layoutManager = LinearLayoutManager(context)
+                adapter = CheckListAdapter(context, dataList)
+            }
+            val func = {
+                binder.listConfirm.setOnClickListener {
+                    binder.listList.adapter.let {
+                        if (it is CheckListAdapter && it.selectList.size > 0)
+                            onCall.invoke(it.selectList[0])
+                    }
+                }
+            }
+            startPopup(context, binder.root, anchor, func)
         }
 
     inline fun startPopup(context: Context, view: View, anchor: View, func: () -> Unit) {

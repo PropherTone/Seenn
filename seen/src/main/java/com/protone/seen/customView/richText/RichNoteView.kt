@@ -34,6 +34,7 @@ import com.protone.mediamodle.note.MyTextWatcher
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ColorSpan
 import com.protone.mediamodle.note.spans.ISpanForEditor
+import com.protone.seen.customView.MyMusicPlayer
 import com.protone.seen.databinding.RichMusicLayoutBinding
 import com.protone.seen.databinding.RichPhotoLayoutBinding
 import com.protone.seen.databinding.RichVideoLayoutBinding
@@ -61,6 +62,7 @@ class RichNoteView @JvmOverloads constructor(
         const val VIDEO = 0x04
     }
 
+    private var curPlaying = 0
     private var curPosition = 0
 
     private var inIndex = false
@@ -205,15 +207,35 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     override fun insertVideo(video: RichVideoStates) = insertMedia {
-        addView(RichVideoLayoutBinding.inflate(context.layoutInflater, this, false).apply {
-
-        }.root, it + 1)
+        addView(RichVideoLayoutBinding.inflate(context.layoutInflater, this, false).root.apply {
+            setVideoPath(video.uri)
+        }, it + 1)
     }
 
     override fun insertMusic(music: RichMusicStates) = insertMedia {
-        addView(RichMusicLayoutBinding.inflate(context.layoutInflater, this, false).apply {
+        addView(RichMusicLayoutBinding.inflate(context.layoutInflater, this, false).root.apply {
+            playMusic = {
+                iRichMusicListener?.play(music.uri, progress)
+                curPlaying = this@RichNoteView.indexOfChild(this)
+            }
+            pauseMusic = { iRichMusicListener?.pause() }
+        }, it + 1)
+    }
 
-        }.root, it + 1)
+    fun setMusicProgress(process: Long) {
+        getChildAt(curPlaying)?.let {
+            if (it is MyMusicPlayer) {
+                it.progress = process
+            }
+        }
+    }
+
+    fun setMusicDuration(duration: Long) {
+        getChildAt(curPosition)?.let {
+            if (it is MyMusicPlayer) {
+                it.duration = duration
+            }
+        }
     }
 
     private fun getBitmapWH(uri: Uri): IntArray {
@@ -436,5 +458,12 @@ class RichNoteView @JvmOverloads constructor(
         } catch (e: IndexOutOfBoundsException) {
             null
         }
+    }
+
+    var iRichMusicListener: IRichMusic? = null
+
+    interface IRichMusic {
+        fun play(uri: Uri, progress: Long)
+        fun pause()
     }
 }

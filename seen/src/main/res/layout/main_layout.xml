@@ -29,9 +29,8 @@
                 android:id="@+id/tool_motion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/action_icon"
                 app:layoutDescription="@xml/main_layout_scene"
-                app:layout_scrollFlags="scroll|enterAlways|snap|exitUntilCollapsed">
+                app:layout_scrollFlags="scroll|snap|exitUntilCollapsed">
 
                 <View
                     android:id="@+id/userCard"
@@ -69,17 +68,17 @@
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/user_icon"
-                    app:shapeAppearanceOverlay="@style/roundCornerImage"
-                    android:src="@drawable/ic_outline_account_circle_24"
                     android:layout_width="@dimen/user_icon"
                     android:layout_height="@dimen/user_icon"
                     android:layout_marginTop="@dimen/main_margin"
                     android:background="@color/background_white"
                     android:contentDescription="@string/icon"
                     android:elevation="@dimen/small_elevation"
+                    android:src="@drawable/ic_outline_account_circle_24"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/user_welcome"
-                    app:layout_constraintTop_toTopOf="@+id/user_welcome" />
+                    app:layout_constraintTop_toTopOf="@+id/user_welcome"
+                    app:shapeAppearanceOverlay="@style/roundCornerImage" />
 
                 <ImageView
                     android:id="@+id/galley"
@@ -126,7 +125,6 @@
                     app:layout_constraintStart_toEndOf="@id/noteBook"
                     app:layout_constraintTop_toBottomOf="@id/userCard" />
 
-
                 <com.protone.seen.customView.MyMusicPlayer
                     android:id="@+id/musicPlayer"
                     android:layout_width="match_parent"
@@ -142,7 +140,51 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:elevation="0dp"
+            android:paddingBottom="@dimen/action_icon_p"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
+
+        <LinearLayout
+            android:id="@+id/action_btn_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/action_icon_p"
+            android:layout_gravity="bottom"
+            android:background="@color/transparent_white"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/action_icon"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:contentDescription="@string/model_Galley"
+                android:onClick="@{()->self.offer(Touch.GALLEY)}"
+                android:paddingTop="@dimen/main_padding"
+                android:paddingBottom="@dimen/main_padding"
+                android:src="@drawable/ic_baseline_image_24_white" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/action_icon"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:contentDescription="@string/model_noteBook"
+                android:onClick="@{()->self.offer(Touch.NOTE)}"
+                android:paddingTop="@dimen/main_padding"
+                android:paddingBottom="@dimen/main_padding"
+                android:src="@drawable/ic_baseline_book_24_white" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/action_icon"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:contentDescription="@string/model_music"
+                android:onClick="@{()->self.offer(Touch.MUSIC)}"
+                android:paddingTop="@dimen/main_padding"
+                android:paddingBottom="@dimen/main_padding"
+                android:src="@drawable/ic_baseline_album_24_white" />
+
+        </LinearLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -25,4 +25,9 @@
     <dimen name="small_title_text">18sp</dimen>
     <dimen name="small_elevation">2dp</dimen>
     <dimen name="action_icon_p">58dp</dimen>
+    <dimen name="model_icon_dimen">60dp</dimen>
+    <dimen name="main_padding">10dp</dimen>
+    <dimen name="icon_padding">5dp</dimen>
+    <dimen name="texts_margin">10dp</dimen>
+    <dimen name="lists_margin">1dp</dimen>
 </resources>

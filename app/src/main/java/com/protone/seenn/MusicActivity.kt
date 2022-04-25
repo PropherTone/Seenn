@@ -26,9 +26,6 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
         cacheMusicBucketName = userConfig.playedMusicBucket
 
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-//        supportActionBar?.title = null
-
         setContentSeen(musicSeen)
 
         musicSeen.initSeen()

@@ -1,12 +1,14 @@
 package com.protone.mediamodle.media
 
+import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.MusicState
 
 interface IMusicPlayer {
-    fun setDate(list: MutableList<Music>){}
+    fun setDate(list: MutableList<Music>) {}
     fun play()
+    fun play(uri: Uri, progress: Long)
     fun pause()
     fun next()
     fun previous()

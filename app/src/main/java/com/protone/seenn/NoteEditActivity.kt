@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.*
 import com.protone.api.context.intent
+import com.protone.api.context.onBackground
 import com.protone.api.json.toEntity
 import com.protone.api.json.toUriJson
 import com.protone.database.room.dao.DataBaseDAOHelper
@@ -13,17 +14,30 @@ import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.note.entity.RichMusicStates
 import com.protone.mediamodle.note.entity.RichPhotoStates
 import com.protone.mediamodle.note.entity.RichVideoStates
+import com.protone.seen.AddMusic2BucketSeen
 import com.protone.seen.GalleySeen
 import com.protone.seen.NoteEditSeen
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 class NoteEditActivity : BaseActivity<NoteEditSeen>() {
 
     private var savedIconPath: String = ""
     private var iconUri: Uri? = null
+
+    private var allNote: MutableList<String>? = null
+
+    private suspend fun getAllNote() = withContext(Dispatchers.IO) {
+        suspendCancellableCoroutine<MutableList<String>> {
+            val notes = DataBaseDAOHelper.getAllNote()
+            val list = mutableListOf<String>()
+            notes?.forEach {
+                list.add(it.title)
+            }
+            it.resumeWith(Result.success(list))
+        }
+    }
 
     companion object {
         const val NOTE_TYPE = "NoteType"
@@ -90,8 +104,17 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                         NoteEditSeen.NoteEditEvent.PickVideo -> startGalleyPick(false)?.let { re ->
                             noteEditSeen.insertVideo(RichVideoStates(re.uri, null))
                         }
-                        NoteEditSeen.NoteEditEvent.PickMusic -> {
-                            noteEditSeen.insertMusic(RichMusicStates(Uri.EMPTY, null))
+                        NoteEditSeen.NoteEditEvent.PickMusic -> startActivityForResult(
+                            ActivityResultContracts.StartActivityForResult(),
+                            AddMusic2BucketActivity::class.intent.apply {
+                                putExtra(AddMusic2BucketSeen.MODE, AddMusic2BucketSeen.PICK_MUSIC)
+                            }
+                        )?.let { re ->
+                            if (re.resultCode == RESULT_OK)
+                                re.data?.data?.let { uri ->
+                                    if (allNote == null) allNote = getAllNote()
+                                    noteEditSeen.insertMusic(uri, allNote!!)
+                                }
                         }
                         NoteEditSeen.NoteEditEvent.PickIcon -> startGalleyPick(true)?.let { re ->
                             noteEditSeen.setNoteIconCache(re.uri)
@@ -114,8 +137,8 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                 GalleyActivity.CHOOSE_MODE,
                 if (isPhoto) GalleySeen.CHOOSE_PHOTO else GalleySeen.CHOOSE_VIDEO
             )
-        }).let { re ->
-        re?.data?.getStringExtra("GalleyData")?.toEntity(GalleyMedia::class.java)
+        })?.let { re ->
+        re.data?.getStringExtra("GalleyData")?.toEntity(GalleyMedia::class.java)
     }
 
 }

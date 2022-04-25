@@ -1,24 +1,21 @@
 package com.protone.seen
 
 import android.content.Context
-import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
-import com.protone.api.TAG
-import com.protone.api.context.Global
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.api.todayTime
 import com.protone.seen.adapter.MainModelListAdapter
 import com.protone.seen.databinding.MainLayoutBinding
 
-class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
+class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
+    ViewTreeObserver.OnGlobalLayoutListener {
 
     enum class Touch {
         MUSIC,
@@ -31,7 +28,6 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
         PauseVideo
     }
 
-    //    val mainTheme by lazy { MainThemeStore() }
     private val binding = MainLayoutBinding.inflate(context.layoutInflater, context.root, false)
 
     var userName: String = ""
@@ -85,17 +81,14 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
 
     override fun getToolBar(): View = binding.mainGroup
 
+    private var btnY = 0f
+
+    private val btnH = context.resources.getDimensionPixelSize(R.dimen.action_icon_p)
+
     init {
-        setNavigation()
         binding.apply {
             self = this@MainSeen
-            toolbar.addOnOffsetChangedListener(
-                AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-                    binding.toolMotion.progress =
-                        -verticalOffset / appBarLayout.totalScrollRange.toFloat().also {
-                            binding.musicPlayer.isVisible = it > 0.7f
-                        }
-                })
+            root.viewTreeObserver.addOnGlobalLayoutListener(this@MainSeen)
             musicPlayer.apply {
                 duration
                 playMusic = {
@@ -125,6 +118,26 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context) {
 
     fun musicSeek(listener: Progress) {
         binding.musicPlayer.seekTo = listener
+    }
+
+    override fun onGlobalLayout() {
+        binding.apply {
+            actionBtnContainer.also {
+                it.y = it.y + btnH * 2
+                btnY = it.y
+            }
+            toolbar.addOnOffsetChangedListener(
+                AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+                    binding.toolMotion.progress =
+                        -verticalOffset / appBarLayout.totalScrollRange.toFloat().also {
+                            binding.musicPlayer.isVisible = it > 0.7f
+                            binding.actionBtnContainer.also { btn ->
+                                btn.y = btnY - (btnH * binding.toolMotion.progress) * 2
+                            }
+                        }
+                })
+            root.viewTreeObserver.removeOnGlobalLayoutListener(this@MainSeen)
+        }
     }
 
 

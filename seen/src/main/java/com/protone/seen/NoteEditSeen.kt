@@ -17,7 +17,7 @@ import com.protone.api.context.onUiThread
 import com.protone.api.context.root
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ISpanForUse
-import com.protone.seen.customView.ColorPopWindow
+import com.protone.seen.customView.ColorfulPopWindow
 import com.protone.seen.databinding.NoteEditLayoutBinding
 
 class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context), ISpanForUse {
@@ -31,8 +31,9 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
         PickIcon
     }
 
-    private var numberPopWindows: ColorPopWindow? = null
-    private var colorPopWindow: ColorPopWindow? = null
+    private var listPopWindow: ColorfulPopWindow? = null
+    private var numberPopWindow: ColorfulPopWindow? = null
+    private var colorPopWindow: ColorfulPopWindow? = null
 
     val title: String get() = binding.noteEditTitle.text.toString()
 
@@ -67,12 +68,12 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
     override fun setItalic() = binding.noteEditRichNote.setItalic()
 
     override fun setSize() {
-        if (numberPopWindows != null) {
-            numberPopWindows?.dismiss()
-            numberPopWindows = null
-        } else ColorPopWindow(context).also {
-            numberPopWindows = it
-            it.setOnDismissListener { numberPopWindows = null }
+        if (numberPopWindow != null) {
+            numberPopWindow?.dismiss()
+            numberPopWindow = null
+        } else ColorfulPopWindow(context).also {
+            numberPopWindow = it
+            it.setOnDismissListener { numberPopWindow = null }
         }.startNumberPickerPopup(binding.noteEditTool) { binding.noteEditRichNote.setSize(it) }
     }
 
@@ -90,47 +91,25 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
 
     override fun insertMusic() = offer(NoteEditEvent.PickMusic)
 
-    fun insertMusic(music: RichMusicStates) = binding.noteEditRichNote.insertMusic(music)
-
-    suspend fun indexRichNote(): Pair<Int, String> {
-//        val indexRichNote = binding.noteEditRichNote.indexRichNote()
-//        var first = indexRichNote.first
-//        val second = indexRichNote.second
-//        val statesStrings = second.jsonToList(String::class.java)
-//        var listSize = statesStrings.size - 1
-//        val richList = arrayListOf<RichStates>()
-//        while (first > 0) {
-//            richList.add(
-//                when (first % 10) {
-//                    RichNoteView.PHOTO -> {
-//                        statesStrings[listSize--].toEntity(RichPhotoStates::class.java)
-//                    }
-//                    RichNoteView.MUSIC -> {
-//                        statesStrings[listSize--].toEntity(RichMusicStates::class.java)
-//                    }
-//                    RichNoteView.VIDEO -> {
-//                        statesStrings[listSize--].toEntity(RichVideoStates::class.java)
-//                    }
-//                    else -> {
-//                        val toEntity = statesStrings[listSize--].toEntity(RichNoteSer::class.java)
-//                        val toEntity1 = toEntity.spans.jsonToList(SpanStates::class.java)
-//                        RichNoteStates(toEntity.text,toEntity1)
-//                    }
-//                }
-//            )
-//            first /= 10
-//        }
-        //TODO Only string color span can be saved
-//        binding.noteEditRichNote.setRichList(richList)
-
-        return binding.noteEditRichNote.indexRichNote()
+    fun insertMusic(uri: Uri, list: MutableList<String>) {
+        if (listPopWindow != null) {
+            listPopWindow?.dismiss()
+            listPopWindow = null
+        } else ColorfulPopWindow(context).also {
+            listPopWindow = it
+            it.setOnDismissListener { listPopWindow = null }
+        }.startListPopup(binding.noteEditTool, list) {
+            binding.noteEditRichNote.insertMusic(RichMusicStates(uri, it))
+        }
     }
+
+    suspend fun indexRichNote(): Pair<Int, String> = binding.noteEditRichNote.indexRichNote()
 
     override fun setColor() {
         if (colorPopWindow != null) {
             colorPopWindow?.dismiss()
             colorPopWindow = null
-        } else ColorPopWindow(context).also {
+        } else ColorfulPopWindow(context).also {
             colorPopWindow = it
             it.setOnDismissListener { colorPopWindow = null }
         }.startColorPickerPopup(binding.noteEditTool) {
@@ -147,18 +126,17 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
             .diskCacheStrategy(DiskCacheStrategy.NONE).into(binding.noteEditIcon)
     }
 
-    fun showProgress(isShow: Boolean) =
-        context.onUiThread {
-            (binding.toolbar.getViewById(R.id.noteEdit_progress) as ImageView?)?.apply {
-                drawable.let {
-                    when (it) {
-                        is Animatable ->
-                            if (isShow) it.start().also { isVisible = true }
-                            else it.stop().also { changeIconAni(binding.noteEditProgress) }
-                    }
+    fun showProgress(isShow: Boolean) = context.onUiThread {
+        (binding.toolbar.getViewById(R.id.noteEdit_progress) as ImageView?)?.apply {
+            drawable.let {
+                when (it) {
+                    is Animatable ->
+                        if (isShow) it.start().also { isVisible = true }
+                        else it.stop().also { changeIconAni(binding.noteEditProgress) }
                 }
             }
         }
+    }
 
     private fun changeIconAni(view: ImageView) = context.onUiThread {
         AnimationHelper.apply {

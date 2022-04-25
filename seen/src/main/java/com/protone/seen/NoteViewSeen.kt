@@ -39,7 +39,7 @@ class NoteViewSeen(context: Context) : Seen<NoteViewSeen.NoteViewEvent>(context)
         }
     }
 
-    fun initNote(note: Note) {
+    fun initNote(note: Note,listener: RichNoteView.IRichMusic) {
         binding.apply {
             noteEditTitle.text = note.title
             note.imagePath.toDrawable(context) {
@@ -51,6 +51,15 @@ class NoteViewSeen(context: Context) : Seen<NoteViewSeen.NoteViewEvent>(context)
             }
             noteEditRichNote.isEditable = false
             noteEditRichNote.setRichList(note.richCode, note.text)
+            noteEditRichNote.iRichMusicListener = listener
         }
+    }
+
+    fun setMusicProgress(progress: Long) {
+        binding.noteEditRichNote.setMusicProgress(progress)
+    }
+
+    fun setMusicDuration(duration: Long) {
+        binding.noteEditRichNote.setMusicDuration(duration)
     }
 }
