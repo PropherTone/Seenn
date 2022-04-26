@@ -2,24 +2,27 @@ package com.protone.seenn
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
-import com.protone.api.*
 import com.protone.api.context.intent
-import com.protone.api.context.onBackground
 import com.protone.api.json.toEntity
 import com.protone.api.json.toUriJson
+import com.protone.api.toDate
+import com.protone.api.toDrawable
+import com.protone.api.toMediaBitmapByteArray
+import com.protone.api.todayTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
 import com.protone.mediamodle.GalleyHelper
-import com.protone.mediamodle.note.entity.RichMusicStates
 import com.protone.mediamodle.note.entity.RichPhotoStates
 import com.protone.mediamodle.note.entity.RichVideoStates
 import com.protone.seen.AddMusic2BucketSeen
 import com.protone.seen.GalleySeen
 import com.protone.seen.NoteEditSeen
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
-import kotlin.coroutines.resume
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 
 class NoteEditActivity : BaseActivity<NoteEditSeen>() {
 
@@ -32,8 +35,8 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
         suspendCancellableCoroutine<MutableList<String>> {
             val notes = DataBaseDAOHelper.getAllNote()
             val list = mutableListOf<String>()
-            notes?.forEach {
-                list.add(it.title)
+            notes?.forEach { note->
+                list.add(note.title)
             }
             it.resumeWith(Result.success(list))
         }
@@ -45,12 +48,11 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
 
     override suspend fun main() {
         val noteEditSeen = NoteEditSeen(this)
+        setContentSeen(noteEditSeen)
 
         while (isActive) {
             select<Unit> {
-                event.onReceive {
-
-                }
+                event.onReceive {}
                 noteEditSeen.viewEvent.onReceive {
                     when (it) {
                         NoteEditSeen.NoteEditEvent.Confirm -> {
@@ -113,7 +115,15 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                             if (re.resultCode == RESULT_OK)
                                 re.data?.data?.let { uri ->
                                     if (allNote == null) allNote = getAllNote()
-                                    noteEditSeen.insertMusic(uri, allNote!!)
+                                    val title = withContext(Dispatchers.IO) {
+                                        suspendCancellableCoroutine<String> { co ->
+                                            val musicByUri = DataBaseDAOHelper.getMusicByUri(uri)
+                                            co.resumeWith(
+                                                Result.success(musicByUri?.title ?: "^ ^")
+                                            )
+                                        }
+                                    }
+                                    noteEditSeen.insertMusic(uri, allNote!!, title)
                                 }
                         }
                         NoteEditSeen.NoteEditEvent.PickIcon -> startGalleyPick(true)?.let { re ->

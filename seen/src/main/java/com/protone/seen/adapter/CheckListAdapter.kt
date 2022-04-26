@@ -3,14 +3,28 @@ package com.protone.seen.adapter
 import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import com.protone.api.context.layoutInflater
 import com.protone.seen.databinding.CheckListAdapterLayoutBinding
 
-class CheckListAdapter(context: Context, private val dataList: MutableList<String>) :
+class CheckListAdapter(
+    context: Context,
+    dataList: MutableList<String>? = null,
+    private val check: Boolean = true
+) :
     SelectListAdapter<CheckListAdapterLayoutBinding, String>(context) {
+
+    var dataList: MutableList<String> = mutableListOf()
+        set(value) {
+            field.clear()
+            field.addAll(value)
+        }
 
     init {
         multiChoose = false
+        if (dataList != null) {
+            this.dataList.addAll(dataList)
+        }
     }
 
     override val select: (holder: Holder<CheckListAdapterLayoutBinding>, isSelect: Boolean) -> Unit =
@@ -29,11 +43,18 @@ class CheckListAdapter(context: Context, private val dataList: MutableList<Strin
     override fun onBindViewHolder(holder: Holder<CheckListAdapterLayoutBinding>, position: Int) {
         setSelect(holder, selectList.contains(dataList[position]))
         holder.binding.apply {
-            root.setOnClickListener { checkSelect(holder, dataList[position]) }
+            clCheck.isGone = !check
+            root.setOnClickListener {
+                if (check) {
+                    checkSelect(holder, dataList[position])
+                } else startNote?.invoke(dataList[position])
+            }
             clCheck.isClickable = false
             clName.text = dataList[position]
         }
     }
+
+    var startNote: ((String) -> Unit)? = null
 
     override fun getItemCount(): Int = dataList.size
 }

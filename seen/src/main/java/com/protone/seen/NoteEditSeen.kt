@@ -91,7 +91,7 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
 
     override fun insertMusic() = offer(NoteEditEvent.PickMusic)
 
-    fun insertMusic(uri: Uri, list: MutableList<String>) {
+    fun insertMusic(uri: Uri, list: MutableList<String>, title: String) {
         if (listPopWindow != null) {
             listPopWindow?.dismiss()
             listPopWindow = null
@@ -99,7 +99,8 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
             listPopWindow = it
             it.setOnDismissListener { listPopWindow = null }
         }.startListPopup(binding.noteEditTool, list) {
-            binding.noteEditRichNote.insertMusic(RichMusicStates(uri, it))
+            listPopWindow?.dismiss()
+            binding.noteEditRichNote.insertMusic(RichMusicStates(uri, it, title))
         }
     }
 

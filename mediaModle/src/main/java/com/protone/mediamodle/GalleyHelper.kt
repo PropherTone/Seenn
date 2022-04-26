@@ -44,7 +44,6 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
             try {
                 byteArray?.let {
                     val tempPath = "${Global.application.filesDir.absolutePath}/${fileName.getFileName()}.jpg"
-                    Log.d("TAG", "saveIconToLocal: $tempPath")
                     val file = File(tempPath)
                     callBack.invoke(
                         when {
@@ -112,7 +111,7 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
             }
             if (map.isNotEmpty()) {
                 val list = arrayListOf<GalleyMedia>()
-                (if (isVideo) Galley.allVideo else Galley.allPhoto).forEach { gm ->
+                (if (isVideo) Galley.allVideo else Galley.allPhoto)?.forEach { gm ->
                     if (map[gm.name] != null) {
                         map[gm.name]?.let { it -> list.add(it) }
                     }

@@ -40,8 +40,11 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
             val binder =
                 NumberPickerPopLayoutBinding.inflate(context.layoutInflater, context.root, false)
             startPopup(context, binder.root, anchor) {
-                (contentView.findViewById(R.id.number_picker) as NumberPicker).setOnValueChangedListener { _, _, newVal ->
-                    onCall.invoke(newVal)
+                (contentView.findViewById(R.id.number_picker) as NumberPicker).apply {
+                    maxValue = 999
+                    minValue = 1
+                    descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
+                    setOnValueChangedListener { _, _, newVal -> onCall.invoke(newVal) }
                 }
             }
         }
@@ -49,7 +52,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
     inline fun startListPopup(
         anchor: View,
         dataList: MutableList<String>,
-        crossinline onCall: (String) -> Unit
+        crossinline onCall: (String?) -> Unit
     ) =
         weakContext.get()?.let { context ->
             val binder =
@@ -61,8 +64,8 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
             val func = {
                 binder.listConfirm.setOnClickListener {
                     binder.listList.adapter.let {
-                        if (it is CheckListAdapter && it.selectList.size > 0)
-                            onCall.invoke(it.selectList[0])
+                        if (it is CheckListAdapter)
+                            onCall.invoke(if (it.selectList.size > 0) it.selectList[0] else null)
                     }
                 }
             }

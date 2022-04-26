@@ -19,7 +19,8 @@
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/noteEdit_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:elevation="@dimen/small_elevation">
 
             <androidx.constraintlayout.motion.widget.MotionLayout
                 android:id="@+id/toolbar"
@@ -113,6 +114,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="60dp"
+            android:background="@color/white"
+            android:elevation="0dp"
             app:layout_anchor="@id/noteEdit_toolbar"
             app:layout_anchorGravity="bottom"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
@@ -131,6 +134,7 @@
             android:layout_gravity="bottom"
             android:background="@color/glass"
             android:clickable="true"
+            android:elevation="@dimen/small_elevation"
             android:focusable="true"
             android:paddingTop="@dimen/main_padding"
             android:paddingBottom="@dimen/main_padding"

@@ -11,6 +11,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.util.ArrayDeque
 
 class NoteViewActivity : BaseActivity<NoteViewSeen>() {
 
@@ -18,53 +19,70 @@ class NoteViewActivity : BaseActivity<NoteViewSeen>() {
         const val NOTE_NAME = "NOTE_NAME"
     }
 
-    override suspend fun main() {
-        val noteViewSeen = NoteViewSeen(this)
+    private val noteQueue = ArrayDeque<String>()
 
+    override suspend fun main() {
         bindMusicService {}
-        noteViewSeen.initSeen()
+
+        val noteViewSeen = intent.getStringExtra(NOTE_NAME)?.let {
+            noteQueue.offer(it)
+            initSeen(noteQueue.poll())
+        } ?: NoteViewSeen(this)
 
         while (isActive) {
             select<Unit> {
-                event.onReceive {
-
-                }
+                event.onReceive {}
                 noteViewSeen.viewEvent.onReceive {
                     when (it) {
-                        NoteViewSeen.NoteViewEvent.Finish -> finish()
+                        NoteViewSeen.NoteViewEvent.Finish ->
+                            if (noteQueue.isNotEmpty())
+                                setContentSeen(initSeen(noteQueue.poll()))
+                            else finish()
+                        NoteViewSeen.NoteViewEvent.Next -> setContentSeen(initSeen(noteQueue.peek()))
                     }
                 }
             }
         }
     }
 
-    private suspend fun NoteViewSeen.initSeen() {
-        intent.getStringExtra(NOTE_NAME)?.let { name ->
-            withContext(Dispatchers.IO) {
-                suspendCancellableCoroutine<Note?> { co ->
-                    co.resumeWith(Result.success(DataBaseDAOHelper.getNoteByName(name)))
-                }
-            }.let { note ->
-                if (note != null) {
-                    initNote(note, object : RichNoteView.IRichMusic {
-                        override fun play(uri: Uri, progress: Long) {
-                            onBackground {
-                                DataBaseDAOHelper.getMusicByUri(uri)
-                                    ?.let { setMusicDuration(it.duration) }
-                            }
-                            binder.play(uri, progress)
-                            binder.getPosition().observe(this@NoteViewActivity) {
-                                setMusicProgress(it)
-                            }
-                        }
-
-                        override fun pause() {
-                            binder.pause()
-                        }
-
-                    })
-                } else toast(getString(R.string.come_up_unknown_error))
+    private suspend fun initSeen(noteName: String?) = NoteViewSeen(this@NoteViewActivity).apply {
+        setContentSeen(this)
+        if (noteName == null) return@apply
+        withContext(Dispatchers.IO) {
+            suspendCancellableCoroutine<Note?> { co ->
+                co.resumeWith(Result.success(DataBaseDAOHelper.getNoteByName(noteName)))
             }
+        }.let { note ->
+            if (note != null) {
+                initNote(note, object : RichNoteView.IRichListener {
+                    override fun play(uri: Uri, progress: Long) {
+                        onBackground {
+                            DataBaseDAOHelper.getMusicByUri(uri)
+                                ?.let {
+                                    setMusicDuration(it.duration)
+                                    binder.play(it, progress)
+                                }
+                        }
+                        binder.getPosition().observe(this@NoteViewActivity) {
+                            setMusicProgress(it)
+                        }
+                    }
+
+                    override fun pause() {
+                        binder.pause()
+                    }
+
+                    override fun jumpTo(note: String) {
+                        noteQueue.offer(note)
+                        offer(NoteViewSeen.NoteViewEvent.Next)
+                    }
+
+                    override fun openImage(uri: Uri, name: String) {
+
+                    }
+
+                })
+            } else toast(getString(R.string.come_up_unknown_error))
         }
     }
 }

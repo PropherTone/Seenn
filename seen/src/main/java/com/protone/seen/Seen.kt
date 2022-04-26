@@ -23,6 +23,9 @@ abstract class Seen<C>(val context: Context) :
 
     abstract fun offer(event: C)
 
+    /**
+     * Let view padding top to full the toolbar
+     */
     protected fun initToolBar() {
         getToolBar()?.apply {
             setPadding(
@@ -35,6 +38,9 @@ abstract class Seen<C>(val context: Context) :
         setNavigation()
     }
 
+    /**
+     * Use a view to full the toolbar
+     */
     protected fun setSettleToolBar() {
         getToolBar()?.apply {
             layoutParams = ConstraintLayout.LayoutParams(width, context.statuesBarHeight)

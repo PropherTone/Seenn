@@ -50,13 +50,8 @@ object Galley {
 
     val musicBucket = mutableMapOf<String, MutableList<Music>>()
 
-    val allPhoto: MutableList<GalleyMedia> by lazy {
-        val ap = mutableListOf<GalleyMedia>()
-        photo.forEach { (_, mutableList) ->
-            ap.addAll(mutableList)
-        }
-        ap
-    }
+    val allPhoto: MutableList<GalleyMedia>?
+        get() = photo[Global.application.getString(R.string.all_galley)]
 
     val allVideo: MutableList<GalleyMedia> by lazy {
         val ap = mutableListOf<GalleyMedia>()
@@ -71,7 +66,7 @@ object Galley {
         val now = Calendar.getInstance(Locale.CHINA).apply {
             timeInMillis = System.currentTimeMillis()
         }
-        allPhoto.forEach {
+        allPhoto?.forEach {
             ca.timeInMillis = it.date * 1000
             return if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH) && ca.get(Calendar.DAY_OF_MONTH) == now.get(
                     Calendar.DAY_OF_MONTH

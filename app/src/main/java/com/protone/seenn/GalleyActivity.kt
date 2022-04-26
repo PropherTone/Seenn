@@ -3,6 +3,7 @@ package com.protone.seenn
 import android.content.Intent
 import android.util.Log
 import com.protone.api.context.deleteMedia
+import com.protone.api.context.intent
 import com.protone.api.context.renameMedia
 import com.protone.api.context.showFailedToast
 import com.protone.api.json.toJson
@@ -45,7 +46,12 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
         }
 
         galleySeen.apply {
-            initPager(Galley.photo, Galley.video, chooseType)
+            initPager(Galley.photo, Galley.video, chooseType) { gm, isVideo ->
+                startActivity(GalleyViewActivity::class.intent.apply {
+                    putExtra(GalleyViewActivity.MEDIA, gm.toJson())
+                    putExtra(GalleyViewActivity.TYPE, isVideo)
+                })
+            }
             chooseData.observe(this@GalleyActivity) {
                 if (it.size > 0) {
                     galleySeen.setOptionButton(true)
@@ -55,14 +61,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
 
         while (isActive) {
             select<Unit> {
-                event.onReceive {
-                    when (it) {
-                        Event.OnStart -> {
-                        }
-                        else -> {
-                        }
-                    }
-                }
+                event.onReceive {}
                 galleySeen.viewEvent.onReceive {
                     when (it) {
                         GalleySeen.Touch.Finish -> {
@@ -93,8 +92,8 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                             galleySeen.chooseData.value?.let { list ->
                                 if (list.size > 0) {
                                     setResult(RESULT_OK, Intent().apply {
-                                        putExtra("Uri",list[0].uri.toUriJson())
-                                        putExtra("GalleyData",list[0].toJson())
+                                        putExtra("Uri", list[0].uri.toUriJson())
+                                        putExtra("GalleyData", list[0].toJson())
                                     })
                                 }
                             }

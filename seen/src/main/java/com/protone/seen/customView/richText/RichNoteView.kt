@@ -18,6 +18,8 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import com.bumptech.glide.Glide
@@ -29,11 +31,14 @@ import com.protone.api.json.jsonToList
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
+import com.protone.api.toDrawable
 import com.protone.api.toMediaBitmapByteArray
 import com.protone.mediamodle.note.MyTextWatcher
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ColorSpan
 import com.protone.mediamodle.note.spans.ISpanForEditor
+import com.protone.seen.R
+import com.protone.seen.customView.DragRect
 import com.protone.seen.customView.MyMusicPlayer
 import com.protone.seen.databinding.RichMusicLayoutBinding
 import com.protone.seen.databinding.RichPhotoLayoutBinding
@@ -193,7 +198,6 @@ class RichNoteView @JvmOverloads constructor(
                         performClick()
                         false
                     }
-                    getEdittext(curPosition)?.requestFocus()
                     tag = note
                 }
             else -> TextView(context).apply {
@@ -203,29 +207,51 @@ class RichNoteView @JvmOverloads constructor(
                 )
                 text = note.text
             }
-        })
+        }).run {
+            this@RichNoteView.requestFocus()
+            getEdittext(curPosition)?.also {
+                it.requestFocus()
+                it.performClick()
+            }
+        }
     }
 
     override fun insertVideo(video: RichVideoStates) = insertMedia {
-        addView(RichVideoLayoutBinding.inflate(context.layoutInflater, this, false).root.apply {
-            setVideoPath(video.uri)
-        }, it + 1)
+        addView(RichVideoLayoutBinding.inflate(context.layoutInflater, this, false).apply {
+            richVideo.setVideoPath(video.uri)
+            richLinkContainer.isGone = video.link == null
+            if (!isEditable) {
+                richLinkContainer.setOnClickListener {
+                    video.link?.let { note -> iRichListener?.jumpTo(note) }
+                }
+                richLink.text = video.link ?: ""
+            }
+        }.root.also { r -> r.tag = video }, it)
     }
 
     override fun insertMusic(music: RichMusicStates) = insertMedia {
-        addView(RichMusicLayoutBinding.inflate(context.layoutInflater, this, false).root.apply {
-            playMusic = {
-                iRichMusicListener?.play(music.uri, progress)
-                curPlaying = this@RichNoteView.indexOfChild(this)
+        addView(RichMusicLayoutBinding.inflate(context.layoutInflater, this, false).apply {
+            richMusic.playMusic = {
+                iRichListener?.play(music.uri, richMusic.progress)
+                curPlaying = this@RichNoteView.indexOfChild(root)
             }
-            pauseMusic = { iRichMusicListener?.pause() }
-        }, it + 1)
+            richMusic.pauseMusic = { iRichListener?.pause() }
+            richLinkContainer.isGone = music.link == null
+            if (!isEditable) {
+                richLinkContainer.setOnClickListener {
+                    music.link?.let { note -> iRichListener?.jumpTo(note) }
+                }
+                richLink.text = music.link ?: ""
+            }
+            richMusic.icon = music.uri
+            richMusic.name = music.name
+        }.root.also { r -> r.tag = music }, it)
     }
 
-    fun setMusicProgress(process: Long) {
+    fun setMusicProgress(progress: Long) {
         getChildAt(curPlaying)?.let {
             if (it is MyMusicPlayer) {
-                it.progress = process
+                it.progress = progress
             }
         }
     }
@@ -238,39 +264,55 @@ class RichNoteView @JvmOverloads constructor(
         }
     }
 
-    private fun getBitmapWH(uri: Uri): IntArray {
-        val ba = uri.toMediaBitmapByteArray()
-        val option = BitmapFactory.Options().apply {
-            inJustDecodeBounds = true
+    private fun getBitmapWH(byteArray: ByteArray): IntArray? {
+        try {
+            val option = BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+            }
+            val dba = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size, option)
+            val height = dba.height
+            val width = dba.width
+            val index = width / height
+            val bmH = Config.screenWidth / index
+            dba.recycle()
+            return intArrayOf(Config.screenWidth, bmH)
+        } catch (e: Exception) {
         }
-        val dba = BitmapFactory.decodeByteArray(ba, 0, ba?.size ?: 0, option)
-        val height = dba.height
-        val width = dba.width
-        val index = width / height
-        val bmH = Config.screenWidth / index
-        dba.recycle()
-        return intArrayOf(Config.screenWidth, bmH)
+        return null
     }
 
     override fun insertImage(photo: RichPhotoStates) = insertMedia {
-        addView(
-            RichPhotoLayoutBinding
-                .inflate(context.layoutInflater, this, false)
-                .apply {
-                    val bitmapWH = getBitmapWH(photo.uri)
-                    Glide.with(context).load(photo.uri).override(bitmapWH[0], bitmapWH[1])
-                        .into(this.richPhotoIv)
-                    richPhotoTitle.text = photo.name
-                    richPhotoDetail.text = photo.date
-                    richPhotoTvContainer.setOnClickListener {
-                        richPhotoTitle.apply {
-                            isVisible = !isVisible
-                            drag.isVisible = isVisible
-                        }
-                        richPhotoDetail.apply { isVisible = !isVisible }
+        addView(RichPhotoLayoutBinding.inflate(context.layoutInflater, this, false).apply {
+            val ba = photo.uri.toMediaBitmapByteArray()
+            if (ba == null) {
+                Glide.with(context).asDrawable()
+                    .load(R.drawable.ic_baseline_error_outline_24_black)
+                    .into(this.richPhotoIv)
+            } else {
+                val bitmapWH = getBitmapWH(ba)
+                Glide.with(context).load(photo.uri).let { glide ->
+                    if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
+                }.into(this.richPhotoIv)
+                richPhotoTitle.text = photo.name
+                richPhotoDetail.text = photo.date
+            }
+            drag.isGone = !isEditable
+            if (isEditable) {
+                drag.rectSizeListener = object : DragRect.RectSize {
+                    override fun onChange(x: Int, y: Int) {
+                        root.layoutParams = LayoutParams(x, y)
                     }
-                }.root.also { v -> v.tag = photo }, it + if (!inIndex) 1 else 0
-        )
+                }
+                richPhotoFull.setOnClickListener { iRichListener?.openImage(photo.uri, photo.name) }
+            }
+            richPhotoTvContainer.setOnClickListener {
+                richPhotoTitle.apply {
+                    isVisible = !isVisible
+                    drag.isVisible = isVisible
+                }
+                richPhotoDetail.apply { isVisible = !isVisible }
+            }
+        }.root.also { v -> v.tag = photo }, it)
     }
 
     override fun setBold() {
@@ -366,7 +408,7 @@ class RichNoteView @JvmOverloads constructor(
                 }
             }
         }
-        func(insertPosition)
+        func(insertPosition + if (!inIndex) 1 else 0)
         //Insert a edittext to make sure there have a place for input
         if (isEditable && !inIndex) insertText(
             RichNoteStates(
@@ -460,10 +502,12 @@ class RichNoteView @JvmOverloads constructor(
         }
     }
 
-    var iRichMusicListener: IRichMusic? = null
+    var iRichListener: IRichListener? = null
 
-    interface IRichMusic {
+    interface IRichListener {
         fun play(uri: Uri, progress: Long)
         fun pause()
+        fun jumpTo(note: String)
+        fun openImage(uri: Uri, name: String)
     }
 }

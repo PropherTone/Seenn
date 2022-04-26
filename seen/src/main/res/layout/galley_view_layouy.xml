@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="self"
+            type="com.protone.seen.GalleyViewSeen" />
+
+        <import type="com.protone.seen.GalleyViewSeen.GalleyVEvent" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/galleyV_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/galleyV_title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/action_icon_p"
+            android:background="@color/foreDark_1"
+            android:ellipsize="marquee"
+            android:gravity="center"
+            android:letterSpacing="0.02"
+            android:maxLines="1"
+            android:paddingStart="@dimen/action_icon_p"
+            android:paddingEnd="@dimen/action_icon_p"
+            android:textColor="@color/white"
+            android:textSize="@dimen/title_text"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/galleyV_back"
+            android:layout_width="@dimen/action_icon_p"
+            android:layout_height="@dimen/action_icon_p"
+            android:contentDescription="@string/action"
+            android:onClick="@{()->self.offer(GalleyVEvent.Finish)}"
+            android:padding="@dimen/main_padding"
+            android:src="@drawable/ic_baseline_arrow_left_24_white"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="@dimen/action_icon_p"
+            android:layout_height="@dimen/action_icon_p"
+            android:contentDescription="@string/action"
+            android:onClick="@{()->self.offer(GalleyVEvent.ShowAction)}"
+            android:padding="@dimen/main_padding"
+            android:src="@drawable/ic_baseline_more_horiz_24_white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/galleyV_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/foreDark_1"
+            android:padding="@dimen/main_padding"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sub_text"
+            app:layout_constraintBottom_toTopOf="@+id/galleyV_size" />
+
+        <TextView
+            android:id="@+id/galleyV_size"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/foreDark_1"
+            android:padding="@dimen/main_padding"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sub_text"
+            app:layout_constraintBottom_toTopOf="@+id/galleyV_cato" />
+
+        <TextView
+            android:id="@+id/galleyV_cato"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/foreDark_1"
+            android:padding="@dimen/main_padding"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sub_text"
+            app:layout_constraintBottom_toTopOf="@+id/galleyV_type" />
+
+        <TextView
+            android:id="@+id/galleyV_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/foreDark_1"
+            android:padding="@dimen/main_padding"
+            android:textColor="@color/white"
+            android:textSize="@dimen/sub_text"
+            app:layout_constraintBottom_toTopOf="@+id/galleyV_links" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/galleyV_links"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/huge_icon"
+            android:background="@color/foreDark_1"
+            android:padding="@dimen/main_padding"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

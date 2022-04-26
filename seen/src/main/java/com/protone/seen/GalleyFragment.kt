@@ -4,13 +4,11 @@ import android.animation.ValueAnimator
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -19,7 +17,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.Config
-import com.protone.api.TAG
 import com.protone.api.animation.AnimationHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.adapter.GalleyBucketAdapter
@@ -37,7 +34,8 @@ class GalleyFragment(
     private val galleyMediaList: MutableMap<String, MutableList<GalleyMedia>>,
     val live: MutableLiveData<MutableList<GalleyMedia>>,
     val multiChoose: Boolean = false,
-    private val isVideo: Boolean = false
+    private val isVideo: Boolean = false,
+    private val openView: (GalleyMedia,Boolean)->Unit
 ) : Fragment(),
     CoroutineScope by CoroutineScope(Dispatchers.Main),
     ViewTreeObserver.OnGlobalLayoutListener, SearchView.OnQueryTextListener {
@@ -82,11 +80,6 @@ class GalleyFragment(
                 Config.keyboardHeight.toFloat(),
                 play = true
             )
-//            searchAnimator = ObjectAnimator.ofFloat(
-//                galleyBucketContainer,
-//                "translationY",
-//                Config.keyboardHeight.toFloat()
-//            )
             galleyToolButton.isVisible = false
             galleyShowBucket.isVisible = false
         }
@@ -169,6 +162,10 @@ class GalleyFragment(
                     override fun select(galleyMedia: MutableList<GalleyMedia>) {
                         live.postValue(galleyMedia)
                     }
+
+                    override fun openView(galleyMedia: GalleyMedia, isVideo: Boolean) {
+                        openView.invoke(galleyMedia, isVideo)
+                    }
                 })
             }
         }
@@ -234,21 +231,11 @@ class GalleyFragment(
                 galleyView.galleyBucketContainer,
                 it
             )
-//            containerAnimator = ObjectAnimator.ofFloat(
-//                galleyView.galleyBucketContainer,
-//                "translationY",
-//                it
-//            )
         }
         toolButtonAnimator = AnimationHelper.rotation(
             galleyView.galleyToolButton,
             45f
         )
-//        toolButtonAnimator = ObjectAnimator.ofFloat(
-//            galleyView.galleyToolButton,
-//            "rotation",
-//            45f
-//        )
         stateCheck()
         galleyView.root.viewTreeObserver?.removeOnGlobalLayoutListener(this)
     }

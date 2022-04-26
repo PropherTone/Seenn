@@ -112,7 +112,8 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
     suspend fun initPager(
         galleyMediaList: MutableMap<String, MutableList<GalleyMedia>>,
         videoMediaList: MutableMap<String, MutableList<GalleyMedia>>,
-        chooseType: String = ""
+        chooseType: String = "",
+        openView: (GalleyMedia, Boolean) -> Unit
     ) = withContext(Dispatchers.Main) {
         initViewMode(chooseType.isNotEmpty())
         binding.galleyPager.let {
@@ -121,7 +122,8 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
                     context as FragmentActivity,
                     galleyMediaList,
                     chooseData,
-                    multiChoose = chooseType.isNotEmpty()
+                    multiChoose = chooseType.isNotEmpty(),
+                    openView = openView
                 )
             }
             val videoFragment by lazy {
@@ -130,7 +132,8 @@ class GalleySeen(context: Context) : Seen<GalleySeen.Touch>(context),
                     videoMediaList,
                     chooseData,
                     multiChoose = chooseType.isNotEmpty(),
-                    isVideo = true
+                    isVideo = true,
+                    openView = openView
                 )
             }
             it.adapter = MyFragmentStateAdapter(

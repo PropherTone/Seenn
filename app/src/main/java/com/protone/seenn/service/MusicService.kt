@@ -31,8 +31,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         val MUSIC_NOTIFICATION_NAME = "MUSIC_NOTIFICATION"
 
         const val NOTIFICATION_ID = 0x01
-
-        private val TAG = this::class.simpleName
     }
 
     private var remoteViews: RemoteViews? = null
@@ -291,26 +289,28 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         }
     }
 
-    override fun play(uri: Uri, progress: Long) {
+    override fun play(music: Music, progress: Long) {
         if (musicTimer == null) musicTimer = Timer()
         musicPlayer = MediaPlayer.create(
             Global.application,
-            uri
-        ).also {
-            it.setOnCompletionListener(this@MusicService)
-            it.setOnPreparedListener { mp ->
-                postData(
-                    musicLists[musicPosition].title,
-                    musicLists[musicPosition].duration,
-                    uri,
-                    mp.isPlaying
-                )
+            music.uri
+        ).apply {
+            setOnCompletionListener(this@MusicService)
+            setOnPreparedListener { mp ->
+                onBackground {
+                    postData(
+                        music.title,
+                        music.duration,
+                        music.uri,
+                        mp.isPlaying
+                    )
+                }
             }
-            it.start()
-            it.seekTo(progress.toInt())
+            start()
+            seekTo(progress.toInt())
             musicTimer?.schedule(timerTask {
                 try {
-                    if (it.isPlaying) playPosition.postValue(it.currentPosition.toLong())
+                    if (isPlaying) playPosition.postValue(currentPosition.toLong())
                 } catch (ignored: Exception) {
                 }
             }, 0, 100)
@@ -329,8 +329,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
                 it.isPlaying
             )
         }
-//        musicTimer?.cancel()
-//        musicTimer = null
     }
 
     override fun next() {
@@ -415,7 +413,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
     inner class MusicControlLer : Binder(), IMusicPlayer {
         override fun setDate(list: MutableList<Music>) = this@MusicService.setDate(list)
         override fun play() = this@MusicService.play()
-        override fun play(uri: Uri, progress: Long) = this@MusicService.play(uri, progress)
+        override fun play(music: Music, progress: Long) = this@MusicService.play(music, progress)
         override fun pause() = this@MusicService.pause()
         override fun next() = this@MusicService.next()
         override fun previous() = this@MusicService.previous()
@@ -424,7 +422,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         override fun getData() = this@MusicService.getData()
         override fun setPlayMusicPosition(position: Int) =
             this@MusicService.setPlayMusicPosition(position)
-
         override fun seekTo(position: Long) = this@MusicService.seekTo(position)
         override fun getPlayState(): MutableLiveData<Boolean> = this@MusicService.getPlayState()
         override fun getPlayPosition(): Int = this@MusicService.getPlayPosition()

@@ -73,7 +73,7 @@ class GalleyListAdapter(
             image.setOnClickListener {
                 if (onSelectMod) {
                     checkSelect(holder, media[position])
-                } else openView()
+                } else onSelectListener?.openView(media[position],isVideo)
             }
             image.setOnLongClickListener {
                 onSelectMod = true
@@ -87,10 +87,6 @@ class GalleyListAdapter(
     override fun checkSelect(holder: Holder<PictureBoxAdapterLayoutBinding>, item: GalleyMedia) {
         onSelectListener?.select(selectList)
         super.checkSelect(holder, item)
-    }
-
-    private fun openView() {
-
     }
 
     fun quitSelectMod(){
@@ -114,6 +110,7 @@ class GalleyListAdapter(
 
     interface OnSelect{
         fun select(galleyMedia: MutableList<GalleyMedia>)
+        fun openView(galleyMedia: GalleyMedia, isVideo: Boolean)
     }
 
     fun setOnSelectListener(listener: OnSelect?) {

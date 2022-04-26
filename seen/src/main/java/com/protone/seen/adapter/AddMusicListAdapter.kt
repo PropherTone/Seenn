@@ -28,8 +28,9 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
     SelectListAdapter<MusicListLayoutBinding, Music>(context) {
 
     init {
-        Galley.musicBucket[bucket]?.let { selectList.addAll(it) }
-        multiChoose = mode != AddMusic2BucketSeen.PICK_MUSIC
+        multiChoose = (mode != AddMusic2BucketSeen.PICK_MUSIC).also { b->
+            if (b) Galley.musicBucket[bucket]?.let { selectList.addAll(it) }
+        }
     }
 
     var musicList = mutableListOf<Music>()
@@ -45,6 +46,13 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
             holder.binding.apply {
                 if (isSelect) {
                     musicListPlayState.visibility = View.VISIBLE
+                    musicListPlayState.setImageDrawable(
+                        ResourcesCompat.getDrawable(
+                            context.resources,
+                            R.drawable.load_animation,
+                            null
+                        )
+                    )
                     musicListContainer.setBackgroundColor(
                         ContextCompat.getColor(
                             context,
@@ -57,6 +65,13 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                     startAnimation(musicListInContainer)
                 } else {
                     musicListPlayState.visibility = View.GONE
+                    musicListPlayState.setImageDrawable(
+                        ResourcesCompat.getDrawable(
+                            context.resources,
+                            R.drawable.ic_baseline_check_24,
+                            null
+                        )
+                    )
                     musicListContainer.setBackgroundColor(
                         ContextCompat.getColor(
                             context,
@@ -106,7 +121,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                         when (d) {
                             is Animatable -> {
                                 d.start()
-                                if (mode == AddMusic2BucketSeen.PICK_MUSIC) {
+                                if (mode != AddMusic2BucketSeen.PICK_MUSIC) {
                                     music.myBucket.apply {
                                         (this as ArrayList).add(bucket)
                                     }
@@ -120,7 +135,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                                             notifyItemChanged()
                                         }
                                     }
-                                }else{
+                                } else {
                                     changeIconAni(musicListPlayState)
                                 }
                                 d.stop()
