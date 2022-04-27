@@ -3,12 +3,12 @@ package com.protone.database.room.dao
 import android.net.Uri
 import android.util.Log
 import com.protone.api.TAG
-import com.protone.database.room.SeennDataBase
+import com.protone.api.upSDK31
+import com.protone.database.room.*
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.MusicBucket
 import com.protone.database.room.entity.Note
-import com.protone.database.room.getMusicBucketDAO
 
 object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGalleyDAO, NoteDAO {
 
@@ -113,7 +113,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     init {
         if (musicDAO == null) {
-            musicDAO = SeennDataBase.database.getMusicDAO()
+            musicDAO = getMusicDAO()
         }
     }
 
@@ -184,7 +184,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     init {
         if (signedGalleyDAO == null) {
-            signedGalleyDAO = SeennDataBase.database.getGalleyDAO()
+            signedGalleyDAO = getGalleyDAO()
         }
     }
 
@@ -206,8 +206,33 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     override fun insertSignedMedia(media: GalleyMedia) {
         execute {
-            signedGalleyDAO?.insertSignedMedia(media)
+            val signedMedia =
+                if (upSDK31()) getSignedMedia(media.uri) else media.path?.let { getSignedMedia(it) }
+            if (signedMedia != null) {
+                signedMedia.name = media.name
+                signedMedia.path = media.path
+                signedMedia.bucket = media.bucket
+                signedMedia.type = media.type
+                signedMedia.cate = media.cate
+                signedMedia.date = media.date
+                signedMedia.notes = media.notes
+                updateSignedMedia(signedMedia)
+            } else signedGalleyDAO?.insertSignedMedia(media)
         }
+    }
+
+    override fun getSignedMedia(uri: Uri): GalleyMedia? = signedGalleyDAO?.getSignedMedia(uri)
+
+    override fun getSignedMedia(path: String): GalleyMedia? = signedGalleyDAO?.getSignedMedia(path)
+
+    fun getSignedMediaCB(uri: Uri, callBack: (GalleyMedia?) -> Unit) {
+        execute {
+            callBack.invoke(getSignedMedia(uri))
+        }
+    }
+
+    override fun updateSignedMedia(galleyMedia: GalleyMedia) {
+        signedGalleyDAO?.updateSignedMedia(galleyMedia)
     }
 
     //Note
@@ -215,7 +240,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     init {
         if (noteDAO == null) {
-            noteDAO = SeennDataBase.database.getNoteDAO()
+            noteDAO = getNoteDAO()
         }
     }
 

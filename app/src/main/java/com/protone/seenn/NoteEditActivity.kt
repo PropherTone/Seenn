@@ -35,7 +35,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
         suspendCancellableCoroutine<MutableList<String>> {
             val notes = DataBaseDAOHelper.getAllNote()
             val list = mutableListOf<String>()
-            notes?.forEach { note->
+            notes?.forEach { note ->
                 list.add(note.title)
             }
             it.resumeWith(Result.success(list))
@@ -102,6 +102,11 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                     re.date.toDate().toString()
                                 )
                             )
+                            re.apply {
+                                if (notes == null) notes = mutableListOf()
+                                (notes as MutableList<String>).add(noteEditSeen.title)
+                            }
+                            DataBaseDAOHelper.insertSignedMedia(re)
                         }
                         NoteEditSeen.NoteEditEvent.PickVideo -> startGalleyPick(false)?.let { re ->
                             noteEditSeen.insertVideo(RichVideoStates(re.uri, null))
@@ -112,19 +117,18 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                 putExtra(AddMusic2BucketSeen.MODE, AddMusic2BucketSeen.PICK_MUSIC)
                             }
                         )?.let { re ->
-                            if (re.resultCode == RESULT_OK)
-                                re.data?.data?.let { uri ->
-                                    if (allNote == null) allNote = getAllNote()
-                                    val title = withContext(Dispatchers.IO) {
-                                        suspendCancellableCoroutine<String> { co ->
-                                            val musicByUri = DataBaseDAOHelper.getMusicByUri(uri)
-                                            co.resumeWith(
-                                                Result.success(musicByUri?.title ?: "^ ^")
-                                            )
-                                        }
+                            re.data?.data?.let { uri ->
+                                if (allNote == null) allNote = getAllNote()
+                                val title = withContext(Dispatchers.IO) {
+                                    suspendCancellableCoroutine<String> { co ->
+                                        val musicByUri = DataBaseDAOHelper.getMusicByUri(uri)
+                                        co.resumeWith(
+                                            Result.success(musicByUri?.title ?: "^ ^")
+                                        )
                                     }
-                                    noteEditSeen.insertMusic(uri, allNote!!, title)
                                 }
+                                noteEditSeen.insertMusic(uri, allNote!!, title)
+                            }
                         }
                         NoteEditSeen.NoteEditEvent.PickIcon -> startGalleyPick(true)?.let { re ->
                             noteEditSeen.setNoteIconCache(re.uri)

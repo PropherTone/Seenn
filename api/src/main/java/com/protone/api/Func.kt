@@ -8,7 +8,9 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import androidx.annotation.ChecksSdkIntAtLeast
 import com.protone.api.context.Global
 import com.protone.api.context.onBackground
 import com.protone.api.context.onUiThread
@@ -17,6 +19,7 @@ import java.io.File
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.stream.Collectors
 
 fun String.getFileName(): String {
     return this.split("/").run {
@@ -36,6 +39,10 @@ fun String.toDrawable(context: Context, callBack: (Drawable?) -> Unit) {
 fun String.getParentPath(): String {
     return this.substring(0, lastIndexOf("/"))
 }
+
+fun <T> List<T>.toSplitString(split: String): String = this.stream().map(java.lang.String::valueOf)
+    .collect(Collectors.joining(split))
+
 
 fun Uri.toMediaBitmapByteArray(): ByteArray? {
     var byteArray: ByteArray? = null
@@ -146,3 +153,6 @@ val todayTime: String
             timeInMillis = System.currentTimeMillis()
         }.time)
     }
+
+@ChecksSdkIntAtLeast(api = 32)
+fun upSDK31() = Build.VERSION.SDK_INT > 31

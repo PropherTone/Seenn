@@ -23,6 +23,11 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
     private val updatePicture = Runnable {
         Galley.photo = scanPicture()
+//        Galley.photo["全部"]?.forEach { its->
+//            Log.d("TAG", "uri:${its.uri} ")
+//            Log.d("TAG", "name:${its.name} ")
+//            Log.d("TAG", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+//        }
         sortSignedMedia(false)
     }
 
@@ -101,25 +106,10 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
     fun updateMusic() = threadPool.execute(updateMusic)
 
+    //TODO WTF this used for???
     private fun sortSignedMedia(isVideo: Boolean) {
         DataBaseDAOHelper.getAllSignedMedia()?.let { signed ->
-            val map = HashMap<String, GalleyMedia?>()
-            signed.forEach { gm ->
-                if (if (isVideo) gm.isVideo else !gm.isVideo) {
-                    map[gm.name] = gm
-                }
-            }
-            if (map.isNotEmpty()) {
-                val list = arrayListOf<GalleyMedia>()
-                (if (isVideo) Galley.allVideo else Galley.allPhoto)?.forEach { gm ->
-                    if (map[gm.name] != null) {
-                        map[gm.name]?.let { it -> list.add(it) }
-                    }
-                }
-                list.forEach { gm ->
-                    DataBaseDAOHelper.deleteSignedMedia(gm)
-                }
-            }
+            //
         }
     }
 

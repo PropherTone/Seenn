@@ -22,7 +22,8 @@ fun scanPicture(): MutableMap<String, MutableList<GalleyMedia>> {
         MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
         MediaStore.Images.Media.SIZE,
         MediaStore.Images.Media.DATE_ADDED,
-        MediaStore.Images.Thumbnails._ID
+        MediaStore.Images.Thumbnails._ID,
+        MediaStore.Images.Media.DATA
     )
     val galley = mutableMapOf<String, MutableList<GalleyMedia>>()
     scan(
@@ -31,6 +32,7 @@ fun scanPicture(): MutableMap<String, MutableList<GalleyMedia>> {
         val id = it.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
         val bucket =
             it.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+        val data = it.getColumnIndex(MediaStore.Images.Media.DATA)
         val size = it.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
         val name = it.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
         val date = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
@@ -38,6 +40,7 @@ fun scanPicture(): MutableMap<String, MutableList<GalleyMedia>> {
         while (it.moveToNext()) {
             val picID = it.getLong(id)
             val imageName = it.getString(name)
+            val path: String? = if (Build.VERSION.SDK_INT < 31) it.getString(data) else null
             val bucketName = it.getString(bucket)
             val imageSize = it.getLong(size)
             val uri = Uri.withAppendedPath(externalContentUri, "$picID")
@@ -51,13 +54,15 @@ fun scanPicture(): MutableMap<String, MutableList<GalleyMedia>> {
                 GalleyMedia(
                     null,
                     imageName,
+                    path,
                     bucketName,
                     imageSize,
-                    "",
-                    "",
+                    null,
+                    null,
                     uri,
                     dateTime,
-                    thumbnailUri, 0, false
+                    thumbnailUri, 0, false,
+                    null
                 )
             )
         }
@@ -74,7 +79,8 @@ fun scanVideo(): MutableMap<String, MutableList<GalleyMedia>> {
         MediaStore.Video.Media.SIZE,
         MediaStore.Video.Media.DATE_ADDED,
         MediaStore.Video.Thumbnails._ID,
-        MediaStore.Video.Media.DURATION
+        MediaStore.Video.Media.DURATION,
+        MediaStore.Video.Media.DATA
     )
     val galley = mutableMapOf<String, MutableList<GalleyMedia>>()
     scan(
@@ -83,6 +89,7 @@ fun scanVideo(): MutableMap<String, MutableList<GalleyMedia>> {
         val id = it.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
         val bucket =
             it.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
+        val data = it.getColumnIndex(MediaStore.Images.Media.DATA)
         val size = it.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE)
         val name = it.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
         val date = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
@@ -91,6 +98,7 @@ fun scanVideo(): MutableMap<String, MutableList<GalleyMedia>> {
         while (it.moveToNext()) {
             val picID = it.getLong(id)
             val imageName = it.getString(name)
+            val path: String? = if (Build.VERSION.SDK_INT < 31) it.getString(data) else null
             val bucketName = it.getString(bucket)
             val imageSize = it.getLong(size)
             val uri = Uri.withAppendedPath(externalContentUri, "$picID")
@@ -105,13 +113,16 @@ fun scanVideo(): MutableMap<String, MutableList<GalleyMedia>> {
                 GalleyMedia(
                     null,
                     imageName,
+                    path,
                     bucketName,
                     imageSize,
-                    "",
-                    "",
+                    null,
+                    null,
                     uri,
                     dateTime,
-                    thumbnailUri, duration, true
+                    thumbnailUri, duration,
+                    true,
+                    null
                 )
             )
         }

@@ -1,12 +1,12 @@
 package com.protone.database.room.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import android.net.Uri
+import androidx.room.*
+import com.protone.database.room.converters.UriTypeConverter
 import com.protone.database.room.entity.GalleyMedia
 
 @Dao
+@TypeConverters(UriTypeConverter::class)
 interface SignedGalleyDAO {
 
     @Query("SELECT * FROM GalleyMedia")
@@ -17,5 +17,14 @@ interface SignedGalleyDAO {
 
     @Insert
     fun insertSignedMedia(media: GalleyMedia)
+
+    @Query("SELECT * FROM GalleyMedia WHERE uri LIKE :uri")
+    fun getSignedMedia(uri: Uri) : GalleyMedia?
+
+    @Query("SELECT * FROM GalleyMedia WHERE uri LIKE :path")
+    fun getSignedMedia(path: String) : GalleyMedia?
+
+    @Update
+    fun updateSignedMedia(galleyMedia: GalleyMedia)
 
 }

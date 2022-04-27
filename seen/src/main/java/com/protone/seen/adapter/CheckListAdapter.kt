@@ -1,5 +1,6 @@
 package com.protone.seen.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
@@ -15,9 +16,11 @@ class CheckListAdapter(
     SelectListAdapter<CheckListAdapterLayoutBinding, String>(context) {
 
     var dataList: MutableList<String> = mutableListOf()
+        @SuppressLint("NotifyDataSetChanged")
         set(value) {
             field.clear()
             field.addAll(value)
+            notifyDataSetChanged()
         }
 
     init {
