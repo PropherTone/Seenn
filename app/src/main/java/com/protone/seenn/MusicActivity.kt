@@ -123,7 +123,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                             if (Galley.music.size > 0) Galley.music[0].uri.toBitmapByteArray() else null,
                             Galley.music.size,
                             null,
-                            todayTime
+                            todayTime("yyyy/MM/dd")
                         )
                     ) { re, _ ->
                         if (re) {

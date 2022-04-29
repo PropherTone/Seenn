@@ -90,7 +90,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:contentDescription="@string/action"
-                android:onClick="@{()->self.offer(Touch.ShowOptionMenu)}"
+                android:onClick="@{()->self.showPop()}"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_baseline_more_horiz_24_white" />
 

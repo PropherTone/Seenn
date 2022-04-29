@@ -5,7 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.intent
 import com.protone.api.json.toEntity
 import com.protone.api.json.toUriJson
-import com.protone.api.toDate
+import com.protone.api.toDateString
 import com.protone.api.toDrawable
 import com.protone.api.toMediaBitmapByteArray
 import com.protone.api.todayTime
@@ -84,7 +84,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                             noteEditSeen.showProgress(false)
                                         }
                                     } else "",
-                                    todayTime,
+                                    todayTime("yyyy/MM/dd"),
                                     intent.getStringExtra(NOTE_TYPE),
                                     indexedRichNote.first
                                 )
@@ -99,7 +99,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                     re.uri,
                                     null,
                                     re.name,
-                                    re.date.toDate().toString()
+                                    re.date.toDateString().toString()
                                 )
                             )
                             re.apply {

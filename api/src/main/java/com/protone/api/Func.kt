@@ -113,9 +113,12 @@ fun Int.to16to9Height(): Int {
     return this * 9 / 16
 }
 
-fun Long.toDate(): Date? {
-    return longToDate(this, "yyyy-MM-dd HH:mm:ss")
-}
+fun Long.toDateString(format: String = "HH:mm:ss yyyy/MM/dd E"): String? =
+    SimpleDateFormat(format, Locale.getDefault()).format(
+        Calendar.getInstance(Locale.getDefault()).also {
+            it.timeInMillis = this * 1000
+        }.time)
+
 
 fun Long.toStringMinuteTime(): String {
     val musicTime: Long = this / 1000
@@ -123,36 +126,13 @@ fun Long.toStringMinuteTime(): String {
     return "${musicTime / 60}:${if (sec >= 10) sec else "0$sec"}"
 }
 
-fun dateToString(data: Date?, formatType: String?): String? {
-    return data?.run { SimpleDateFormat(formatType, Locale.CHINA).format(this) }
-}
+fun todayTime(format: String): String = SimpleDateFormat(
+    format,
+    Locale.getDefault()
+).format(Calendar.getInstance(Locale.getDefault()).apply {
+    timeInMillis = System.currentTimeMillis()
+}.time)
 
-fun longToString(currentTime: Long, formatType: String): String? {
-    return dateToString(longToDate(currentTime, formatType), formatType)
-}
-
-fun stringToDate(strTime: String?, formatType: String?): Date? {
-    val formatter = SimpleDateFormat(formatType, Locale.CHINA)
-    var date: Date? = null
-    strTime?.let {
-        date = formatter.parse(it)
-    }
-    return date
-}
-
-fun longToDate(currentTime: Long, formatType: String): Date? {
-    return stringToDate(dateToString(Date(currentTime), formatType), formatType)
-}
-
-val todayTime: String
-    get() {
-        return SimpleDateFormat(
-            "yyyy/MM/dd",
-            Locale.getDefault()
-        ).format(Calendar.getInstance(Locale.getDefault()).apply {
-            timeInMillis = System.currentTimeMillis()
-        }.time)
-    }
 
 @ChecksSdkIntAtLeast(api = 32)
 fun upSDK31() = Build.VERSION.SDK_INT > 31

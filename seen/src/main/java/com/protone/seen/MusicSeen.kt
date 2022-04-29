@@ -76,8 +76,6 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
         binding.apply {
             self = this@MusicSeen
             root.viewTreeObserver.addOnGlobalLayoutListener(this@MusicSeen)
-            binding.toolbar.progress = 1f
-            binding.toolbar.transitionToEnd()
             appToolbar.addOnOffsetChangedListener(
                 AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
                     binding.toolbar.progress =
@@ -206,41 +204,45 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
                 )
                 it.setOnTouchListener { _, _ -> false }
                 it.setOnClickListener { }
-                containerAnimator = AnimationHelper.translationY(
-                    it,
-                    it.height.toFloat() - mySmallMusicPlayer.height
-                ).also { ani ->
-                    ani.doOnStart {
-                        val event = MotionEvent.obtain(
-                            SystemClock.uptimeMillis(),
-                            SystemClock.uptimeMillis(),
-                            MotionEvent.ACTION_DOWN,
-                            binding.root.width / 2f,
-                            binding.root.height / 2f,
-                            0
-                        )
-                        binding.musicMusicList.dispatchTouchEvent(event)
-                        ani.addUpdateListener { va ->
-                            event.setLocation(
-                                binding.root.width / 2f,
-                                (va.animatedValue as Float) / 2
-                            )
-                            event.action = MotionEvent.ACTION_MOVE
-                            binding.musicMusicList.dispatchTouchEvent(event)
-                        }
-                        ani.doOnEnd {
-                            event.action = MotionEvent.ACTION_UP
-                            binding.musicMusicList.dispatchTouchEvent(event)
-                        }
-                        event.recycle()
-                    }
-                }
+                containerAnimator = getAni(it, mySmallMusicPlayer.height.toFloat())
 
                 it.y = toolbar.minHeight + context.statuesBarHeight.toFloat()
             }
             musicShowBucket.setOnStateListener(this@MusicSeen)
             musicMusicList.setPadding(0, 0, 0, mySmallMusicPlayer.height)
+            binding.toolbar.progress = 1f
+            hideBucket()
             root.viewTreeObserver.removeOnGlobalLayoutListener(this@MusicSeen)
+        }
+    }
+
+    private fun getAni(target: View, value: Float) = AnimationHelper.translationY(
+        target,
+        target.height.toFloat() - value
+    ).also { ani ->
+        ani.doOnStart {
+            val event = MotionEvent.obtain(
+                SystemClock.uptimeMillis(),
+                SystemClock.uptimeMillis(),
+                MotionEvent.ACTION_DOWN,
+                binding.root.width / 2f,
+                binding.root.height.toFloat(),
+                0
+            )
+            binding.musicMusicList.dispatchTouchEvent(event)
+            ani.addUpdateListener { va ->
+                event.setLocation(
+                    binding.root.width / 2f,
+                    (va.animatedValue as Float) / 2
+                )
+                event.action = MotionEvent.ACTION_MOVE
+                binding.musicMusicList.dispatchTouchEvent(event)
+            }
+            ani.doOnEnd {
+                event.action = MotionEvent.ACTION_UP
+                binding.musicMusicList.dispatchTouchEvent(event)
+            }
+            event.recycle()
         }
     }
 

@@ -38,6 +38,7 @@
                     android:layout_height="@dimen/huge_icon"
                     android:background="@color/white"
                     android:elevation="@dimen/small_elevation"
+                    android:onClick="@{()->self.offer(Touch.ConfigUser)}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -135,13 +136,20 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/model_list"
+        <com.protone.seen.customView.DragRefreshView
+            android:id="@+id/model_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:elevation="0dp"
             android:paddingBottom="@dimen/action_icon_p"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/model_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.protone.seen.customView.DragRefreshView>
 
         <LinearLayout
             android:id="@+id/action_btn_container"

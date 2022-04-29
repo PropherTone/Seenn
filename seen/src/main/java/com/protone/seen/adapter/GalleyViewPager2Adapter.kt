@@ -23,7 +23,12 @@ class GalleyViewPager2Adapter(context: Context, private val data: MutableList<Ga
             .load(data[position].uri)
             .skipMemoryCache(true)
             .into(holder.binding.root as ImageView)
+        holder.binding.root.setOnClickListener {
+            onClk?.invoke()
+        }
     }
+
+    var onClk : (()->Unit)? = null
 
     override fun getItemCount(): Int = data.size
 

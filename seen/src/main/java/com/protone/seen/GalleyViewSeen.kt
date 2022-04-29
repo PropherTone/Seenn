@@ -1,12 +1,11 @@
 package com.protone.seen
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
-import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.database.room.entity.GalleyMedia
@@ -14,12 +13,19 @@ import com.protone.seen.adapter.CheckListAdapter
 import com.protone.seen.adapter.GalleyViewPager2Adapter
 import com.protone.seen.databinding.GalleyViewLayouyBinding
 
-class GalleyViewSeen(context: Context) : Seen<GalleyViewSeen.GalleyVEvent>(context) {
+@SuppressLint("ClickableViewAccessibility")
+class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEvent>(context) {
 
     enum class GalleyVEvent {
         Finish,
         ShowAction,
-        SetNotes
+        SetNotes,
+        Delete,
+        Rename,
+        MoveTo,
+        SelectAll,
+        AddCato,
+        IntoBox
     }
 
     private val binding =
@@ -33,23 +39,15 @@ class GalleyViewSeen(context: Context) : Seen<GalleyViewSeen.GalleyVEvent>(conte
     init {
         initToolBar()
         binding.self = this
-        binding.galleyVCover.setOnClickListener {
-            Log.d(TAG, "clk: ")
-            binding.galleyVCover.isVisible = !binding.galleyVCover.isVisible
-        }
-        binding.galleyVView.setOnClickListener {
-            Log.d(TAG, "clk: 1")
-            binding.galleyVCover.isVisible = !binding.galleyVCover.isVisible
-        }
-        binding.root.setOnClickListener {
-            Log.d(TAG, "clk: 2")
-            binding.galleyVCover.isVisible = !binding.galleyVCover.isVisible
-        }
     }
 
     fun initViewPager(position: Int, data: MutableList<GalleyMedia>, onChange: (Int) -> Unit) {
         binding.galleyVView.apply {
-            adapter = GalleyViewPager2Adapter(context, data)
+            adapter = GalleyViewPager2Adapter(context, data).also { a ->
+                a.onClk = {
+                    binding.galleyVCover.isVisible = !binding.galleyVCover.isVisible
+                }
+            }
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     onChange.invoke(position)
@@ -100,6 +98,16 @@ class GalleyViewSeen(context: Context) : Seen<GalleyViewSeen.GalleyVEvent>(conte
         (binding.galleyVLinks.adapter as CheckListAdapter).dataList = notes
     }
 
+    fun showPop() {
+        showPop(binding.galleyVAction)
+    }
+
+    override fun popDelete() = offer(GalleyVEvent.Delete)
+    override fun popMoveTo() = offer(GalleyVEvent.MoveTo)
+    override fun popRename() = offer(GalleyVEvent.Rename)
+    override fun popSelectAll() = offer(GalleyVEvent.SelectAll)
+    override fun popSetCate() = offer(GalleyVEvent.AddCato)
+    override fun popIntoBox() = offer(GalleyVEvent.IntoBox)
     override fun offer(event: GalleyVEvent) {
         viewEvent.offer(event)
     }

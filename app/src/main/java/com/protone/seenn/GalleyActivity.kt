@@ -64,12 +64,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                 event.onReceive {}
                 galleySeen.viewEvent.onReceive {
                     when (it) {
-                        GalleySeen.Touch.Finish -> {
-                            finish()
-                        }
-                        GalleySeen.Touch.ShowOptionMenu -> {
-                            galleySeen.showPop()
-                        }
+                        GalleySeen.Touch.Finish -> finish()
                         GalleySeen.Touch.MOVE_TO -> {
                         }
                         GalleySeen.Touch.RENAME -> galleySeen.rename()
@@ -84,8 +79,10 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                                     this@GalleyActivity,
                                     PictureBoxActivity::class.java
                                 ).apply {
-                                    galleySeen.chooseData()
-                                        ?.let { d -> putExtra(CUSTOM, d.toJson()) }
+                                    putExtra(
+                                        CUSTOM,
+                                        (galleySeen.chooseData() ?: Galley.allPhoto)?.toJson()
+                                    )
                                 })
                         }
                         GalleySeen.Touch.ConfirmChoose -> {

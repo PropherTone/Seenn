@@ -82,7 +82,7 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                 if (uri != null) uri?.toMediaBitmapByteArray() else null,
                 0,
                 detail,
-                todayTime
+                todayTime("yyyy/MM/dd")
             ),
             callBack
         )

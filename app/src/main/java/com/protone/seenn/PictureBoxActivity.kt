@@ -24,8 +24,9 @@ class PictureBoxActivity : BaseActivity<PictureBoxSeen>() {
                     when (it) {
                         Event.OnStart -> {
                             pictureBoxSeen.initPictureBox(
-                                intent.getStringExtra(GalleyActivity.CUSTOM)
-                                    ?.jsonToList(GalleyMedia::class.java) as MutableList<GalleyMedia>
+                                (intent.getStringExtra(GalleyActivity.CUSTOM)
+                                    ?.jsonToList(GalleyMedia::class.java)
+                                    ?: mutableListOf()) as MutableList<GalleyMedia>
                             )
                         }
                         Event.OnResume -> {

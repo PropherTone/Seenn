@@ -25,7 +25,7 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
         PauseMusic,
         NextMusic,
         PreviousMusic,
-        PauseVideo
+        ConfigUser
     }
 
     private val binding = MainLayoutBinding.inflate(context.layoutInflater, context.root, false)
@@ -34,7 +34,7 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
         set(value) {
             binding.userWelcome.text =
                 String.format(context.getString(R.string.welcome_msg), "\n$value")
-            binding.userDate.text = todayTime
+            binding.userDate.text = todayTime("yyyy/MM/dd")
             field = value
         }
         get() = binding.userWelcome.text.toString()

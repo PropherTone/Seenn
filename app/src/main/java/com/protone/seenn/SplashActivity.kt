@@ -34,7 +34,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                             if (Galley.music.size > 0) Galley.music[0].uri.toBitmapByteArray() else null,
                             Galley.music.size,
                             null,
-                            todayTime
+                            todayTime("yyyy/MM/dd")
                         )
                     )
                     DataBaseDAOHelper.insertMusicMulti(Galley.music)

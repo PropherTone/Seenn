@@ -80,27 +80,15 @@ class MainActivity : BaseActivity<MainSeen>() {
                         }
                         MainSeen.Touch.MUSIC -> startActivity(MusicActivity::class.intent)
                         MainSeen.Touch.NOTE -> startActivity(NoteActivity::class.intent)
-                        MainSeen.Touch.PlayMusic -> musicBroadCastManager.sendBroadcast(
-                            Intent().setAction(
-                                MUSIC_PLAY
-                            )
-                        )
-                        MainSeen.Touch.PauseMusic -> musicBroadCastManager.sendBroadcast(
-                            Intent().setAction(
-                                MUSIC_PLAY
-                            )
-                        )
-                        MainSeen.Touch.PreviousMusic -> musicBroadCastManager.sendBroadcast(
-                            Intent().setAction(
-                                MUSIC_PREVIOUS
-                            )
-                        )
-                        MainSeen.Touch.NextMusic -> musicBroadCastManager.sendBroadcast(
-                            Intent().setAction(
-                                MUSIC_NEXT
-                            )
-                        )
-                        MainSeen.Touch.PauseVideo -> {}
+                        MainSeen.Touch.PlayMusic ->
+                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
+                        MainSeen.Touch.PauseMusic ->
+                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
+                        MainSeen.Touch.PreviousMusic ->
+                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PREVIOUS))
+                        MainSeen.Touch.NextMusic ->
+                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_NEXT))
+                        MainSeen.Touch.ConfigUser -> startActivity(UserConfigActivity::class.intent)
                     }
                 }
             }
@@ -116,7 +104,7 @@ class MainActivity : BaseActivity<MainSeen>() {
         binder.getPosition().observe(this@MainActivity) {
             progress = it
         }
-        binder.getPlayState().observe(this@MainActivity){
+        binder.getPlayState().observe(this@MainActivity) {
             isPlaying = it
         }
     }

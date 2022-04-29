@@ -25,12 +25,6 @@ class PhotoCard @JvmOverloads constructor(
             field = value
         }
 
-//    var detail = ""
-//        set(value) {
-//            binding.photoCardDetial.text = value
-//            field = value
-//        }
-
     val photo : ImageView
         get() = binding.photoCardPhoto
 

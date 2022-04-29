@@ -1,9 +1,12 @@
 package com.protone.seenn
 
 import android.net.Uri
+import com.protone.api.context.intent
 import com.protone.api.context.onBackground
+import com.protone.api.json.toJson
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Note
+import com.protone.mediamodle.Galley
 import com.protone.seen.NoteViewSeen
 import com.protone.seen.customView.richText.RichNoteView
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +15,7 @@ import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.util.ArrayDeque
+import java.util.stream.Collectors
 
 class NoteViewActivity : BaseActivity<NoteViewSeen>() {
 
@@ -78,7 +82,16 @@ class NoteViewActivity : BaseActivity<NoteViewSeen>() {
                     }
 
                     override fun openImage(uri: Uri, name: String) {
-
+                        val collect = Galley.allPhoto
+                            ?.stream()
+                            ?.filter { media -> media.uri == uri }
+                            ?.collect(Collectors.toList())
+                        if (collect != null && collect.size > 0) {
+                            startActivity(GalleyViewActivity::class.intent.apply {
+                                putExtra(GalleyViewActivity.MEDIA, collect[0].toJson())
+                                putExtra(GalleyViewActivity.TYPE, false)
+                            })
+                        } else toast(getString(R.string.none))
                     }
 
                 })

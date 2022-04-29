@@ -1,11 +1,9 @@
 package com.protone.seenn
 
-import android.net.Uri
-import android.util.Log
 import com.protone.api.context.intent
 import com.protone.api.context.onUiThread
 import com.protone.api.json.toEntity
-import com.protone.api.toDate
+import com.protone.api.toDateString
 import com.protone.api.toSplitString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
@@ -16,13 +14,12 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import java.util.stream.Collectors
 
 class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
 
     companion object {
-        const val MEDIA = "MediaData"
-        const val TYPE = "MediaType"
+        const val MEDIA = "GalleyViewActivity:MediaData"
+        const val TYPE = "GalleyViewActivity:IsVideo"
     }
 
     private var curPosition: Int = 0
@@ -44,19 +41,14 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
                 galleyViewSeen.viewEvent.onReceive {
                     when (it) {
                         GalleyViewSeen.GalleyVEvent.Finish -> finish()
-                        GalleyViewSeen.GalleyVEvent.ShowAction -> {}
-                        GalleyViewSeen.GalleyVEvent.SetNotes -> {
-                            DataBaseDAOHelper.getSignedMediaCB(
-                                galleyMedias[curPosition].uri
-                            ) { galleyMedia ->
-                                onUiThread {
-                                    galleyViewSeen.setNotes(
-                                        (galleyMedia?.notes ?: mutableListOf())
-                                                as MutableList<String>
-                                    )
-                                }
-                            }
-                        }
+                        GalleyViewSeen.GalleyVEvent.ShowAction -> galleyViewSeen.showPop()
+                        GalleyViewSeen.GalleyVEvent.SetNotes -> galleyViewSeen.setNotes()
+                        GalleyViewSeen.GalleyVEvent.AddCato -> {}
+                        GalleyViewSeen.GalleyVEvent.Delete -> {}
+                        GalleyViewSeen.GalleyVEvent.IntoBox -> {}
+                        GalleyViewSeen.GalleyVEvent.MoveTo -> {}
+                        GalleyViewSeen.GalleyVEvent.Rename -> {}
+                        GalleyViewSeen.GalleyVEvent.SelectAll -> {}
                     }
                 }
             }
@@ -69,18 +61,34 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
                 putExtra(NoteViewActivity.NOTE_NAME, it)
             })
         }
-        initViewPager(getMediaIndex(), galleyMedias) { position ->
+        val mediaIndex = getMediaIndex()
+        initViewPager(mediaIndex, galleyMedias) { position ->
             curPosition = position
-            galleyMedias[position].let { m ->
-                setMediaInfo(
-                    m.name,
-                    m.date.toDate().toString(),
-                    "${m.size / 1024}Kb",
-                    m.cate?.toSplitString(",") ?: "",
-                    m.type?.toSplitString(",") ?: ""
-                )
+            setMediaInfo(position)
+        }
+        setMediaInfo(mediaIndex)
+        setNotes()
+    }
+
+    private fun GalleyViewSeen.setNotes() {
+        DataBaseDAOHelper.getSignedMediaCB(
+            galleyMedias[curPosition].uri
+        ) { galleyMedia ->
+            onUiThread {
+                ((galleyMedia?.notes
+                    ?: mutableListOf()) as MutableList<String>).let { setNotes(it) }
             }
         }
+    }
+
+    private fun GalleyViewSeen.setMediaInfo(position: Int) = galleyMedias[position].let { m ->
+        setMediaInfo(
+            m.name,
+            m.date.toDateString().toString(),
+            "${m.size / 1024}Kb",
+            m.cate?.toSplitString(",") ?: "",
+            m.type?.toSplitString(",") ?: ""
+        )
     }
 
     private suspend fun getMediaIndex() = withContext(Dispatchers.IO) {

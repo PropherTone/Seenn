@@ -53,13 +53,8 @@ object Galley {
     val allPhoto: MutableList<GalleyMedia>?
         get() = photo[Global.application.getString(R.string.all_galley)]
 
-    val allVideo: MutableList<GalleyMedia> by lazy {
-        val ap = mutableListOf<GalleyMedia>()
-        video.forEach { (_, mutableList) ->
-            ap.addAll(mutableList)
-        }
-        ap
-    }
+    val allVideo: MutableList<GalleyMedia>?
+        get() = video[Global.application.getString(R.string.all_galley)]
 
     fun photoInToday(): GalleyMedia? {
         val ca = Calendar.getInstance(Locale.CHINA)
@@ -68,14 +63,13 @@ object Galley {
         }
         allPhoto?.forEach {
             ca.timeInMillis = it.date * 1000
-            return if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH) && ca.get(Calendar.DAY_OF_MONTH) == now.get(
-                    Calendar.DAY_OF_MONTH
-                )
+            if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH)
+                && ca.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)
             ) {
-                it
-            } else null
+                return it
+            }
         }
-        return null
+        return allPhoto?.let { it[(0 until it.size).random()] }
     }
 
     fun videoInToday(): GalleyMedia? {
@@ -83,31 +77,29 @@ object Galley {
         val now = Calendar.getInstance(Locale.CHINA).apply {
             timeInMillis = System.currentTimeMillis()
         }
-        allVideo.forEach {
+        allVideo?.forEach {
             ca.timeInMillis = it.date * 1000
-            return if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH) && ca.get(Calendar.DAY_OF_MONTH) == now.get(
-                    Calendar.DAY_OF_MONTH
-                )
+            if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH)
+                && ca.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)
             ) {
-                it
-            } else null
+                return it
+            }
         }
         return null
     }
 
     fun musicInToday(): Music? {
-        val ca = Calendar.getInstance(Locale.CHINA)
-        val now = Calendar.getInstance(Locale.CHINA).apply {
+        val ca = Calendar.getInstance(Locale.getDefault())
+        val now = Calendar.getInstance(Locale.getDefault()).apply {
             timeInMillis = System.currentTimeMillis()
         }
         music.forEach {
             ca.timeInMillis = it.year * 1000
-            return if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH) && ca.get(Calendar.DAY_OF_MONTH) == now.get(
-                    Calendar.DAY_OF_MONTH
-                )
+            if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH)
+                && ca.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)
             ) {
-                it
-            } else null
+                return it
+            }
         }
         return null
     }

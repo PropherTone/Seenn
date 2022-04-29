@@ -63,7 +63,7 @@
         app:layout_constraintTop_toBottomOf="@+id/galley_moveTo" />
 
     <TextView
-        android:id="@+id/imageView6"
+        android:id="@+id/galley_intoBox"
         android:layout_width="@dimen/user_icon"
         android:layout_height="@dimen/user_icon"
         android:gravity="center"

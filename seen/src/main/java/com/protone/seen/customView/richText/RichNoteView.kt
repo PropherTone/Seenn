@@ -296,21 +296,21 @@ class RichNoteView @JvmOverloads constructor(
                 richPhotoTitle.text = photo.name
                 richPhotoDetail.text = photo.date
             }
-            drag.isGone = !isEditable
+//            drag.isGone = !isEditable
             if (isEditable) {
                 drag.rectSizeListener = object : DragRect.RectSize {
                     override fun onChange(x: Int, y: Int) {
                         root.layoutParams = LayoutParams(x, y)
                     }
                 }
-                richPhotoFull.setOnClickListener { iRichListener?.openImage(photo.uri, photo.name) }
             }
+            richPhotoFull.setOnClickListener { iRichListener?.openImage(photo.uri, photo.name) }
             richPhotoTvContainer.setOnClickListener {
                 richPhotoTitle.apply {
                     isVisible = !isVisible
-                    drag.isVisible = isVisible
+                    if (!drag.isGone) drag.isVisible = isVisible
+                    richPhotoDetailContainer.isVisible = isVisible
                 }
-                richPhotoDetail.apply { isVisible = !isVisible }
             }
         }.root.also { v -> v.tag = photo }, it)
     }

@@ -58,10 +58,11 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
+                android:id="@+id/galleyV_action"
                 android:layout_width="@dimen/action_icon_p"
                 android:layout_height="@dimen/action_icon_p"
                 android:contentDescription="@string/action"
-                android:onClick="@{()->self.offer(GalleyVEvent.ShowAction)}"
+                android:onClick="@{()->self.showPop()}"
                 android:padding="@dimen/icon_padding_mid"
                 android:src="@drawable/ic_baseline_more_horiz_24_white"
                 app:layout_constraintEnd_toEndOf="parent"

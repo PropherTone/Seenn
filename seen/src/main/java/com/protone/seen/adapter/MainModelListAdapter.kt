@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.protone.api.context.layoutInflater
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
+import com.protone.api.toDateString
 import com.protone.api.todayTime
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
@@ -45,19 +46,19 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
     }
 
     fun loadDataBelow() {
-        itemList.add("tTime:$todayTime")
-        notifyItemInserted(itemList.size)
         Galley.apply {
             musicInToday()?.toJson()?.let { itemList.add("music:$it") }
-            notifyItemInserted(itemList.size)
+            notifyItemInserted(itemList.size - 1)
             photoInToday()?.toJson()?.let { itemList.add("photo:$it") }
-            notifyItemInserted(itemList.size)
+            notifyItemInserted(itemList.size - 1)
             videoInToday()?.toJson()?.let { itemList.add("video:$it") }
-            notifyItemInserted(itemList.size)
+            notifyItemInserted(itemList.size - 1)
+            videoInToday()?.toJson()?.let { itemList.add("tNote:$it") }
+            notifyItemInserted(itemList.size - 1)
         }
     }
 
-    fun loadDataUpside(){
+    fun loadDataUpside() {
 
     }
 
@@ -119,9 +120,12 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
             is PhotoCardViewHolder -> {
                 val media = itemList[position].substring(6).toEntity(GalleyMedia::class.java)
                 holder.binding.photoCard.apply {
-                    title = media.name
+                    title = media.date.toDateString("yyyy/MM/dd E").toString()
                     photo.let {
                         Glide.with(context).load(media.uri).into(it)
+                    }
+                    setOnClickListener {
+                        modelClkListener?.onPhoto(media.toJson())
                     }
                 }
             }
@@ -135,8 +139,16 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
         }
     }
 
-    override fun getItemCount(): Int = itemList.size
+    var modelClkListener : ModelClk? = null
 
+    interface ModelClk{
+        fun onPhoto(json : String)
+        fun onNote(json : String)
+        fun onVideo(json : String)
+        fun onMusic(json : String)
+    }
+
+    override fun getItemCount(): Int = itemList.size
 
     class MusicPlayerViewHolder(val binding: MusicCardBinding) :
         RecyclerView.ViewHolder(binding.root)

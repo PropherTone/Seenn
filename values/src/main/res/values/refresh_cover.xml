@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="RefreshCover">
+        <attr name="refresh_icon_size" format="dimension" />
+        <attr name="refresh_margin_top" format="dimension" />
+    </declare-styleable>
+
+</resources>
