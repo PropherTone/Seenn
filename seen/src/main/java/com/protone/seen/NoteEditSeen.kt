@@ -15,9 +15,12 @@ import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.onUiThread
 import com.protone.api.context.root
-import com.protone.mediamodle.note.entity.*
+import com.protone.mediamodle.note.entity.RichMusicStates
+import com.protone.mediamodle.note.entity.RichNoteStates
+import com.protone.mediamodle.note.entity.RichPhotoStates
+import com.protone.mediamodle.note.entity.RichVideoStates
 import com.protone.mediamodle.note.spans.ISpanForUse
-import com.protone.seen.customView.ColorfulPopWindow
+import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seen.databinding.NoteEditLayoutBinding
 
 class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context), ISpanForUse {
@@ -87,7 +90,19 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
 
     override fun insertVideo() = offer(NoteEditEvent.PickVideo)
 
-    fun insertVideo(video: RichVideoStates) = binding.noteEditRichNote.insertVideo(video)
+    fun insertVideo(uri: Uri, list: MutableList<String>){
+        if (listPopWindow != null) {
+            listPopWindow?.dismiss()
+            listPopWindow = null
+        } else ColorfulPopWindow(context).also {
+            listPopWindow = it
+            it.setOnDismissListener { listPopWindow = null }
+        }.startListPopup(binding.noteEditTool, list) {
+            listPopWindow?.dismiss()
+            binding.noteEditRichNote.insertVideo(RichVideoStates(uri,it, name = ""))
+        }
+
+    }
 
     override fun insertMusic() = offer(NoteEditEvent.PickMusic)
 

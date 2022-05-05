@@ -1,18 +1,21 @@
 package com.protone.seenn
 
 import android.content.Intent
-import android.util.Log
 import com.protone.api.context.deleteMedia
 import com.protone.api.context.intent
 import com.protone.api.context.renameMedia
 import com.protone.api.context.showFailedToast
+import com.protone.api.getFileMimeType
+import com.protone.api.getFileName
 import com.protone.api.json.toJson
 import com.protone.api.json.toUriJson
-import com.protone.api.toBitmapByteArray
-import com.protone.api.toMediaBitmapByteArray
+import com.protone.database.room.dao.DataBaseDAOHelper
+import com.protone.database.room.entity.NoteType
 import com.protone.mediamodle.Galley
 import com.protone.seen.GalleySeen
+import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seen.dialog.RenameDialog
+import com.protone.seen.dialog.TitleDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
@@ -46,11 +49,20 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
         }
 
         galleySeen.apply {
-            initPager(Galley.photo, Galley.video, chooseType) { gm, isVideo ->
-                startActivity(GalleyViewActivity::class.intent.apply {
-                    putExtra(GalleyViewActivity.MEDIA, gm.toJson())
-                    putExtra(GalleyViewActivity.TYPE, isVideo)
-                })
+            initPager(
+                Galley.photo, Galley.video, chooseType,
+                { gm, isVideo ->
+                    startActivity(GalleyViewActivity::class.intent.apply {
+                        putExtra(GalleyViewActivity.MEDIA, gm.toJson())
+                        putExtra(GalleyViewActivity.TYPE, isVideo)
+                    })
+                },
+            ) {
+                TitleDialog(this@GalleyActivity, "名称", "") {
+                    DataBaseDAOHelper.insertNoteTypeCB(NoteType(it, "")) { re, name ->
+                        if (re) addBucket(name) else toast(getString(R.string.failed_msg))
+                    }
+                }
             }
             chooseData.observe(this@GalleyActivity) {
                 if (it.size > 0) {
@@ -65,11 +77,9 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                 galleySeen.viewEvent.onReceive {
                     when (it) {
                         GalleySeen.Touch.Finish -> finish()
-                        GalleySeen.Touch.MOVE_TO -> {
-                        }
+                        GalleySeen.Touch.MOVE_TO -> galleySeen.startListPop()
                         GalleySeen.Touch.RENAME -> galleySeen.rename()
-                        GalleySeen.Touch.ADD_CATE -> {
-                        }
+                        GalleySeen.Touch.ADD_CATE -> galleySeen.addCate()
                         GalleySeen.Touch.SELECT_ALL -> {
                         }
                         GalleySeen.Touch.DELETE -> galleySeen.delete()
@@ -102,25 +112,68 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
         }
     }
 
-    private fun GalleySeen.rename() {
-        chooseData.value?.onEach {
-            RenameDialog(context, it.name) { name ->
-                renameMedia(name, it.uri) { result ->
-                    if (result) {
-                        it.name = name
-                    } else showFailedToast()
-                }
+    private fun GalleySeen.rename() = chooseData.value?.onEach {
+        if (it.path == null) {
+            toast(getString(R.string.not_supported))
+            return@onEach
+        }
+        val mimeType = it.path!!.getFileName().getFileMimeType()
+        RenameDialog(context, it.path!!.getFileName().replace(mimeType, "")) { name ->
+            renameMedia(name + mimeType, it.uri) { result ->
+                if (result) {
+                    it.name = name + mimeType
+                } else showFailedToast()
             }
         }
     }
 
+
     private suspend fun GalleySeen.delete() = withContext(Dispatchers.IO) {
         chooseData.value?.onEach {
             deleteMedia(it.uri) { result ->
-                if (result) {
-                    Galley.deleteMedia(it.isVideo, it)
+                if (result) Galley.deleteMedia(it.isVideo, it)
+            }
+        }
+    }
+
+    private fun GalleySeen.addCate() = TitleDialog(context, getString(R.string.rename), "") { re ->
+        if (re.isEmpty()) {
+            toast("请输入内容")
+            return@TitleDialog
+        }
+        chooseData.value?.let { list ->
+            list.forEach { gm ->
+                gm.also { g ->
+                    if (g.cate == null) g.cate = mutableListOf()
+                    (g.cate as MutableList).add(re)
                 }
             }
+            DataBaseDAOHelper.insertSignedMediaMulti(list)
+        }
+    }
+
+    private suspend fun GalleySeen.startListPop() {
+        val pop = ColorfulPopWindow(this@GalleyActivity)
+        pop.startListPopup(
+            getBar(),
+            withContext(Dispatchers.IO) {
+                val list = mutableListOf<String>()
+                DataBaseDAOHelper.getALLNoteType()?.forEach {
+                    list.add(it.type)
+                }
+                list
+            }) { re ->
+            chooseData.value?.let { list ->
+                list.forEach {
+                    if (re != null) {
+                        if (it.type == null) it.type = mutableListOf()
+                        if (it.type?.contains(re) == false)
+                            (it.type as MutableList<String>).add(re)
+                    } else toast(getString(R.string.none))
+                }
+                DataBaseDAOHelper.insertSignedMediaMulti(list)
+            }
+            pop.dismiss()
         }
     }
 

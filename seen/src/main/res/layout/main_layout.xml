@@ -39,29 +39,35 @@
                     android:background="@color/white"
                     android:elevation="@dimen/small_elevation"
                     android:onClick="@{()->self.offer(Touch.ConfigUser)}"
+                    app:layout_constraintBottom_toTopOf="@+id/noteBook"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <View
+                    android:elevation="@dimen/small_elevation"
+                    android:id="@+id/color_bar"
+                    android:background="@color/blue_1"
+                    app:layout_constraintBottom_toBottomOf="@id/userCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/small_elevation"/>
 
                 <TextView
                     android:id="@+id/user_welcome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="40dp"
-                    android:layout_marginTop="20dp"
                     android:elevation="@dimen/small_elevation"
-                    android:text="Hello,Eqi"
                     android:textColor="@color/black"
                     android:textSize="@dimen/hug_title_text"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintStart_toEndOf="@id/user_icon"
+                    app:layout_constraintTop_toTopOf="@id/user_icon" />
 
                 <TextView
                     android:id="@+id/user_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:elevation="@dimen/small_elevation"
-                    android:text="Jan,21"
                     android:textColor="@color/black"
                     android:textSize="@dimen/sub_text"
                     app:layout_constraintStart_toStartOf="@id/user_welcome"
@@ -71,14 +77,15 @@
                     android:id="@+id/user_icon"
                     android:layout_width="@dimen/user_icon"
                     android:layout_height="@dimen/user_icon"
+                    android:layout_marginStart="@dimen/action_icon"
                     android:layout_marginTop="@dimen/main_margin"
                     android:background="@color/background_white"
                     android:contentDescription="@string/icon"
                     android:elevation="@dimen/small_elevation"
                     android:src="@drawable/ic_outline_account_circle_24"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/user_welcome"
-                    app:layout_constraintTop_toTopOf="@+id/user_welcome"
+                    app:layout_constraintBottom_toBottomOf="@id/userCard"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
                     app:shapeAppearanceOverlay="@style/roundCornerImage" />
 
                 <ImageView
@@ -136,20 +143,13 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.protone.seen.customView.DragRefreshView
-            android:id="@+id/model_refresh"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/model_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:elevation="0dp"
             android:paddingBottom="@dimen/action_icon_p"
-            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/model_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </com.protone.seen.customView.DragRefreshView>
+            app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
         <LinearLayout
             android:id="@+id/action_btn_container"

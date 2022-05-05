@@ -5,6 +5,7 @@ import android.graphics.SurfaceTexture
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.Surface
@@ -31,8 +32,13 @@ class MyVideoPlayer @JvmOverloads constructor(
 //        VideoPlayerLayoutBinding.inflate(context.layoutInflater, this, true)
 
     private var isPrepared: Boolean = false
+    private lateinit var path: Uri
 
     private val videoController: MyVideoController by lazy { MyVideoController(context) }
+
+    fun setFullScreen(listener: ()->Unit){
+        videoController.fullScreen = listener
+    }
 //        get() {
 //            return binding.videoController
 //        }
@@ -50,8 +56,21 @@ class MyVideoPlayer @JvmOverloads constructor(
             surface = Surface(value)
         }
 
-    init {
+    private val progressHandler = Handler(context.mainLooper)
 
+    private val progressRunnable = ProgressRunnable()
+
+    inner class ProgressRunnable : Runnable {
+        override fun run() {
+            try {
+                mediaPlayer?.currentPosition?.toLong()?.let { videoController.seekTo(it) }
+                progressHandler.postDelayed(progressRunnable, 1000)
+            } catch (ignored: Exception) {
+            }
+        }
+    }
+
+    init {
         videoController.apply {
             playVideo = { play() }
             pauseVideo = { pause() }
@@ -77,9 +96,13 @@ class MyVideoPlayer @JvmOverloads constructor(
     }
 
     private fun initVideoPlayer() {
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
-        mediaPlayer = MediaPlayer()
+        try {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = MediaPlayer()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun initTextureView() {
@@ -96,21 +119,23 @@ class MyVideoPlayer @JvmOverloads constructor(
 
     fun setVideoPath(path: Uri) {
         initPlayer()
-        mediaPlayer?.setDataSource(context, path)
+        this.path = path
+        mediaPlayer?.setDataSource(context, this.path)
     }
 
-//    fun setVideoPath(path: String) {
-//        initPlayer()
-//        mediaPlayer?.setDataSource(context, Uri.parse(path))
-//    }
+    private fun startProgress() {
+        progressHandler.post(progressRunnable)
+    }
 
     private fun play() {
         try {
-            if (isPrepared) {
-                mediaPlayer?.start()
+            if (!isPrepared) {
+                setVideoPath(this.path)
             }
+            mediaPlayer?.start()
+            startProgress()
         } catch (e: IOException) {
-
+            e.printStackTrace()
         }
     }
 
@@ -118,9 +143,10 @@ class MyVideoPlayer @JvmOverloads constructor(
         try {
             if (mediaPlayer?.isPlaying == true) {
                 mediaPlayer?.pause()
+                progressHandler.removeCallbacksAndMessages(null)
             }
         } catch (e: IOException) {
-
+            e.printStackTrace()
         }
 
     }
@@ -131,14 +157,19 @@ class MyVideoPlayer @JvmOverloads constructor(
             reset()
             release()
         }
+        mediaPlayer = null
+        progressHandler.removeCallbacksAndMessages(null)
     }
 
     private fun videoSeekTo(position: Long) {
         mediaPlayer?.duration?.let {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                mediaPlayer?.seekTo(position * it / 100, MediaPlayer.SEEK_CLOSEST)
+                mediaPlayer?.seekTo(
+                    (position.toFloat() / 100 * it).toLong(),
+                    MediaPlayer.SEEK_CLOSEST
+                )
             } else {
-                mediaPlayer?.seekTo((position * it).toInt())
+                mediaPlayer?.seekTo((position.toFloat() / 100 * it).toInt())
             }
         }
     }
@@ -181,16 +212,13 @@ class MyVideoPlayer @JvmOverloads constructor(
     }
 
     override fun onCompletion(p0: MediaPlayer?) {
+        isPrepared = false
         videoController.complete()
     }
 
     override fun onPrepared(p0: MediaPlayer?) {
         isPrepared = true
         p0?.duration?.let { videoController.setVideoDuration(it.toLong()) }
-    }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        pause()
     }
 }

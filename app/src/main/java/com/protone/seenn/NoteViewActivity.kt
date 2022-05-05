@@ -14,7 +14,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import java.util.ArrayDeque
+import java.util.*
 import java.util.stream.Collectors
 
 class NoteViewActivity : BaseActivity<NoteViewSeen>() {
@@ -81,15 +81,15 @@ class NoteViewActivity : BaseActivity<NoteViewSeen>() {
                         offer(NoteViewSeen.NoteViewEvent.Next)
                     }
 
-                    override fun openImage(uri: Uri, name: String) {
-                        val collect = Galley.allPhoto
+                    override fun open(uri: Uri, name: String, isVideo: Boolean) {
+                        val collect = if (isVideo) Galley.allVideo else Galley.allPhoto
                             ?.stream()
                             ?.filter { media -> media.uri == uri }
                             ?.collect(Collectors.toList())
                         if (collect != null && collect.size > 0) {
                             startActivity(GalleyViewActivity::class.intent.apply {
                                 putExtra(GalleyViewActivity.MEDIA, collect[0].toJson())
-                                putExtra(GalleyViewActivity.TYPE, false)
+                                putExtra(GalleyViewActivity.TYPE, isVideo)
                             })
                         } else toast(getString(R.string.none))
                     }

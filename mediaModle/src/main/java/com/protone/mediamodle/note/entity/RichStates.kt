@@ -1,5 +1,3 @@
 package com.protone.mediamodle.note.entity
 
-import android.net.Uri
-
-abstract class RichStates
+abstract class RichStates(val name :String)

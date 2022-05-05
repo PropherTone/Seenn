@@ -285,7 +285,7 @@ class RichNoteAdapter(
                 var position = it
                 dataList.removeAt(position)
                 dataList.add(position++, RichNoteStates(sequenceStart, arrayListOf()))
-                dataList.add(position++, RichPhotoStates(uri, link, name, date))
+//                dataList.add(position++, RichPhotoStates(uri, link, name, date))
                 dataList.add(position, RichNoteStates(sequenceEnd, arrayListOf()))
                 handleDataSetChanged()
                 getCurEditText(position)?.requestFocus()

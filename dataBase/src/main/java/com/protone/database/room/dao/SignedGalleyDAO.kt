@@ -21,7 +21,7 @@ interface SignedGalleyDAO {
     @Query("SELECT * FROM GalleyMedia WHERE uri LIKE :uri")
     fun getSignedMedia(uri: Uri) : GalleyMedia?
 
-    @Query("SELECT * FROM GalleyMedia WHERE uri LIKE :path")
+    @Query("SELECT * FROM GalleyMedia WHERE path LIKE :path")
     fun getSignedMedia(path: String) : GalleyMedia?
 
     @Update

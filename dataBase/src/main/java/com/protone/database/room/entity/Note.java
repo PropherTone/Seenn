@@ -4,8 +4,14 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
+import com.protone.database.room.converters.ListTypeConverter;
+
+import java.util.List;
 
 @Entity
+@TypeConverters(ListTypeConverter.class)
 public class Note {
 
     @PrimaryKey(autoGenerate = true)
@@ -24,7 +30,7 @@ public class Note {
     @ColumnInfo(name = "Time")
     public String time;
 
-    public String type;
+    public List<String> type;
 
     public int richCode;
 
@@ -32,7 +38,7 @@ public class Note {
     public Note() {
     }
 
-    public Note(String title, String text, String imagePath, String time, String type, int richCode) {
+    public Note(String title, String text, String imagePath, String time, List<String> type, int richCode) {
         this.title = title;
         this.text = text;
         this.imagePath = imagePath;
@@ -41,11 +47,11 @@ public class Note {
         this.richCode = richCode;
     }
 
-    public String getType() {
+    public List<String> getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(List<String> type) {
         this.type = type;
     }
 

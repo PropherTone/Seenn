@@ -1,7 +1,6 @@
-package com.protone.seen.customView
+package com.protone.seen.popWindows
 
 import android.content.Context
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup

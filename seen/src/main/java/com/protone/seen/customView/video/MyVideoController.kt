@@ -32,15 +32,38 @@ class MyVideoController @JvmOverloads constructor(
                 else R.drawable.ic_baseline_pause_24_white,
                 null
             )
+            binding.vControl.background = ResourcesCompat.getDrawable(
+                resources,
+                if (!value) R.drawable.ic_baseline_play_arrow_24_white
+                else R.drawable.ic_baseline_pause_24_white,
+                null
+            )
             field = value
         }
 
+    var fullScreen : (()->Unit)? = null
+
     init {
+        binding.vFull.setOnClickListener{
+            fullScreen?.invoke()
+        }
         binding.vStart.setOnClickListener {
             if (!isPlaying) {
                 playVideo()
-            } else pauseVideo()
-            this.isVisible = false
+                binding.vSeekBar.startGradient()
+            }
+            it.isVisible = false
+            binding.vContainer.isVisible = true
+            isPlaying = true
+        }
+        binding.vControl.setOnClickListener {
+            if (!isPlaying) {
+                playVideo()
+                binding.vSeekBar.startGradient()
+            } else {
+                pauseVideo()
+                binding.vSeekBar.stopGradient()
+            }
             isPlaying = !isPlaying
         }
     }
@@ -48,10 +71,13 @@ class MyVideoController @JvmOverloads constructor(
     fun complete() {
         isPlaying = false
         isVisible = true
+        binding.vStart.isVisible = true
+        binding.vContainer.isVisible = false
+        binding.vSeekBar.stopGradient()
     }
 
     fun setVideoDuration(duration: Long) {
-        binding.vSeekBar.barDuration = duration;
+        binding.vSeekBar.barDuration = duration
     }
 
     fun seekTo(duration: Long) = binding.vSeekBar.barSeekTo(duration)

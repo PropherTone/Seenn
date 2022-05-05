@@ -5,12 +5,10 @@ import android.util.Log
 import com.protone.api.TAG
 import com.protone.api.upSDK31
 import com.protone.database.room.*
-import com.protone.database.room.entity.GalleyMedia
-import com.protone.database.room.entity.Music
-import com.protone.database.room.entity.MusicBucket
-import com.protone.database.room.entity.Note
+import com.protone.database.room.entity.*
 
-object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGalleyDAO, NoteDAO {
+object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGalleyDAO, NoteDAO,
+    NoteTypeDAO {
 
     //MusicBucket
     private var musicBucketDAO: MusicBucketDAO? = null
@@ -204,21 +202,27 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
+    fun insertSignedMediaMulti(list: MutableList<GalleyMedia>) {
+        execute { list.forEach { sortSignedMedia(it) } }
+    }
+
     override fun insertSignedMedia(media: GalleyMedia) {
-        execute {
-            val signedMedia =
-                if (upSDK31()) getSignedMedia(media.uri) else media.path?.let { getSignedMedia(it) }
-            if (signedMedia != null) {
-                signedMedia.name = media.name
-                signedMedia.path = media.path
-                signedMedia.bucket = media.bucket
-                signedMedia.type = media.type
-                signedMedia.cate = media.cate
-                signedMedia.date = media.date
-                signedMedia.notes = media.notes
-                updateSignedMedia(signedMedia)
-            } else signedGalleyDAO?.insertSignedMedia(media)
-        }
+        execute { sortSignedMedia(media) }
+    }
+
+    private fun sortSignedMedia(media: GalleyMedia) {
+        val signedMedia =
+            if (upSDK31()) getSignedMedia(media.uri) else media.path?.let { getSignedMedia(it) }
+        if (signedMedia != null) {
+            signedMedia.name = media.name
+            signedMedia.path = media.path
+            signedMedia.bucket = media.bucket
+            signedMedia.type = media.type
+            signedMedia.cate = media.cate
+            signedMedia.date = media.date
+            signedMedia.notes = media.notes
+            updateSignedMedia(signedMedia)
+        } else signedGalleyDAO?.insertSignedMedia(media)
     }
 
     override fun getSignedMedia(uri: Uri): GalleyMedia? = signedGalleyDAO?.getSignedMedia(uri)
@@ -274,5 +278,52 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
             callBack.invoke(getNoteByName(note.title) != null, note.title)
         }
     }
+
+    //NoteType
+    private var noteTypeDAO: NoteTypeDAO? = null
+
+    init {
+        if (noteTypeDAO == null) {
+            noteTypeDAO = getNoteTypeDAO()
+        }
+    }
+
+    inline fun insertNoteTypeCB(
+        noteType: NoteType,
+        crossinline callBack: (Boolean, String) -> Unit
+    ) {
+        execute {
+            var count = 0
+            val tempName = noteType.type
+            val names = mutableMapOf<String, Int>()
+            getAllMusicBucket()?.forEach {
+                names[it.name] = 1
+                if (it.name == noteType.type) {
+                    noteType.type = "${tempName}(${++count})"
+                }
+            }
+            while (names[noteType.type] != null) {
+                noteType.type = "${tempName}(${++count})"
+            }
+            insertNoteType(noteType)
+            callBack.invoke(getNoteType(noteType.type) != null, noteType.type)
+        }
+    }
+
+    override fun insertNoteType(noteType: NoteType) {
+        noteTypeDAO?.insertNoteType(noteType)
+    }
+
+    override fun getNoteType(name: String): NoteType? = noteTypeDAO?.getNoteType(name)
+
+
+    override fun deleteNoteType(noteType: NoteType) {
+        execute {
+            noteTypeDAO?.deleteNoteType(noteType)
+        }
+    }
+
+    override fun getALLNoteType(): List<NoteType>? = noteTypeDAO?.getALLNoteType()
+
 
 }

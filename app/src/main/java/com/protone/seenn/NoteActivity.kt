@@ -69,10 +69,12 @@ class NoteActivity : BaseActivity<NoteSeen>() {
                     selected = s
                 }] = mutableListOf<Note>().apply { addAll(it) }
                 it.forEach { note ->
-                    if (noteList[note.type] == null) {
-                        noteList[note.type] = mutableListOf()
+                    note.type.forEach { type ->
+                        if (noteList[type] == null) {
+                            noteList[type] = mutableListOf()
+                        }
+                        if (type != getString(R.string.all)) noteList[type]?.add(note)
                     }
-                    if (note.type != getString(R.string.all)) noteList[note.type]?.add(note)
                 }
                 co.resumeWith(Result.success(noteList[selected] ?: mutableListOf()))
             }

@@ -16,16 +16,21 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
+            android:id="@+id/color_bar"
+            app:layout_constraintBottom_toBottomOf="@id/userCard"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/small_elevation"/>
+
+        <Constraint
             android:id="@+id/user_welcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
-            android:layout_marginTop="20dp"
             android:alpha="1"
             android:textColor="@color/black"
             android:textSize="@dimen/hug_title_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toEndOf="@id/user_icon"
+            app:layout_constraintTop_toTopOf="@id/user_icon" />
 
         <Constraint
             android:id="@+id/user_date"
@@ -41,14 +46,15 @@
             android:id="@+id/user_icon"
             android:layout_width="@dimen/user_icon"
             android:layout_height="@dimen/user_icon"
+            android:layout_marginStart="@dimen/action_icon"
             android:layout_marginTop="@dimen/main_margin"
             android:alpha="1"
             android:background="@color/background_white"
             android:contentDescription="@string/icon"
             android:elevation="@dimen/small_elevation"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/user_welcome"
-            app:layout_constraintTop_toTopOf="@+id/user_welcome" />
+            app:layout_constraintBottom_toBottomOf="@id/userCard"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
             android:id="@+id/galley"
@@ -111,16 +117,21 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
+            android:id="@+id/color_bar"
+            app:layout_constraintBottom_toBottomOf="@id/userCard"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/small_elevation"/>
+
+        <Constraint
             android:id="@+id/user_welcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
-            android:layout_marginTop="20dp"
             android:alpha="0"
             android:textColor="@color/black"
             android:textSize="@dimen/hug_title_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toEndOf="@id/user_icon"
+            app:layout_constraintTop_toTopOf="@id/user_icon" />
 
         <Constraint
             android:id="@+id/user_date"
@@ -136,13 +147,13 @@
             android:id="@+id/user_icon"
             android:layout_width="@dimen/user_icon"
             android:layout_height="@dimen/user_icon"
+            android:layout_marginStart="@dimen/action_icon"
             android:layout_marginTop="@dimen/main_margin"
             android:alpha="0"
             android:contentDescription="@string/icon"
             app:layout_constraintBottom_toBottomOf="@id/userCard"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/user_welcome"
-            app:layout_constraintTop_toTopOf="@+id/user_welcome" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
             android:id="@+id/galley"

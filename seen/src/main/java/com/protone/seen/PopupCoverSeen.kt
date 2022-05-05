@@ -7,9 +7,9 @@ import com.protone.api.context.root
 import com.protone.seen.databinding.GalleyOptionPopBinding
 import com.protone.seen.popWindows.GalleyOptionPop
 
-abstract class PopupCoverSeen<C>(context: Context) :Seen<C>(context), View.OnClickListener {
+abstract class PopupCoverSeen<C>(context: Context) : Seen<C>(context), View.OnClickListener {
 
-    private val popLayout =
+    val popLayout =
         GalleyOptionPopBinding.inflate(context.layoutInflater, context.root, false)
 
     private val pop = GalleyOptionPop(context, popLayout.root)
@@ -25,7 +25,7 @@ abstract class PopupCoverSeen<C>(context: Context) :Seen<C>(context), View.OnCli
         }
     }
 
-    fun showPop(anchor : View) {
+    fun showPop(anchor: View) {
         pop.showPop(anchor)
     }
 
@@ -40,6 +40,7 @@ abstract class PopupCoverSeen<C>(context: Context) :Seen<C>(context), View.OnCli
                 galleyIntoBox -> popIntoBox()
             }
         }
+        pop.dismiss()
     }
 
     abstract fun popDelete()

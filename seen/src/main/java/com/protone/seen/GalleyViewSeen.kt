@@ -3,6 +3,7 @@ package com.protone.seen
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
@@ -39,11 +40,17 @@ class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEv
     init {
         initToolBar()
         binding.self = this
+        popLayout.galleySelectAll.isGone = true
     }
 
-    fun initViewPager(position: Int, data: MutableList<GalleyMedia>, onChange: (Int) -> Unit) {
+    fun initViewPager(
+        position: Int,
+        data: MutableList<GalleyMedia>,
+        isVideo: Boolean = false,
+        onChange: (Int) -> Unit
+    ) {
         binding.galleyVView.apply {
-            adapter = GalleyViewPager2Adapter(context, data).also { a ->
+            adapter = GalleyViewPager2Adapter(context, data, isVideo).also { a ->
                 a.onClk = {
                     binding.galleyVCover.isVisible = !binding.galleyVCover.isVisible
                 }

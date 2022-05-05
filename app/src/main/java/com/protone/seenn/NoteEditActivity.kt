@@ -14,7 +14,6 @@ import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
 import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.note.entity.RichPhotoStates
-import com.protone.mediamodle.note.entity.RichVideoStates
 import com.protone.seen.AddMusic2BucketSeen
 import com.protone.seen.GalleySeen
 import com.protone.seen.NoteEditSeen
@@ -85,7 +84,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                         }
                                     } else "",
                                     todayTime("yyyy/MM/dd"),
-                                    intent.getStringExtra(NOTE_TYPE),
+                                    mutableListOf(intent.getStringExtra(NOTE_TYPE)),
                                     indexedRichNote.first
                                 )
                             ) { re, _ ->
@@ -97,7 +96,6 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                             noteEditSeen.insertImage(
                                 RichPhotoStates(
                                     re.uri,
-                                    null,
                                     re.name,
                                     re.date.toDateString().toString()
                                 )
@@ -109,7 +107,8 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                             DataBaseDAOHelper.insertSignedMedia(re)
                         }
                         NoteEditSeen.NoteEditEvent.PickVideo -> startGalleyPick(false)?.let { re ->
-                            noteEditSeen.insertVideo(RichVideoStates(re.uri, null))
+                            if (allNote == null) allNote = getAllNote()
+                            noteEditSeen.insertVideo(re.uri, allNote!!)
                         }
                         NoteEditSeen.NoteEditEvent.PickMusic -> startActivityForResult(
                             ActivityResultContracts.StartActivityForResult(),

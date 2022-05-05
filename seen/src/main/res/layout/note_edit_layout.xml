@@ -29,7 +29,7 @@
                 android:minHeight="@dimen/list_icon"
                 app:layoutDescription="@xml/note_edit_layout_scene"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_scrollFlags="scroll|enterAlways|snap|exitUntilCollapsed">
+                app:layout_scrollFlags="scroll|snap|exitUntilCollapsed">
 
                 <ImageView
                     android:id="@+id/noteEdit_icon"

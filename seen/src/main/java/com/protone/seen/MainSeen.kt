@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
+import com.protone.api.toDrawable
 import com.protone.api.todayTime
 import com.protone.seen.adapter.MainModelListAdapter
 import com.protone.seen.databinding.MainLayoutBinding
@@ -33,11 +34,21 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
     var userName: String = ""
         set(value) {
             binding.userWelcome.text =
-                String.format(context.getString(R.string.welcome_msg), "\n$value")
+                if (value == "") context.getString(R.string.welcome_msg) else value
             binding.userDate.text = todayTime("yyyy/MM/dd")
             field = value
         }
         get() = binding.userWelcome.text.toString()
+
+    var userIcon: String = ""
+        set(value) {
+            value.toDrawable(context) {
+                if (it != null) {
+                    binding.userIcon.background = it
+                }
+            }
+            field = value
+        }
 
     var progress: Long = 0
         set(value) {

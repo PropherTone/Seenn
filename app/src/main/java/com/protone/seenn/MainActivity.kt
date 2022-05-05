@@ -39,6 +39,7 @@ class MainActivity : BaseActivity<MainSeen>() {
                     when (it) {
                         Event.OnStart -> {
                             mainSeen.userName = userConfig.userName
+                            mainSeen.userIcon = userConfig.userIcon
                         }
                         else -> {}
                     }

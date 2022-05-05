@@ -84,6 +84,8 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     ) {
         if (requestCode == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
             mHandler.sendEmptyMessage(2)
+        } else {
+            finish()
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }

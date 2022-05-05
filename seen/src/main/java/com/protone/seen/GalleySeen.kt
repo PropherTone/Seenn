@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
@@ -14,10 +15,10 @@ import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.adapter.MyFragmentStateAdapter
 import com.protone.seen.databinding.GalleyLayoutBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withContext
 
-class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context){
+class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
+    TabLayout.OnTabSelectedListener {
 
     enum class Touch {
         Finish,
@@ -40,7 +41,8 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context){
 
     private val binding = GalleyLayoutBinding.inflate(context.layoutInflater, context.root, false)
 
-    private lateinit var rightChannel: Channel<GalleyFragment.Event>
+    private val mailers = arrayOfNulls<GalleyFragment.FragMailer>(2)
+    private var rightMailer = 0
 
     val chooseData: MutableLiveData<MutableList<GalleyMedia>> =
         MutableLiveData<MutableList<GalleyMedia>>().apply {
@@ -55,6 +57,8 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context){
         get() = binding.root
 
     override fun getToolBar(): View = binding.view
+
+    fun getBar() = binding.galleyBar
 
     init {
         setSettleToolBar()
@@ -77,15 +81,12 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context){
         if (!binding.galleyActionMenu.isGone) binding.galleyActionMenu.isVisible = visible
     }
 
-    fun offer(msg: GalleyFragment.Event) {
-        rightChannel.offer(msg)
-    }
-
     suspend fun initPager(
         galleyMediaList: MutableMap<String, MutableList<GalleyMedia>>,
         videoMediaList: MutableMap<String, MutableList<GalleyMedia>>,
         chooseType: String = "",
-        openView: (GalleyMedia, Boolean) -> Unit
+        openView: (GalleyMedia, Boolean) -> Unit,
+        addBucket: () -> Unit
     ) = withContext(Dispatchers.Main) {
         initViewMode(chooseType.isNotEmpty())
         binding.galleyPager.let {
@@ -96,7 +97,10 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context){
                     chooseData,
                     multiChoose = chooseType.isNotEmpty(),
                     openView = openView
-                )
+                ).also { gf ->
+                    gf.addBucket = addBucket
+                    mailers[0] = gf.fragMailer
+                }
             }
             val videoFragment by lazy {
                 GalleyFragment(
@@ -106,7 +110,10 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context){
                     multiChoose = chooseType.isNotEmpty(),
                     isVideo = true,
                     openView = openView
-                )
+                ).also { gf ->
+                    gf.addBucket = addBucket
+                    mailers[1] = gf.fragMailer
+                }
             }
             it.adapter = MyFragmentStateAdapter(
                 context as FragmentActivity,
@@ -116,7 +123,9 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context){
                     else -> arrayListOf(photoFragment, videoFragment)
                 }
             )
-            TabLayoutMediator(binding.galleyTab, it) { tab, position ->
+            TabLayoutMediator(binding.galleyTab.apply {
+                addOnTabSelectedListener(this@GalleySeen)
+            }, it) { tab, position ->
                 tab.setText(
                     when (chooseType) {
                         CHOOSE_PHOTO -> arrayOf(R.string.photo)
@@ -128,8 +137,12 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context){
         }
     }
 
-    fun showPop(){
+    fun showPop() {
         showPop(binding.galleyActionMenu)
+    }
+
+    fun addBucket(name: String) {
+        mailers[rightMailer]?.addBucket(name)
     }
 
     override fun popDelete() = offer(Touch.DELETE)
@@ -138,6 +151,16 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context){
     override fun popSelectAll() = offer(Touch.SELECT_ALL)
     override fun popSetCate() = offer(Touch.ADD_CATE)
     override fun popIntoBox() = offer(Touch.IntoBOX)
+    override fun onTabSelected(tab: TabLayout.Tab?) {
+        when (tab?.text) {
+            context.getString(R.string.photo) -> rightMailer = 0
+            context.getString(R.string.video) -> rightMailer = 1
+        }
+    }
+
+    override fun onTabUnselected(tab: TabLayout.Tab?) = Unit
+
+    override fun onTabReselected(tab: TabLayout.Tab?) = Unit
 
 
 }

@@ -35,7 +35,7 @@ class GalleyFragment(
     val live: MutableLiveData<MutableList<GalleyMedia>>,
     val multiChoose: Boolean = false,
     private val isVideo: Boolean = false,
-    private val openView: (GalleyMedia,Boolean)->Unit
+    private val openView: (GalleyMedia, Boolean) -> Unit
 ) : Fragment(),
     CoroutineScope by CoroutineScope(Dispatchers.Main),
     ViewTreeObserver.OnGlobalLayoutListener, SearchView.OnQueryTextListener {
@@ -45,13 +45,14 @@ class GalleyFragment(
         UpdateGalley
     }
 
-    val channel = Channel<Event>(Channel.UNLIMITED)
+    var addBucket: (() -> Unit)? = null
+    private val channel = Channel<Event>(Channel.UNLIMITED)
 
     private lateinit var selectedBucket: String
 
     private var isSelectMod = false
 
-    private var isBucketShowUp = false
+    private var isBucketShowUp = true
 
     private lateinit var galleyView: GalleyFragmentLayoutBinding
 
@@ -197,7 +198,7 @@ class GalleyFragment(
             adapter = getGalleyAdapter()?.apply {
                 galleyView.galleyToolButton.setOnClickListener {
                     if (isBucketShowUp) {
-                        addBucket()
+                        addBucket?.invoke()
                     } else {
                         quitSelectMod()
                     }
@@ -209,12 +210,13 @@ class GalleyFragment(
         channel.offer(Event.UpdateBucket)
     }
 
-    private fun addBucket() {
-    }
-
     private suspend fun updateBucket() = withContext(Dispatchers.Main) {
         (galleyView.galleyBucket.adapter as GalleyBucketAdapter?)?.noticeDataUpdate(getBucketData())
     }
+
+    private fun insertBucket(item: Pair<Uri, Array<String>>) =
+        (galleyView.galleyBucket.adapter as GalleyBucketAdapter?)?.insetBucket(item)
+
 
     private suspend fun updateGalley(name: String) = withContext(Dispatchers.Main) {
         (galleyView.galleyList.adapter as GalleyListAdapter?)?.noticeDataUpdate(getListData(name))
@@ -247,14 +249,12 @@ class GalleyFragment(
             suspendCoroutine {
                 val videoBucket = mutableListOf<Pair<Uri, Array<String>>>()
                 mediaList.forEach { (s, mutableList) ->
-                    if (mutableList.size > 0) {
-                        videoBucket.add(
-                            Pair(
-                                mutableList[0].uri,
-                                arrayOf(s, mutableList.size.toString())
-                            )
+                    if (mutableList.size > 0) videoBucket.add(
+                        Pair(
+                            mutableList[0].uri,
+                            arrayOf(s, mutableList.size.toString())
                         )
-                    }
+                    )
                 }
                 it.resumeWith(Result.success(videoBucket))
             }
@@ -282,6 +282,16 @@ class GalleyFragment(
         galleyMediaList[name] as MutableList<GalleyMedia>
 
     private fun initListData(): MutableList<GalleyMedia>? = galleyMediaList[selectedBucket]
+
+    val fragMailer = object :FragMailer{
+        override fun addBucket(name: String) {
+            insertBucket(Pair(Uri.EMPTY, arrayOf(name, "")))
+        }
+    }
+
+    interface FragMailer{
+        fun addBucket(name:String)
+    }
 }
 
 //class PhotoFragment(

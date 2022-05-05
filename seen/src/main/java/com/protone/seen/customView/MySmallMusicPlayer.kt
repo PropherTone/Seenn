@@ -2,11 +2,9 @@ package com.protone.seen.customView
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.text.TextUtils
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
@@ -84,11 +82,13 @@ class MySmallMusicPlayer @JvmOverloads constructor(
     var pauseMusic: () -> Unit = {}
 
     private fun loadAlbum(embeddedPicture: ByteArray?) {
+        Glide.with(context).clear(binding.smallMusicIcon)
         Glide.with(context).asDrawable().load(embeddedPicture)
             .error(R.drawable.ic_baseline_music_note_24)
             .circleCrop().transition(DrawableTransitionOptions.withCrossFade())
             .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .placeholder(R.drawable.ic_baseline_music_note_24)
             .override(binding.smallMusicIcon.measuredWidth, binding.smallMusicIcon.measuredHeight)
             .into(binding.smallMusicIcon)
     }

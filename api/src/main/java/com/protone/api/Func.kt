@@ -1,6 +1,5 @@
 package com.protone.api
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -9,22 +8,22 @@ import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.annotation.ChecksSdkIntAtLeast
 import com.protone.api.context.Global
 import com.protone.api.context.onBackground
 import com.protone.api.context.onUiThread
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.stream.Collectors
 
 fun String.getFileName(): String {
-    return this.split("/").run {
-        this[this.size - 1]
-    }
+    return this.split("/").run { this[this.size - 1] }
+}
+
+fun String.getFileMimeType(): String {
+    return "." + this.split(".").let { it[it.size - 1] }
 }
 
 fun String.toDrawable(context: Context, callBack: (Drawable?) -> Unit) {
@@ -117,7 +116,8 @@ fun Long.toDateString(format: String = "HH:mm:ss yyyy/MM/dd E"): String? =
     SimpleDateFormat(format, Locale.getDefault()).format(
         Calendar.getInstance(Locale.getDefault()).also {
             it.timeInMillis = this * 1000
-        }.time)
+        }.time
+    )
 
 
 fun Long.toStringMinuteTime(): String {

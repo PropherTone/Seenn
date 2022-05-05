@@ -9,6 +9,7 @@ import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
 import com.protone.api.Config
 import com.protone.api.context.layoutInflater
+import com.protone.api.context.onUiThread
 import com.protone.seen.databinding.GalleyBucketListLayoutBinding
 
 class GalleyBucketAdapter(
@@ -65,6 +66,13 @@ class GalleyBucketAdapter(
         videoBucket.clear()
         videoBucket.addAll(item)
         notifyDataSetChanged()
+    }
+
+    fun insetBucket(item: Pair<Uri, Array<String>>) {
+        videoBucket.add(item)
+        context.onUiThread {
+            notifyItemInserted(videoBucket.size)
+        }
     }
 
     override fun getItemCount(): Int {

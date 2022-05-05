@@ -3,7 +3,6 @@ package com.protone.seen.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
@@ -12,7 +11,6 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.protone.api.TAG
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.onUiThread
@@ -20,9 +18,6 @@ import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicBucketAdapterLayoutBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.util.stream.Collectors
 
 
 class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
@@ -138,7 +133,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                         context.onUiThread { notifyItemRemoved(holder.layoutPosition) }
                     } else {
                         context.onUiThread {
-                             Toast.makeText(
+                            Toast.makeText(
                                 context,
                                 context.getString(R.string.failed_msg),
                                 Toast.LENGTH_SHORT
@@ -169,6 +164,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .placeholder(R.drawable.ic_baseline_music_note_24)
                 .override(imageView.measuredWidth, imageView.measuredHeight)
                 .into(imageView)
         }

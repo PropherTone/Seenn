@@ -6,14 +6,12 @@ import android.graphics.*
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.setPadding
-import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
 import com.protone.seen.Progress
 import com.protone.seen.R
@@ -32,10 +30,9 @@ class ColorfulProgressBar @JvmOverloads constructor(
         set(value) {
             binding.root.x = value
         }
-
     private var halfHeight = 0f
-
     private var halfChildW = 0
+    private var rootWidth: Int = 0
     private var scroll = 0
     private var steep = 10
     private var speed = 100
@@ -81,7 +78,6 @@ class ColorfulProgressBar @JvmOverloads constructor(
     init {
         setPadding(0)
         setBackgroundColor(Color.TRANSPARENT)
-        mHandler.post(colorRunnable)
         context.theme.obtainStyledAttributes(
             attrs,
             R.styleable.DragBar,
@@ -121,6 +117,7 @@ class ColorfulProgressBar @JvmOverloads constructor(
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         halfHeight = measuredHeight / 2.toFloat()
+        rootWidth = measuredWidth.coerceAtLeast(rootWidth)
         (measuredHeight / 1.5).toFloat().let {
             foreBarPaint.strokeWidth = it
             backBarPaint.strokeWidth = it
@@ -148,14 +145,22 @@ class ColorfulProgressBar @JvmOverloads constructor(
 
     fun barSeekTo(position: Long) {
         if (isTouch) return
-        moveLength = (position.toFloat() / barDuration.toFloat() * (measuredWidth - 2 * halfChildW))
-        if (moveLength > measuredWidth - 2 * halfChildW) {
-            moveLength = (measuredWidth - 2 * halfChildW).toFloat()
+        moveLength = (position.toFloat() / barDuration.toFloat() * (rootWidth - 2 * halfChildW))
+        if (moveLength > rootWidth - 2 * halfChildW) {
+            moveLength = (rootWidth - 2 * halfChildW).toFloat()
         } else if (moveLength < 0) {
             moveLength = 0f
         }
         childX = moveLength
         invalidate()
+    }
+
+    fun startGradient() {
+        mHandler.post(colorRunnable)
+    }
+
+    fun stopGradient() {
+        mHandler.removeCallbacksAndMessages(null)
     }
 
     inner class ColorRunnable : Runnable {

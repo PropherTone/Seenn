@@ -3,10 +3,7 @@ package com.protone.mediamodle.media
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.protone.api.TAG
 import com.protone.api.context.*
 
 const val LOOPING = 1
@@ -29,7 +26,6 @@ abstract class MusicReceiver : BroadcastReceiver() {
                     pause()
                     false
                 }
-                Log.d("TAG", "onReceive: $isPlaying")
             }
             MUSIC_FINISH -> {
                 finish()

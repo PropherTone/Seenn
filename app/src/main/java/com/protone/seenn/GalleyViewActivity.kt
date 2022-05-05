@@ -29,11 +29,12 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
         val galleyViewSeen = GalleyViewSeen(this)
         setContentSeen(galleyViewSeen)
 
-        galleyMedias = (if (intent.getBooleanExtra(TYPE, false))
+        val isVideo = intent.getBooleanExtra(TYPE, false)
+        galleyMedias = (if (isVideo)
             Galley.video[getString(R.string.all_galley)] ?: mutableListOf()
         else Galley.photo[getString(R.string.all_galley)]) ?: mutableListOf()
 
-        galleyViewSeen.init()
+        galleyViewSeen.init(isVideo)
 
         while (isActive) {
             select<Unit> {
@@ -55,14 +56,14 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
         }
     }
 
-    private suspend fun GalleyViewSeen.init() {
+    private suspend fun GalleyViewSeen.init(isVideo: Boolean) {
         initList {
             startActivity(NoteViewActivity::class.intent.apply {
                 putExtra(NoteViewActivity.NOTE_NAME, it)
             })
         }
         val mediaIndex = getMediaIndex()
-        initViewPager(mediaIndex, galleyMedias) { position ->
+        initViewPager(mediaIndex, galleyMedias, isVideo) { position ->
             curPosition = position
             setMediaInfo(position)
         }

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="GradientRelative">
+        <attr name="color1" format="color"/>
+        <attr name="color2" format="color"/>
+        <attr name="length" format="float"/>
+        <attr name="y1" format="float"/>
+        <attr name="GradientSteep" format="float"/>
+    </declare-styleable>
+
+    <attr name="GradientRLTheme" format="reference"/>
+    
+</resources>
