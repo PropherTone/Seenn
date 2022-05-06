@@ -10,12 +10,11 @@ import com.protone.api.getFileName
 import com.protone.api.json.toJson
 import com.protone.api.json.toUriJson
 import com.protone.database.room.dao.DataBaseDAOHelper
-import com.protone.database.room.entity.NoteType
+import com.protone.database.room.entity.GalleyBucket
 import com.protone.mediamodle.Galley
 import com.protone.seen.GalleySeen
-import com.protone.seen.popWindows.ColorfulPopWindow
-import com.protone.seen.dialog.RenameDialog
 import com.protone.seen.dialog.TitleDialog
+import com.protone.seen.popWindows.ColorfulPopWindow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
@@ -57,9 +56,9 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                         putExtra(GalleyViewActivity.TYPE, isVideo)
                     })
                 },
-            ) {
+            ) { isVideo ->
                 TitleDialog(this@GalleyActivity, "名称", "") {
-                    DataBaseDAOHelper.insertNoteTypeCB(NoteType(it, "")) { re, name ->
+                    DataBaseDAOHelper.insertGalleyBucketCB(GalleyBucket(it, isVideo)) { re, name ->
                         if (re) addBucket(name) else toast(getString(R.string.failed_msg))
                     }
                 }
@@ -106,6 +105,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                             }
                             finish()
                         }
+                        GalleySeen.Touch.ShowPop -> galleySeen.showPop(galleySeen.chooseData()?.size ?: 0 > 0)
                     }
                 }
             }
@@ -118,7 +118,11 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
             return@onEach
         }
         val mimeType = it.path!!.getFileName().getFileMimeType()
-        RenameDialog(context, it.path!!.getFileName().replace(mimeType, "")) { name ->
+        TitleDialog(
+            context,
+            getString(R.string.rename),
+            it.path!!.getFileName().replace(mimeType, "")
+        ) { name ->
             renameMedia(name + mimeType, it.uri) { result ->
                 if (result) {
                     it.name = name + mimeType
@@ -158,7 +162,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
             getBar(),
             withContext(Dispatchers.IO) {
                 val list = mutableListOf<String>()
-                DataBaseDAOHelper.getALLNoteType()?.forEach {
+                DataBaseDAOHelper.getALLGalleyBucket()?.forEach {
                     list.add(it.type)
                 }
                 list

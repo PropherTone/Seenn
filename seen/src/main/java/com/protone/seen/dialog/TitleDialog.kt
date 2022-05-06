@@ -27,12 +27,7 @@ class TitleDialog(val context: Context, val title : String, val name: String, va
             it.setPositiveButton(
                 R.string.confirm
             ) { p0, _ ->
-                val text = binding.renameInput.text.toString()
-                if (text.isEmpty()) {
-                    callBack("EMPTY")
-                    p0?.dismiss()
-                }
-                callBack(text)
+                callBack(binding.renameInput.text.toString())
                 p0?.dismiss()
             }
             it.setNegativeButton(R.string.cancel, null)

@@ -1,19 +1,14 @@
 package com.protone.mediamodle
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.protone.api.TAG
 import com.protone.api.context.Global
 import com.protone.api.context.onBackground
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 import java.util.*
-import kotlin.collections.ArrayList
 
 object Galley {
-
-//    val photoLive = MutableLiveData<MutableMap<String, MutableList<GalleyMedia>>>()
 
     var photo: MutableMap<String, MutableList<GalleyMedia>> = mutableMapOf()
         set(value) {
@@ -23,10 +18,7 @@ object Galley {
             }
             value[Global.application.getString(R.string.all_galley)] = ap
             field = value
-//            photoLive.postValue(field)
         }
-
-//    val videoLive = MutableLiveData<MutableMap<String, MutableList<GalleyMedia>>>()
 
     var video: MutableMap<String, MutableList<GalleyMedia>> = mutableMapOf()
         set(value) {
@@ -36,10 +28,7 @@ object Galley {
             }
             value[Global.application.getString(R.string.all_galley)] = ap
             field = value
-//            videoLive.postValue(field)
         }
-
-    val musicBucketLive = MutableLiveData<Set<String>>()
 
     var music: MutableList<Music> = mutableListOf()
         set(value) {
@@ -47,6 +36,8 @@ object Galley {
             field = value
         }
         get() = musicBucket[Global.application.getString(R.string.all_music)] ?: mutableListOf()
+
+    val musicBucketLive = MutableLiveData<Set<String>>()
 
     val musicBucket = mutableMapOf<String, MutableList<Music>>()
 

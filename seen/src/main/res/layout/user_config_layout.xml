@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
@@ -10,11 +10,18 @@
         <import type="com.protone.seen.UserConfigSeen" />
     </data>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/root"
+    <ScrollView
         android:layout_width="match_parent"
-        android:fitsSystemWindows="true"
-        android:layout_height="match_parent"
-        android:background="@color/white"
-        android:orientation="vertical"/>
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/userRoot"
+            android:layout_width="match_parent"
+            android:fitsSystemWindows="true"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical"/>
+
+    </ScrollView>
+
 </layout>

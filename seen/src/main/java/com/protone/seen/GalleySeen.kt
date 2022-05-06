@@ -28,7 +28,8 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
         SELECT_ALL,
         ADD_CATE,
         IntoBOX,
-        ConfirmChoose
+        ConfirmChoose,
+        ShowPop
     }
 
     companion object {
@@ -86,7 +87,7 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
         videoMediaList: MutableMap<String, MutableList<GalleyMedia>>,
         chooseType: String = "",
         openView: (GalleyMedia, Boolean) -> Unit,
-        addBucket: () -> Unit
+        addBucket: (Boolean) -> Unit
     ) = withContext(Dispatchers.Main) {
         initViewMode(chooseType.isNotEmpty())
         binding.galleyPager.let {
@@ -137,8 +138,8 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
         }
     }
 
-    fun showPop() {
-        showPop(binding.galleyActionMenu)
+    fun showPop(isSelect : Boolean) {
+        showPop(binding.galleyActionMenu,isSelect)
     }
 
     fun addBucket(name: String) {

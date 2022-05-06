@@ -21,3 +21,7 @@ fun getMusicBucketDAO(): MusicBucketDAO {
 fun getMusicDAO(): MusicDAO {
     return SeennDataBase.database.getMusicDAO()
 }
+
+fun getGalleyBucketDAO(): GalleyBucketDAO {
+    return SeennDataBase.database.getGalleyBucketDAO()
+}

@@ -3,16 +3,19 @@ package com.protone.seenn
 import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.intent
 import com.protone.api.json.toEntity
-import com.protone.api.json.toUriJson
-import com.protone.api.toDrawable
 import com.protone.api.toMediaBitmapByteArray
+import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.mediamodle.GalleyHelper
 import com.protone.seen.GalleySeen
 import com.protone.seen.UserConfigSeen
+import com.protone.seen.dialog.CheckListDialog
+import com.protone.seen.dialog.TitleDialog
 import com.protone.seen.popWindows.UserPops
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.withContext
 
 class UserConfigActivity : BaseActivity<UserConfigSeen>() {
 
@@ -87,12 +90,10 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                         }
                         UserConfigSeen.UserEvent.Name -> {}
                         UserConfigSeen.UserEvent.PassWord -> {}
-                        UserConfigSeen.UserEvent.Note -> {}
                         UserConfigSeen.UserEvent.ShareNote -> {}
-                        UserConfigSeen.UserEvent.Data -> {}
                         UserConfigSeen.UserEvent.ShareData -> {}
-                        UserConfigSeen.UserEvent.Lock -> {}
-                        UserConfigSeen.UserEvent.Unlock -> {}
+                        UserConfigSeen.UserEvent.Lock -> startLockListPop()
+                        UserConfigSeen.UserEvent.Unlock -> startUnlockListPop()
                     }
                 }
             }
@@ -110,4 +111,59 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
         )
     }
 
+    private suspend fun startLockListPop() {
+        CheckListDialog(this@UserConfigActivity, withContext(Dispatchers.IO) {
+            val allGalleyBucket = DataBaseDAOHelper.getALLGalleyBucket()
+            val list =
+                mutableListOf(getString(R.string.model_noteBook), getString(R.string.model_music))
+            allGalleyBucket?.forEach {
+                list.add(it.type)
+            }
+            list
+        }) {
+            if (!it.isNullOrEmpty()) {
+                TitleDialog(this@UserConfigActivity, "选择", "") { lock ->
+                    if (lock.isEmpty()) {
+                        toast(getString(R.string.none))
+                        return@TitleDialog
+                    }
+                    when (it) {
+                        getString(R.string.model_noteBook) -> userConfig.lockNote = lock
+                        getString(R.string.model_music) -> userConfig.lockNote = lock
+                        else -> userConfig.lockGalley = lock
+                    }
+                }
+            } else {
+                toast(getString(R.string.none))
+            }
+        }
+    }
+
+    private suspend fun startUnlockListPop() {
+        CheckListDialog(this@UserConfigActivity, withContext(Dispatchers.IO) {
+            val allGalleyBucket = DataBaseDAOHelper.getALLGalleyBucket()
+            val list =
+                mutableListOf(getString(R.string.model_noteBook), getString(R.string.model_music))
+            allGalleyBucket?.forEach {
+                list.add(it.type)
+            }
+            list
+        }) {
+            if (!it.isNullOrEmpty()) {
+                TitleDialog(this@UserConfigActivity, "选择", "") { lock ->
+                    if (lock.isEmpty()) {
+                        toast(getString(R.string.none))
+                        return@TitleDialog
+                    }
+                    when (it) {
+                        getString(R.string.model_noteBook) -> userConfig.lockNote = lock
+                        getString(R.string.model_music) -> userConfig.lockNote = lock
+                        else -> userConfig.lockGalley = lock
+                    }
+                }
+            } else {
+                toast(getString(R.string.none))
+            }
+        }
+    }
 }

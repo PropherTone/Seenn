@@ -45,7 +45,7 @@ class GalleyFragment(
         UpdateGalley
     }
 
-    var addBucket: (() -> Unit)? = null
+    var addBucket: ((Boolean) -> Unit)? = null
     private val channel = Channel<Event>(Channel.UNLIMITED)
 
     private lateinit var selectedBucket: String
@@ -164,8 +164,8 @@ class GalleyFragment(
                         live.postValue(galleyMedia)
                     }
 
-                    override fun openView(galleyMedia: GalleyMedia, isVideo: Boolean) {
-                        openView.invoke(galleyMedia, isVideo)
+                    override fun openView(galleyMedia: GalleyMedia) {
+                        openView.invoke(galleyMedia, this@GalleyFragment.isVideo)
                     }
                 })
             }
@@ -198,7 +198,7 @@ class GalleyFragment(
             adapter = getGalleyAdapter()?.apply {
                 galleyView.galleyToolButton.setOnClickListener {
                     if (isBucketShowUp) {
-                        addBucket?.invoke()
+                        addBucket?.invoke(isVideo)
                     } else {
                         quitSelectMod()
                     }

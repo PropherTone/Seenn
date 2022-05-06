@@ -46,7 +46,7 @@
             android:id="@+id/user_icon"
             android:layout_width="@dimen/user_icon"
             android:layout_height="@dimen/user_icon"
-            android:layout_marginStart="@dimen/action_icon"
+            android:layout_marginStart="@dimen/icon_margin"
             android:layout_marginTop="@dimen/main_margin"
             android:alpha="1"
             android:background="@color/background_white"

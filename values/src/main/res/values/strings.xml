@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Seenn</string>
-    <string name="model_account">Account</string>
-    <string name="model_Galley">Galley</string>
-    <string name="model_noteBook">NoteBook</string>
+    <string name="model_account">用户</string>
+    <string name="model_Galley">相册</string>
+    <string name="model_noteBook">记事本</string>
     <string name="photo">相片</string>
     <string name="video">视频</string>
     <string name="back">back</string>
@@ -361,4 +361,5 @@ II. 幂等 的意味着对同一URL的多个请求应该返回同样的结果。
     <string name="password">密码</string>
     <string name="user_name">名称</string>
     <string name="not_supported">系统版本不支持</string>
+    <string name="locked">锁定</string>
 </resources>

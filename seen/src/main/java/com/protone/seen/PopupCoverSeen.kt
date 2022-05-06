@@ -2,6 +2,7 @@ package com.protone.seen
 
 import android.content.Context
 import android.view.View
+import androidx.core.view.isGone
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.seen.databinding.GalleyOptionPopBinding
@@ -25,7 +26,13 @@ abstract class PopupCoverSeen<C>(context: Context) : Seen<C>(context), View.OnCl
         }
     }
 
-    fun showPop(anchor: View) {
+    fun showPop(anchor: View, isSelect: Boolean) {
+        popLayout.apply {
+            galleyDelete.isGone = isSelect
+            galleyMoveTo.isGone = isSelect
+            galleyRename.isGone = isSelect
+            galleySetCate.isGone = isSelect
+        }
         pop.showPop(anchor)
     }
 

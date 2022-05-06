@@ -2,7 +2,6 @@ package com.protone.seen.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -12,7 +11,6 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.protone.api.Config
-import com.protone.api.TAG
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.databinding.PictureBoxAdapterLayoutBinding
 
@@ -73,7 +71,7 @@ class GalleyListAdapter(
             image.setOnClickListener {
                 if (onSelectMod) {
                     checkSelect(holder, media[position])
-                } else onSelectListener?.openView(media[position],isVideo)
+                } else onSelectListener?.openView(media[position])
             }
             image.setOnLongClickListener {
                 onSelectMod = true
@@ -110,7 +108,7 @@ class GalleyListAdapter(
 
     interface OnSelect{
         fun select(galleyMedia: MutableList<GalleyMedia>)
-        fun openView(galleyMedia: GalleyMedia, isVideo: Boolean)
+        fun openView(galleyMedia: GalleyMedia)
     }
 
     fun setOnSelectListener(listener: OnSelect?) {

@@ -3,9 +3,12 @@ package com.protone.seen
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
@@ -50,10 +53,19 @@ class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEv
         onChange: (Int) -> Unit
     ) {
         binding.galleyVView.apply {
-            adapter = GalleyViewPager2Adapter(context, data, isVideo).also { a ->
-                a.onClk = {
-                    binding.galleyVCover.isVisible = !binding.galleyVCover.isVisible
+            if (!isVideo) {
+                adapter = GalleyViewPager2Adapter(context, data).also { a ->
+                    a.onClk = {
+                        binding.galleyVCover.isVisible = !binding.galleyVCover.isVisible
+                    }
                 }
+            } else {
+                adapter = object : FragmentStateAdapter(context as AppCompatActivity) {
+                    override fun getItemCount(): Int = data.size
+                    override fun createFragment(position: Int): Fragment =
+                        GalleyViewFragment(data[position])
+                }
+                binding.galleyVCover.isVisible = false
             }
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
@@ -106,7 +118,7 @@ class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEv
     }
 
     fun showPop() {
-        showPop(binding.galleyVAction)
+        showPop(binding.galleyVAction,true)
     }
 
     override fun popDelete() = offer(GalleyVEvent.Delete)

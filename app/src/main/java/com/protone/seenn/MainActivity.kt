@@ -79,8 +79,10 @@ class MainActivity : BaseActivity<MainSeen>() {
 //                                BIND_AUTO_CREATE
 //                            )
                         }
-                        MainSeen.Touch.MUSIC -> startActivity(MusicActivity::class.intent)
-                        MainSeen.Touch.NOTE -> startActivity(NoteActivity::class.intent)
+                        MainSeen.Touch.MUSIC -> if (userConfig.lockMusic == "")
+                            startActivity(MusicActivity::class.intent) else toast(getString(R.string.locked))
+                        MainSeen.Touch.NOTE -> if (userConfig.lockNote == "")
+                            startActivity(NoteActivity::class.intent) else toast(getString(R.string.locked))
                         MainSeen.Touch.PlayMusic ->
                             musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
                         MainSeen.Touch.PauseMusic ->

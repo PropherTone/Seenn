@@ -40,6 +40,7 @@
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/galley_fragment_layout.xml" value="0.23007246376811594" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/galley_layout.xml" value="0.2" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/galley_option_pop.xml" value="0.23007246376811594" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/galley_view_fraagment_layout.xml" value="0.20820863616930313" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/galley_view_layouy.xml" value="0.25" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/galley_vp2_adapter_layout.xml" value="0.20820863616930313" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/list_pop_windows_layout.xml" value="0.176" />
@@ -190,13 +191,6 @@
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/video_player_layout.xml" value="0.36614583333333334" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/zsdfadsfgaf.xml" value="0.22864583333333333" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/menu/galley_toolbar.xml" value="0.22" />
-        <entry key="..\:/QQ/1147674004/FileRecv/MobileFile/Seenn/seen/src/main/res/drawable/oval_back_white.xml" value="0.259" />
-        <entry key="..\:/QQ/1147674004/FileRecv/MobileFile/Seenn/seen/src/main/res/layout/galley_vp2_adapter_layout.xml" value="0.2783240701154339" />
-        <entry key="..\:/QQ/1147674004/FileRecv/MobileFile/Seenn/seen/src/main/res/layout/login_pop_layout.xml" value="0.2783240701154339" />
-        <entry key="..\:/QQ/1147674004/FileRecv/MobileFile/Seenn/seen/src/main/res/layout/note_layout.xml" value="0.14365113296280463" />
-        <entry key="..\:/QQ/1147674004/FileRecv/MobileFile/Seenn/seen/src/main/res/layout/note_list_layout.xml" value="0.2902949978623343" />
-        <entry key="..\:/QQ/1147674004/FileRecv/MobileFile/Seenn/seen/src/main/res/layout/splash_layout.xml" value="0.2902949978623343" />
-        <entry key="..\:/QQ/1147674004/FileRecv/MobileFile/Seenn/seen/src/main/res/layout/user_config_layout.xml" value="0.2902949978623343" />
       </map>
     </option>
   </component>

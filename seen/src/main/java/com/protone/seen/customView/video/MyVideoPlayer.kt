@@ -15,7 +15,6 @@ import androidx.annotation.AttrRes
 import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import com.protone.seen.Progress
-import java.io.IOException
 
 class MyVideoPlayer @JvmOverloads constructor(
     context: Context,
@@ -36,7 +35,7 @@ class MyVideoPlayer @JvmOverloads constructor(
 
     private val videoController: MyVideoController by lazy { MyVideoController(context) }
 
-    fun setFullScreen(listener: ()->Unit){
+    fun setFullScreen(listener: () -> Unit) {
         videoController.fullScreen = listener
     }
 //        get() {
@@ -63,7 +62,7 @@ class MyVideoPlayer @JvmOverloads constructor(
     inner class ProgressRunnable : Runnable {
         override fun run() {
             try {
-                mediaPlayer?.currentPosition?.toLong()?.let { videoController.seekTo(it) }
+                mediaPlayer?.let { videoController.seekTo(it.currentPosition.toLong()) }
                 progressHandler.postDelayed(progressRunnable, 1000)
             } catch (ignored: Exception) {
             }
@@ -97,8 +96,7 @@ class MyVideoPlayer @JvmOverloads constructor(
 
     private fun initVideoPlayer() {
         try {
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
+            release()
             mediaPlayer = MediaPlayer()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -118,43 +116,40 @@ class MyVideoPlayer @JvmOverloads constructor(
     }
 
     fun setVideoPath(path: Uri) {
-        initPlayer()
         this.path = path
-        mediaPlayer?.setDataSource(context, this.path)
+        initPlayer()
     }
 
     private fun startProgress() {
         progressHandler.post(progressRunnable)
     }
 
-    private fun play() {
+    fun play() {
         try {
-            if (!isPrepared) {
-                setVideoPath(this.path)
+            if (mediaPlayer?.isPlaying == false && isPrepared) {
+                mediaPlayer?.start()
+                startProgress()
             }
-            mediaPlayer?.start()
-            startProgress()
-        } catch (e: IOException) {
+        } catch (e: IllegalStateException) {
             e.printStackTrace()
         }
     }
 
-    private fun pause() {
+    fun pause() {
         try {
             if (mediaPlayer?.isPlaying == true) {
                 mediaPlayer?.pause()
                 progressHandler.removeCallbacksAndMessages(null)
             }
-        } catch (e: IOException) {
+        } catch (e: IllegalStateException) {
             e.printStackTrace()
         }
 
     }
 
-    private fun release() {
+    fun release() {
         mediaPlayer?.apply {
             stop()
-            reset()
             release()
         }
         mediaPlayer = null
@@ -178,6 +173,7 @@ class MyVideoPlayer @JvmOverloads constructor(
         if (surfaceTexture == null) {
             surfaceTexture = p0
             mediaPlayer?.apply {
+                setDataSource(context, path)
                 setSurface(surface)
                 prepareAsync()
                 setOnVideoSizeChangedListener(this@MyVideoPlayer)
@@ -218,7 +214,8 @@ class MyVideoPlayer @JvmOverloads constructor(
 
     override fun onPrepared(p0: MediaPlayer?) {
         isPrepared = true
-        p0?.duration?.let { videoController.setVideoDuration(it.toLong()) }
+        videoController.seekTo(0)
+        p0?.let { videoController.setVideoDuration(it.duration.toLong()) }
 
     }
 }

@@ -9,8 +9,6 @@
             type="com.protone.seen.GalleySeen" />
 
         <import type="com.protone.seen.GalleySeen.Touch" />
-
-        <import type="com.protone.seen.GalleyFragment.Event" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -90,7 +88,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:contentDescription="@string/action"
-                android:onClick="@{()->self.showPop()}"
+                android:onClick="@{()->self.offer(Touch.ShowPop)}"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_baseline_more_horiz_24_white" />
 

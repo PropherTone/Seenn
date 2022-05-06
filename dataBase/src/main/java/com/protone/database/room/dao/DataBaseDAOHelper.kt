@@ -8,7 +8,7 @@ import com.protone.database.room.*
 import com.protone.database.room.entity.*
 
 object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGalleyDAO, NoteDAO,
-    NoteTypeDAO {
+    NoteTypeDAO, GalleyBucketDAO {
 
     //MusicBucket
     private var musicBucketDAO: MusicBucketDAO? = null
@@ -296,9 +296,9 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
             var count = 0
             val tempName = noteType.type
             val names = mutableMapOf<String, Int>()
-            getAllMusicBucket()?.forEach {
-                names[it.name] = 1
-                if (it.name == noteType.type) {
+            getALLNoteType()?.forEach {
+                names[it.type] = 1
+                if (it.type == noteType.type) {
                     noteType.type = "${tempName}(${++count})"
                 }
             }
@@ -325,5 +325,52 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     override fun getALLNoteType(): List<NoteType>? = noteTypeDAO?.getALLNoteType()
 
+    //GalleyBucket
+    private var galleyBucketDAO: GalleyBucketDAO? = null
+
+    init {
+        if (galleyBucketDAO == null) {
+            galleyBucketDAO = getGalleyBucketDAO()
+        }
+    }
+
+    inline fun insertGalleyBucketCB(
+        galleyBucket: GalleyBucket,
+        crossinline callBack: (Boolean, String) -> Unit
+    ) {
+        execute {
+            var count = 0
+            val tempName = galleyBucket.type
+            val names = mutableMapOf<String, Int>()
+            getALLGalleyBucket()?.forEach {
+                names[it.type] = 1
+                if (it.type == galleyBucket.type) {
+                    galleyBucket.type = "${tempName}(${++count})"
+                }
+            }
+            while (names[galleyBucket.type] != null) {
+                galleyBucket.type = "${tempName}(${++count})"
+            }
+            insertGalleyBucket(galleyBucket)
+            callBack.invoke(getGalleyBucket(galleyBucket.type) != null, galleyBucket.type)
+        }
+    }
+
+    override fun insertGalleyBucket(galleyBucket: GalleyBucket) {
+        galleyBucketDAO?.insertGalleyBucket(galleyBucket)
+    }
+
+    override fun getGalleyBucket(name: String): GalleyBucket? =
+        galleyBucketDAO?.getGalleyBucket(name)
+
+    override fun deleteGalleyBucket(galleyBucket: GalleyBucket) {
+        execute {
+            galleyBucketDAO?.deleteGalleyBucket(galleyBucket)
+        }
+    }
+
+    override fun getALLGalleyBucket(): List<GalleyBucket>? = galleyBucketDAO?.getALLGalleyBucket()
+
 
 }
+
