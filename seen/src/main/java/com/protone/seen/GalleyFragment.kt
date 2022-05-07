@@ -211,7 +211,8 @@ class GalleyFragment(
     }
 
     private suspend fun updateBucket() = withContext(Dispatchers.Main) {
-        (galleyView.galleyBucket.adapter as GalleyBucketAdapter?)?.noticeDataUpdate(getBucketData())
+        if (galleyView.galleyBucket.adapter is GalleyBucketAdapter)
+            (galleyView.galleyBucket.adapter as GalleyBucketAdapter).noticeDataUpdate(getBucketData())
     }
 
     private fun insertBucket(item: Pair<Uri, Array<String>>) =
@@ -283,47 +284,21 @@ class GalleyFragment(
 
     private fun initListData(): MutableList<GalleyMedia>? = galleyMediaList[selectedBucket]
 
-    val fragMailer = object :FragMailer{
+    val fragMailer = object : FragMailer {
         override fun addBucket(name: String) {
             insertBucket(Pair(Uri.EMPTY, arrayOf(name, "")))
         }
+
+        override fun selectAll() {
+            if (galleyView.galleyList.adapter is GalleyListAdapter) {
+                (galleyView.galleyList.adapter as GalleyListAdapter).selectAll()
+                live.postValue((galleyView.galleyList.adapter as GalleyListAdapter).selectList)
+            }
+        }
     }
 
-    interface FragMailer{
-        fun addBucket(name:String)
+    interface FragMailer {
+        fun addBucket(name: String)
+        fun selectAll()
     }
 }
-
-//class PhotoFragment(
-//    mContext: FragmentActivity,
-//    private val photoMediaList: MutableMap<String, MutableList<GalleyMedia>>
-//) : GalleyFragment(mContext) {
-//
-//    override suspend fun getBucketData(): MutableList<Pair<Uri, Array<String>>> =
-//        mapList(photoMediaList)
-//
-//    override suspend fun getListData(name: String): MutableList<GalleyMedia> =
-//        photoMediaList[name] as MutableList<GalleyMedia>
-//
-//    override suspend fun initListData(): MutableList<GalleyMedia>? = photoMediaList[selectedBucket]
-//
-//}
-//
-//class VideoFragment(
-//    mContext: FragmentActivity,
-//    private val videoMediaList: MutableMap<String, MutableList<GalleyMedia>>
-//) : GalleyFragment(mContext) {
-//
-//    init {
-//        isVideo = true
-//    }
-//
-//    override suspend fun getBucketData(): MutableList<Pair<Uri, Array<String>>> =
-//        mapList(videoMediaList)
-//
-//    override suspend fun getListData(name: String): MutableList<GalleyMedia> =
-//        videoMediaList[name] as MutableList<GalleyMedia>
-//
-//    override suspend fun initListData(): MutableList<GalleyMedia>? = videoMediaList[selectedBucket]
-//
-//}

@@ -1,8 +1,6 @@
 package com.protone.database.room.dao
 
 import android.net.Uri
-import android.util.Log
-import com.protone.api.TAG
 import com.protone.api.upSDK31
 import com.protone.database.room.*
 import com.protone.database.room.entity.*
@@ -25,9 +23,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     inline fun getAllMusicBucket(crossinline callBack: (result: List<MusicBucket>?) -> Unit) {
         execute {
-            Log.d(TAG, "getAllMusicBucket: exe")
             getAllMusicBucket()?.let {
-                Log.d(TAG, "getAllMusicBucket: $it")
                 callBack(it)
             }
         }
@@ -370,7 +366,6 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun getALLGalleyBucket(): List<GalleyBucket>? = galleyBucketDAO?.getALLGalleyBucket()
-
 
 }
 

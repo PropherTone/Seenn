@@ -24,9 +24,6 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
 
     companion object {
         @JvmStatic
-        val BUCKET = "GalleyBucket"
-
-        @JvmStatic
         val CUSTOM = "CustomChoose"
 
         @JvmStatic
@@ -63,11 +60,6 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                     }
                 }
             }
-            chooseData.observe(this@GalleyActivity) {
-                if (it.size > 0) {
-                    galleySeen.setOptionButton(true)
-                } else galleySeen.setOptionButton(false)
-            }
         }
 
         while (isActive) {
@@ -79,8 +71,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                         GalleySeen.Touch.MOVE_TO -> galleySeen.startListPop()
                         GalleySeen.Touch.RENAME -> galleySeen.rename()
                         GalleySeen.Touch.ADD_CATE -> galleySeen.addCate()
-                        GalleySeen.Touch.SELECT_ALL -> {
-                        }
+                        GalleySeen.Touch.SELECT_ALL -> galleySeen.selectAll()
                         GalleySeen.Touch.DELETE -> galleySeen.delete()
                         GalleySeen.Touch.IntoBOX -> {
                             startActivity(

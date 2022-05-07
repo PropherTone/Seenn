@@ -10,6 +10,7 @@ import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.seen.databinding.UserConfigItemLayoutBinding
 import com.protone.seen.databinding.UserConfigLayoutBinding
+import kotlinx.coroutines.delay
 
 class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context) {
 
@@ -21,7 +22,9 @@ class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context)
         ShareNote,
         ShareData,
         Lock,
-        Unlock
+        Unlock,
+        Finish,
+        Refresh
     }
 
     enum class DisplayMode {
@@ -50,8 +53,7 @@ class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context)
         binding.userRoot.removeAllViews()
     }
 
-    fun chooseMode(mode: DisplayMode) {
-        TransitionManager.beginDelayedTransition(binding.userRoot)
+    suspend fun chooseMode(mode: DisplayMode) {
         if (mode == DisplayMode.UnRegis) {
             UserConfigItemLayoutBinding.inflate(context.layoutInflater, context.root, false)
                 .apply {
@@ -76,7 +78,9 @@ class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context)
         )
         if (mode == DisplayMode.Locked) views.add(initModeView("模块解锁", UserEvent.Unlock))
         views.forEach {
+            TransitionManager.beginDelayedTransition(binding.userRoot)
             binding.userRoot.addView(it)
+            delay(180)
         }
     }
 

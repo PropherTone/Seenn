@@ -46,39 +46,7 @@ class MainActivity : BaseActivity<MainSeen>() {
                 }
                 mainSeen.viewEvent.onReceive {
                     when (it) {
-                        MainSeen.Touch.GALLEY -> {
-                            startActivity(GalleyActivity::class.intent)
-//                            bindService(
-//                                NoteSyncService::class.intent.apply {
-//                                    action = "SERVER"
-//                                },
-//                                object : IServerConnection() {
-//                                    override fun onServiceConnected(
-//                                        p0: ComponentName?,
-//                                        p1: IBinder?
-//                                    ) {
-//                                        super.onServiceConnected(p0, p1)
-//                                        (p1 as NoteSyncService.SyncBinder).connect(
-//                                            port = 6666,
-//                                            statesString = object : CloudStates<String> {
-//                                                override fun success() {
-//                                                    Log.d(TAG, "success: ")
-//                                                }
-//
-//                                                override fun failed(msg: String) {
-//                                                    Log.d(TAG, "failed: ")
-//                                                }
-//
-//                                                override fun successMsg(arg: String) {
-//                                                    Log.d(TAG, "successMsg: ${arg.toJson()}")
-//                                                }
-//
-//                                            })
-//                                    }
-//                                },
-//                                BIND_AUTO_CREATE
-//                            )
-                        }
+                        MainSeen.Touch.GALLEY -> startActivity(GalleyActivity::class.intent)
                         MainSeen.Touch.MUSIC -> if (userConfig.lockMusic == "")
                             startActivity(MusicActivity::class.intent) else toast(getString(R.string.locked))
                         MainSeen.Touch.NOTE -> if (userConfig.lockNote == "")

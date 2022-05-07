@@ -3,9 +3,7 @@ package com.protone.seen
 import android.content.Context
 import android.view.View
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -46,13 +44,7 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
     private var rightMailer = 0
 
     val chooseData: MutableLiveData<MutableList<GalleyMedia>> =
-        MutableLiveData<MutableList<GalleyMedia>>().apply {
-            observe(context as LifecycleOwner) {
-                it?.let {
-                    setOptionButton(it.size > 0)
-                }
-            }
-        }
+        MutableLiveData<MutableList<GalleyMedia>>()
 
     override val viewRoot: View
         get() = binding.root
@@ -70,16 +62,11 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
         if (chooseMode) {
             binding.galleyChooseConfirm.isGone = !chooseMode
             binding.galleyChooseConfirm.setOnClickListener { offer(Touch.ConfirmChoose) }
-            binding.galleyActionMenu.isGone = chooseMode
         }
     }
 
     override fun offer(event: Touch) {
         viewEvent.offer(event)
-    }
-
-    fun setOptionButton(visible: Boolean) {
-        if (!binding.galleyActionMenu.isGone) binding.galleyActionMenu.isVisible = visible
     }
 
     suspend fun initPager(
@@ -139,11 +126,15 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
     }
 
     fun showPop(isSelect : Boolean) {
-        showPop(binding.galleyActionMenu,isSelect)
+        showPop(binding.galleyActionMenu,!isSelect)
     }
 
     fun addBucket(name: String) {
         mailers[rightMailer]?.addBucket(name)
+    }
+
+    fun selectAll(){
+        mailers[rightMailer]?.selectAll()
     }
 
     override fun popDelete() = offer(Touch.DELETE)

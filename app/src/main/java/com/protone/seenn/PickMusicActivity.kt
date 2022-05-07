@@ -2,31 +2,30 @@ package com.protone.seenn
 
 import android.content.Intent
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
-import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.workLocalBroadCast
-import com.protone.seen.AddMusic2BucketSeen
+import com.protone.seen.PickMusicActivity
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 
-class AddMusic2BucketActivity : BaseActivity<AddMusic2BucketSeen>() {
+class PickMusicActivity : BaseActivity<PickMusicActivity>() {
 
     private var mode: String? = null
 
     override suspend fun main() {
-        val addMusic2BucketSeen = AddMusic2BucketSeen(this)
+        val pickMusicActivity = PickMusicActivity(this)
 
-        setContentSeen(addMusic2BucketSeen)
+        setContentSeen(pickMusicActivity)
 
-        mode = intent.getStringExtra(AddMusic2BucketSeen.MODE)
+        mode = intent.getStringExtra(PickMusicActivity.MODE)
 
         val bucket = when (mode) {
-            AddMusic2BucketSeen.PICK_MUSIC -> getString(R.string.all_music)
-            else -> intent.getStringExtra(AddMusic2BucketSeen.BUCKET_NAME)
+            PickMusicActivity.PICK_MUSIC -> getString(R.string.all_music)
+            else -> intent.getStringExtra(PickMusicActivity.BUCKET_NAME)
         }
 
         if (bucket != null) {
-            addMusic2BucketSeen.initSeen(bucket, mode ?: AddMusic2BucketSeen.ADD_BUCKET)
+            pickMusicActivity.initSeen(bucket, mode ?: PickMusicActivity.ADD_BUCKET)
         } else {
             toast(getString(R.string.no_bucket))
             cancel()
@@ -34,18 +33,15 @@ class AddMusic2BucketActivity : BaseActivity<AddMusic2BucketSeen>() {
 
         while (isActive) {
             select<Unit> {
-                event.onReceive {
-
-                }
-                addMusic2BucketSeen.viewEvent.onReceive {
+                event.onReceive {}
+                pickMusicActivity.viewEvent.onReceive {
                     when (it) {
-                        AddMusic2BucketSeen.Event.Finished -> {
+                        PickMusicActivity.Event.Finished -> {
                             workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
-                            setResult(RESULT_OK)
                             finish()
                         }
-                        AddMusic2BucketSeen.Event.Confirm -> {
-                            val selectList = addMusic2BucketSeen.getSelectList()
+                        PickMusicActivity.Event.Confirm -> {
+                            val selectList = pickMusicActivity.getSelectList()
                             if (selectList != null && selectList.size > 0) {
                                 setResult(RESULT_OK, Intent().apply {
                                     data = selectList[0].uri

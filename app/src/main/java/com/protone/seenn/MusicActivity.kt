@@ -1,10 +1,10 @@
 package com.protone.seenn
 
 import android.content.Intent
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.MUSIC_PLAY
 import com.protone.api.context.intent
+import com.protone.api.context.onUiThread
 import com.protone.api.toBitmapByteArray
 import com.protone.api.todayTime
 import com.protone.database.room.dao.DataBaseDAOHelper
@@ -58,7 +58,6 @@ class MusicActivity : BaseActivity<MusicSeen>() {
             musicSeen.observeMusicUpdate()
         }
 
-
         doOnFinish {
             musicSeen.clearMer()
         }
@@ -73,39 +72,23 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                                 ActivityResultContracts.StartActivityForResult(),
                                 AddBucketActivity::class.intent
                             ).apply {
-                                resultCode.let { code ->
-                                    when (code) {
-                                        RESULT_OK -> {
-                                            data?.getStringExtra(
-                                                AddBucketActivity.BUCKET_NAME
-                                            )?.let {
-                                                musicSeen.addBucket(
-                                                    it
-                                                )
-                                            }
-                                        }
-                                        RESULT_CANCELED -> {
-                                            toast(getString(R.string.cancel))
-                                        }
-                                    }
+                                when (resultCode) {
+                                    RESULT_OK -> data?.getStringExtra(AddBucketActivity.BUCKET_NAME)
+                                        ?.let { musicSeen.addBucket(it) }
+                                    RESULT_CANCELED -> toast(getString(R.string.cancel))
                                 }
                             }
                         }
-                        MusicSeen.Event.Play -> musicBroadCastManager.sendBroadcast(
-                            Intent().setAction(
-                                MUSIC_PLAY
-                            )
-                        )
+                        MusicSeen.Event.Play ->
+                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
                         MusicSeen.Event.Finish -> cancel()
-                        MusicSeen.Event.AddList -> startActivityForResult(
-                            ActivityResultContracts.StartActivityForResult(),
-                            AddMusic2BucketActivity::class.intent.also {
-                                it.putExtra("BUCKET", musicSeen.bucket)
-                            }).let {
-                            if (it?.resultCode == RESULT_OK) {
-
-                            }
-                        }
+                        MusicSeen.Event.AddList ->
+                            startActivity(PickMusicActivity::class.intent
+                                .also { it.putExtra("BUCKET", musicSeen.bucket) })
+                        MusicSeen.Event.Delete -> musicSeen.delete()
+                        MusicSeen.Event.Edit -> startActivity(AddBucketActivity::class.intent.apply {
+                            putExtra(AddBucketActivity.BUCKET_NAME, musicSeen.getMusicBucketName())
+                        })
                     }
                 }
 
@@ -174,6 +157,28 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
     private suspend fun MusicSeen.addBucket(name: String) = launch(Dispatchers.IO) {
         DataBaseDAOHelper.getMusicBucketByName(name)?.let { addBucket(it) }
+    }
+
+    private suspend fun MusicSeen.delete() {
+        val musicBucket = withContext(Dispatchers.IO) {
+            DataBaseDAOHelper.getMusicBucketByName(getMusicBucketName())
+        }
+        if (musicBucket != null) {
+            if (deleteBucket(musicBucket)) {
+                DataBaseDAOHelper.deleteMusicBucketCB(musicBucket) { re ->
+                    onUiThread {
+                        if (re) {
+                            toast(getString(R.string.success))
+                        } else {
+                            toast(getString(R.string.failed_msg))
+                            addBucketNoCheck(musicBucket)
+                        }
+                    }
+                }
+            } else {
+                toast(getString(R.string.failed_msg))
+            }
+        }
     }
 
     private fun MusicSeen.observeMusicUpdate() {

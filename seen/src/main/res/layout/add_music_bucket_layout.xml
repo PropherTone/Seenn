@@ -7,10 +7,10 @@
 
         <variable
             name="self"
-            type="com.protone.seen.AddMusic2BucketSeen" />
+            type="com.protone.seen.PickMusicActivity" />
 
 
-        <import type="com.protone.seen.AddMusic2BucketSeen.Event" />
+        <import type="com.protone.seen.PickMusicActivity.Event" />
 
     </data>
 

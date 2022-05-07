@@ -1,36 +1,35 @@
 package com.protone.seenn
 
 import android.content.Intent
-import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.intent
 import com.protone.api.json.toUri
-import com.protone.api.toBitmapByteArray
 import com.protone.api.toMediaBitmapByteArray
 import com.protone.api.todayTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.AddBucketSeen
 import com.protone.seen.GalleySeen
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.withContext
 
 class AddBucketActivity : BaseActivity<AddBucketSeen>() {
 
     companion object {
         @JvmStatic
-        val BUCKET_ICON = "BUCKET_ICON"
-
-        @JvmStatic
         val BUCKET_NAME = "BUCKET_NAME"
-
-        @JvmStatic
-        val BUCKET_DETAIL = "BUCKET_DETAIL"
     }
 
     override suspend fun main() {
         val addBucketSeen = AddBucketSeen(this)
         setContentSeen(addBucketSeen)
+
+        val name = intent.getStringExtra(BUCKET_NAME)
+        if (name != null) {
+            addBucketSeen.refresh(name)
+        }
 
         while (isActive) {
             select<Unit> {
@@ -73,6 +72,13 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                 }
             }
         }
+    }
+
+    private suspend fun AddBucketSeen.refresh(name: String) = withContext(Dispatchers.IO) {
+        val musicBucket = DataBaseDAOHelper.getMusicBucketByName(name)
+        this@refresh.name = musicBucket?.name.toString()
+        this@refresh.detail = musicBucket?.detail.toString()
+        this@refresh.loadIcon(musicBucket?.icon)
     }
 
     private inline fun AddBucketSeen.addMusicBucket(crossinline callBack: (result: Boolean, name: String) -> Unit) =

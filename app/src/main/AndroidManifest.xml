@@ -39,7 +39,7 @@
         <activity android:name=".NoteEditActivity" />
         <activity android:name=".NoteViewActivity" />
         <activity android:name=".GalleyViewActivity" />
-        <activity android:name=".AddMusic2BucketActivity" />
+        <activity android:name=".PickMusicActivity" />
         <activity android:name=".UserConfigActivity" />
         <activity
             android:name=".SplashActivity"

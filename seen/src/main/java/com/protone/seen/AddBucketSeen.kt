@@ -21,10 +21,16 @@ class AddBucketSeen(context: Context) : Seen<AddBucketSeen.Event>(context) {
 
     val binding = AddBucketLayoutBinding.inflate(context.layoutInflater, context.root, true)
 
-    val name: String
+    var name: String
+        set(value) {
+            binding.musicBucketEnterName.setText(value)
+        }
         get() = binding.musicBucketEnterName.text.toString()
 
-    val detail: String
+    var detail: String
+        set(value) {
+            binding.musicBucketEnterDetail.setText(value)
+        }
         get() = binding.musicBucketEnterDetail.text.toString()
 
     var uri: Uri? = null
@@ -48,10 +54,9 @@ class AddBucketSeen(context: Context) : Seen<AddBucketSeen.Event>(context) {
         viewEvent.offer(event)
     }
 
-    private fun loadIcon(model: ByteArray?) = binding.musicBucketIcon.apply {
+    fun loadIcon(model: ByteArray?) = binding.musicBucketIcon.apply {
         Glide.with(this@AddBucketSeen.context).load(model).into(this)
     }
-
 
 
 }

@@ -32,4 +32,28 @@ class UserConfig(context: Context) {
     )
 
     var playedMusicPosition by config.int("MUSIC_POSITION", 0)
+
+    data class UserData(
+        val userName: String,
+        val isLogin: Boolean,
+        val userIcon: String,
+        val userPassword: String,
+        val lockGalley: String,
+        val lockNote: String,
+        val lockMusic: String
+    )
+
+    fun getJson() = this.run {
+        val userData = UserData(
+            userName,
+            isLogin,
+            userIcon,
+            userPassword,
+            lockGalley,
+            lockNote,
+            lockMusic
+        )
+        userData
+    }
+
 }

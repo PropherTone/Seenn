@@ -34,11 +34,29 @@ public class GalleyBucket {
         this.type = type;
     }
 
-    public boolean getImage() {
+    public boolean isImage() {
         return image;
     }
 
     public void setImage(boolean image) {
         this.image = image;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GalleyBucket that = (GalleyBucket) o;
+
+        if (image != that.image) return false;
+        return type.equals(that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + (image ? 1 : 0);
+        return result;
     }
 }

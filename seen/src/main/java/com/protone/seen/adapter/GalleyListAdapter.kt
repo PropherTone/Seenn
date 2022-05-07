@@ -100,6 +100,12 @@ class GalleyListAdapter(
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun selectAll(){
+        selectList.addAll(media)
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int {
         return media.size
     }
@@ -115,34 +121,3 @@ class GalleyListAdapter(
         this.onSelectListener = listener
     }
 }
-
-//          Glide RequestListener
-//            .addListener(object : RequestListener<Drawable> {
-//                override fun onResourceReady(
-//                    resource: Drawable?,
-//                    model: Any?,
-//                    target: Target<Drawable>?,
-//                    dataSource: DataSource?,
-//                    isFirstResource: Boolean
-//                ): Boolean {
-//                    image.apply {
-//                        updateLayoutParams {
-//                            width = this@PhotoListAdapter.itemLength
-//                            height = width
-//                        }
-//                        scaleType = ImageView.ScaleType.CENTER_CROP
-//                    }
-//                    return false
-//                }
-//
-//                override fun onLoadFailed(
-//                    e: GlideException?,
-//                    model: Any?,
-//                    target: Target<Drawable>?,
-//                    isFirstResource: Boolean
-//                ): Boolean {
-//                    return false
-//                }
-//
-//
-//            })

@@ -1,7 +1,7 @@
+@file:Suppress("DEPRECATION")
+
 package com.protone.mediamodle.media
 
-import android.content.ContentResolver
-import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -10,9 +10,6 @@ import androidx.annotation.Nullable
 import com.protone.api.context.Global
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
-import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.suspendCoroutine
 
 fun scanPicture(): MutableMap<String, MutableList<GalleyMedia>> {
     val externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -211,12 +208,8 @@ private inline fun scan(
         MediaStore.MediaColumns.SIZE + ">0",
         null,
         MediaStore.MediaColumns.DATE_ADDED + " DESC"
-    )?.apply {
-        block(this)
-        close()
+    )?.let {
+        block(it)
+        it.close()
     }
-}
-
-interface Filter<T> {
-    fun offer(arg: T, arg1: T)
 }

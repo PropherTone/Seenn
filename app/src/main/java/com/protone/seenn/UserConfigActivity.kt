@@ -4,7 +4,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.intent
 import com.protone.api.json.toEntity
 import com.protone.api.toMediaBitmapByteArray
-import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.mediamodle.GalleyHelper
 import com.protone.seen.GalleySeen
@@ -12,10 +11,8 @@ import com.protone.seen.UserConfigSeen
 import com.protone.seen.dialog.CheckListDialog
 import com.protone.seen.dialog.TitleDialog
 import com.protone.seen.popWindows.UserPops
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.withContext
 
 class UserConfigActivity : BaseActivity<UserConfigSeen>() {
 
@@ -45,7 +42,7 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                                     name != userConfig.userName -> false
                                     password != userConfig.userPassword -> false
                                     else -> {
-                                        userConfigSeen.refreshLayout()
+                                        userConfigSeen.offer(UserConfigSeen.UserEvent.Refresh)
                                         userConfig.isLogin = true
                                         true
                                     }
@@ -88,19 +85,38 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                                 toast(getString(R.string.come_up_unknown_error))
                             }
                         }
-                        UserConfigSeen.UserEvent.Name -> {}
-                        UserConfigSeen.UserEvent.PassWord -> {}
-                        UserConfigSeen.UserEvent.ShareNote -> {}
+                        UserConfigSeen.UserEvent.Name -> startNameDialog()
+                        UserConfigSeen.UserEvent.PassWord -> startPasswordDialog()
+                        UserConfigSeen.UserEvent.ShareNote -> startActivity(NoteSyncActivity::class.intent)
                         UserConfigSeen.UserEvent.ShareData -> {}
                         UserConfigSeen.UserEvent.Lock -> startLockListPop()
                         UserConfigSeen.UserEvent.Unlock -> startUnlockListPop()
+                        UserConfigSeen.UserEvent.Finish -> finish()
+                        UserConfigSeen.UserEvent.Refresh -> userConfigSeen.refreshLayout()
                     }
                 }
             }
         }
     }
 
-    private fun UserConfigSeen.refreshLayout() {
+    private fun startNameDialog() {
+        TitleDialog(this, getString(R.string.user_name), "") {
+            if (it.isNotEmpty()) {
+                userConfig.userName = it
+            }
+        }
+    }
+
+    private fun startPasswordDialog() {
+        TitleDialog(this, getString(R.string.password), "") {
+            if (it == userConfig.userPassword) {
+                userConfig.userPassword = it
+                toast(getString(R.string.success))
+            } else toast(getString(R.string.wrong_password))
+        }
+    }
+
+    private suspend fun UserConfigSeen.refreshLayout() {
         clear()
         chooseMode(
             if (userConfig.lockGalley != "" || userConfig.lockNote != "" || userConfig.lockMusic != "") {
@@ -111,16 +127,15 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
         )
     }
 
-    private suspend fun startLockListPop() {
-        CheckListDialog(this@UserConfigActivity, withContext(Dispatchers.IO) {
-            val allGalleyBucket = DataBaseDAOHelper.getALLGalleyBucket()
-            val list =
-                mutableListOf(getString(R.string.model_noteBook), getString(R.string.model_music))
-            allGalleyBucket?.forEach {
-                list.add(it.type)
-            }
-            list
-        }) {
+    private fun startLockListPop() {
+        CheckListDialog(
+            this@UserConfigActivity,
+            mutableListOf(
+                getString(R.string.model_noteBook),
+                getString(R.string.model_music),
+                getString(R.string.model_Galley)
+            )
+        ) {
             if (!it.isNullOrEmpty()) {
                 TitleDialog(this@UserConfigActivity, "选择", "") { lock ->
                     if (lock.isEmpty()) {
@@ -139,27 +154,42 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
         }
     }
 
-    private suspend fun startUnlockListPop() {
-        CheckListDialog(this@UserConfigActivity, withContext(Dispatchers.IO) {
-            val allGalleyBucket = DataBaseDAOHelper.getALLGalleyBucket()
-            val list =
-                mutableListOf(getString(R.string.model_noteBook), getString(R.string.model_music))
-            allGalleyBucket?.forEach {
-                list.add(it.type)
-            }
-            list
-        }) {
+    private fun startUnlockListPop() {
+        CheckListDialog(
+            this@UserConfigActivity,
+            mutableListOf(
+                getString(R.string.model_noteBook),
+                getString(R.string.model_music),
+                getString(R.string.model_Galley)
+            )
+        ) {
             if (!it.isNullOrEmpty()) {
-                TitleDialog(this@UserConfigActivity, "选择", "") { lock ->
+                TitleDialog(this@UserConfigActivity, getString(R.string.password), "") { lock ->
                     if (lock.isEmpty()) {
                         toast(getString(R.string.none))
                         return@TitleDialog
                     }
-                    when (it) {
-                        getString(R.string.model_noteBook) -> userConfig.lockNote = lock
-                        getString(R.string.model_music) -> userConfig.lockNote = lock
-                        else -> userConfig.lockGalley = lock
-                    }
+                    if (when (it) {
+                            getString(R.string.model_noteBook) -> {
+                                if (userConfig.lockNote == lock) {
+                                    userConfig.lockNote = ""
+                                    true
+                                } else false
+                            }
+                            getString(R.string.model_music) -> {
+                                if (userConfig.lockNote == lock) {
+                                    userConfig.lockNote = ""
+                                    true
+                                } else false
+                            }
+                            else -> {
+                                if (userConfig.lockGalley == lock) {
+                                    userConfig.lockGalley = ""
+                                    true
+                                } else false
+                            }
+                        }
+                    ) toast(getString(R.string.success)) else toast(getString(R.string.wrong_password))
                 }
             } else {
                 toast(getString(R.string.none))

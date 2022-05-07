@@ -16,19 +16,16 @@ import com.protone.api.toStringMinuteTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Galley
-import com.protone.seen.AddMusic2BucketSeen
+import com.protone.seen.PickMusicActivity
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
 
 class AddMusicListAdapter(context: Context, private val bucket: String, private val mode: String) :
     SelectListAdapter<MusicListLayoutBinding, Music>(context) {
 
     init {
-        multiChoose = (mode != AddMusic2BucketSeen.PICK_MUSIC).also { b->
+        multiChoose = (mode != PickMusicActivity.PICK_MUSIC).also { b->
             if (b) Galley.musicBucket[bucket]?.let { selectList.addAll(it) }
         }
     }
@@ -121,7 +118,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                         when (d) {
                             is Animatable -> {
                                 d.start()
-                                if (mode != AddMusic2BucketSeen.PICK_MUSIC) {
+                                if (mode != PickMusicActivity.PICK_MUSIC) {
                                     music.myBucket.apply {
                                         (this as ArrayList).add(bucket)
                                     }

@@ -39,7 +39,9 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
         AddBucket,
         Play,
         Finish,
-        AddList
+        AddList,
+        Delete,
+        Edit
     }
 
     private var containerAnimator: ObjectAnimator? = null
@@ -105,9 +107,14 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
                         }
                 ).apply {
                     this.musicBuckets = musicBucket
-                    this.addList = {
-                        bucket = it
-                        offer(Event.AddList)
+                    this.musicBucketEvent = object : MusicBucketAdapter.MusicBucketEvent {
+                        override fun addList(bucket: String) {
+                            this@MusicSeen.bucket = bucket
+                            offer(Event.AddList)
+                        }
+
+                        override fun delete(bucket: String) = offer(Event.Delete)
+                        override fun edit(bucket: String) = offer(Event.AddList)
                     }
                 }
             }
@@ -154,31 +161,47 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             }
         }
 
+    fun getMusicBucketName() = binding.musicBucketName.text.toString()
+
     fun mbClickCallBack(callback: (String) -> Unit) {
-        (binding.musicBucket.adapter as MusicBucketAdapter?)?.clickCallback = callback
+        if (binding.musicBucket.adapter is MusicBucketAdapter)
+            (binding.musicBucket.adapter as MusicBucketAdapter).clickCallback = callback
     }
 
+    fun deleteBucket(musicBucket: MusicBucket): Boolean =
+        if (binding.musicBucket.adapter is MusicBucketAdapter)
+            (binding.musicBucket.adapter as MusicBucketAdapter).deleteBucket(musicBucket)
+        else false
+
     suspend fun refreshBucket(bucket: MusicBucket) = withContext(Dispatchers.Main) {
-        (binding.musicBucket.adapter as MusicBucketAdapter?)?.refreshBucket(
-            this@MusicSeen.bucket,
-            bucket
-        )
+        if (binding.musicBucket.adapter is MusicBucketAdapter)
+            (binding.musicBucket.adapter as MusicBucketAdapter)
+                .refreshBucket(this@MusicSeen.bucket, bucket)
     }
 
     fun mlClickCallBack(callback: (Int) -> Unit) {
-        (binding.musicMusicList.adapter as MusicListAdapter?)?.clickCallback = callback
+        if (binding.musicMusicList.adapter is MusicListAdapter)
+            (binding.musicMusicList.adapter as MusicListAdapter).clickCallback = callback
     }
 
     fun updateMusicList(list: MutableList<Music>) {
-        (binding.musicMusicList.adapter as MusicListAdapter?)?.musicList = list
+        if (binding.musicMusicList.adapter is MusicListAdapter)
+            (binding.musicMusicList.adapter as MusicListAdapter).musicList = list
     }
 
     suspend fun addBucket(bucket: MusicBucket) = withContext(Dispatchers.Main) {
-        (binding.musicBucket.adapter as MusicBucketAdapter?)?.addBucket(bucket)
+        if (binding.musicBucket.adapter is MusicBucketAdapter)
+            (binding.musicBucket.adapter as MusicBucketAdapter).addBucket(bucket)
+    }
+
+    fun addBucketNoCheck(bucket: MusicBucket) {
+        if (binding.musicBucket.adapter is MusicBucketAdapter)
+            (binding.musicBucket.adapter as MusicBucketAdapter).addBucket(bucket)
     }
 
     fun playPosition(position: Int) {
-        (binding.musicMusicList.adapter as MusicListAdapter?)?.playPosition(position)
+        if (binding.musicMusicList.adapter is MusicListAdapter)
+            (binding.musicMusicList.adapter as MusicListAdapter).playPosition(position)
     }
 
     override fun onActive() {
