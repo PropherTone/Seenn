@@ -70,18 +70,6 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     }
 
-    override fun updateMusicBucketName(oldName: String, name: String) {
-        execute {
-            musicBucketDAO?.updateMusicBucketName(oldName, name)
-        }
-    }
-
-    override fun updateMusicBucketIcon(bucketName: String, icon: ByteArray) {
-        execute {
-            musicBucketDAO?.updateMusicBucketIcon(bucketName, icon)
-        }
-    }
-
     override fun updateMusicBucket(bucket: MusicBucket) {
         execute {
             musicBucketDAO?.updateMusicBucket(bucket)

@@ -272,7 +272,7 @@ class GalleyFragment(
 
     private suspend fun filterData(name: String, query: String): MutableList<GalleyMedia> =
         withContext(Dispatchers.IO) {
-            getListData(name).filter { it.name.contains(query) } as MutableList<GalleyMedia>
+            getListData(name).filter { it.name.contains(query) || it.cate?.contains(query) == true } as MutableList<GalleyMedia>
         }
 
 

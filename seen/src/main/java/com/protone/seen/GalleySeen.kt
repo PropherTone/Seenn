@@ -3,6 +3,7 @@ package com.protone.seen
 import android.content.Context
 import android.view.View
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.tabs.TabLayout
@@ -135,6 +136,10 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
 
     fun selectAll(){
         mailers[rightMailer]?.selectAll()
+    }
+
+    fun hideActionBtn(){
+        binding.galleyActionMenu.isVisible = false
     }
 
     override fun popDelete() = offer(Touch.DELETE)

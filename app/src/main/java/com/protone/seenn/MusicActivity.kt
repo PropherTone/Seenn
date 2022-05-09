@@ -3,6 +3,7 @@ package com.protone.seenn
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.MUSIC_PLAY
+import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.intent
 import com.protone.api.context.onUiThread
 import com.protone.api.toBitmapByteArray
@@ -12,6 +13,7 @@ import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.media.MusicReceiver
 import com.protone.mediamodle.media.musicBroadCastManager
+import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.MusicSeen
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
@@ -71,9 +73,9 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                             startActivityForResult(
                                 ActivityResultContracts.StartActivityForResult(),
                                 AddBucketActivity::class.intent
-                            ).apply {
-                                when (resultCode) {
-                                    RESULT_OK -> data?.getStringExtra(AddBucketActivity.BUCKET_NAME)
+                            ).also { re ->
+                                when (re.resultCode) {
+                                    RESULT_OK -> re.data?.getStringExtra(AddBucketActivity.BUCKET_NAME)
                                         ?.let { musicSeen.addBucket(it) }
                                     RESULT_CANCELED -> toast(getString(R.string.cancel))
                                 }
@@ -82,13 +84,28 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                         MusicSeen.Event.Play ->
                             musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
                         MusicSeen.Event.Finish -> cancel()
-                        MusicSeen.Event.AddList ->
+                        MusicSeen.Event.AddList -> if (!musicSeen.compareName())
                             startActivity(PickMusicActivity::class.intent
                                 .also { it.putExtra("BUCKET", musicSeen.bucket) })
                         MusicSeen.Event.Delete -> musicSeen.delete()
-                        MusicSeen.Event.Edit -> startActivity(AddBucketActivity::class.intent.apply {
-                            putExtra(AddBucketActivity.BUCKET_NAME, musicSeen.getMusicBucketName())
-                        })
+                        MusicSeen.Event.Edit -> if (!musicSeen.compareName())
+                            startActivityForResult(
+                                ActivityResultContracts.StartActivityForResult(),
+                                AddBucketActivity::class.intent.apply {
+                                    putExtra(
+                                        AddBucketActivity.BUCKET_NAME,
+                                        musicSeen.getMusicBucketName()
+                                    )
+                                }).also { re ->
+                                if (re.resultCode == RESULT_OK)
+                                    re.data?.getStringExtra(AddBucketActivity.BUCKET_NAME)
+                                        ?.let { name ->
+                                            musicSeen.bucket = name
+                                            musicSeen.offer(MusicSeen.Event.RefreshBucket)
+                                        }
+                            }
+                        MusicSeen.Event.RefreshBucket-> musicSeen.refreshBucket()
+
                     }
                 }
 
@@ -140,16 +157,17 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         }
 
         Galley.musicBucketLive.observe(this@MusicActivity) {
-            launch(Dispatchers.IO) {
-                DataBaseDAOHelper.getMusicBucketByName(bucket)
-                    ?.let { bucket ->
-                        refreshBucket(bucket)
-                    }
-            }
+            offer(MusicSeen.Event.RefreshBucket)
         }
 
         initSmallMusic()
     }
+
+    private suspend fun MusicSeen.refreshBucket() = withContext(Dispatchers.IO) {
+        DataBaseDAOHelper.getMusicBucketByName(bucket)
+            ?.let { b -> refreshBucket(b) }
+    }
+
 
     private fun MusicSeen.playPosition() {
         playPosition(binder.getPlayPosition())
@@ -160,6 +178,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     }
 
     private suspend fun MusicSeen.delete() {
+        if (compareName()) return
         val musicBucket = withContext(Dispatchers.IO) {
             DataBaseDAOHelper.getMusicBucketByName(getMusicBucketName())
         }
@@ -169,6 +188,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                     onUiThread {
                         if (re) {
                             toast(getString(R.string.success))
+                            workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
                         } else {
                             toast(getString(R.string.failed_msg))
                             addBucketNoCheck(musicBucket)
@@ -199,5 +219,14 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                 if (it.date != null && it.detail != null) "${it.date} ${it.detail}" else getString(R.string.none)
             )
         }
+    }
+
+    private fun MusicSeen.compareName(): Boolean {
+        val musicBucketName = getMusicBucketName()
+        if (musicBucketName == "" || musicBucketName == getString(R.string.all_music)) {
+            toast(getString(R.string.none))
+            return true
+        }
+        return false
     }
 }

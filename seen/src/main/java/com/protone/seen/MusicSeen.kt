@@ -5,12 +5,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.SystemClock
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -41,7 +43,8 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
         Finish,
         AddList,
         Delete,
-        Edit
+        Edit,
+        RefreshBucket
     }
 
     private var containerAnimator: ObjectAnimator? = null
@@ -168,6 +171,11 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             (binding.musicBucket.adapter as MusicBucketAdapter).clickCallback = callback
     }
 
+    fun performListClick() {
+        if (binding.musicBucket.adapter is MusicBucketAdapter)
+            (binding.musicBucket.adapter as MusicBucketAdapter).clickCallback(context.getString(R.string.all_music))
+    }
+
     fun deleteBucket(musicBucket: MusicBucket): Boolean =
         if (binding.musicBucket.adapter is MusicBucketAdapter)
             (binding.musicBucket.adapter as MusicBucketAdapter).deleteBucket(musicBucket)
@@ -205,6 +213,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
     }
 
     override fun onActive() {
+        binding.appToolbar.setExpanded(false, false)
         containerAnimator?.reverse()
     }
 
@@ -233,8 +242,12 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             }
             musicShowBucket.setOnStateListener(this@MusicSeen)
             musicMusicList.setPadding(0, 0, 0, mySmallMusicPlayer.height)
-            binding.toolbar.progress = 1f
-            hideBucket()
+            var value: ViewTreeObserver.OnGlobalLayoutListener? = null
+            value = ViewTreeObserver.OnGlobalLayoutListener {
+                binding.appToolbar.setExpanded(false, false)
+                binding.appToolbar.viewTreeObserver.removeOnGlobalLayoutListener(value)
+            }
+            binding.appToolbar.viewTreeObserver.addOnGlobalLayoutListener(value)
             root.viewTreeObserver.removeOnGlobalLayoutListener(this@MusicSeen)
         }
     }
@@ -242,32 +255,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
     private fun getAni(target: View, value: Float) = AnimationHelper.translationY(
         target,
         target.height.toFloat() - value
-    ).also { ani ->
-        ani.doOnStart {
-            val event = MotionEvent.obtain(
-                SystemClock.uptimeMillis(),
-                SystemClock.uptimeMillis(),
-                MotionEvent.ACTION_DOWN,
-                binding.root.width / 2f,
-                binding.root.height.toFloat(),
-                0
-            )
-            binding.musicMusicList.dispatchTouchEvent(event)
-            ani.addUpdateListener { va ->
-                event.setLocation(
-                    binding.root.width / 2f,
-                    (va.animatedValue as Float) / 2
-                )
-                event.action = MotionEvent.ACTION_MOVE
-                binding.musicMusicList.dispatchTouchEvent(event)
-            }
-            ani.doOnEnd {
-                event.action = MotionEvent.ACTION_UP
-                binding.musicMusicList.dispatchTouchEvent(event)
-            }
-            event.recycle()
-        }
-    }
+    )
 
     fun clearMer() {
         Glide.get(context).clearMemory()

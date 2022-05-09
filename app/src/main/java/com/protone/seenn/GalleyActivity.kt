@@ -30,8 +30,6 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
         val CHOOSE_MODE = "ChooseData"
     }
 
-    private var chooseMode = false
-
     private var chooseType = ""
 
     override suspend fun main() {
@@ -40,9 +38,10 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
         setContentSeen(galleySeen)
 
         intent.getStringExtra(CHOOSE_MODE)?.let {
-            chooseMode = true
             chooseType = it
         }
+
+        if (chooseType != "") galleySeen.hideActionBtn()
 
         galleySeen.apply {
             initPager(
@@ -131,7 +130,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
         }
     }
 
-    private fun GalleySeen.addCate() = TitleDialog(context, getString(R.string.rename), "") { re ->
+    private fun GalleySeen.addCate() = TitleDialog(context, getString(R.string.addCate), "") { re ->
         if (re.isEmpty()) {
             toast("请输入内容")
             return@TitleDialog

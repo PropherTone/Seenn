@@ -15,12 +15,6 @@ interface MusicBucketDAO {
     @Insert
     fun addMusicBucket(musicBucket: MusicBucket)
 
-    @Query("UPDATE MusicBucket SET name = :name WHERE name LIKE :oldName")
-    fun updateMusicBucketName(oldName: String, name: String)
-
-    @Query("UPDATE MusicBucket SET icon = :icon WHERE name LIKE :bucketName")
-    fun updateMusicBucketIcon(bucketName: String, icon: ByteArray)
-
     @Update
     fun updateMusicBucket(bucket: MusicBucket)
 
