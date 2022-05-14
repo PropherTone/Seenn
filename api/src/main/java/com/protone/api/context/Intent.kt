@@ -15,8 +15,7 @@ const val MUSIC = "MUSIC"
 
 const val UPDATE_MUSIC_BUCKET = "UPDATE_MUSIC_BUCKET"
 const val UPDATE_MUSIC = "UPDATE_MUSIC"
-const val UPDATE_PHOTO = "UPDATE_PHOTO"
-const val UPDATE_VIDEO = "UPDATE_VIDEO"
+const val UPDATE_GALLEY = "UPDATE_GALLEY"
 
 val musicIntentFilter: IntentFilter
     get() {
@@ -34,8 +33,7 @@ val workIntentFilter: IntentFilter
         return IntentFilter().apply {
             addAction(UPDATE_MUSIC_BUCKET)
             addAction(UPDATE_MUSIC)
-            addAction(UPDATE_PHOTO)
-            addAction(UPDATE_VIDEO)
+            addAction(UPDATE_GALLEY)
         }
     }
 

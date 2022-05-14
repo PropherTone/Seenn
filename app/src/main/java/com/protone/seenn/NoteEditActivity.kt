@@ -14,7 +14,7 @@ import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
 import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.note.entity.RichPhotoStates
-import com.protone.seen.PickMusicActivity
+import com.protone.seen.PickMusicSeen
 import com.protone.seen.GalleySeen
 import com.protone.seen.NoteEditSeen
 import kotlinx.coroutines.Dispatchers
@@ -112,8 +112,8 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                         }
                         NoteEditSeen.NoteEditEvent.PickMusic -> startActivityForResult(
                             ActivityResultContracts.StartActivityForResult(),
-                            PickMusicActivity::class.intent.apply {
-                                putExtra(PickMusicActivity.MODE, PickMusicActivity.PICK_MUSIC)
+                            PickMusicSeen::class.intent.apply {
+                                putExtra(PickMusicSeen.MODE, PickMusicSeen.PICK_MUSIC)
                             }
                         )?.let { re ->
                             re.data?.data?.let { uri ->

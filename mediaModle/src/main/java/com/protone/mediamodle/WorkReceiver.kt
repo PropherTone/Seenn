@@ -14,8 +14,7 @@ abstract class WorkReceiver : BroadcastReceiver() ,IWorkService {
         when (p1?.action) {
             UPDATE_MUSIC_BUCKET -> updateMusicBucket()
             UPDATE_MUSIC -> updateMusic()
-            UPDATE_PHOTO -> updatePhoto()
-            UPDATE_VIDEO -> updateVideo()
+            UPDATE_GALLEY -> updateGalley()
         }
     }
 }

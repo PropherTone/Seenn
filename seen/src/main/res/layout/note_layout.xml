@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -11,7 +12,7 @@
 
     </data>
 
-    <androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.motion.widget.MotionLayout
         android:id="@+id/note_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -34,30 +35,6 @@
                 android:src="@drawable/ic_baseline_arrow_left_24_white" />
 
         </FrameLayout>
-
-        <ImageView
-            android:id="@+id/note_addBucket"
-            android:layout_width="@dimen/action_icon"
-            android:layout_height="@dimen/action_icon"
-            android:layout_marginBottom="@dimen/action_icon"
-            android:background="@color/glass"
-            android:contentDescription="@string/action"
-            android:padding="@dimen/icon_padding_lite"
-            android:src="@drawable/ic_baseline_add_24_white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <ImageView
-            android:id="@+id/note_refreshBucket"
-            android:layout_width="@dimen/action_icon"
-            android:layout_height="@dimen/action_icon"
-            android:layout_marginEnd="@dimen/action_icon"
-            android:background="@color/glass"
-            android:contentDescription="@string/action"
-            android:padding="@dimen/icon_padding_lite"
-            android:src="@drawable/ic_baseline_refresh_24_white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/note_list"
@@ -85,16 +62,40 @@
                 android:id="@+id/note_bucketList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="@dimen/user_icon"
                 android:paddingTop="@dimen/list_icon" />
 
         </androidx.constraintlayout.motion.widget.MotionLayout>
+
+        <ImageView
+            android:id="@+id/note_addBucket"
+            android:layout_width="@dimen/action_icon"
+            android:layout_height="@dimen/action_icon"
+            android:background="@color/glass"
+            android:contentDescription="@string/action"
+            android:onClick="@{()->self.offer(NoteEvent.AddBucket)}"
+            android:padding="@dimen/icon_padding_lite"
+            android:src="@drawable/ic_baseline_add_24_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ImageView
+            android:id="@+id/note_refreshBucket"
+            android:layout_width="@dimen/action_icon"
+            android:layout_height="@dimen/action_icon"
+            android:background="@color/glass"
+            android:contentDescription="@string/action"
+            android:onClick="@{()->self.offer(NoteEvent.Refresh)}"
+            android:padding="@dimen/icon_padding_lite"
+            android:src="@drawable/ic_baseline_refresh_24_white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <View
             android:id="@+id/note_action"
             android:layout_width="@dimen/action_icon"
             android:layout_height="@dimen/action_icon"
             android:background="@color/blue_3"
+            android:onClick="@{()->self.handleBucketEvent()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

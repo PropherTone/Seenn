@@ -11,7 +11,7 @@ import com.protone.api.context.Global
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 
-fun scanPicture(): MutableMap<String, MutableList<GalleyMedia>> {
+fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)? = null): MutableMap<String, MutableList<GalleyMedia>> {
     val externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val queryArray = arrayOf(
         MediaStore.Images.Media.DISPLAY_NAME,
@@ -47,6 +47,21 @@ fun scanPicture(): MutableMap<String, MutableList<GalleyMedia>> {
             if (!galley.containsKey(bucketName)) {
                 galley[bucketName] = arrayListOf()
             }
+            function?.invoke(
+                uri, GalleyMedia(
+                    null,
+                    imageName,
+                    path,
+                    bucketName,
+                    imageSize,
+                    null,
+                    null,
+                    uri,
+                    dateTime,
+                    thumbnailUri, 0, false,
+                    null
+                )
+            )
             galley[bucketName]?.add(
                 GalleyMedia(
                     null,

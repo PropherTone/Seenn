@@ -9,18 +9,21 @@ import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.database.room.entity.Note
+import com.protone.database.room.entity.NoteType
 import com.protone.seen.adapter.NoteListAdapter
 import com.protone.seen.adapter.NoteTypeListAdapter
 import com.protone.seen.databinding.NoteLayoutBinding
 import kotlin.math.abs
 
-class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context), View.OnClickListener {
+class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context) {
 
     enum class NoteEvent {
-        Finish
+        Finish,
+        AddBucket,
+        Refresh
     }
 
-    val binding = NoteLayoutBinding.inflate(context.layoutInflater, context.root, true)
+    val binding = NoteLayoutBinding.inflate(context.layoutInflater, context.root, false)
 
     override val viewRoot: View
         get() = binding.root
@@ -29,10 +32,7 @@ class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context), View.OnCli
 
     init {
         setNavigation()
-        binding.apply {
-            self = this@NoteSeen
-            noteAction.setOnClickListener(this@NoteSeen)
-        }
+        binding.self = this
     }
 
     override fun offer(event: NoteEvent) {
@@ -57,26 +57,30 @@ class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context), View.OnCli
     }
 
     fun addNoteType(it: ((String?) -> Unit)?) {
-        (binding.noteBucketList.adapter as NoteTypeListAdapter?)?.addNote = it
+        if (binding.noteBucketList.adapter is NoteTypeListAdapter)
+            (binding.noteBucketList.adapter as NoteTypeListAdapter).addNote = it
     }
 
     fun onTypeSelected(it: ((String?) -> Unit)?) {
-        (binding.noteBucketList.adapter as NoteTypeListAdapter?)?.onTypeSelected = it
+        if (binding.noteBucketList.adapter is NoteTypeListAdapter)
+            (binding.noteBucketList.adapter as NoteTypeListAdapter).onTypeSelected = it
     }
 
     fun refreshNoteList(list: List<Note>) {
         (binding.noteList.adapter as NoteListAdapter?)?.setNoteList(list)
     }
 
-    override fun onClick(v: View?) {
-        when (v) {
-            binding.noteAction -> {
-                handleBucketEvent()
-            }
-        }
+    fun refreshNoteType(list: List<NoteType>) {
+        if (binding.noteBucketList.adapter is NoteTypeListAdapter)
+            (binding.noteBucketList.adapter as NoteTypeListAdapter).setNoteTypeList(list)
     }
 
-    private fun handleBucketEvent() {
+    fun insertNoteType(noteType: NoteType) {
+        if (binding.noteBucketList.adapter is NoteTypeListAdapter)
+            (binding.noteBucketList.adapter as NoteTypeListAdapter).insertNoteType(noteType)
+    }
+
+    fun handleBucketEvent() {
         val progress = binding.noteContainer.progress
         ValueAnimator.ofFloat(progress, abs(progress - 1f)).apply {
             addUpdateListener {

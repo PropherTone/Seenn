@@ -3,29 +3,29 @@ package com.protone.seenn
 import android.content.Intent
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.mediamodle.workLocalBroadCast
-import com.protone.seen.PickMusicActivity
+import com.protone.seen.PickMusicSeen
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 
-class PickMusicActivity : BaseActivity<PickMusicActivity>() {
+class PickMusicActivity : BaseActivity<PickMusicSeen>() {
 
     private var mode: String? = null
 
     override suspend fun main() {
-        val pickMusicActivity = PickMusicActivity(this)
+        val pickMusicSeen = PickMusicSeen(this)
 
-        setContentSeen(pickMusicActivity)
+        setContentSeen(pickMusicSeen)
 
-        mode = intent.getStringExtra(PickMusicActivity.MODE)
+        mode = intent.getStringExtra(PickMusicSeen.MODE)
 
         val bucket = when (mode) {
-            PickMusicActivity.PICK_MUSIC -> getString(R.string.all_music)
-            else -> intent.getStringExtra(PickMusicActivity.BUCKET_NAME)
+            PickMusicSeen.PICK_MUSIC -> getString(R.string.all_music)
+            else -> intent.getStringExtra(PickMusicSeen.BUCKET_NAME)
         }
 
         if (bucket != null) {
-            pickMusicActivity.initSeen(bucket, mode ?: PickMusicActivity.ADD_BUCKET)
+            pickMusicSeen.initSeen(bucket, mode ?: PickMusicSeen.ADD_BUCKET)
         } else {
             toast(getString(R.string.no_bucket))
             cancel()
@@ -34,14 +34,14 @@ class PickMusicActivity : BaseActivity<PickMusicActivity>() {
         while (isActive) {
             select<Unit> {
                 event.onReceive {}
-                pickMusicActivity.viewEvent.onReceive {
+                pickMusicSeen.viewEvent.onReceive {
                     when (it) {
-                        PickMusicActivity.Event.Finished -> {
+                        PickMusicSeen.Event.Finished -> {
                             workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
                             finish()
                         }
-                        PickMusicActivity.Event.Confirm -> {
-                            val selectList = pickMusicActivity.getSelectList()
+                        PickMusicSeen.Event.Confirm -> {
+                            val selectList = pickMusicSeen.getSelectList()
                             if (selectList != null && selectList.size > 0) {
                                 setResult(RESULT_OK, Intent().apply {
                                     data = selectList[0].uri

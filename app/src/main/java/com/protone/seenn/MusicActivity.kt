@@ -21,12 +21,10 @@ import kotlin.coroutines.suspendCoroutine
 
 class MusicActivity : BaseActivity<MusicSeen>() {
 
-    private lateinit var cacheMusicBucketName: String
-
     override suspend fun main() {
         val musicSeen = MusicSeen(this)
 
-        cacheMusicBucketName = userConfig.playedMusicBucket
+        musicSeen.bucket = userConfig.playedMusicBucket
 
         setContentSeen(musicSeen)
 
@@ -50,7 +48,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                 }
 
             }
-            setMusicList(Galley.musicBucket[cacheMusicBucketName] ?: Galley.music)
+            setMusicList(Galley.musicBucket[musicSeen.bucket] ?: Galley.music)
             binder.getData().apply {
                 musicSeen.musicName = name
                 musicSeen.icon = albumUri
@@ -94,13 +92,14 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                                 AddBucketActivity::class.intent.apply {
                                     putExtra(
                                         AddBucketActivity.BUCKET_NAME,
-                                        musicSeen.getMusicBucketName()
+                                        musicSeen.bucket
                                     )
                                 }).also { re ->
                                 if (re.resultCode == RESULT_OK)
                                     re.data?.getStringExtra(AddBucketActivity.BUCKET_NAME)
-                                        ?.let { name ->
-                                            musicSeen.bucket = name
+                                        ?.let {
+                                            musicSeen.bucket = it
+                                            musicSeen.performListClick(musicSeen.bucket)
                                             musicSeen.offer(MusicSeen.Event.RefreshBucket)
                                         }
                             }
@@ -145,15 +144,14 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         )
 
         mbClickCallBack { name ->
-            cacheMusicBucketName = name
+            bucket = name
             hideBucket()
-            setBucket()
-            updateMusicList(Galley.musicBucket[cacheMusicBucketName] ?: mutableListOf())
+            updateBucket()
         }
         mlClickCallBack { position ->
-            binder.setDate(Galley.musicBucket[cacheMusicBucketName] ?: mutableListOf())
+            binder.setDate(Galley.musicBucket[bucket] ?: mutableListOf())
             binder.setPlayMusicPosition(position)
-            userConfig.playedMusicBucket = cacheMusicBucketName
+            userConfig.playedMusicBucket = bucket
         }
 
         Galley.musicBucketLive.observe(this@MusicActivity) {
@@ -161,6 +159,11 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         }
 
         initSmallMusic()
+    }
+
+    private fun MusicSeen.updateBucket(){
+        setBucket()
+        updateMusicList(Galley.musicBucket[bucket] ?: mutableListOf())
     }
 
     private suspend fun MusicSeen.refreshBucket() = withContext(Dispatchers.IO) {
@@ -180,7 +183,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     private suspend fun MusicSeen.delete() {
         if (compareName()) return
         val musicBucket = withContext(Dispatchers.IO) {
-            DataBaseDAOHelper.getMusicBucketByName(getMusicBucketName())
+            DataBaseDAOHelper.getMusicBucketByName(bucket)
         }
         if (musicBucket != null) {
             if (deleteBucket(musicBucket)) {
@@ -189,6 +192,8 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                         if (re) {
                             toast(getString(R.string.success))
                             workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
+                            bucket = getString(R.string.all_music)
+                            updateBucket()
                         } else {
                             toast(getString(R.string.failed_msg))
                             addBucketNoCheck(musicBucket)
@@ -212,7 +217,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     }
 
     private fun MusicSeen.setBucket() = launch(Dispatchers.IO) {
-        DataBaseDAOHelper.getMusicBucketByName(cacheMusicBucketName)?.let {
+        DataBaseDAOHelper.getMusicBucketByName(bucket)?.let {
             setBucket(
                 it.icon,
                 it.name,
@@ -222,8 +227,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     }
 
     private fun MusicSeen.compareName(): Boolean {
-        val musicBucketName = getMusicBucketName()
-        if (musicBucketName == "" || musicBucketName == getString(R.string.all_music)) {
+        if (bucket == "" || bucket == getString(R.string.all_music)) {
             toast(getString(R.string.none))
             return true
         }

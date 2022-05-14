@@ -6,19 +6,24 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import com.protone.api.context.Global
+import com.protone.api.context.onBackground
 import com.protone.api.context.workIntentFilter
+import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMulti
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusic
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusicBucket
 import com.protone.database.room.dao.DataBaseDAOHelper.getMusicBucketByName
 import com.protone.database.room.dao.DataBaseDAOHelper.insertMusicMulti
-import com.protone.database.room.dao.DataBaseDAOHelper.updateMusicBucket
+import com.protone.database.room.dao.DataBaseDAOHelper.sortSignedMedia
+import com.protone.database.room.dao.DataBaseDAOHelper.updateMusicBucketBack
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Galley.music
 import com.protone.mediamodle.Galley.musicBucket
 import com.protone.mediamodle.Galley.musicBucketLive
+import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.IWorkService
 import com.protone.mediamodle.WorkReceiver
+import com.protone.mediamodle.media.scanPicture
 import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seenn.R
 import java.util.concurrent.Executor
@@ -36,12 +41,8 @@ class WorkService : Service() {
             this@WorkService.updateMusic()
         }
 
-        override fun updatePhoto() {
-            this@WorkService.updatePhoto()
-        }
-
-        override fun updateVideo() {
-            this@WorkService.updateVideo()
+        override fun updateGalley() {
+            this@WorkService.updateGalley()
         }
     }
 
@@ -91,7 +92,7 @@ class WorkService : Service() {
                 getMusicBucketByName(it)?.let { mb ->
                     musicBucket[it]?.size?.let { size ->
                         mb.size = size
-                        updateMusicBucket(mb)
+                        updateMusicBucketBack(mb)
                     }
                 }
             }
@@ -100,8 +101,18 @@ class WorkService : Service() {
     }
 
     private fun updateMusic() {}
-    private fun updatePhoto() {}
-    private fun updateVideo() {}
+    private fun updateGalley() = DataBaseDAOHelper.run {
+        onBackground {
+            val allSignedMedia = getAllSignedMedia() as MutableList
+            scanPicture{ _, galleyMedia ->
+                allSignedMedia.remove(galleyMedia)
+                sortSignedMedia(galleyMedia)
+            }
+            allSignedMedia.forEach {
+                deleteSignedMedia(it)
+            }
+        }
+    }
 
     private inner class WorkBinder : Binder(), IWorkService {
         override fun updateMusicBucket() {
@@ -112,12 +123,8 @@ class WorkService : Service() {
             this@WorkService.updateMusic()
         }
 
-        override fun updatePhoto() {
-            this@WorkService.updatePhoto()
-        }
-
-        override fun updateVideo() {
-            this@WorkService.updateVideo()
+        override fun updateGalley() {
+            this@WorkService.updateGalley()
         }
     }
 }

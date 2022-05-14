@@ -3,6 +3,7 @@ package com.protone.seen.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Animatable
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -16,16 +17,17 @@ import com.protone.api.toStringMinuteTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Galley
-import com.protone.seen.PickMusicActivity
+import com.protone.seen.PickMusicSeen
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
 import java.util.*
+import kotlin.collections.ArrayList
 
 class AddMusicListAdapter(context: Context, private val bucket: String, private val mode: String) :
     SelectListAdapter<MusicListLayoutBinding, Music>(context) {
 
     init {
-        multiChoose = (mode != PickMusicActivity.PICK_MUSIC).also { b->
+        multiChoose = (mode != PickMusicSeen.PICK_MUSIC).also { b ->
             if (b) Galley.musicBucket[bucket]?.let { selectList.addAll(it) }
         }
     }
@@ -62,13 +64,13 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                     startAnimation(musicListInContainer)
                 } else {
                     musicListPlayState.visibility = View.GONE
-                    musicListPlayState.setImageDrawable(
-                        ResourcesCompat.getDrawable(
-                            context.resources,
-                            R.drawable.ic_baseline_check_24,
-                            null
-                        )
-                    )
+//                    musicListPlayState.setImageDrawable(
+//                        ResourcesCompat.getDrawable(
+//                            context.resources,
+//                            R.drawable.ic_baseline_check_24,
+//                            null
+//                        )
+//                    )
                     musicListContainer.setBackgroundColor(
                         ContextCompat.getColor(
                             context,
@@ -108,23 +110,31 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: Holder<MusicListLayoutBinding>, position: Int) {
         holder.binding.apply {
-            musicList[position].let { music ->
+            musicList[position].also { music ->
                 setSelect(holder, selectList.contains(music))
 
                 musicListContainer.setOnClickListener {
-                    checkSelect(holder, music)
                     viewQueue.add(position)
+                    if (selectList.contains(music)) {
+                        if (mode == PickMusicSeen.PICK_MUSIC) return@setOnClickListener
+                        (music.myBucket as ArrayList).remove(bucket)
+                        DataBaseDAOHelper.updateMusicCB(music) { re ->
+                            if (re != -1 && re != 0) {
+                                context.onUiThread { checkSelect(holder, music) }
+                            }
+                        }
+                        return@setOnClickListener
+                    }
+                    checkSelect(holder, music)
                     musicListPlayState.drawable.let { d ->
                         when (d) {
                             is Animatable -> {
                                 d.start()
-                                if (mode != PickMusicActivity.PICK_MUSIC) {
+                                if (mode != PickMusicSeen.PICK_MUSIC) {
                                     music.myBucket.apply {
                                         (this as ArrayList).add(bucket)
                                     }
-                                    DataBaseDAOHelper.updateMusicCB(
-                                        music
-                                    ) { re ->
+                                    DataBaseDAOHelper.updateMusicCB(music) { re ->
                                         if (re != -1 && re != 0) {
                                             changeIconAni(musicListPlayState)
                                         } else {

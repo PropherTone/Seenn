@@ -16,7 +16,7 @@ interface MusicBucketDAO {
     fun addMusicBucket(musicBucket: MusicBucket)
 
     @Update
-    fun updateMusicBucket(bucket: MusicBucket)
+    fun updateMusicBucket(bucket: MusicBucket) : Int
 
     @Delete
     fun deleteMusicBucket(bucket: MusicBucket)

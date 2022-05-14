@@ -133,6 +133,7 @@
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_outline_select_all_24.xml" value="0.2385" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/ic_outline_surfing_24.xml" value="0.2385" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/icon_add_back.xml" value="0.155" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/load_animation.xml" value="0.29" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/main_background.xml" value="0.24479166666666666" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/oval_background.xml" value="0.155" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/drawable/round_edittext.xml" value="0.28703703703703703" />
@@ -169,6 +170,7 @@
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/note_edit_layout.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/note_layout.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/note_sync_layout.xml" value="0.16944444444444445" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/note_tpye_list_adapter.xml" value="0.24206708975521304" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/note_view_layout.xml" value="0.18307291666666667" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/photo_card.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/photo_card_layout.xml" value="0.22" />

@@ -34,6 +34,7 @@
                     android:layout_width="@dimen/huge_icon"
                     android:layout_height="@dimen/huge_icon"
                     android:layout_marginTop="50dp"
+                    android:scaleType="centerCrop"
                     android:background="@drawable/icon_add_back"
                     android:contentDescription="@string/icon"
                     android:onClick="@{()->self.offer(Event.ChooseIcon)}"

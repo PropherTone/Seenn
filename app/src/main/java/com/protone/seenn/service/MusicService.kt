@@ -13,7 +13,7 @@ import android.widget.RemoteViews
 import androidx.lifecycle.MutableLiveData
 import com.protone.api.context.*
 import com.protone.api.toBitmapByteArray
-import com.protone.database.room.config.UserConfig
+import com.protone.database.sp.config.UserConfig
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.MusicState

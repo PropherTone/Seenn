@@ -70,9 +70,19 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     }
 
-    override fun updateMusicBucket(bucket: MusicBucket) {
+    override fun updateMusicBucket(bucket: MusicBucket): Int {
+        return musicBucketDAO?.updateMusicBucket(bucket) ?: -1
+    }
+
+    fun updateMusicBucketBack(bucket: MusicBucket) {
         execute {
-            musicBucketDAO?.updateMusicBucket(bucket)
+            updateMusicBucket(bucket)
+        }
+    }
+
+    inline fun updateMusicBucketCB(bucket: MusicBucket,crossinline callBack: (Int) -> Unit) {
+        execute {
+            callBack.invoke(updateMusicBucket(bucket))
         }
     }
 
@@ -179,6 +189,13 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun getAllSignedMedia(): List<GalleyMedia>? = signedGalleyDAO?.getAllSignedMedia()
+    override fun getAllMediaGalley(): List<String>? {
+        return signedGalleyDAO?.getAllMediaGalley()
+    }
+
+    override fun getGalleyByName(name: String): List<GalleyMedia>? {
+      return signedGalleyDAO?.getGalleyByName(name)
+    }
 
     override fun deleteSignedMedia(media: GalleyMedia) {
         execute {
@@ -194,19 +211,19 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         execute { sortSignedMedia(media) }
     }
 
-    private fun sortSignedMedia(media: GalleyMedia) {
-        val signedMedia =
-            if (upSDK31()) getSignedMedia(media.uri) else media.path?.let { getSignedMedia(it) }
-        if (signedMedia != null) {
-            signedMedia.name = media.name
-            signedMedia.path = media.path
-            signedMedia.bucket = media.bucket
-            signedMedia.type = media.type
-            signedMedia.cate = media.cate
-            signedMedia.date = media.date
-            signedMedia.notes = media.notes
-            updateSignedMedia(signedMedia)
-        } else signedGalleyDAO?.insertSignedMedia(media)
+    fun sortSignedMedia(media: GalleyMedia) {
+        getSignedMedia(media.uri).let {
+            if (it != null) {
+                it.name = media.name
+                it.path = media.path
+                it.bucket = media.bucket
+                it.type = media.type
+                it.cate = media.cate
+                it.date = media.date
+                it.notes = media.notes
+                updateSignedMedia(it)
+            } else signedGalleyDAO?.insertSignedMedia(media)
+        }
     }
 
     override fun getSignedMedia(uri: Uri): GalleyMedia? = signedGalleyDAO?.getSignedMedia(uri)
@@ -302,8 +319,13 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
 
     override fun deleteNoteType(noteType: NoteType) {
-        execute {
-            noteTypeDAO?.deleteNoteType(noteType)
+         noteTypeDAO?.deleteNoteType(noteType)
+    }
+
+    fun doDeleteNoteType(noteType: NoteType,callBack: (Boolean) -> Unit){
+        execute{
+            deleteNoteType(noteType)
+            callBack.invoke(getNoteType(noteType.type) != null)
         }
     }
 

@@ -10,7 +10,7 @@ import com.protone.mediamodle.Galley
 import com.protone.seen.adapter.AddMusicListAdapter
 import com.protone.seen.databinding.AddMusicBucketLayoutBinding
 
-class PickMusicActivity(context: Context) : Seen<PickMusicActivity.Event>(context) {
+class PickMusicSeen(context: Context) : Seen<PickMusicSeen.Event>(context) {
 
     enum class Event {
         Finished,

@@ -74,6 +74,8 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
 
     var bucket: String = ""
 
+    var actionPosition: Int = 0
+
     override fun getToolBar(): View = binding.appToolbar
 
     init {
@@ -111,13 +113,23 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
                 ).apply {
                     this.musicBuckets = musicBucket
                     this.musicBucketEvent = object : MusicBucketAdapter.MusicBucketEvent {
-                        override fun addList(bucket: String) {
+                        override fun addList(bucket: String, position: Int) {
                             this@MusicSeen.bucket = bucket
+                            actionPosition = position
                             offer(Event.AddList)
                         }
 
-                        override fun delete(bucket: String) = offer(Event.Delete)
-                        override fun edit(bucket: String) = offer(Event.AddList)
+                        override fun delete(bucket: String, position: Int) {
+                            this@MusicSeen.bucket = bucket
+                            actionPosition = position
+                            offer(Event.Delete)
+                        }
+
+                        override fun edit(bucket: String, position: Int) {
+                            this@MusicSeen.bucket = bucket
+                            actionPosition = position
+                            offer(Event.Edit)
+                        }
                     }
                 }
             }
@@ -140,6 +152,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
 
     suspend fun setBucket(bitArray: ByteArray?, bucketName: String, detail: String) =
         withContext(Dispatchers.Main) {
+            bucket = bucketName
             binding.apply {
                 if (bitArray != null) {
                     Glide.with(context).asDrawable().load(bitArray)
@@ -164,17 +177,23 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             }
         }
 
-    fun getMusicBucketName() = binding.musicBucketName.text.toString()
-
     fun mbClickCallBack(callback: (String) -> Unit) {
         if (binding.musicBucket.adapter is MusicBucketAdapter)
             (binding.musicBucket.adapter as MusicBucketAdapter).clickCallback = callback
     }
 
-    fun performListClick() {
+    fun performListClick(bucket: String) {
         if (binding.musicBucket.adapter is MusicBucketAdapter)
-            (binding.musicBucket.adapter as MusicBucketAdapter).clickCallback(context.getString(R.string.all_music))
+            (binding.musicBucket.adapter as MusicBucketAdapter).clickCallback(bucket)
     }
+
+    private fun getActionBucket(): String? = if (binding.musicBucket.adapter is MusicBucketAdapter
+        && (binding.musicBucket.adapter as MusicBucketAdapter).musicBuckets.size > 0
+        && (binding.musicBucket.adapter as MusicBucketAdapter).musicBuckets.size > actionPosition
+    ) {
+        (binding.musicBucket.adapter as MusicBucketAdapter).musicBuckets[actionPosition].name
+    } else null
+
 
     fun deleteBucket(musicBucket: MusicBucket): Boolean =
         if (binding.musicBucket.adapter is MusicBucketAdapter)
@@ -182,9 +201,10 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
         else false
 
     suspend fun refreshBucket(bucket: MusicBucket) = withContext(Dispatchers.Main) {
-        if (binding.musicBucket.adapter is MusicBucketAdapter)
+        val actionBucket = getActionBucket()
+        if (binding.musicBucket.adapter is MusicBucketAdapter && actionBucket != null)
             (binding.musicBucket.adapter as MusicBucketAdapter)
-                .refreshBucket(this@MusicSeen.bucket, bucket)
+                .refreshBucket(actionBucket, bucket)
     }
 
     fun mlClickCallBack(callback: (Int) -> Unit) {

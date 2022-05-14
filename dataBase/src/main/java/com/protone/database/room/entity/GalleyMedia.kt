@@ -16,7 +16,7 @@ data class GalleyMedia(
     var name: String,
     var path : String?,
     var bucket: String,
-    val size: Long,
+    var size: Long,
     var type: List<String>?,
     var cate: List<String>?,
     val uri: Uri,

@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
 import com.protone.api.checkNeededPermission
+import com.protone.api.context.UPDATE_GALLEY
 import com.protone.api.context.intent
 import com.protone.api.requestContentPermission
 import com.protone.api.toBitmapByteArray
@@ -15,6 +16,7 @@ import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
 import com.protone.mediamodle.GalleyHelper
+import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.SplashSeen
 import com.protone.seenn.service.MusicService
 import com.protone.seenn.service.WorkService
@@ -45,7 +47,6 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                     }
                 }
                 startService(Intent(this, MusicService::class.java))
-                startService(Intent(this, WorkService::class.java))
                 startActivity(MainActivity::class.intent)
                 finish()
             }
@@ -57,6 +58,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     override suspend fun main() {
         val splashSeen = SplashSeen(this)
         setContentSeen(splashSeen)
+        startService(Intent(this, WorkService::class.java))
         while (isActive) {
             select<Unit> {
                 event.onReceive {
@@ -109,6 +111,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     }
 
     private fun updateMedia() {
+        workLocalBroadCast.sendBroadcast(Intent().setAction(UPDATE_GALLEY))
         GalleyHelper.run {
             updateAll {
                 mHandler.sendEmptyMessage(1)

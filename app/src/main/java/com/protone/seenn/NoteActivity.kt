@@ -3,11 +3,12 @@ package com.protone.seenn
 import com.protone.api.context.intent
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Note
+import com.protone.database.room.entity.NoteType
 import com.protone.seen.NoteSeen
 import com.protone.seen.R
+import com.protone.seen.dialog.TitleDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.suspendCoroutine
@@ -20,25 +21,44 @@ class NoteActivity : BaseActivity<NoteSeen>() {
 
     override suspend fun main() {
 
-        val noteSeen = NoteSeen(this)
-
+        var noteSeen = NoteSeen(this)
+        setContentSeen(noteSeen)
         noteSeen.initSeen()
 
         while (isActive) {
             select<Unit> {
                 event.onReceive {
                     when (it) {
-                        Event.OnResume -> {
-                            queryAllNote().let { list ->
-                                noteSeen.refreshNoteList(list)
-                            }
-                        }
+                        Event.OnResume -> noteSeen.refreshList()
                         else -> {}
                     }
                 }
                 noteSeen.viewEvent.onReceive {
                     when (it) {
                         NoteSeen.NoteEvent.Finish -> finish()
+                        NoteSeen.NoteEvent.AddBucket -> {
+                            TitleDialog(this@NoteActivity, getString(R.string.add_dir), "") { re ->
+                                if (re.isNotEmpty()) {
+                                    DataBaseDAOHelper.insertNoteTypeCB(
+                                        NoteType(re, "")
+                                    ) { suc, name ->
+                                        if (suc) {
+                                            noteSeen.insertNoteType(NoteType(name, ""))
+                                        } else {
+                                            toast(getString(R.string.failed_msg))
+                                        }
+                                    }
+                                } else {
+                                    toast(getString(R.string.enter))
+                                }
+                            }
+                        }
+                        NoteSeen.NoteEvent.Refresh -> {
+                            noteSeen = NoteSeen(this@NoteActivity)
+                            setContentSeen(noteSeen)
+                            noteSeen.initSeen()
+                            noteSeen.refreshList()
+                        }
                     }
                 }
             }
@@ -79,6 +99,21 @@ class NoteActivity : BaseActivity<NoteSeen>() {
                 co.resumeWith(Result.success(noteList[selected] ?: mutableListOf()))
             }
         }
+    }
+
+    private suspend fun queryAllNoteType() = withContext(Dispatchers.IO) {
+        suspendCoroutine<MutableList<NoteType>> { co ->
+            co.resumeWith(
+                Result.success(
+                    (DataBaseDAOHelper.getALLNoteType() ?: mutableListOf()) as MutableList<NoteType>
+                )
+            )
+        }
+    }
+
+    private suspend fun NoteSeen.refreshList() {
+        refreshNoteList(queryAllNote())
+        refreshNoteType(queryAllNoteType())
     }
 
 }

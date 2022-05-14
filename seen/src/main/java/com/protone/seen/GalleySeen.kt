@@ -130,6 +130,14 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
         showPop(binding.galleyActionMenu,!isSelect)
     }
 
+    fun refreshGalleries(galleries : MutableList<String>){
+
+    }
+
+    fun refreshMedias(medias : MutableList<GalleyMedia>){
+
+    }
+
     fun addBucket(name: String) {
         mailers[rightMailer]?.addBucket(name)
     }

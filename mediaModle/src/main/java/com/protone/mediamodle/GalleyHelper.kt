@@ -16,20 +16,6 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
     private val threadPool = Executors.newCachedThreadPool()
 
-//    private val updatePicture = Runnable {
-//        Galley.photo = scanPicture()
-//        sortSignedMedia(false)
-//    }
-
-//    private val updateVideo = Runnable {
-//        Galley.video = scanVideo()
-//        sortSignedMedia(true)
-//    }
-//
-//    private val updateMusic = Runnable {
-//        Galley.music = scanAudio()
-//    }
-
     inline fun saveIconToLocal(
         fileName: String, byteArray: ByteArray?,
         crossinline callBack: (String?) -> Unit
@@ -90,18 +76,5 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
         while (job1.isActive || job2.isActive || job3.isActive) continue
         callBack()
     }
-
-//    fun updatePicture() = threadPool.execute(updatePicture)
-//
-//    fun updateVideo() = threadPool.execute(updateVideo)
-//
-//    fun updateMusic() = threadPool.execute(updateMusic)
-
-    //TODO WTF this used for???
-//    private fun sortSignedMedia(isVideo: Boolean) {
-//        DataBaseDAOHelper.getAllSignedMedia()?.let { signed ->
-//            //
-//        }
-//    }
 
 }

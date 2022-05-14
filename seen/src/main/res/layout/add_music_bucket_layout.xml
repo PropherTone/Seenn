@@ -7,10 +7,10 @@
 
         <variable
             name="self"
-            type="com.protone.seen.PickMusicActivity" />
+            type="com.protone.seen.PickMusicSeen" />
 
 
-        <import type="com.protone.seen.PickMusicActivity.Event" />
+        <import type="com.protone.seen.PickMusicSeen.Event" />
 
     </data>
 

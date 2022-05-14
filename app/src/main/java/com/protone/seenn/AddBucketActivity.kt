@@ -9,6 +9,7 @@ import com.protone.api.toMediaBitmapByteArray
 import com.protone.api.todayTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
+import com.protone.mediamodle.Galley
 import com.protone.seen.AddBucketSeen
 import com.protone.seen.GalleySeen
 import kotlinx.coroutines.Dispatchers
@@ -61,10 +62,19 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                         }
                         AddBucketSeen.Event.Confirm ->
                             if (name != null) {
-                                addBucketSeen.updateMusicBucket(musicBucket!!).run {
+                                addBucketSeen.updateMusicBucket(musicBucket!!) { re ->
                                     Intent().apply {
-                                        setResult(RESULT_OK)
-                                        putExtra(BUCKET_NAME, name)
+                                        setResult(
+                                            if (re != 0 || re != -1) {
+                                                if (Galley.musicBucket.containsKey(name)) {
+                                                    Galley.musicBucket[addBucketSeen.name] =
+                                                        Galley.musicBucket.remove(name)
+                                                            ?: mutableListOf()
+                                                }
+                                                putExtra(BUCKET_NAME, addBucketSeen.name)
+                                                RESULT_OK
+                                            } else RESULT_CANCELED, this
+                                        )
                                     }
                                     finish()
                                 }
@@ -98,15 +108,18 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
         }
     }
 
-    private fun AddBucketSeen.updateMusicBucket(musicBucket: MusicBucket) {
-        DataBaseDAOHelper.updateMusicBucket(
+    private inline fun AddBucketSeen.updateMusicBucket(
+        musicBucket: MusicBucket,
+        crossinline callBack: (Int) -> Unit
+    ) {
+        DataBaseDAOHelper.updateMusicBucketCB(
             musicBucket.also { mb ->
                 if (mb.name != name) mb.name = name
                 val toMediaBitmapByteArray = uri?.toMediaBitmapByteArray()
                 if (!mb.icon.contentEquals(toMediaBitmapByteArray)) mb.icon = toMediaBitmapByteArray
                 if (mb.detail != detail) mb.detail = detail
                 todayTime("yyyy/MM/dd")
-            }
+            }, callBack
         )
     }
 

@@ -10,7 +10,13 @@ import com.protone.database.room.entity.GalleyMedia
 interface SignedGalleyDAO {
 
     @Query("SELECT * FROM GalleyMedia")
-    fun getAllSignedMedia() : List<GalleyMedia>?
+    fun getAllSignedMedia(): List<GalleyMedia>?
+
+    @Query("SELECT bucket FROM GalleyMedia")
+    fun getAllMediaGalley(): List<String>?
+
+    @Query("SELECT * FROM GalleyMedia WHERE bucket LIKE :name")
+    fun getGalleyByName(name: String): List<GalleyMedia>?
 
     @Delete
     fun deleteSignedMedia(media: GalleyMedia)
@@ -19,10 +25,10 @@ interface SignedGalleyDAO {
     fun insertSignedMedia(media: GalleyMedia)
 
     @Query("SELECT * FROM GalleyMedia WHERE uri LIKE :uri")
-    fun getSignedMedia(uri: Uri) : GalleyMedia?
+    fun getSignedMedia(uri: Uri): GalleyMedia?
 
     @Query("SELECT * FROM GalleyMedia WHERE path LIKE :path")
-    fun getSignedMedia(path: String) : GalleyMedia?
+    fun getSignedMedia(path: String): GalleyMedia?
 
     @Update
     fun updateSignedMedia(galleyMedia: GalleyMedia)

@@ -3,6 +3,7 @@ package com.protone.seen.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
@@ -124,16 +125,16 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 }
             }
             musicBucketEdit.setOnClickListener {
-                musicBucketEvent?.edit(musicBuckets[holder.layoutPosition].name)
+                musicBucketEvent?.edit(musicBuckets[holder.layoutPosition].name,position)
                 closeMusicBucketBack()
             }
             musicBucketDelete.setOnClickListener {
-                musicBucketEvent?.delete(musicBuckets[holder.layoutPosition].name)
+                musicBucketEvent?.delete(musicBuckets[holder.layoutPosition].name,position)
                 closeMusicBucketBack()
             }
             musicBucketAddList.setOnClickListener {
                 closeMusicBucketBack()
-                musicBucketEvent?.addList(musicBuckets[holder.layoutPosition].name)
+                musicBucketEvent?.addList(musicBuckets[holder.layoutPosition].name,position)
             }
         }
     }
@@ -141,9 +142,9 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
     var musicBucketEvent: MusicBucketEvent? = null
 
     interface MusicBucketEvent {
-        fun addList(bucket: String)
-        fun delete(bucket: String)
-        fun edit(bucket: String)
+        fun addList(bucket: String,position: Int)
+        fun delete(bucket: String,position: Int)
+        fun edit(bucket: String,position: Int)
     }
 
     private fun loadIcon(
@@ -178,8 +179,10 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
 
     fun refreshBucket(name: String, bucket: MusicBucket) {
         val indexOfFirst = musicBuckets.indexOfFirst { it.name == name }
-        musicBuckets[indexOfFirst] = bucket
-        notifyItemChanged(indexOfFirst)
+        if (indexOfFirst != -1) {
+            musicBuckets[indexOfFirst] = bucket
+            notifyItemChanged(indexOfFirst)
+        }
     }
 
 }
