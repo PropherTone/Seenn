@@ -1,6 +1,6 @@
 package com.protone.seen.adapter
 
-import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.net.Uri
 import android.view.ViewGroup
@@ -10,11 +10,13 @@ import com.bumptech.glide.Glide
 import com.protone.api.Config
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.onUiThread
+import com.protone.database.room.dao.DataBaseDAOHelper
+import com.protone.seen.R
 import com.protone.seen.databinding.GalleyBucketListLayoutBinding
 
 class GalleyBucketAdapter(
     context: Context,
-    var videoBucket: MutableList<Pair<Uri, Array<String>>>,
+    var galleries: MutableList<Pair<Uri, Array<String>>>,
     val selectBucket: (String) -> Unit
 ) : SelectListAdapter<GalleyBucketListLayoutBinding, Pair<Uri, Array<String>>>(context) {
 
@@ -24,7 +26,7 @@ class GalleyBucketAdapter(
         }
 
     override fun itemIndex(path: Pair<Uri, Array<String>>): Int {
-        return videoBucket.indexOf(path)
+        return galleries.indexOf(path)
     }
 
     override fun onCreateViewHolder(
@@ -41,9 +43,27 @@ class GalleyBucketAdapter(
     }
 
     override fun onBindViewHolder(holder: Holder<GalleyBucketListLayoutBinding>, position: Int) {
-        videoBucket[position].let { data ->
+        galleries[position].let { data ->
             setSelect(holder, selectList.contains(data))
             holder.binding.apply {
+                root.setOnLongClickListener {
+                    DataBaseDAOHelper.getGalleyBucket(galleries[position].second[0]) { galley ->
+                        if (galley != null) context.onUiThread {
+                            AlertDialog.Builder(context)
+                                .setTitle(context.getString(R.string.delete))
+                                .setPositiveButton(
+                                    R.string.confirm
+                                ) { dialog, _ ->
+                                    DataBaseDAOHelper.deleteGalleyBucket(galley)
+                                    deleteBucket(galleries[position])
+                                    dialog.dismiss()
+                                }.setNegativeButton(R.string.cancel) { dialog, _ ->
+                                    dialog.dismiss()
+                                }.create().show()
+                        }
+                    }
+                    false
+                }
                 bucketThumb.let { thumb ->
                     Glide.with(context).load(data.first)
                         .into(thumb)
@@ -61,21 +81,23 @@ class GalleyBucketAdapter(
 
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun noticeDataUpdate(item: MutableList<Pair<Uri, Array<String>>>) {
-        videoBucket.clear()
-        videoBucket.addAll(item)
-        notifyDataSetChanged()
+    fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
+        val index = galleries.indexOf(bucket)
+        if (index != -1) {
+            galleries.removeAt(index)
+            selectList.remove(bucket)
+            notifyItemRemoved(index)
+        }
     }
 
-    fun insetBucket(item: Pair<Uri, Array<String>>) {
-        videoBucket.add(item)
+    fun insertBucket(item: Pair<Uri, Array<String>>) {
+        galleries.add(item)
         context.onUiThread {
-            notifyItemInserted(videoBucket.size)
+            notifyItemInserted(galleries.size)
         }
     }
 
     override fun getItemCount(): Int {
-        return videoBucket.size
+        return galleries.size
     }
 }

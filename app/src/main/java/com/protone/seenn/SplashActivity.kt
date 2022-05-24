@@ -11,7 +11,7 @@ import com.protone.api.context.UPDATE_GALLEY
 import com.protone.api.context.intent
 import com.protone.api.requestContentPermission
 import com.protone.api.toBitmapByteArray
-import com.protone.api.todayTime
+import com.protone.api.todayDate
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
@@ -36,7 +36,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                             if (Galley.music.size > 0) Galley.music[0].uri.toBitmapByteArray() else null,
                             Galley.music.size,
                             null,
-                            todayTime("yyyy/MM/dd")
+                            todayDate("yyyy/MM/dd")
                         )
                     )
                     DataBaseDAOHelper.insertMusicMulti(Galley.music)
@@ -112,10 +112,6 @@ class SplashActivity : BaseActivity<SplashSeen>() {
 
     private fun updateMedia() {
         workLocalBroadCast.sendBroadcast(Intent().setAction(UPDATE_GALLEY))
-        GalleyHelper.run {
-            updateAll {
-                mHandler.sendEmptyMessage(1)
-            }
-        }
+        GalleyHelper.updateAll { mHandler.sendEmptyMessage(1) }
     }
 }

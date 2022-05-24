@@ -11,7 +11,7 @@ import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.api.toDrawable
-import com.protone.api.todayTime
+import com.protone.api.todayDate
 import com.protone.seen.adapter.MainModelListAdapter
 import com.protone.seen.databinding.MainLayoutBinding
 
@@ -35,7 +35,7 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
         set(value) {
             binding.userWelcome.text =
                 if (value == "") context.getString(R.string.welcome_msg) else value
-            binding.userDate.text = todayTime("yyyy/MM/dd")
+            binding.userDate.text = todayDate("yyyy/MM/dd")
             field = value
         }
         get() = binding.userWelcome.text.toString()

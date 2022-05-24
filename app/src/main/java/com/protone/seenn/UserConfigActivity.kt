@@ -35,7 +35,7 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                 event.onReceive {}
                 userConfigSeen.viewEvent.onReceive {
                     when (it) {
-                        UserConfigSeen.UserEvent.Login -> UserPops(this@UserConfigActivity).startLoginPopUp(
+                        UserConfigSeen.UserEvent.Login -> UserPops(this@UserConfigActivity).startLoginPopUp(userConfig.userName != "",
                             { name, password ->
                                 return@startLoginPopUp when {
                                     userConfig.userName == "" -> false
@@ -65,7 +65,7 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                                 )
                             }).let { re ->
                             if (re != null) {
-                                val toEntity = re.data?.getStringExtra("GalleyData")
+                                val toEntity = re.data?.getStringExtra(GalleyActivity.GALLEY_DATA)
                                     ?.toEntity(GalleyMedia::class.java)
                                 if (toEntity != null) {
                                     GalleyHelper.saveIconToLocal(

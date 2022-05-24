@@ -7,12 +7,12 @@ import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.intent
 import com.protone.api.context.onUiThread
 import com.protone.api.toBitmapByteArray
-import com.protone.api.todayTime
+import com.protone.api.todayDate
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
-import com.protone.mediamodle.media.MusicReceiver
-import com.protone.mediamodle.media.musicBroadCastManager
+import com.protone.seenn.broadcast.MusicReceiver
+import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.MusicSeen
 import kotlinx.coroutines.*
@@ -122,7 +122,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                             if (Galley.music.size > 0) Galley.music[0].uri.toBitmapByteArray() else null,
                             Galley.music.size,
                             null,
-                            todayTime("yyyy/MM/dd")
+                            todayDate("yyyy/MM/dd")
                         )
                     ) { re, _ ->
                         if (re) {

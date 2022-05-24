@@ -18,6 +18,6 @@ interface GalleyBucketDAO {
     @Delete
     fun deleteGalleyBucket(galleyBucket: GalleyBucket)
 
-    @Query("SELECT * FROM GalleyBucket")
-    fun getALLGalleyBucket(): List<GalleyBucket>?
+    @Query("SELECT * FROM GalleyBucket WHERE image LIKE :isVideo")
+    fun getALLGalleyBucket(isVideo : Boolean): List<GalleyBucket>?
 }

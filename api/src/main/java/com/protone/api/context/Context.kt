@@ -64,6 +64,10 @@ val Context.hasNavigationBar: Boolean
     get() = currentHeight > getHeight
 
 inline fun Context.onUiThread(crossinline function: () -> Unit) {
+    if (Looper.getMainLooper() == Looper.myLooper()) {
+        function.invoke()
+        return
+    }
     when (this) {
         is Activity -> runOnUiThread { function.invoke() }
         else -> CoroutineScope(Dispatchers.Main).launch { function.invoke() }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.protone.api.context.layoutInflater
+import com.protone.api.toDateString
 import com.protone.api.toDrawable
 import com.protone.database.room.entity.Note
 import com.protone.seen.databinding.MainLayoutBinding
@@ -35,7 +36,7 @@ class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBindi
                     noteBack.background = drawable
                 }
                 noteTitle.text = it.title
-                noteDate.text = it.time
+                noteDate.text = it.time.toDateString()
             }
         }
     }

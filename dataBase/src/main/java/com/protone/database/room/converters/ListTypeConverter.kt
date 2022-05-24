@@ -5,14 +5,14 @@ import androidx.room.TypeConverter
 class ListTypeConverter {
 
     @TypeConverter
-    fun stringToObject(value: String?): List<String>? {
+    fun stringToObject(value: String?): List<String> {
         val mutableList = mutableListOf<String>()
-        value?.split("|")?.forEach { mutableList.add(it) }
+        value?.split("|")?.forEach { if (it.isNotEmpty()) mutableList.add(it) }
         return mutableList
     }
 
     @TypeConverter
-    fun objectToString(list: List<String>?): String? {
+    fun objectToString(list: List<String>?): String {
         val sb = StringBuilder()
         list?.stream()?.forEach { sb.append("$it|") }
         return sb.toString()

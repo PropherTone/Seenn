@@ -4,7 +4,7 @@ import android.content.Intent
 import android.transition.TransitionManager
 import com.protone.api.context.*
 import com.protone.mediamodle.Galley
-import com.protone.mediamodle.media.musicBroadCastManager
+import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.MainSeen
 import com.protone.seen.Progress

@@ -179,8 +179,9 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
 
     fun refreshBucket(name: String, bucket: MusicBucket) {
         val indexOfFirst = musicBuckets.indexOfFirst { it.name == name }
-        if (indexOfFirst != -1) {
+        if (indexOfFirst != -1 && indexOfFirst != 0) {
             musicBuckets[indexOfFirst] = bucket
+            Log.d("TAG", "refreshBucket: $indexOfFirst")
             notifyItemChanged(indexOfFirst)
         }
     }

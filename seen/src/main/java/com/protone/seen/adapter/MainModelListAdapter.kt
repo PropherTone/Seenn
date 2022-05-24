@@ -8,7 +8,6 @@ import com.protone.api.context.layoutInflater
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.toDateString
-import com.protone.api.todayTime
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.Note
@@ -45,16 +44,16 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
         loadDataBelow()
     }
 
-    fun loadDataBelow() {
+    private fun loadDataBelow() {
         Galley.apply {
-            musicInToday()?.toJson()?.let { itemList.add("music:$it") }
-            notifyItemInserted(itemList.size - 1)
             photoInToday()?.toJson()?.let { itemList.add("photo:$it") }
             notifyItemInserted(itemList.size - 1)
             videoInToday()?.toJson()?.let { itemList.add("video:$it") }
             notifyItemInserted(itemList.size - 1)
-            videoInToday()?.toJson()?.let { itemList.add("tNote:$it") }
+            noteInToday()?.toJson()?.let { itemList.add("tNote:$it") }
             notifyItemInserted(itemList.size - 1)
+//            musicInToday().toJson().let { itemList.add("music:$it") }
+//            notifyItemInserted(itemList.size - 1)
         }
     }
 
@@ -116,6 +115,9 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
             }
             is NoteCardViewHolder -> {
                 val note = itemList[position].substring(6).toEntity(Note::class.java)
+                Glide.with(context).asDrawable().load(note.imagePath)
+                    .into(holder.binding.modelNoteIcon)
+                holder.binding.modelNoteTitle.text = note.title
             }
             is PhotoCardViewHolder -> {
                 val media = itemList[position].substring(6).toEntity(GalleyMedia::class.java)
@@ -139,13 +141,13 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
         }
     }
 
-    var modelClkListener : ModelClk? = null
+    var modelClkListener: ModelClk? = null
 
-    interface ModelClk{
-        fun onPhoto(json : String)
-        fun onNote(json : String)
-        fun onVideo(json : String)
-        fun onMusic(json : String)
+    interface ModelClk {
+        fun onPhoto(json: String)
+        fun onNote(json: String)
+        fun onVideo(json: String)
+        fun onMusic(json: String)
     }
 
     override fun getItemCount(): Int = itemList.size

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
 import com.protone.api.context.Global
 import com.protone.api.context.onBackground
 import com.protone.api.context.workIntentFilter
@@ -16,6 +17,7 @@ import com.protone.database.room.dao.DataBaseDAOHelper.getMusicBucketByName
 import com.protone.database.room.dao.DataBaseDAOHelper.insertMusicMulti
 import com.protone.database.room.dao.DataBaseDAOHelper.sortSignedMedia
 import com.protone.database.room.dao.DataBaseDAOHelper.updateMusicBucketBack
+import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Galley.music
 import com.protone.mediamodle.Galley.musicBucket
@@ -24,13 +26,19 @@ import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.IWorkService
 import com.protone.mediamodle.WorkReceiver
 import com.protone.mediamodle.media.scanPicture
+import com.protone.mediamodle.media.scanVideo
 import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seenn.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.function.Consumer
+import java.util.stream.Collectors
 
-class WorkService : Service() {
+class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
     private val workReceiver: BroadcastReceiver = object : WorkReceiver() {
         override fun updateMusicBucket() {
@@ -102,12 +110,31 @@ class WorkService : Service() {
 
     private fun updateMusic() {}
     private fun updateGalley() = DataBaseDAOHelper.run {
-        onBackground {
+        fun sortMedia(allSignedMedia: MutableList<GalleyMedia>, galleyMedia: GalleyMedia) {
+            allSignedMedia.stream().filter { it.uri == galleyMedia.uri }
+                .collect(Collectors.toList()).let { list ->
+                    if (list.size > 0) allSignedMedia.remove(list[0])
+                }
+        }
+        launch {
             val allSignedMedia = getAllSignedMedia() as MutableList
-            scanPicture{ _, galleyMedia ->
-                allSignedMedia.remove(galleyMedia)
-                sortSignedMedia(galleyMedia)
+            val scanPicture = launch {
+                scanPicture { _, galleyMedia ->
+                    synchronized(allSignedMedia) {
+                        sortMedia(allSignedMedia, galleyMedia)
+                    }
+                    sortSignedMedia(galleyMedia)
+                }
             }
+            val scanVideo = launch {
+                scanVideo { _, galleyMedia ->
+                    synchronized(allSignedMedia) {
+                        sortMedia(allSignedMedia, galleyMedia)
+                    }
+                    sortSignedMedia(galleyMedia)
+                }
+            }
+            while (scanPicture.isActive || scanVideo.isActive) continue
             allSignedMedia.forEach {
                 deleteSignedMedia(it)
             }

@@ -16,8 +16,8 @@ import com.protone.api.context.intent
 import com.protone.api.context.musicIntentFilter
 import com.protone.database.sp.config.UserConfig
 import com.protone.database.room.entity.Music
-import com.protone.mediamodle.media.MediaContentObserver
-import com.protone.mediamodle.media.MusicReceiver
+import com.protone.seenn.broadcast.MediaContentObserver
+import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seen.Seen
 import com.protone.seenn.service.MusicService
 import com.protone.seenn.theme.ThemeProvider
@@ -31,7 +31,7 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     CoroutineScope by MainScope() {
 
     companion object {
-        val TAG = this::class.simpleName
+        val TAG = "TAG"
     }
 
     var musicReceiver: MusicReceiver? = null

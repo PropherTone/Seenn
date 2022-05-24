@@ -1,7 +1,6 @@
 package com.protone.database.room.dao
 
 import android.net.Uri
-import com.protone.api.upSDK31
 import com.protone.database.room.*
 import com.protone.database.room.entity.*
 
@@ -80,7 +79,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    inline fun updateMusicBucketCB(bucket: MusicBucket,crossinline callBack: (Int) -> Unit) {
+    inline fun updateMusicBucketCB(bucket: MusicBucket, crossinline callBack: (Int) -> Unit) {
         execute {
             callBack.invoke(updateMusicBucket(bucket))
         }
@@ -189,12 +188,15 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun getAllSignedMedia(): List<GalleyMedia>? = signedGalleyDAO?.getAllSignedMedia()
-    override fun getAllMediaGalley(): List<String>? {
-        return signedGalleyDAO?.getAllMediaGalley()
+    override fun getAllMediaByType(isVideo: Boolean): List<GalleyMedia>? =
+        signedGalleyDAO?.getAllMediaByType(isVideo)
+
+    override fun getAllGalley(isVideo: Boolean): List<String>? {
+        return signedGalleyDAO?.getAllGalley(isVideo)
     }
 
-    override fun getGalleyByName(name: String): List<GalleyMedia>? {
-      return signedGalleyDAO?.getGalleyByName(name)
+    override fun getAllMediaByGalley(name: String, isVideo: Boolean): List<GalleyMedia>? {
+        return signedGalleyDAO?.getAllMediaByGalley(name, isVideo)
     }
 
     override fun deleteSignedMedia(media: GalleyMedia) {
@@ -203,8 +205,8 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    fun insertSignedMediaMulti(list: MutableList<GalleyMedia>) {
-        execute { list.forEach { sortSignedMedia(it) } }
+    fun updateMediaMulti(list: MutableList<GalleyMedia>) {
+        execute { list.forEach { updateSignedMedia(it) } }
     }
 
     override fun insertSignedMedia(media: GalleyMedia) {
@@ -218,9 +220,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
                 it.path = media.path
                 it.bucket = media.bucket
                 it.type = media.type
-                it.cate = media.cate
                 it.date = media.date
-                it.notes = media.notes
                 updateSignedMedia(it)
             } else signedGalleyDAO?.insertSignedMedia(media)
         }
@@ -319,11 +319,11 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
 
     override fun deleteNoteType(noteType: NoteType) {
-         noteTypeDAO?.deleteNoteType(noteType)
+        noteTypeDAO?.deleteNoteType(noteType)
     }
 
-    fun doDeleteNoteType(noteType: NoteType,callBack: (Boolean) -> Unit){
-        execute{
+    fun doDeleteNoteType(noteType: NoteType, callBack: (Boolean) -> Unit) {
+        execute {
             deleteNoteType(noteType)
             callBack.invoke(getNoteType(noteType.type) != null)
         }
@@ -348,7 +348,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
             var count = 0
             val tempName = galleyBucket.type
             val names = mutableMapOf<String, Int>()
-            getALLGalleyBucket()?.forEach {
+            getALLGalleyBucket(galleyBucket.isImage)?.forEach {
                 names[it.type] = 1
                 if (it.type == galleyBucket.type) {
                     galleyBucket.type = "${tempName}(${++count})"
@@ -370,12 +370,21 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         galleyBucketDAO?.getGalleyBucket(name)
 
     override fun deleteGalleyBucket(galleyBucket: GalleyBucket) {
-        execute {
+        execute{
             galleyBucketDAO?.deleteGalleyBucket(galleyBucket)
         }
     }
 
-    override fun getALLGalleyBucket(): List<GalleyBucket>? = galleyBucketDAO?.getALLGalleyBucket()
+
+
+    fun getGalleyBucket(name: String,callBack: (GalleyBucket?) -> Unit){
+        execute{
+            callBack.invoke(getGalleyBucket(name))
+        }
+    }
+
+    override fun getALLGalleyBucket(isVideo: Boolean): List<GalleyBucket>? =
+        galleyBucketDAO?.getALLGalleyBucket(isVideo)
 
 }
 

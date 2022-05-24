@@ -61,7 +61,7 @@
             android:exported="false" />
 
         <receiver
-            android:name="com.protone.mediamodle.media.MusicReceiver"
+            android:name=".broadcast.MusicReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

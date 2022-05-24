@@ -2,7 +2,10 @@ package com.protone.seen
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -11,11 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.protone.api.context.layoutInflater
+import com.protone.api.context.onUiThread
 import com.protone.api.context.root
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.adapter.CheckListAdapter
 import com.protone.seen.adapter.GalleyViewPager2Adapter
 import com.protone.seen.databinding.GalleyViewLayouyBinding
+import com.protone.seen.databinding.RichVideoLayoutBinding
 
 @SuppressLint("ClickableViewAccessibility")
 class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEvent>(context) {
@@ -95,7 +100,6 @@ class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEv
         title: String,
         time: String,
         size: String,
-        cato: String,
         type: String,
     ) = binding.run {
         galleyVTitle.text = title
@@ -105,20 +109,32 @@ class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEv
         galleyVSize.text = String.format(
             context.getString(R.string.size),
             size.ifEmpty { context.getString(R.string.none) })
-        galleyVCato.text = String.format(
-            context.getString(R.string.cato),
-            cato.ifEmpty { context.getString(R.string.none) })
         galleyVType.text = String.format(
-            context.getString(R.string.type),
+            context.getString(R.string.location),
             type.ifEmpty { context.getString(R.string.none) })
     }
 
     fun setNotes(notes: MutableList<String>) {
-        (binding.galleyVLinks.adapter as CheckListAdapter).dataList = notes
+        context.onUiThread {
+            if (binding.galleyVLinks.adapter is CheckListAdapter)
+                (binding.galleyVLinks.adapter as CheckListAdapter).dataList = notes
+        }
+    }
+
+    fun addCato(view:View) {
+        context.onUiThread {
+            binding.galleyVCatoContainer.addView(view)
+        }
+    }
+
+    fun removeCato() {
+        context.onUiThread {
+            binding.galleyVCatoContainer.removeAllViews()
+        }
     }
 
     fun showPop() {
-        showPop(binding.galleyVAction,true)
+        showPop(binding.galleyVAction, true)
     }
 
     override fun popDelete() = offer(GalleyVEvent.Delete)
@@ -131,4 +147,33 @@ class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEv
         viewEvent.offer(event)
     }
 
+    class GalleyViewFragment(private val galleyMedia: GalleyMedia) : Fragment() {
+
+        private lateinit var binding: RichVideoLayoutBinding
+
+        override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View {
+            binding = RichVideoLayoutBinding.inflate(inflater, container, false)
+            binding.richVideo.setVideoPath(galleyMedia.uri)
+            return binding.root
+        }
+
+        override fun onDestroy() {
+            super.onDestroy()
+            binding.richVideo.release()
+        }
+
+        override fun onResume() {
+            super.onResume()
+            binding.richVideo.play()
+        }
+
+        override fun onPause() {
+            super.onPause()
+            binding.richVideo.pause()
+        }
+    }
 }

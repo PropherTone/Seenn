@@ -19,7 +19,7 @@ import com.protone.mediamodle.Galley
 import com.protone.mediamodle.MusicState
 import com.protone.mediamodle.media.*
 import com.protone.seenn.R
-import com.protone.seenn.broadcast.ApplicationBroadCast
+import com.protone.seenn.broadcast.*
 import java.util.*
 import kotlin.concurrent.timerTask
 import kotlin.system.exitProcess
@@ -41,7 +41,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
 
     private val appReceiver = object : ApplicationBroadCast() {
         override fun finish() {
-            notificationManager?.cancel(NOTIFICATION_ID)
+            notificationManager?.cancelAll()
             this@MusicService.stopSelf()
             exitProcess(0)
         }
@@ -90,6 +90,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
 
         private fun notificationPlayState(state: Boolean) {
             playState.postValue(state)
+            initMusicNotification()
             remoteViews?.setImageViewResource(
                 R.id.notify_music_control,
                 if (state) R.drawable.ic_baseline_pause_24
@@ -177,9 +178,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
 
     override fun onDestroy() {
         super.onDestroy()
-        remoteViews?.let {
-            it.removeAllViews(it.layoutId)
-        }
         remoteViews = null
         notificationManager?.cancelAll()
         notificationManager = null

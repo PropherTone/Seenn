@@ -50,30 +50,14 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
         }
     }
 
-    private suspend fun updatePictureCO() = withContext(Dispatchers.IO) {
-        Galley.photo = scanPicture()
-//        sortSignedMedia(false)
-        cancel()
-    }
-
-    private suspend fun updateVideoCO() = withContext(Dispatchers.IO) {
-        val allSignedMedia = DataBaseDAOHelper.getAllSignedMedia()
-        Galley.video = scanVideo()
-//        sortSignedMedia(true)
-        cancel()
-    }
-
     private suspend fun updateMusicCO() = withContext(Dispatchers.IO) {
         Galley.musicBucket[Global.application.getString(R.string.all_music)] = scanAudio()
         cancel()
     }
 
     fun updateAll(callBack: () -> Unit) = threadPool.execute {
-        val job1 = launch { updatePictureCO() }
-        val job2 = launch { updateVideoCO() }
         val job3 = launch { updateMusicCO() }
-
-        while (job1.isActive || job2.isActive || job3.isActive) continue
+        while (job3.isActive) continue
         callBack()
     }
 

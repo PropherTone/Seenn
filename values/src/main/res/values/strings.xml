@@ -354,8 +354,8 @@ II. 幂等 的意味着对同一URL的多个请求应该返回同样的结果。
     <string name="come_up_unknown_error">发生未知错误</string>
     <string name="time">日期:%s</string>
     <string name="size">大小:%s</string>
-    <string name="cato">标签:%s</string>
-    <string name="type">类别:%s</string>
+    <string name="cato">标签:</string>
+    <string name="location">路径:%s</string>
     <string name="login">登陆</string>
     <string name="reg">注册</string>
     <string name="password">密码</string>
@@ -366,4 +366,6 @@ II. 幂等 的意味着对同一URL的多个请求应该返回同样的结果。
     <string name="success">成功</string>
     <string name="addCate">添加标签</string>
     <string name="add_dir">添加文件夹</string>
+    <string name="add_cate">添加标签</string>
+    <string name="add_con">添加链接</string>
 </resources>

@@ -22,20 +22,19 @@ class NoteSyncActivity : BaseActivity<NoteSyncSeen>() {
         val noteSyncSeen = NoteSyncSeen(this)
         setContentSeen(noteSyncSeen)
 
-        withContext(Dispatchers.IO) {
-            val appdata = DataBaseDAOHelper.let {
-                AppData(
-                    it.getAllMusic()?.toJson() ?: "",
-                    it.getALLGalleyBucket()?.toJson() ?: "",
-                    it.getALLNoteType()?.toJson() ?: "",
-                    it.getAllMusicBucket()?.toJson() ?: "",
-                    it.getAllNote()?.toJson() ?: "",
-                    it.getAllSignedMedia()?.toJson() ?: ""
-                )
-            }
-            Log.d("TAG", "main: $appdata")
-            appdata
-        }
+//        withContext(Dispatchers.IO) {
+//            val appdata = DataBaseDAOHelper.let {
+//                AppData(
+//                    it.getAllMusic()?.toJson() ?: "",
+//                    it.getALLGalleyBucket()?.toJson() ?: "",
+//                    it.getALLNoteType()?.toJson() ?: "",
+//                    it.getAllMusicBucket()?.toJson() ?: "",
+//                    it.getAllNote()?.toJson() ?: "",
+//                    it.getAllSignedMedia()?.toJson() ?: ""
+//                )
+//            }
+//            Log.d("TAG", "main: $appdata")
+//        }
 
         bindService(
             Intent(this@NoteSyncActivity, NoteSyncService::class.java),

@@ -1,25 +1,32 @@
 package com.protone.seenn
 
+import com.bumptech.glide.Glide
 import com.protone.api.context.intent
+import com.protone.api.context.layoutInflater
 import com.protone.api.context.onUiThread
+import com.protone.api.context.root
 import com.protone.api.json.toEntity
+import com.protone.api.json.toJson
+import com.protone.api.json.toUri
 import com.protone.api.toDateString
-import com.protone.api.toSplitString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
-import com.protone.mediamodle.Galley
 import com.protone.seen.GalleyViewSeen
+import com.protone.seen.databinding.ImageCateLayoutBinding
+import com.protone.seen.databinding.TextCateLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.util.stream.Collectors
 
 class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
 
     companion object {
         const val MEDIA = "GalleyViewActivity:MediaData"
         const val TYPE = "GalleyViewActivity:IsVideo"
+        const val GALLEY = "GalleyViewActivity:Galley"
     }
 
     private var curPosition: Int = 0
@@ -30,10 +37,17 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
         setContentSeen(galleyViewSeen)
 
         val isVideo = intent.getBooleanExtra(TYPE, false)
-        galleyMedias = (if (isVideo)
-            Galley.video[getString(R.string.all_galley)] ?: mutableListOf()
-        else Galley.photo[getString(R.string.all_galley)]) ?: mutableListOf()
 
+        galleyMedias = withContext(Dispatchers.IO) {
+            val galley = intent.getStringExtra(GALLEY) ?: getString(R.string.all_galley)
+            var allMedia = (DataBaseDAOHelper.getAllMediaByType(isVideo)
+                ?: mutableListOf()) as MutableList<GalleyMedia>
+            if (galley != this@GalleyViewActivity.getString(R.string.all_galley)) allMedia =
+                allMedia.stream().filter {
+                    (it.bucket == galley) || (it.type?.contains(galley) == true)
+                }.collect(Collectors.toList())
+            allMedia
+        }
         galleyViewSeen.init(isVideo)
 
         while (isActive) {
@@ -43,7 +57,7 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
                     when (it) {
                         GalleyViewSeen.GalleyVEvent.Finish -> finish()
                         GalleyViewSeen.GalleyVEvent.ShowAction -> galleyViewSeen.showPop()
-                        GalleyViewSeen.GalleyVEvent.SetNotes -> galleyViewSeen.setNotes()
+                        GalleyViewSeen.GalleyVEvent.SetNotes -> galleyViewSeen.setInfo()
                         GalleyViewSeen.GalleyVEvent.AddCato -> {}
                         GalleyViewSeen.GalleyVEvent.Delete -> {}
                         GalleyViewSeen.GalleyVEvent.IntoBox -> {}
@@ -68,27 +82,56 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
             setMediaInfo(position)
         }
         setMediaInfo(mediaIndex)
-        setNotes()
+        setInfo()
     }
 
-    private fun GalleyViewSeen.setNotes() {
+    private fun GalleyViewSeen.setInfo() {
         DataBaseDAOHelper.getSignedMediaCB(
             galleyMedias[curPosition].uri
         ) { galleyMedia ->
-            onUiThread {
-                ((galleyMedia?.notes
-                    ?: mutableListOf()) as MutableList<String>).let { setNotes(it) }
+            removeCato()
+            galleyMedia?.cate?.onEach {
+                if (it.contains("content://")) {
+                    addCato(
+                        ImageCateLayoutBinding.inflate(
+                            context.layoutInflater,
+                            context.root,
+                            false
+                        ).apply {
+                            onUiThread {
+                                Glide.with(context).asDrawable().load(it.toUri()).into(catoBack)
+                                catoName.text = galleyMedia.name
+                                root.setOnClickListener {
+                                    startActivity(GalleyViewActivity::class.intent.apply {
+                                        putExtra(MEDIA, galleyMedia.toJson())
+                                        putExtra(TYPE, galleyMedia.isVideo)
+                                    })
+                                }
+                            }
+                        }.root
+                    )
+                } else {
+                    addCato(
+                        TextCateLayoutBinding.inflate(
+                            context.layoutInflater,
+                            context.root,
+                            false
+                        ).apply {
+                            cato.text = it
+                        }.root
+                    )
+                }
             }
+            setNotes(((galleyMedia?.notes ?: mutableListOf()) as MutableList<String>))
         }
     }
 
     private fun GalleyViewSeen.setMediaInfo(position: Int) = galleyMedias[position].let { m ->
         setMediaInfo(
             m.name,
-            m.date.toDateString().toString(),
+            m.date.toDateString("yyyy/MM/dd").toString(),
             "${m.size / 1024}Kb",
-            m.cate?.toSplitString(",") ?: "",
-            m.type?.toSplitString(",") ?: ""
+            m.path ?: m.uri.toString()
         )
     }
 

@@ -47,42 +47,29 @@ fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)? = null): MutableMap<Stri
             if (!galley.containsKey(bucketName)) {
                 galley[bucketName] = arrayListOf()
             }
-            function?.invoke(
-                uri, GalleyMedia(
-                    null,
-                    imageName,
-                    path,
-                    bucketName,
-                    imageSize,
-                    null,
-                    null,
-                    uri,
-                    dateTime,
-                    thumbnailUri, 0, false,
-                    null
-                )
-            )
-            galley[bucketName]?.add(
-                GalleyMedia(
-                    null,
-                    imageName,
-                    path,
-                    bucketName,
-                    imageSize,
-                    null,
-                    null,
-                    uri,
-                    dateTime,
-                    thumbnailUri, 0, false,
-                    null
-                )
-            )
+            GalleyMedia(
+                null,
+                imageName,
+                path,
+                bucketName,
+                imageSize,
+                null,
+                null,
+                uri,
+                dateTime,
+                thumbnailUri, 0,
+                false,
+                null
+            ).let { gm ->
+                function?.invoke(gm.uri, gm)
+                galley[bucketName]?.add(gm)
+            }
         }
     }
     return galley
 }
 
-fun scanVideo(): MutableMap<String, MutableList<GalleyMedia>> {
+fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)? = null): MutableMap<String, MutableList<GalleyMedia>> {
     val externalContentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     val query = arrayOf(
         MediaStore.Video.Media.DISPLAY_NAME,
@@ -121,22 +108,23 @@ fun scanVideo(): MutableMap<String, MutableList<GalleyMedia>> {
             if (!galley.containsKey(bucketName)) {
                 galley[bucketName] = arrayListOf()
             }
-            galley[bucketName]?.add(
-                GalleyMedia(
-                    null,
-                    imageName,
-                    path,
-                    bucketName,
-                    imageSize,
-                    null,
-                    null,
-                    uri,
-                    dateTime,
-                    thumbnailUri, duration,
-                    true,
-                    null
-                )
-            )
+            GalleyMedia(
+                null,
+                imageName,
+                path,
+                bucketName,
+                imageSize,
+                null,
+                null,
+                uri,
+                dateTime,
+                thumbnailUri, duration,
+                true,
+                null
+            ).let { gm ->
+                function?.invoke(gm.uri, gm)
+                galley[bucketName]?.add(gm)
+            }
         }
     }
     return galley

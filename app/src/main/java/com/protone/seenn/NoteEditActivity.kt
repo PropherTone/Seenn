@@ -8,7 +8,6 @@ import com.protone.api.json.toUriJson
 import com.protone.api.toDateString
 import com.protone.api.toDrawable
 import com.protone.api.toMediaBitmapByteArray
-import com.protone.api.todayTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
@@ -83,7 +82,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                             noteEditSeen.showProgress(false)
                                         }
                                     } else "",
-                                    todayTime("yyyy/MM/dd"),
+                                    System.currentTimeMillis(),
                                     mutableListOf(intent.getStringExtra(NOTE_TYPE)),
                                     indexedRichNote.first
                                 )
@@ -104,7 +103,9 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                 if (notes == null) notes = mutableListOf()
                                 (notes as MutableList<String>).add(noteEditSeen.title)
                             }
-                            DataBaseDAOHelper.insertSignedMedia(re)
+                            withContext(Dispatchers.IO){
+                                DataBaseDAOHelper.updateSignedMedia(re)
+                            }
                         }
                         NoteEditSeen.NoteEditEvent.PickVideo -> startGalleyPick(false)?.let { re ->
                             if (allNote == null) allNote = getAllNote()
@@ -151,7 +152,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                 if (isPhoto) GalleySeen.CHOOSE_PHOTO else GalleySeen.CHOOSE_VIDEO
             )
         })?.let { re ->
-        re.data?.getStringExtra("GalleyData")?.toEntity(GalleyMedia::class.java)
+        re.data?.getStringExtra(GalleyActivity.GALLEY_DATA)?.toEntity(GalleyMedia::class.java)
     }
 
 }

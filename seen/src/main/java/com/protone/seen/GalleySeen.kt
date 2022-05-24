@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.tabs.TabLayout
@@ -11,6 +12,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.database.room.entity.GalleyMedia
+import com.protone.mediamodle.media.FragMailer
 import com.protone.seen.adapter.MyFragmentStateAdapter
 import com.protone.seen.databinding.GalleyLayoutBinding
 import kotlinx.coroutines.Dispatchers
@@ -41,11 +43,8 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
 
     private val binding = GalleyLayoutBinding.inflate(context.layoutInflater, context.root, false)
 
-    private val mailers = arrayOfNulls<GalleyFragment.FragMailer>(2)
-    private var rightMailer = 0
-
-    val chooseData: MutableLiveData<MutableList<GalleyMedia>> =
-        MutableLiveData<MutableList<GalleyMedia>>()
+    val mailers = arrayOfNulls<FragMailer>(2)
+    var rightMailer = 0
 
     override val viewRoot: View
         get() = binding.root
@@ -71,45 +70,17 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
     }
 
     suspend fun initPager(
-        galleyMediaList: MutableMap<String, MutableList<GalleyMedia>>,
-        videoMediaList: MutableMap<String, MutableList<GalleyMedia>>,
+        fragments: ArrayList<Fragment>,
         chooseType: String = "",
-        openView: (GalleyMedia, Boolean) -> Unit,
-        addBucket: (Boolean) -> Unit
     ) = withContext(Dispatchers.Main) {
         initViewMode(chooseType.isNotEmpty())
         binding.galleyPager.let {
-            val photoFragment by lazy {
-                GalleyFragment(
-                    context as FragmentActivity,
-                    galleyMediaList,
-                    chooseData,
-                    multiChoose = chooseType.isNotEmpty(),
-                    openView = openView
-                ).also { gf ->
-                    gf.addBucket = addBucket
-                    mailers[0] = gf.fragMailer
-                }
-            }
-            val videoFragment by lazy {
-                GalleyFragment(
-                    context as FragmentActivity,
-                    videoMediaList,
-                    chooseData,
-                    multiChoose = chooseType.isNotEmpty(),
-                    isVideo = true,
-                    openView = openView
-                ).also { gf ->
-                    gf.addBucket = addBucket
-                    mailers[1] = gf.fragMailer
-                }
-            }
             it.adapter = MyFragmentStateAdapter(
                 context as FragmentActivity,
                 when (chooseType) {
-                    CHOOSE_PHOTO -> arrayListOf(photoFragment)
-                    CHOOSE_VIDEO -> arrayListOf(videoFragment)
-                    else -> arrayListOf(photoFragment, videoFragment)
+                    CHOOSE_PHOTO -> arrayListOf(fragments[0])
+                    CHOOSE_VIDEO -> arrayListOf(fragments[1])
+                    else -> fragments
                 }
             )
             TabLayoutMediator(binding.galleyTab.apply {
@@ -126,27 +97,28 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
         }
     }
 
-    fun showPop(isSelect : Boolean) {
-        showPop(binding.galleyActionMenu,!isSelect)
+    fun showPop(isSelect: Boolean) {
+        showPop(binding.galleyActionMenu, !isSelect)
     }
 
-    fun refreshGalleries(galleries : MutableList<String>){
+    fun onAction(){
+        mailers[rightMailer]?.onActionBtn()
+    }
+
+    fun addBucket(name: String,list: MutableList<GalleyMedia>) {
+        mailers[rightMailer]?.addBucket(name,list)
+    }
+
+    fun deleteMedia(media: GalleyMedia) {
+        mailers[rightMailer]?.deleteMedia(media)
 
     }
 
-    fun refreshMedias(medias : MutableList<GalleyMedia>){
-
-    }
-
-    fun addBucket(name: String) {
-        mailers[rightMailer]?.addBucket(name)
-    }
-
-    fun selectAll(){
+    fun selectAll() {
         mailers[rightMailer]?.selectAll()
     }
 
-    fun hideActionBtn(){
+    fun showActionBtn() {
         binding.galleyActionMenu.isVisible = false
     }
 

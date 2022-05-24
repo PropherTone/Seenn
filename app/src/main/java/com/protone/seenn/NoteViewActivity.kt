@@ -9,11 +9,8 @@ import com.protone.database.room.entity.Note
 import com.protone.mediamodle.Galley
 import com.protone.seen.NoteViewSeen
 import com.protone.seen.customView.richText.RichNoteView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.stream.Collectors
 
@@ -82,16 +79,19 @@ class NoteViewActivity : BaseActivity<NoteViewSeen>() {
                     }
 
                     override fun open(uri: Uri, name: String, isVideo: Boolean) {
-                        val collect = if (isVideo) Galley.allVideo else Galley.allPhoto
-                            ?.stream()
-                            ?.filter { media -> media.uri == uri }
-                            ?.collect(Collectors.toList())
-                        if (collect != null && collect.size > 0) {
-                            startActivity(GalleyViewActivity::class.intent.apply {
-                                putExtra(GalleyViewActivity.MEDIA, collect[0].toJson())
-                                putExtra(GalleyViewActivity.TYPE, isVideo)
-                            })
-                        } else toast(getString(R.string.none))
+                        launch {
+                            val collect = withContext(Dispatchers.IO) {
+                                DataBaseDAOHelper.getAllMediaByType(isVideo)
+                            }?.stream()
+                                ?.filter { media -> media.uri == uri }
+                                ?.collect(Collectors.toList())
+                            if (collect != null && collect.size > 0) {
+                                startActivity(GalleyViewActivity::class.intent.apply {
+                                    putExtra(GalleyViewActivity.MEDIA, collect[0].toJson())
+                                    putExtra(GalleyViewActivity.TYPE, isVideo)
+                                })
+                            } else toast(getString(R.string.none))
+                        }
                     }
 
                 })

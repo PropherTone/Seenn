@@ -9,14 +9,17 @@ import com.protone.database.room.entity.GalleyMedia
 @TypeConverters(UriTypeConverter::class)
 interface SignedGalleyDAO {
 
-    @Query("SELECT * FROM GalleyMedia")
+    @Query("SELECT * FROM GalleyMedia ORDER BY date DESC")
     fun getAllSignedMedia(): List<GalleyMedia>?
 
-    @Query("SELECT bucket FROM GalleyMedia")
-    fun getAllMediaGalley(): List<String>?
+    @Query("SELECT * FROM GalleyMedia WHERE isVideo LIKE :isVideo")
+    fun getAllMediaByType(isVideo: Boolean): List<GalleyMedia>?
 
-    @Query("SELECT * FROM GalleyMedia WHERE bucket LIKE :name")
-    fun getGalleyByName(name: String): List<GalleyMedia>?
+    @Query("SELECT DISTINCT bucket FROM GalleyMedia WHERE isVideo LIKE :isVideo")
+    fun getAllGalley(isVideo: Boolean): List<String>?
+
+    @Query("SELECT * FROM GalleyMedia WHERE bucket LIKE :name AND isVideo LIKE :isVideo")
+    fun getAllMediaByGalley(name: String, isVideo: Boolean): List<GalleyMedia>?
 
     @Delete
     fun deleteSignedMedia(media: GalleyMedia)

@@ -11,14 +11,14 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.protone.api.Config
+import com.protone.api.context.onUiThread
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.databinding.PictureBoxAdapterLayoutBinding
 
 class GalleyListAdapter(
     context: Context,
     private val media: MutableList<GalleyMedia>,
-    private val isVideo: Boolean = false,
-    private val onSelect : (Boolean)->Unit = {}
+    private val isVideo: Boolean = false
 ) : SelectListAdapter<PictureBoxAdapterLayoutBinding, GalleyMedia>(context) {
 
     private var itemLength = 0
@@ -71,39 +71,51 @@ class GalleyListAdapter(
             image.setOnClickListener {
                 if (onSelectMod) {
                     checkSelect(holder, media[position])
+                    onSelectListener?.select(selectList)
                 } else onSelectListener?.openView(media[position])
             }
             image.setOnLongClickListener {
                 onSelectMod = true
-                onSelect(onSelectMod)
                 checkSelect(holder, media[position])
+                onSelectListener?.select(selectList)
                 true
             }
         }
     }
 
-    override fun checkSelect(holder: Holder<PictureBoxAdapterLayoutBinding>, item: GalleyMedia) {
-        onSelectListener?.select(selectList)
-        super.checkSelect(holder, item)
-    }
-
-    fun quitSelectMod(){
+    fun quitSelectMod() {
         onSelectMod = false
-        onSelect(onSelectMod)
-        clearAllSelected()
+        context.onUiThread {
+            clearAllSelected()
+        }
+        onSelectListener?.select(selectList)
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun noticeDataUpdate(item: MutableList<GalleyMedia>) {
+    fun noticeDataUpdate(item: MutableList<GalleyMedia>?) {
+        if (item == null) return
         media.clear()
         media.addAll(item)
-        notifyDataSetChanged()
+        context.onUiThread {
+            notifyDataSetChanged()
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun selectAll(){
+    fun selectAll() {
         selectList.addAll(media)
-        notifyDataSetChanged()
+        context.onUiThread {
+            notifyDataSetChanged()
+        }
+    }
+
+    fun removeMedia(galleyMedia: GalleyMedia) {
+        val index = media.indexOf(galleyMedia)
+        if (index != -1) {
+            media.removeAt(index)
+            if (selectList.contains(galleyMedia)) selectList.remove(galleyMedia)
+            notifyItemRemoved(index)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -112,7 +124,7 @@ class GalleyListAdapter(
 
     private var onSelectListener: OnSelect? = null
 
-    interface OnSelect{
+    interface OnSelect {
         fun select(galleyMedia: MutableList<GalleyMedia>)
         fun openView(galleyMedia: GalleyMedia)
     }

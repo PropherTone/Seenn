@@ -28,7 +28,7 @@ public class Note {
     public String imagePath;
 
     @ColumnInfo(name = "Time")
-    public String time;
+    public Long time;
 
     public List<String> type;
 
@@ -38,7 +38,7 @@ public class Note {
     public Note() {
     }
 
-    public Note(String title, String text, String imagePath, String time, List<String> type, int richCode) {
+    public Note(String title, String text, String imagePath, Long time, List<String> type, int richCode) {
         this.title = title;
         this.text = text;
         this.imagePath = imagePath;
@@ -87,11 +87,11 @@ public class Note {
         this.imagePath = imagePath;
     }
 
-    public String getTime() {
+    public Long getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Long time) {
         this.time = time;
     }
 

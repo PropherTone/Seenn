@@ -5,6 +5,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.PopupWindow
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isGone
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.seen.databinding.LoginPopLayoutBinding
@@ -16,9 +17,10 @@ class UserPops(context: Context) {
 
     private val weakContext = WeakReference(context)
 
-    fun startLoginPopUp(loginCall: (String, String) -> Boolean, regClk: View.OnClickListener) =
+    fun startLoginPopUp(isReg:Boolean,loginCall: (String, String) -> Boolean, regClk: View.OnClickListener) =
         weakContext.get()?.let { context ->
             val binding = LoginPopLayoutBinding.inflate(context.layoutInflater, context.root, false)
+            if (isReg) binding.btnReg.isGone = true
             val log = AlertDialog.Builder(context).setView(binding.root).create()
             binding.btnLogin.setOnClickListener {
                 loginCall.invoke(

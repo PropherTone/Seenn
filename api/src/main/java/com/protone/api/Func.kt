@@ -39,10 +39,6 @@ fun String.getParentPath(): String {
     return this.substring(0, lastIndexOf("/"))
 }
 
-fun <T> List<T>.toSplitString(split: String): String = this.stream().map(java.lang.String::valueOf)
-    .collect(Collectors.joining(split))
-
-
 fun Uri.toMediaBitmapByteArray(): ByteArray? {
     var byteArray: ByteArray? = null
     var ois = Global.application.contentResolver.openInputStream(this) ?: return byteArray
@@ -119,6 +115,12 @@ fun Long.toDateString(format: String = "HH:mm:ss yyyy/MM/dd E"): String? =
         }.time
     )
 
+fun Long.toDateString(): String? =
+    SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(
+        Calendar.getInstance(Locale.getDefault()).also {
+            it.timeInMillis = this
+        }.time
+    )
 
 fun Long.toStringMinuteTime(): String {
     val musicTime: Long = this / 1000
@@ -126,13 +128,9 @@ fun Long.toStringMinuteTime(): String {
     return "${musicTime / 60}:${if (sec >= 10) sec else "0$sec"}"
 }
 
-fun todayTime(format: String): String = SimpleDateFormat(
+fun todayDate(format: String): String = SimpleDateFormat(
     format,
     Locale.getDefault()
 ).format(Calendar.getInstance(Locale.getDefault()).apply {
     timeInMillis = System.currentTimeMillis()
 }.time)
-
-
-@ChecksSdkIntAtLeast(api = 32)
-fun upSDK31() = Build.VERSION.SDK_INT > 31

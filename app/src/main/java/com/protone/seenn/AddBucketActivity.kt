@@ -6,7 +6,7 @@ import com.protone.api.context.intent
 import com.protone.api.context.onUiThread
 import com.protone.api.json.toUri
 import com.protone.api.toMediaBitmapByteArray
-import com.protone.api.todayTime
+import com.protone.api.todayDate
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.Galley
@@ -57,7 +57,7 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                                     )
                                 }
                             )?.let { result ->
-                                addBucketSeen.uri = result.data?.getStringExtra("Uri")?.toUri()
+                                addBucketSeen.uri = result.data?.getStringExtra(GalleyActivity.URI)?.toUri()
                             }
                         }
                         AddBucketSeen.Event.Confirm ->
@@ -118,7 +118,7 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                 val toMediaBitmapByteArray = uri?.toMediaBitmapByteArray()
                 if (!mb.icon.contentEquals(toMediaBitmapByteArray)) mb.icon = toMediaBitmapByteArray
                 if (mb.detail != detail) mb.detail = detail
-                todayTime("yyyy/MM/dd")
+                todayDate("yyyy/MM/dd")
             }, callBack
         )
     }
@@ -131,7 +131,7 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                 if (uri != null) uri?.toMediaBitmapByteArray() else null,
                 0,
                 detail,
-                todayTime("yyyy/MM/dd")
+                todayDate("yyyy/MM/dd")
             ),
             callBack
         )
