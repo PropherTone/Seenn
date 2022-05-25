@@ -6,7 +6,7 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
-import com.protone.mediamodle.Galley
+import com.protone.mediamodle.Medias
 import com.protone.seen.adapter.AddMusicListAdapter
 import com.protone.seen.databinding.AddMusicBucketLayoutBinding
 
@@ -51,7 +51,7 @@ class PickMusicSeen(context: Context) : Seen<PickMusicSeen.Event>(context) {
         binding.addMBList.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = AddMusicListAdapter(context, bucket, mode).apply {
-                musicList = Galley.music
+                musicList = Medias.music
             }
         }
     }

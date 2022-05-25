@@ -11,7 +11,7 @@ import com.protone.api.toDateString
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.Note
-import com.protone.mediamodle.Galley
+import com.protone.mediamodle.Medias
 import com.protone.seen.R
 import com.protone.seen.databinding.*
 
@@ -45,7 +45,7 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
     }
 
     private fun loadDataBelow() {
-        Galley.apply {
+        Medias.apply {
             photoInToday()?.toJson()?.let { itemList.add("photo:$it") }
             notifyItemInserted(itemList.size - 1)
             videoInToday()?.toJson()?.let { itemList.add("video:$it") }

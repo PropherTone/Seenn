@@ -10,7 +10,7 @@ import com.protone.api.toBitmapByteArray
 import com.protone.api.todayDate
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
-import com.protone.mediamodle.Galley
+import com.protone.mediamodle.Medias
 import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.mediamodle.workLocalBroadCast
@@ -48,7 +48,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                 }
 
             }
-            setMusicList(Galley.musicBucket[musicSeen.bucket] ?: Galley.music)
+            setMusicList(Medias.musicBucket[musicSeen.bucket] ?: Medias.music)
             binder.getData().apply {
                 musicSeen.musicName = name
                 musicSeen.icon = albumUri
@@ -119,8 +119,8 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                     DataBaseDAOHelper.addMusicBucketWithCallBack(
                         MusicBucket(
                             getString(R.string.all_music),
-                            if (Galley.music.size > 0) Galley.music[0].uri.toBitmapByteArray() else null,
-                            Galley.music.size,
+                            if (Medias.music.size > 0) Medias.music[0].uri.toBitmapByteArray() else null,
+                            Medias.music.size,
                             null,
                             todayDate("yyyy/MM/dd")
                         )
@@ -139,7 +139,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
         initList(
             buckets,
-            Galley.musicBucket[userConfig.playedMusicBucket] ?: Galley.music,
+            Medias.musicBucket[userConfig.playedMusicBucket] ?: Medias.music,
             userConfig.playedMusicBucket
         )
 
@@ -149,12 +149,12 @@ class MusicActivity : BaseActivity<MusicSeen>() {
             updateBucket()
         }
         mlClickCallBack { position ->
-            binder.setDate(Galley.musicBucket[bucket] ?: mutableListOf())
+            binder.setDate(Medias.musicBucket[bucket] ?: mutableListOf())
             binder.setPlayMusicPosition(position)
             userConfig.playedMusicBucket = bucket
         }
 
-        Galley.musicBucketLive.observe(this@MusicActivity) {
+        Medias.musicBucketLive.observe(this@MusicActivity) {
             offer(MusicSeen.Event.RefreshBucket)
         }
 
@@ -163,7 +163,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
     private fun MusicSeen.updateBucket(){
         setBucket()
-        updateMusicList(Galley.musicBucket[bucket] ?: mutableListOf())
+        updateMusicList(Medias.musicBucket[bucket] ?: mutableListOf())
     }
 
     private suspend fun MusicSeen.refreshBucket() = withContext(Dispatchers.IO) {
@@ -207,7 +207,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     }
 
     private fun MusicSeen.observeMusicUpdate() {
-        Galley.musicState.observe(this@MusicActivity) {
+        Medias.musicState.observe(this@MusicActivity) {
             if (musicName != it.name) musicName = it.name
             if (icon != it.albumUri) icon = it.albumUri
         }

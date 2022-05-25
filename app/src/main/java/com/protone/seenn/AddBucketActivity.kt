@@ -9,7 +9,7 @@ import com.protone.api.toMediaBitmapByteArray
 import com.protone.api.todayDate
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
-import com.protone.mediamodle.Galley
+import com.protone.mediamodle.Medias
 import com.protone.seen.AddBucketSeen
 import com.protone.seen.GalleySeen
 import kotlinx.coroutines.Dispatchers
@@ -66,9 +66,9 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                                     Intent().apply {
                                         setResult(
                                             if (re != 0 || re != -1) {
-                                                if (Galley.musicBucket.containsKey(name)) {
-                                                    Galley.musicBucket[addBucketSeen.name] =
-                                                        Galley.musicBucket.remove(name)
+                                                if (Medias.musicBucket.containsKey(name)) {
+                                                    Medias.musicBucket[addBucketSeen.name] =
+                                                        Medias.musicBucket.remove(name)
                                                             ?: mutableListOf()
                                                 }
                                                 putExtra(BUCKET_NAME, addBucketSeen.name)

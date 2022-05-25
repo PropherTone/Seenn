@@ -3,11 +3,13 @@ package com.protone.seenn
 import android.content.Intent
 import android.transition.TransitionManager
 import com.protone.api.context.*
-import com.protone.mediamodle.Galley
-import com.protone.seenn.broadcast.musicBroadCastManager
+import com.protone.database.room.dao.DataBaseDAOHelper
+import com.protone.mediamodle.Medias
 import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.MainSeen
 import com.protone.seen.Progress
+import com.protone.seenn.broadcast.musicBroadCastManager
+import com.protone.seenn.service.WorkService
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 
@@ -21,7 +23,7 @@ class MainActivity : BaseActivity<MainSeen>() {
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
 
         bindMusicService {
-            setMusicList(Galley.music)
+            setMusicList(Medias.music)
             mainSeen.apply {
                 binder.getData().let {
                     musicName = it.name
@@ -33,6 +35,25 @@ class MainActivity : BaseActivity<MainSeen>() {
             mainSeen.setAndUpdateDuration()
         }
 
+        Medias.mediaLive.observe(this) {
+            if (it == Medias.AUDIO_UPDATED) {
+                mainSeen.apply {
+                    binder.getData().let {
+                        musicName = it.name
+                        icon = it.albumUri
+                        duration = it.duration
+                        isPlaying = it.isPlaying
+                    }
+                }
+            } else {
+                mainSeen.refreshModelList()
+            }
+        }
+
+        doOnFinish {
+            DataBaseDAOHelper.shutdownNow()
+            stopService(WorkService::class.intent)
+        }
         while (isActive) {
             select<Unit> {
                 event.onReceive {
@@ -81,7 +102,7 @@ class MainActivity : BaseActivity<MainSeen>() {
     }
 
     private fun MainSeen.setAndUpdateDuration() {
-        Galley.musicState.observe(this@MainActivity) {
+        Medias.musicState.observe(this@MainActivity) {
             duration = it.duration
             musicName = it.name
             icon = it.albumUri

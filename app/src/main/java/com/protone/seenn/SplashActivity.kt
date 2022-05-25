@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
-import android.provider.MediaStore
 import com.protone.api.checkNeededPermission
 import com.protone.api.context.UPDATE_GALLEY
 import com.protone.api.context.intent
@@ -14,8 +13,8 @@ import com.protone.api.toBitmapByteArray
 import com.protone.api.todayDate
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
-import com.protone.mediamodle.Galley
 import com.protone.mediamodle.GalleyHelper
+import com.protone.mediamodle.Medias
 import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.SplashSeen
 import com.protone.seenn.service.MusicService
@@ -33,20 +32,20 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                     DataBaseDAOHelper.addMusicBucketThread(
                         MusicBucket(
                             getString(R.string.all_music),
-                            if (Galley.music.size > 0) Galley.music[0].uri.toBitmapByteArray() else null,
-                            Galley.music.size,
+                            if (Medias.music.size > 0) Medias.music[0].uri.toBitmapByteArray() else null,
+                            Medias.music.size,
                             null,
                             todayDate("yyyy/MM/dd")
                         )
                     )
-                    DataBaseDAOHelper.insertMusicMulti(Galley.music)
+                    DataBaseDAOHelper.insertMusicMulti(Medias.music)
                     userConfig.apply {
                         isFirstBoot = true
                         playedMusicBucket = getString(R.string.all_music)
                         playedMusicPosition = 0
                     }
                 }
-                startService(Intent(this, MusicService::class.java))
+                startService(MusicService::class.intent)
                 startActivity(MainActivity::class.intent)
                 finish()
             }
@@ -58,7 +57,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     override suspend fun main() {
         val splashSeen = SplashSeen(this)
         setContentSeen(splashSeen)
-        startService(Intent(this, WorkService::class.java))
+        startService(WorkService::class.intent)
         while (isActive) {
             select<Unit> {
                 event.onReceive {
@@ -68,7 +67,6 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                                 requestContentPermission()
                             }, {
                                 mHandler.sendEmptyMessage(2)
-                                registerBroadcast()
                             })
                         }
                         else -> {
@@ -90,24 +88,6 @@ class SplashActivity : BaseActivity<SplashSeen>() {
             finish()
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    private fun registerBroadcast() {
-        contentResolver.registerContentObserver(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            true,
-            mediaContentObserver
-        )
-        contentResolver.registerContentObserver(
-            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-            true,
-            mediaContentObserver
-        )
-        contentResolver.registerContentObserver(
-            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-            true,
-            mediaContentObserver
-        )
     }
 
     private fun updateMedia() {

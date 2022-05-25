@@ -3,7 +3,6 @@ package com.protone.seen.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Animatable
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -16,7 +15,7 @@ import com.protone.api.context.onUiThread
 import com.protone.api.toStringMinuteTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Music
-import com.protone.mediamodle.Galley
+import com.protone.mediamodle.Medias
 import com.protone.seen.PickMusicSeen
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
@@ -28,7 +27,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
 
     init {
         multiChoose = (mode != PickMusicSeen.PICK_MUSIC).also { b ->
-            if (b) Galley.musicBucket[bucket]?.let { selectList.addAll(it) }
+            if (b) Medias.musicBucket[bucket]?.let { selectList.addAll(it) }
         }
     }
 

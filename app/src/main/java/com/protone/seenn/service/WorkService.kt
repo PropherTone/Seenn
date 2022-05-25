@@ -3,11 +3,13 @@ package com.protone.seenn.service
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Intent
+import android.net.Uri
 import android.os.Binder
+import android.os.Handler
 import android.os.IBinder
-import android.util.Log
+import android.os.Looper
+import android.provider.MediaStore
 import com.protone.api.context.Global
-import com.protone.api.context.onBackground
 import com.protone.api.context.workIntentFilter
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMulti
@@ -15,26 +17,23 @@ import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusic
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusicBucket
 import com.protone.database.room.dao.DataBaseDAOHelper.getMusicBucketByName
 import com.protone.database.room.dao.DataBaseDAOHelper.insertMusicMulti
-import com.protone.database.room.dao.DataBaseDAOHelper.sortSignedMedia
 import com.protone.database.room.dao.DataBaseDAOHelper.updateMusicBucketBack
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
-import com.protone.mediamodle.Galley.music
-import com.protone.mediamodle.Galley.musicBucket
-import com.protone.mediamodle.Galley.musicBucketLive
-import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.IWorkService
+import com.protone.mediamodle.Medias.AUDIO_UPDATED
+import com.protone.mediamodle.Medias.GALLEY_UPDATED
+import com.protone.mediamodle.Medias.mediaLive
+import com.protone.mediamodle.Medias.music
+import com.protone.mediamodle.Medias.musicBucket
+import com.protone.mediamodle.Medias.musicBucketLive
 import com.protone.mediamodle.WorkReceiver
-import com.protone.mediamodle.media.scanPicture
-import com.protone.mediamodle.media.scanVideo
+import com.protone.mediamodle.media.*
 import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seenn.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
+import com.protone.seenn.broadcast.MediaContentObserver
+import kotlinx.coroutines.*
+import java.util.concurrent.LinkedBlockingDeque
 import java.util.function.Consumer
 import java.util.stream.Collectors
 
@@ -45,19 +44,28 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             this@WorkService.updateMusicBucket()
         }
 
-        override fun updateMusic() {
-            this@WorkService.updateMusic()
+        override fun updateMusic(data: Uri?) {
+            if (data != null) {
+                this@WorkService.updateMusic(data)
+            } else {
+                this@WorkService.updateMusic()
+            }
         }
 
-        override fun updateGalley() {
-            this@WorkService.updateGalley()
+        override fun updateGalley(data: Uri?) {
+            if (data != null) {
+                this@WorkService.updateGalley(data)
+            } else {
+                this@WorkService.updateGalley()
+            }
         }
     }
 
-    private val executor: Executor = Executors.newCachedThreadPool()
+    private val mediaContentObserver = MediaContentObserver(Handler(Looper.getMainLooper()))
 
     override fun onCreate() {
         super.onCreate()
+        registerBroadcast()
         workLocalBroadCast.registerReceiver(workReceiver, workIntentFilter)
     }
 
@@ -67,49 +75,111 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
 
     override fun onDestroy() {
         super.onDestroy()
+        cancel()
         workLocalBroadCast.unregisterReceiver(workReceiver)
+        contentResolver.unregisterContentObserver(mediaContentObserver)
     }
 
-    private fun updateMusicBucket() {
-        executor.execute {
-            val cacheList = arrayListOf<Music>().apply { addAll(music) }
-            val cacheAllMusic = arrayListOf<Music>()
-            val allMusic = (getAllMusic() as ArrayList?)?.also { cacheAllMusic.addAll(it) }
-            val allMusicBucket = getAllMusicBucket().let { l ->
-                (l as ArrayList).stream().filter {
-                    it.name != Global.application.getString(R.string.all_music)
+    private fun registerBroadcast() {
+        contentResolver.registerContentObserver(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            true,
+            mediaContentObserver
+        )
+        contentResolver.registerContentObserver(
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+            true,
+            mediaContentObserver
+        )
+        contentResolver.registerContentObserver(
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            true,
+            mediaContentObserver
+        )
+    }
+
+    private fun updateMusicBucket() = launch {
+        val cacheList = arrayListOf<Music>().apply { addAll(music) }
+        val cacheAllMusic = arrayListOf<Music>()
+        val allMusic = (getAllMusic() as ArrayList?)?.also { cacheAllMusic.addAll(it) }
+        val allMusicBucket = getAllMusicBucket().let { l ->
+            (l as ArrayList).stream().filter {
+                it.name != Global.application.getString(R.string.all_music)
+            }
+        }
+        allMusicBucket?.forEach { (name) -> musicBucket[name] = ArrayList() }
+        allMusic?.forEach { music ->
+            music.myBucket.forEach(Consumer {
+                musicBucket[it]?.add(music)
+            })
+            if (cacheList.contains(music)) {
+                cacheList.remove(music)
+                cacheAllMusic.remove(music)
+            }
+        }
+        if (cacheList.size > 0) {
+            insertMusicMulti(cacheList)
+        } else if (cacheAllMusic.size > 0) {
+            deleteMusicMulti(cacheAllMusic)
+        }
+        getAllMusic { music = it as MutableList<Music> }
+        musicBucket.keys.forEach {
+            getMusicBucketByName(it)?.let { mb ->
+                musicBucket[it]?.size?.let { size ->
+                    mb.size = size
+                    updateMusicBucketBack(mb)
                 }
             }
-            allMusicBucket?.forEach { (name) -> musicBucket[name] = ArrayList() }
-            allMusic?.forEach { music ->
-                music.myBucket.forEach(Consumer {
-                    musicBucket[it]?.add(music)
-                })
-                if (cacheList.contains(music)) {
-                    cacheList.remove(music)
-                    cacheAllMusic.remove(music)
-                }
-            }
-            if (cacheList.size > 0) {
-                insertMusicMulti(cacheList)
-            } else if (cacheAllMusic.size > 0) {
-                deleteMusicMulti(cacheAllMusic)
-            }
-            getAllMusic { music = it as MutableList<Music> }
-            musicBucket.keys.forEach {
-                getMusicBucketByName(it)?.let { mb ->
-                    musicBucket[it]?.size?.let { size ->
-                        mb.size = size
-                        updateMusicBucketBack(mb)
-                    }
-                }
-            }
-            musicBucketLive.postValue(musicBucket.keys)
+        }
+        musicBucketLive.postValue(musicBucket.keys)
+    }
+
+    private fun updateMusic(uri: Uri) {
+        scanAudioWithUri(uri) {
+            DataBaseDAOHelper.insertMusic(it)
+            mediaLive.postValue(AUDIO_UPDATED)
         }
     }
 
-    private fun updateMusic() {}
+    private fun updateMusic() {
+        val dataPool = LinkedBlockingDeque<Music>()
+        fun sortMusic(allMusic: MutableList<Music>, music: Music) {
+            allMusic.stream().filter { it.uri == music.uri }
+                .collect(Collectors.toList()).let { list ->
+                    if (list.size > 0) allMusic.remove(list[0])
+                }
+        }
+        launch {
+            val allMusic = getAllMusic() as MutableList
+            val sortMedia = launch(Dispatchers.IO) {
+                while (isActive) while (dataPool.isNotEmpty()) {
+                    dataPool.poll()?.let {
+                        synchronized(allMusic) { sortMusic(allMusic, it) }
+                    }
+                }
+            }
+            val scanMusic = async {
+                scanAudio { _, music ->
+                    dataPool.offer(music)
+                    DataBaseDAOHelper.insertMusicCheck(music)
+                }
+            }
+            scanMusic.await()
+            sortMedia.cancel()
+            deleteMusicMulti(allMusic)
+            mediaLive.postValue(AUDIO_UPDATED)
+        }
+    }
+
+    private fun updateGalley(uri: Uri) = launch {
+        scanGalleyWithUri(uri) {
+            DataBaseDAOHelper.insertSignedMedia(it)
+            mediaLive.postValue(GALLEY_UPDATED)
+        }
+    }
+
     private fun updateGalley() = DataBaseDAOHelper.run {
+        val dataPool = LinkedBlockingDeque<GalleyMedia>()
         fun sortMedia(allSignedMedia: MutableList<GalleyMedia>, galleyMedia: GalleyMedia) {
             allSignedMedia.stream().filter { it.uri == galleyMedia.uri }
                 .collect(Collectors.toList()).let { list ->
@@ -118,26 +188,30 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         }
         launch {
             val allSignedMedia = getAllSignedMedia() as MutableList
-            val scanPicture = launch {
+            val sortMedia = launch(Dispatchers.IO) {
+                while (isActive) while (dataPool.isNotEmpty()) {
+                    dataPool.poll()?.let {
+                        synchronized(allSignedMedia) { sortMedia(allSignedMedia, it) }
+                    }
+                }
+            }
+            val scanPicture = async {
                 scanPicture { _, galleyMedia ->
-                    synchronized(allSignedMedia) {
-                        sortMedia(allSignedMedia, galleyMedia)
-                    }
+                    dataPool.offer(galleyMedia)
                     sortSignedMedia(galleyMedia)
                 }
             }
-            val scanVideo = launch {
+            val scanVideo = async {
                 scanVideo { _, galleyMedia ->
-                    synchronized(allSignedMedia) {
-                        sortMedia(allSignedMedia, galleyMedia)
-                    }
+                    dataPool.offer(galleyMedia)
                     sortSignedMedia(galleyMedia)
                 }
             }
-            while (scanPicture.isActive || scanVideo.isActive) continue
-            allSignedMedia.forEach {
-                deleteSignedMedia(it)
-            }
+            scanPicture.await()
+            scanVideo.await()
+            sortMedia.cancel()
+            deleteSignedMedias(allSignedMedia)
+            mediaLive.postValue(GALLEY_UPDATED)
         }
     }
 
@@ -146,11 +220,11 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             this@WorkService.updateMusicBucket()
         }
 
-        override fun updateMusic() {
+        override fun updateMusic(data: Uri?) {
             this@WorkService.updateMusic()
         }
 
-        override fun updateGalley() {
+        override fun updateGalley(data: Uri?) {
             this@WorkService.updateGalley()
         }
     }

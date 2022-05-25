@@ -6,7 +6,6 @@ import com.protone.api.context.onBackground
 import com.protone.api.json.toJson
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Note
-import com.protone.mediamodle.Galley
 import com.protone.seen.NoteViewSeen
 import com.protone.seen.customView.richText.RichNoteView
 import kotlinx.coroutines.*

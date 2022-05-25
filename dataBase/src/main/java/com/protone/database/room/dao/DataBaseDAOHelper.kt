@@ -133,10 +133,14 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    override fun insertMusic(music: Music) {
-        execute {
-            musicDAO?.insertMusic(music)
+    fun insertMusicCheck(music: Music) {
+        musicDAO?.getMusicByUri(music.uri).let {
+            if (it == null) insertMusic(music)
         }
+    }
+
+    override fun insertMusic(music: Music) {
+        musicDAO?.insertMusic(music)
     }
 
     override fun getAllMusic(): List<Music>? = musicDAO?.getAllMusic()
@@ -197,6 +201,18 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     override fun getAllMediaByGalley(name: String, isVideo: Boolean): List<GalleyMedia>? {
         return signedGalleyDAO?.getAllMediaByGalley(name, isVideo)
+    }
+
+    fun deleteSignedMedias(list: MutableList<GalleyMedia>) {
+        execute {
+            list.forEach {
+                deleteSignedMediaByUri(it.uri)
+            }
+        }
+    }
+
+    override fun deleteSignedMediaByUri(uri: Uri) {
+        signedGalleyDAO?.deleteSignedMediaByUri(uri)
     }
 
     override fun deleteSignedMedia(media: GalleyMedia) {
@@ -370,15 +386,14 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         galleyBucketDAO?.getGalleyBucket(name)
 
     override fun deleteGalleyBucket(galleyBucket: GalleyBucket) {
-        execute{
+        execute {
             galleyBucketDAO?.deleteGalleyBucket(galleyBucket)
         }
     }
 
 
-
-    fun getGalleyBucket(name: String,callBack: (GalleyBucket?) -> Unit){
-        execute{
+    fun getGalleyBucket(name: String, callBack: (GalleyBucket?) -> Unit) {
+        execute {
             callBack.invoke(getGalleyBucket(name))
         }
     }

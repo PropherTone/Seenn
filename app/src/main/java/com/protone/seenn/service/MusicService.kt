@@ -13,11 +13,11 @@ import android.widget.RemoteViews
 import androidx.lifecycle.MutableLiveData
 import com.protone.api.context.*
 import com.protone.api.toBitmapByteArray
-import com.protone.database.sp.config.UserConfig
 import com.protone.database.room.entity.Music
-import com.protone.mediamodle.Galley
+import com.protone.database.sp.config.UserConfig
+import com.protone.mediamodle.Medias
 import com.protone.mediamodle.MusicState
-import com.protone.mediamodle.media.*
+import com.protone.mediamodle.media.IMusicPlayer
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.*
 import java.util.*
@@ -47,7 +47,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         }
 
         override fun music() {
-
+//            Global.application.startActivity(SplashActivity::class.intent)
         }
 
     }
@@ -119,7 +119,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
     private var playPosition = MutableLiveData<Long>()
     private var playState = MutableLiveData<Boolean>()
     private val musicLists: MutableList<Music>
-        get() = Galley.musicBucket[userConfig.playedMusicBucket] ?: Galley.music
+        get() = Medias.musicBucket[userConfig.playedMusicBucket] ?: Medias.music
 
     private var musicPlayer: MediaPlayer? = null
         get() {
@@ -397,7 +397,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         uri: Uri,
         isPlaying: Boolean = false
     ) {
-        Galley.musicState.postValue(
+        Medias.musicState.postValue(
             MusicState(
                 displayName,
                 duration,
@@ -420,6 +420,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
         override fun getData() = this@MusicService.getData()
         override fun setPlayMusicPosition(position: Int) =
             this@MusicService.setPlayMusicPosition(position)
+
         override fun seekTo(position: Long) = this@MusicService.seekTo(position)
         override fun getPlayState(): MutableLiveData<Boolean> = this@MusicService.getPlayState()
         override fun getPlayPosition(): Int = this@MusicService.getPlayPosition()

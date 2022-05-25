@@ -2,10 +2,7 @@ package com.protone.mediamodle
 
 import com.protone.api.context.Global
 import com.protone.api.getFileName
-import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.mediamodle.media.scanAudio
-import com.protone.mediamodle.media.scanPicture
-import com.protone.mediamodle.media.scanVideo
 import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
@@ -51,7 +48,7 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     }
 
     private suspend fun updateMusicCO() = withContext(Dispatchers.IO) {
-        Galley.musicBucket[Global.application.getString(R.string.all_music)] = scanAudio()
+        Medias.musicBucket[Global.application.getString(R.string.all_music)] = scanAudio()
         cancel()
     }
 

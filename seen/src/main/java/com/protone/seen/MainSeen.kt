@@ -123,6 +123,13 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
 
     }
 
+    fun refreshModelList() {
+        binding.modelList.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = MainModelListAdapter(context)
+        }
+    }
+
     override fun offer(event: Touch) {
         viewEvent.offer(event)
     }
