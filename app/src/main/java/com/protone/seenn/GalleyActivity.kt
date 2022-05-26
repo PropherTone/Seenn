@@ -10,10 +10,10 @@ import com.protone.api.context.renameMedia
 import com.protone.api.context.showFailedToast
 import com.protone.api.getFileMimeType
 import com.protone.api.json.toJson
-import com.protone.api.json.toUri
 import com.protone.api.json.toUriJson
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
+import com.protone.mediamodle.Medias
 import com.protone.mediamodle.media.IGalleyFragment
 import com.protone.seen.GalleySeen
 import com.protone.seen.dialog.CateDialog
@@ -70,18 +70,25 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
 
         if (chooseType.isNotEmpty()) galleySeen.showActionBtn()
 
-        galleySeen.initPager(arrayListOf<Fragment>().apply {
-            add(GalleyFragment(false, userConfig.lockGalley.isNotEmpty()).also {
-                galleySeen.mailers[0] = it.fragMailer
-                it.iGalleyFragment = this@GalleyActivity.iGalleyFragment
-            })
-            add(GalleyFragment(true, userConfig.lockGalley.isNotEmpty()).also {
-                galleySeen.mailers[1] = it.fragMailer
-                it.iGalleyFragment = this@GalleyActivity.iGalleyFragment
-            })
-        }, chooseType)
+        suspend fun initPager() {
+            galleySeen.initPager(arrayListOf<Fragment>().apply {
+                add(GalleyFragment(false, userConfig.lockGalley.isNotEmpty()).also {
+                    galleySeen.mailers[0] = it.fragMailer
+                    it.iGalleyFragment = this@GalleyActivity.iGalleyFragment
+                })
+                add(GalleyFragment(true, userConfig.lockGalley.isNotEmpty()).also {
+                    galleySeen.mailers[1] = it.fragMailer
+                    it.iGalleyFragment = this@GalleyActivity.iGalleyFragment
+                })
+            }, chooseType)
+        }
 
-
+        initPager()
+        Medias.mediaLive.observe(this) {
+            if (it == Medias.GALLEY_UPDATED) {
+                galleySeen.offer(GalleySeen.Touch.Init)
+            }
+        }
         chooseData.observe(this) {
             if (it.size > 0) {
                 galleySeen.onAction()
@@ -93,6 +100,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                 event.onReceive {}
                 galleySeen.viewEvent.onReceive {
                     when (it) {
+                        GalleySeen.Touch.Init-> initPager()
                         GalleySeen.Touch.Finish -> finish()
                         GalleySeen.Touch.MOVE_TO -> galleySeen.moveTo()
                         GalleySeen.Touch.RENAME -> galleySeen.rename()
@@ -186,7 +194,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                     val uri = result.data?.getStringExtra(URI)
                     if (uri != null) {
                         addCate(uri)
-                    }else showFailedToast()
+                    } else showFailedToast()
                 }
             }
         }

@@ -16,14 +16,14 @@ class MediaContentObserver(mHandler: Handler) : ContentObserver(mHandler) {
         when {
             uriString.contains("audio") -> {
                 workLocalBroadCast.sendBroadcast(Intent().apply {
+                    if (isUpdate(uri ?: Uri.EMPTY)) putExtra("uri", uriString)
                     action = UPDATE_MUSIC
-                    if (isUpdate(uri ?: Uri.EMPTY)) data = uri
                 })
             }
             else -> {
                 workLocalBroadCast.sendBroadcast(Intent().apply {
+                    if (isUpdate(uri ?: Uri.EMPTY)) putExtra("uri", uriString)
                     action = UPDATE_GALLEY
-                    if (isUpdate(uri ?: Uri.EMPTY)) data = uri
                 })
             }
         }

@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,10 +31,7 @@ import com.protone.seen.customView.StateImageView
 import com.protone.seen.databinding.GalleyFragmentLayoutBinding
 import com.protone.seen.dialog.TitleDialog
 import com.protone.seenn.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class GalleyFragment(
     private val isVideo: Boolean,
@@ -189,6 +185,11 @@ class GalleyFragment(
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cancel()
     }
 
     private fun initList() = binding.run {

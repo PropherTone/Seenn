@@ -168,6 +168,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         startForeground(0x01, initMusicNotification())
         return super.onStartCommand(intent, flags, startId)
     }
@@ -189,7 +190,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener, IMusicPlayer {
 
     @Suppress("DEPRECATION")
     private fun initMusicNotification(): Notification {
-        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         remoteViews = RemoteViews(packageName, R.layout.music_notification_layout).apply {
             val intentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 

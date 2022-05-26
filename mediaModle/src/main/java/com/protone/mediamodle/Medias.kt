@@ -25,7 +25,7 @@ object Medias {
         }
         get() = musicBucket[Global.application.getString(R.string.all_music)] ?: mutableListOf()
 
-    val musicBucketLive = MutableLiveData<Set<String>>()
+    val musicBucketLive = MutableLiveData<Int>()
 
     val musicBucket = mutableMapOf<String, MutableList<Music>>()
 

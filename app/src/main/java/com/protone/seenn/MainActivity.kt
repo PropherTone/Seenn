@@ -2,10 +2,12 @@ package com.protone.seenn
 
 import android.content.Intent
 import android.transition.TransitionManager
-import com.protone.api.context.*
+import com.protone.api.context.MUSIC_NEXT
+import com.protone.api.context.MUSIC_PLAY
+import com.protone.api.context.MUSIC_PREVIOUS
+import com.protone.api.context.intent
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.mediamodle.Medias
-import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.MainSeen
 import com.protone.seen.Progress
 import com.protone.seenn.broadcast.musicBroadCastManager
@@ -20,8 +22,6 @@ class MainActivity : BaseActivity<MainSeen>() {
         setContentSeen(mainSeen)
         mainSeen.beginTransition()
 
-        workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
-
         bindMusicService {
             setMusicList(Medias.music)
             mainSeen.apply {
@@ -35,8 +35,8 @@ class MainActivity : BaseActivity<MainSeen>() {
             mainSeen.setAndUpdateDuration()
         }
 
-        Medias.mediaLive.observe(this) {
-            if (it == Medias.AUDIO_UPDATED) {
+        Medias.mediaLive.observe(this) { code->
+            if (code == Medias.AUDIO_UPDATED) {
                 mainSeen.apply {
                     binder.getData().let {
                         musicName = it.name

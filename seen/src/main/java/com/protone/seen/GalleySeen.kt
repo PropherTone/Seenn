@@ -6,7 +6,6 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.MutableLiveData
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.api.context.layoutInflater
@@ -30,7 +29,8 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
         ADD_CATE,
         IntoBOX,
         ConfirmChoose,
-        ShowPop
+        ShowPop,
+        Init
     }
 
     companion object {

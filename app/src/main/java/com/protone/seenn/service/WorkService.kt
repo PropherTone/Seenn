@@ -131,7 +131,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                 }
             }
         }
-        musicBucketLive.postValue(musicBucket.keys)
+        musicBucketLive.postValue(1)
     }
 
     private fun updateMusic(uri: Uri) {
@@ -151,7 +151,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         }
         launch {
             val allMusic = getAllMusic() as MutableList
-            val sortMedia = launch(Dispatchers.IO) {
+            launch(Dispatchers.IO) {
                 while (isActive) while (dataPool.isNotEmpty()) {
                     dataPool.poll()?.let {
                         synchronized(allMusic) { sortMusic(allMusic, it) }
@@ -163,11 +163,13 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                     dataPool.offer(music)
                     DataBaseDAOHelper.insertMusicCheck(music)
                 }
+                true
             }
             scanMusic.await()
-            sortMedia.cancel()
+            while (dataPool.isNotEmpty()) continue
             deleteMusicMulti(allMusic)
             mediaLive.postValue(AUDIO_UPDATED)
+            cancel()
         }
     }
 
@@ -188,7 +190,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         }
         launch {
             val allSignedMedia = getAllSignedMedia() as MutableList
-            val sortMedia = launch(Dispatchers.IO) {
+            launch(Dispatchers.IO) {
                 while (isActive) while (dataPool.isNotEmpty()) {
                     dataPool.poll()?.let {
                         synchronized(allSignedMedia) { sortMedia(allSignedMedia, it) }
@@ -209,9 +211,10 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             }
             scanPicture.await()
             scanVideo.await()
-            sortMedia.cancel()
+            while (dataPool.isNotEmpty()) continue
             deleteSignedMedias(allSignedMedia)
             mediaLive.postValue(GALLEY_UPDATED)
+            cancel()
         }
     }
 

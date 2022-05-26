@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import com.protone.api.checkNeededPermission
 import com.protone.api.context.UPDATE_GALLEY
+import com.protone.api.context.UPDATE_MUSIC
 import com.protone.api.context.intent
 import com.protone.api.requestContentPermission
 import com.protone.api.toBitmapByteArray
@@ -58,6 +59,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
         val splashSeen = SplashSeen(this)
         setContentSeen(splashSeen)
         startService(WorkService::class.intent)
+
         while (isActive) {
             select<Unit> {
                 event.onReceive {
@@ -92,6 +94,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
 
     private fun updateMedia() {
         workLocalBroadCast.sendBroadcast(Intent().setAction(UPDATE_GALLEY))
+        workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC))
         GalleyHelper.updateAll { mHandler.sendEmptyMessage(1) }
     }
 }
