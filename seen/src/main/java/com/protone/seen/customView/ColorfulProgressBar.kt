@@ -13,7 +13,6 @@ import androidx.annotation.StyleRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.setPadding
 import com.protone.api.context.layoutInflater
-import com.protone.seen.Progress
 import com.protone.seen.R
 import com.protone.seen.databinding.ColorfulBarChildLayoutBinding
 
@@ -181,5 +180,9 @@ class ColorfulProgressBar @JvmOverloads constructor(
 
             mHandler.postDelayed(colorRunnable, speed.toLong())
         }
+    }
+
+    interface Progress {
+        fun getProgress(position : Long)
     }
 }

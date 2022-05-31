@@ -4,104 +4,80 @@
 
     <ConstraintSet android:id="@+id/start">
         <Constraint
+            android:id="@+id/music_back"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintHeight_percent="1"
+            app:layout_constraintWidth_percent="1" />
+
+        <Constraint
             android:id="@+id/music_cover_back"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/music_cover_back_round"
-            android:contentDescription="@string/icon"
-            android:scaleType="centerCrop"
-            app:layout_constraintBottom_toTopOf="@id/settle_detail"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.28"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/music_back"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="@id/music_back"
+            app:layout_constraintStart_toStartOf="@id/music_back"
+            app:layout_constraintTop_toTopOf="@id/music_back"
+            app:layout_constraintVertical_bias="0.25"
             app:layout_constraintWidth_percent="0.6" />
 
         <Constraint
             android:id="@+id/music_cover"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/music_cover_back_round"
-            android:contentDescription="@string/icon"
-            android:scaleType="centerCrop"
-            app:layout_constraintBottom_toTopOf="@id/settle_detail"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.23"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.5" />
-
-        <Constraint
-            android:id="@+id/settle_cover"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintHeight_percent="0.06"
-            app:layout_constraintTop_toBottomOf="@id/music_cover" />
+            app:layout_constraintBottom_toBottomOf="@id/music_cover_back"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="@id/music_cover_back"
+            app:layout_constraintStart_toStartOf="@id/music_cover_back"
+            app:layout_constraintTop_toTopOf="@id/music_cover_back"
+            app:layout_constraintWidth_percent="0.56" />
 
         <Constraint
             android:id="@+id/music_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:letterSpacing="0.06"
-            android:lines="1"
-            android:text="@string/model_music"
             android:textColor="@color/white"
-            android:textSize="26sp"
+            android:textSize="@dimen/title_text"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/music_detail"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/settle_cover"
+            app:layout_constraintBottom_toTopOf="@id/music_progress"
+            app:layout_constraintEnd_toEndOf="@id/music_back"
+            app:layout_constraintStart_toStartOf="@id/music_back"
+            app:layout_constraintTop_toBottomOf="@id/music_cover_back"
+            app:layout_constraintVertical_bias="0.04"
             app:layout_constraintWidth_percent="0.46" />
 
         <Constraint
             android:id="@+id/music_detail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:lines="1"
-            android:text="@string/music_bucket_name"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:alpha="1"
+            android:textSize="@dimen/small_title_text"
+            app:layout_constraintEnd_toEndOf="@id/music_name"
+            app:layout_constraintStart_toStartOf="@id/music_name"
             app:layout_constraintTop_toBottomOf="@id/music_name"
             app:layout_constraintWidth_percent="0.5" />
-
-        <Constraint
-            android:id="@+id/settle_detail"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/music_progress"
-            app:layout_constraintHeight_percent="0.06" />
 
         <Constraint
             android:id="@+id/music_progress"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/settle_progress"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.02"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/music_back"
+            app:layout_constraintEnd_toEndOf="@id/music_back"
+            app:layout_constraintHeight_percent="0.01"
+            app:layout_constraintStart_toStartOf="@id/music_back"
+            app:layout_constraintTop_toTopOf="@id/music_back"
+            app:layout_constraintVertical_bias="0.8"
             app:layout_constraintWidth_percent="0.88" />
-
-        <Constraint
-            android:id="@+id/settle_progress"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/music_control"
-            app:layout_constraintHeight_percent="0.012" />
 
         <Constraint
             android:id="@+id/music_previous"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/ic_round_arrow_left__white_24"
             app:layout_constraintBottom_toBottomOf="@id/music_control"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@id/music_control"
-            app:layout_constraintHeight_percent="0.09"
             app:layout_constraintTop_toTopOf="@id/music_control"
             app:layout_constraintWidth_percent="0.2" />
 
@@ -109,173 +85,123 @@
             android:id="@+id/music_control"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/ic_round_on__white_24"
-            app:layout_constraintBottom_toTopOf="@id/settle_down"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.09"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="@id/music_back"
+            app:layout_constraintStart_toStartOf="@id/music_back"
+            app:layout_constraintTop_toBottomOf="@id/music_progress"
             app:layout_constraintWidth_percent="0.2" />
 
         <Constraint
             android:id="@+id/music_next"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/ic_round_arrow_right_white_24"
             app:layout_constraintBottom_toBottomOf="@id/music_control"
-            app:layout_constraintHeight_percent="0.09"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toEndOf="@id/music_control"
             app:layout_constraintTop_toTopOf="@id/music_control"
             app:layout_constraintWidth_percent="0.2" />
-
-        <Constraint
-            android:id="@+id/settle_down"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHeight_percent="0.06" />
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
         <Constraint
+            android:id="@+id/music_back"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.16" />
+
+        <Constraint
             android:id="@+id/music_cover_back"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/music_cover_back_round"
-            android:contentDescription="@string/icon"
-            android:scaleType="centerCrop"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/music_back"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@id/music_progress"
-            app:layout_constraintHeight_percent="0.12"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.24" />
+            app:layout_constraintHeight_percent="0.14"
+            app:layout_constraintStart_toStartOf="@id/music_back"
+            app:layout_constraintTop_toTopOf="@id/music_back" />
 
         <Constraint
             android:id="@+id/music_cover"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/music_cover_back_round"
-            android:contentDescription="@string/icon"
-            android:scaleType="centerCrop"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/music_progress"
-            app:layout_constraintHeight_percent="0.10"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.2" />
-
-        <Constraint
-            android:id="@+id/settle_cover"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintHeight_percent="0.06"
-            app:layout_constraintTop_toBottomOf="@id/music_cover" />
+            app:layout_constraintBottom_toBottomOf="@id/music_cover_back"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="@id/music_cover_back"
+            app:layout_constraintHeight_percent="0.12"
+            app:layout_constraintStart_toStartOf="@id/music_cover_back"
+            app:layout_constraintTop_toTopOf="@id/music_cover_back" />
 
         <Constraint
             android:id="@+id/music_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:letterSpacing="0.06"
-            android:lines="1"
-            android:text="@string/model_music"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="26sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/music_progress"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/music_progress"
-            app:layout_constraintTop_toTopOf="@id/music_cover"
+            app:layout_constraintEnd_toEndOf="@id/music_back"
+            app:layout_constraintStart_toEndOf="@id/music_cover_back"
+            app:layout_constraintTop_toTopOf="@id/music_back"
             app:layout_constraintWidth_percent="0.46" />
 
         <Constraint
             android:id="@+id/music_detail"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:lines="1"
+            android:layout_height="0dp"
+            android:alpha="0"
             android:text="@string/music_bucket_name"
             android:textColor="@color/white"
             android:textSize="20sp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/music_name"
-            app:layout_constraintWidth_percent="0.5" />
-
-        <Constraint
-            android:id="@+id/settle_detail"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/music_progress"
-            app:layout_constraintHeight_percent="0.06" />
+            app:layout_constraintEnd_toEndOf="@id/music_name"
+            app:layout_constraintStart_toStartOf="@id/music_name"
+            app:layout_constraintTop_toBottomOf="@id/music_name" />
 
         <Constraint
             android:id="@+id/music_progress"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/settle_progress"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.02"
-            app:layout_constraintStart_toEndOf="@id/music_cover"
-            app:layout_constraintTop_toBottomOf="@id/music_name"
-            app:layout_constraintWidth_percent="0.72" />
-
-        <Constraint
-            android:id="@+id/settle_progress"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/music_control"
-            app:layout_constraintHeight_percent="0.012" />
+            app:layout_constraintEnd_toEndOf="@id/music_back"
+            app:layout_constraintHeight_percent="0.01"
+            app:layout_constraintStart_toEndOf="@id/music_cover_back"
+            app:layout_constraintTop_toBottomOf="@id/music_name"
+            app:layout_constraintWidth_percent="0.66" />
 
         <Constraint
             android:id="@+id/music_previous"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/ic_round_arrow_left__white_24"
             app:layout_constraintBottom_toBottomOf="@id/music_control"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@id/music_control"
-            app:layout_constraintHeight_percent="0.08"
-            app:layout_constraintTop_toTopOf="@id/music_control"
-            app:layout_constraintWidth_percent="0.14" />
+            app:layout_constraintHeight_percent="0.06"
+            app:layout_constraintTop_toTopOf="@id/music_control" />
 
         <Constraint
             android:id="@+id/music_control"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/ic_round_on__white_24"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent="0.08"
-            app:layout_constraintStart_toEndOf="@id/music_cover"
-            app:layout_constraintTop_toBottomOf="@id/music_progress"
-            app:layout_constraintWidth_percent="0.14" />
+            app:layout_constraintBottom_toBottomOf="@id/music_back"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="@id/music_back"
+            app:layout_constraintHeight_percent="0.06"
+            app:layout_constraintStart_toEndOf="@id/music_cover_back"
+            app:layout_constraintTop_toBottomOf="@id/music_progress" />
 
         <Constraint
             android:id="@+id/music_next"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:src="@drawable/ic_round_arrow_right_white_24"
             app:layout_constraintBottom_toBottomOf="@id/music_control"
-            app:layout_constraintHeight_percent="0.08"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintHeight_percent="0.06"
             app:layout_constraintStart_toEndOf="@id/music_control"
-            app:layout_constraintTop_toTopOf="@id/music_control"
-            app:layout_constraintWidth_percent="0.14" />
-
-        <Constraint
-            android:id="@+id/settle_down"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHeight_percent="0.06" />
+            app:layout_constraintTop_toTopOf="@id/music_control" />
     </ConstraintSet>
 
     <Transition
-        app:motionInterpolator="linear"
         app:constraintSetEnd="@id/end"
-        app:constraintSetStart="@+id/start" />
+        app:constraintSetStart="@+id/start"
+        app:motionInterpolator="easeIn" />
 </MotionScene>

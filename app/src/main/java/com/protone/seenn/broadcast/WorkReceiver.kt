@@ -1,4 +1,4 @@
-package com.protone.mediamodle
+package com.protone.seenn.broadcast
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -9,10 +9,11 @@ import com.protone.api.context.UPDATE_GALLEY
 import com.protone.api.context.UPDATE_MUSIC
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.json.toUri
+import com.protone.mediamodle.IWorkService
 
 val workLocalBroadCast by lazy { LocalBroadcastManager.getInstance(Global.application) }
 
-abstract class WorkReceiver : BroadcastReceiver() ,IWorkService {
+abstract class WorkReceiver : BroadcastReceiver() , IWorkService {
 
     override fun onReceive(p0: Context?, p1: Intent?) {
         when (p1?.action) {

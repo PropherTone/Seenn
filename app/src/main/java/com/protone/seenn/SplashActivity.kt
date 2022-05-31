@@ -16,8 +16,8 @@ import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.Medias
-import com.protone.mediamodle.workLocalBroadCast
 import com.protone.seen.SplashSeen
+import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.service.MusicService
 import com.protone.seenn.service.WorkService
 import kotlinx.coroutines.isActive

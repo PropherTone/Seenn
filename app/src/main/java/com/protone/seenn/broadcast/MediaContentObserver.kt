@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Handler
 import com.protone.api.context.UPDATE_GALLEY
 import com.protone.api.context.UPDATE_MUSIC
-import com.protone.mediamodle.workLocalBroadCast
 
 class MediaContentObserver(mHandler: Handler) : ContentObserver(mHandler) {
 

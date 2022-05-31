@@ -14,6 +14,8 @@ class AutoSizeTextView @JvmOverloads constructor(
     }
 
     private var mW = 0
+    private var isGet = false
+    private var scale = 0f
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
@@ -22,19 +24,15 @@ class AutoSizeTextView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-//        measureText(mW)
+        if (!isGet) {
+            scale = textSize / mW
+            isGet = true
+        }
+        measureText(mW)
     }
 
     private fun measureText(target: Int) {
-        val cacheSize = textSize
-        textSize = target.toFloat()
-        val measureText = paint.measureText(text.toString().trim())
-        if (measureText > target) {
-            val scale = measureText / textSize
-            val newSize = target / scale
-            setTextSize(TypedValue.COMPLEX_UNIT_PX, newSize)
-        } else {
-            textSize = cacheSize
-        }
+        val newSize = scale * target
+        setTextSize(TypedValue.COMPLEX_UNIT_PX, newSize)
     }
 }
