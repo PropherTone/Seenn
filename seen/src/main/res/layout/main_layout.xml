@@ -133,10 +133,12 @@
                     app:layout_constraintStart_toEndOf="@id/noteBook"
                     app:layout_constraintTop_toBottomOf="@id/userCard" />
 
-                <com.protone.seen.customView.MyMusicPlayer
+                <com.protone.seen.customView.musicPlayer.MusicPlayerViewMid
                     android:id="@+id/musicPlayer"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
+                    app:layout_constraintHeight_percent="0.32"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/noteBook" />
 
             </androidx.constraintlayout.motion.widget.MotionLayout>

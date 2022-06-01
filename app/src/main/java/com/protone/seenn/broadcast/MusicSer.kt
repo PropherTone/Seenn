@@ -253,8 +253,13 @@ class MusicSer : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO), IM
             return
         }
         launch {
-            val index = playList.indexOf(music)
-            playPosition = index
+            if (music != null) {
+                if (!playList.contains(music)) {
+                    playList.add(music)
+                }
+                val index = playList.indexOf(music)
+                playPosition = index
+            }
             musicPlayer?.apply {
                 start()
                 if (progressTimer == null) progressTimer = Timer()
@@ -317,6 +322,9 @@ class MusicSer : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO), IM
         }
     }
 
+    private val musicLive = MutableLiveData<Music>()
+    override fun onMusicPlaying(): LiveData<Music> = musicLive
+
     private fun finishMusic() {
         musicPlayer?.apply {
             stop()
@@ -337,6 +345,7 @@ class MusicSer : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO), IM
         override fun onProgress(): LiveData<Long> = this@MusicSer.onProgress()
         override fun onPlayState(): LiveData<Boolean> = this@MusicSer.onPlayState()
         override fun setProgress(progress: Long) = this@MusicSer.setProgress(progress)
+        override fun onMusicPlaying(): LiveData<Music> = this@MusicSer.onMusicPlaying()
     }
 
     override fun onCompletion(mp: MediaPlayer?) {
@@ -367,4 +376,5 @@ interface IMusicService {
     fun onProgress(): LiveData<Long>
     fun onPlayState(): LiveData<Boolean>
     fun setProgress(progress: Long)
+    fun onMusicPlaying(): LiveData<Music>
 }

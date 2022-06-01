@@ -56,6 +56,10 @@
             android:enabled="true"
             android:exported="false" />
         <service
+            android:name=".broadcast.MusicSer"
+            android:enabled="true"
+            android:exported="false" />
+        <service
             android:name=".service.WorkService"
             android:enabled="true"
             android:exported="false" />
@@ -74,7 +78,7 @@
         </receiver>
 
         <receiver
-            android:name="com.protone.mediamodle.WorkReceiver"
+            android:name=".broadcast.WorkReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

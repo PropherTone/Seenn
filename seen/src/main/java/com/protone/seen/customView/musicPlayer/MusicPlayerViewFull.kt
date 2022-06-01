@@ -15,7 +15,7 @@ class MusicPlayerViewFull @JvmOverloads constructor(
 ) : BaseMusicPlayer(context, attrs) {
 
     private val binding =
-        AutoMusicPlayerLayoutFullBinding.inflate(context.layoutInflater, this, false)
+        AutoMusicPlayerLayoutFullBinding.inflate(context.layoutInflater, this, true)
 
     override val next: ImageView
         get() = binding.musicNext
@@ -32,9 +32,9 @@ class MusicPlayerViewFull @JvmOverloads constructor(
             field = value
         }
 
-    override var duration: Long = 0L
+    override var duration: Long? = 0L
         set(value) {
-            binding.musicProgress.barDuration = duration
+            binding.musicProgress.barDuration = value?:0L
             field = value
         }
 
@@ -44,6 +44,14 @@ class MusicPlayerViewFull @JvmOverloads constructor(
 
     override fun onPause() {
         binding.musicControl.setImageResource(R.drawable.ic_round_paused_white_24)
+    }
+
+    override fun setName(name: String) {
+        binding.musicName.text = name
+    }
+
+    override fun setDetail(detail: String) {
+        binding.musicDetail.text = detail
     }
 
 }

@@ -60,10 +60,11 @@ class NoteViewActivity : BaseActivity<NoteViewSeen>() {
                             DataBaseDAOHelper.getMusicByUri(uri)
                                 ?.let {
                                     setMusicDuration(it.duration)
-                                    binder.play(it, progress)
+                                    binder.play(it)
+                                    binder.setProgress(progress)
                                 }
                         }
-                        binder.getPosition().observe(this@NoteViewActivity) {
+                        binder.onProgress().observe(this@NoteViewActivity) {
                             setMusicProgress(it)
                         }
                     }

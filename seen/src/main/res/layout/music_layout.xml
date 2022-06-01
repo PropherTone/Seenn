@@ -159,13 +159,14 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="ContentDescription" />
 
-            <com.protone.seen.customView.MySmallMusicPlayer
+            <com.protone.seen.customView.musicPlayer.MusicPlayerViewLite
                 android:id="@+id/mySmallMusicPlayer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:background="@color/white"
                 app:layout_constraintBottom_toTopOf="@id/music_bucket"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.08"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

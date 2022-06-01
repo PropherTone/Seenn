@@ -15,22 +15,24 @@ import com.protone.seen.MusicSeen
 import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.seenn.broadcast.workLocalBroadCast
+import com.protone.seenn.service.MusicControllerIMP
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
 import kotlin.coroutines.suspendCoroutine
 
 class MusicActivity : BaseActivity<MusicSeen>() {
 
+    private lateinit var musicController: MusicControllerIMP
+
     override suspend fun main() {
         val musicSeen = MusicSeen(this)
 
         musicSeen.bucket = userConfig.playedMusicBucket
-
+        musicController = MusicControllerIMP(musicSeen.musicController)
         setContentSeen(musicSeen)
 
         musicSeen.initSeen()
         musicSeen.setBucket()
-
         bindMusicService {
             musicReceiver = object : MusicReceiver() {
                 override fun play() {}
@@ -48,14 +50,9 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                 }
 
             }
-            setMusicList(Medias.musicBucket[musicSeen.bucket] ?: Medias.music)
-            binder.getData().apply {
-                musicSeen.musicName = name
-                musicSeen.icon = albumUri
-            }
-            musicSeen.isPlaying = binder.getPlayState().value == true
+            this@MusicActivity.musicController.setBinder(this@MusicActivity, binder)
+            musicController.setMusicList(Medias.musicBucket[musicSeen.bucket] ?: Medias.music)
             musicSeen.playPosition()
-            musicSeen.observeMusicUpdate()
         }
 
         doOnFinish {
@@ -103,7 +100,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                                             musicSeen.offer(MusicSeen.Event.RefreshBucket)
                                         }
                             }
-                        MusicSeen.Event.RefreshBucket-> musicSeen.refreshBucket()
+                        MusicSeen.Event.RefreshBucket -> musicSeen.refreshBucket()
 
                     }
                 }
@@ -148,20 +145,20 @@ class MusicActivity : BaseActivity<MusicSeen>() {
             hideBucket()
             updateBucket()
         }
-        mlClickCallBack { position ->
-            binder.setDate(Medias.musicBucket[bucket] ?: mutableListOf())
-            binder.setPlayMusicPosition(position)
+        mlClickCallBack { music ->
+            this@MusicActivity.musicController.setMusicList(
+                Medias.musicBucket[bucket] ?: mutableListOf()
+            )
+            this@MusicActivity.musicController.play(music)
             userConfig.playedMusicBucket = bucket
         }
 
         Medias.musicBucketLive.observe(this@MusicActivity) {
             offer(MusicSeen.Event.RefreshBucket)
         }
-
-        initSmallMusic()
     }
 
-    private fun MusicSeen.updateBucket(){
+    private fun MusicSeen.updateBucket() {
         setBucket()
         updateMusicList(Medias.musicBucket[bucket] ?: mutableListOf())
     }
@@ -172,7 +169,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     }
 
     private fun MusicSeen.playPosition() {
-        playPosition(binder.getPlayPosition())
+        this@MusicActivity.musicController.getPlayingMusic()?.let { playPosition(it) }
     }
 
     private suspend fun MusicSeen.addBucket(name: String) = launch(Dispatchers.IO) {
@@ -202,16 +199,6 @@ class MusicActivity : BaseActivity<MusicSeen>() {
             } else {
                 toast(getString(R.string.failed_msg))
             }
-        }
-    }
-
-    private fun MusicSeen.observeMusicUpdate() {
-        Medias.musicState.observe(this@MusicActivity) {
-            if (musicName != it.name) musicName = it.name
-            if (icon != it.albumUri) icon = it.albumUri
-        }
-        binder.getPlayState().observe(this@MusicActivity) {
-            isPlaying = it
         }
     }
 

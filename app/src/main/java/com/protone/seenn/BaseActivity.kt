@@ -12,11 +12,10 @@ import com.bumptech.glide.Glide
 import com.protone.api.ActivityLifecycleOwner
 import com.protone.api.context.intent
 import com.protone.api.context.musicIntentFilter
-import com.protone.database.room.entity.Music
 import com.protone.database.sp.config.UserConfig
 import com.protone.seen.Seen
 import com.protone.seenn.broadcast.MusicReceiver
-import com.protone.seenn.service.MusicService
+import com.protone.seenn.broadcast.MusicSer
 import com.protone.seenn.theme.ThemeProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -37,7 +36,7 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
 
     protected val userConfig by lazy { UserConfig(this) }
 
-    lateinit var binder: MusicService.MusicControlLer
+    lateinit var binder: MusicSer.MusicBinder
 
     enum class Event {
         OnStart,
@@ -107,7 +106,7 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     fun bindMusicService(block: () -> Unit) {
         serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-                binder = (p1 as MusicService.MusicControlLer)
+                binder = (p1 as MusicSer.MusicBinder)
                 block()
             }
 
@@ -116,12 +115,8 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
 
         }
         serviceConnection?.let {
-            bindService(MusicService::class.intent, it, BIND_AUTO_CREATE)
+            bindService(MusicSer::class.intent, it, BIND_AUTO_CREATE)
         }
-    }
-
-    fun setMusicList(mutableList: MutableList<Music>) {
-        binder.setDate(mutableList)
     }
 
     fun toast(msg: CharSequence) {

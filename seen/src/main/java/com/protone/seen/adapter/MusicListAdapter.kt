@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import com.protone.api.animation.AnimationHelper
@@ -25,7 +24,7 @@ class MusicListAdapter(context: Context) :
             notifyDataSetChanged()
         }
 
-    var clickCallback: (Int) -> Unit? = {}
+    var clickCallback: (Music) -> Unit? = {}
 
     private var playPosition = 0
 
@@ -95,7 +94,7 @@ class MusicListAdapter(context: Context) :
                     if (playPosition == holder.layoutPosition) return@setOnClickListener
                     checkSelect(holder, music)
                     playPosition = holder.layoutPosition
-                    clickCallback(holder.layoutPosition)
+                    clickCallback(music)
                 }
                 musicListName.text = music.title
                 if (music.artist != null && music.album != null) {
@@ -108,13 +107,13 @@ class MusicListAdapter(context: Context) :
 
     override fun getItemCount(): Int = musicList.size
 
-    fun playPosition(position: Int) {
+    fun playPosition(music: Music) {
         if (musicList.size <= 0) return
-        musicList[position].let {
+        if (musicList.contains(music)) {
             selectList.clear()
-            selectList.add(it)
+            selectList.add(music)
             notifyItemChanged(playPosition)
-            playPosition = position
+            playPosition = musicList.indexOf(music)
             notifyItemChanged(playPosition)
         }
     }

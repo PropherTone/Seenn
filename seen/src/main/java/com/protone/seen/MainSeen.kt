@@ -1,7 +1,6 @@
 package com.protone.seen
 
 import android.content.Context
-import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
@@ -13,7 +12,6 @@ import com.protone.api.context.root
 import com.protone.api.toDrawable
 import com.protone.api.todayDate
 import com.protone.seen.adapter.MainModelListAdapter
-import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.databinding.MainLayoutBinding
 
 class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
@@ -23,14 +21,12 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
         MUSIC,
         NOTE,
         GALLEY,
-        PlayMusic,
-        PauseMusic,
-        NextMusic,
-        PreviousMusic,
         ConfigUser
     }
 
     private val binding = MainLayoutBinding.inflate(context.layoutInflater, context.root, false)
+
+    val musicController = binding.musicPlayer
 
     var userName: String = ""
         set(value) {
@@ -48,40 +44,6 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
                     binding.userIcon.background = it
                 }
             }
-            field = value
-        }
-
-    var progress: Long = 0
-        set(value) {
-            binding.musicPlayer.progress = value
-            field = value
-        }
-
-    var duration: Long = 0
-        set(value) {
-            binding.musicPlayer.duration = value
-            field = value
-        }
-
-    var musicName: String = ""
-        set(value) {
-            if (value != field)
-                binding.musicPlayer.name = value
-            field = value
-        }
-
-
-    var icon: Uri = Uri.parse("")
-        set(value) {
-            if (value != field)
-                binding.musicPlayer.icon = value
-            field = value
-        }
-
-    var isPlaying: Boolean = false
-        set(value) {
-            if (value != field)
-                binding.musicPlayer.isPlaying = value
             field = value
         }
 
@@ -103,18 +65,6 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
             root.viewTreeObserver.addOnGlobalLayoutListener(this@MainSeen)
             musicPlayer.apply {
                 duration
-                playMusic = {
-                    offer(Touch.PlayMusic)
-                }
-                pauseMusic = {
-                    offer(Touch.PauseMusic)
-                }
-                musicPrevious = {
-                    offer(Touch.PreviousMusic)
-                }
-                musicNext = {
-                    offer(Touch.NextMusic)
-                }
             }
             modelList.apply {
                 layoutManager = LinearLayoutManager(context)
@@ -133,10 +83,6 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
 
     override fun offer(event: Touch) {
         viewEvent.offer(event)
-    }
-
-    fun musicSeek(listener: ColorfulProgressBar.Progress) {
-        binding.musicPlayer.seekTo = listener
     }
 
     override fun onGlobalLayout() {

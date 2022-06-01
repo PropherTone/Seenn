@@ -13,12 +13,12 @@ import com.protone.seen.customView.ColorfulProgressBar
 abstract class BaseMusicPlayer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
-    abstract val next: ImageView
+    abstract val next: ImageView?
     abstract val control: ImageView
-    abstract val previous: ImageView
-    abstract val progress: ColorfulProgressBar
+    abstract val previous: ImageView?
+    abstract val progress: ColorfulProgressBar?
     abstract var cover: Uri
-    abstract var duration: Long
+    abstract var duration: Long?
     var isPlay = false
         set(value) {
             if (value) onPlay() else onPause()
@@ -27,6 +27,8 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
 
     abstract fun onPlay()
     abstract fun onPause()
+    abstract fun setName(name: String)
+    abstract fun setDetail(detail: String)
 
     fun loadAlbum(embeddedPicture: ByteArray?, target: ImageView) {
         Glide.with(context).load(embeddedPicture)

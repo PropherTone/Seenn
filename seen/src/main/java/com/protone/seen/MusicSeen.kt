@@ -3,16 +3,9 @@ package com.protone.seen
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.Uri
-import android.os.SystemClock
-import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewTreeObserver
-import androidx.core.animation.doOnEnd
-import androidx.core.animation.doOnStart
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -49,28 +42,10 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
 
     private var containerAnimator: ObjectAnimator? = null
     private val binding = MusicLayoutBinding.inflate(context.layoutInflater, context.root, true)
+    val musicController = binding.mySmallMusicPlayer
 
     override val viewRoot: View
         get() = binding.root
-
-    var musicName: String = ""
-        set(value) {
-            binding.mySmallMusicPlayer.name = value
-            field = value
-        }
-
-
-    var icon: Uri = Uri.parse("")
-        set(value) {
-            binding.mySmallMusicPlayer.icon = value
-            field = value
-        }
-
-    var isPlaying: Boolean = false
-        set(value) {
-            binding.mySmallMusicPlayer.isPlaying = value
-            field = value
-        }
 
     var bucket: String = ""
 
@@ -141,15 +116,6 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             }
         }
 
-    suspend fun initSmallMusic() = withContext(Dispatchers.IO) {
-        binding.mySmallMusicPlayer.apply {
-            { offer(Event.Play) }.let {
-                playMusic = it
-                pauseMusic = it
-            }
-        }
-    }
-
     suspend fun setBucket(bitArray: ByteArray?, bucketName: String, detail: String) =
         withContext(Dispatchers.Main) {
             bucket = bucketName
@@ -207,7 +173,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
                 .refreshBucket(actionBucket, bucket)
     }
 
-    fun mlClickCallBack(callback: (Int) -> Unit) {
+    fun mlClickCallBack(callback: (Music) -> Unit) {
         if (binding.musicMusicList.adapter is MusicListAdapter)
             (binding.musicMusicList.adapter as MusicListAdapter).clickCallback = callback
     }
@@ -227,9 +193,9 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             (binding.musicBucket.adapter as MusicBucketAdapter).addBucket(bucket)
     }
 
-    fun playPosition(position: Int) {
+    fun playPosition(music: Music) {
         if (binding.musicMusicList.adapter is MusicListAdapter)
-            (binding.musicMusicList.adapter as MusicListAdapter).playPosition(position)
+            (binding.musicMusicList.adapter as MusicListAdapter).playPosition(music)
     }
 
     override fun onActive() {

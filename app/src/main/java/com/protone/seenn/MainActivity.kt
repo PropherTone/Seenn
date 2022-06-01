@@ -1,16 +1,11 @@
 package com.protone.seenn
 
-import android.content.Intent
 import android.transition.TransitionManager
-import com.protone.api.context.MUSIC_NEXT
-import com.protone.api.context.MUSIC_PLAY
-import com.protone.api.context.MUSIC_PREVIOUS
 import com.protone.api.context.intent
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.mediamodle.Medias
 import com.protone.seen.MainSeen
-import com.protone.seen.customView.ColorfulProgressBar
-import com.protone.seenn.broadcast.musicBroadCastManager
+import com.protone.seenn.service.MusicControllerIMP
 import com.protone.seenn.service.WorkService
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
@@ -21,30 +16,15 @@ class MainActivity : BaseActivity<MainSeen>() {
         val mainSeen = MainSeen(this)
         setContentSeen(mainSeen)
         mainSeen.beginTransition()
-
+        val musicController = MusicControllerIMP(mainSeen.musicController)
         bindMusicService {
-            setMusicList(Medias.music)
-            mainSeen.apply {
-                binder.getData().let {
-                    musicName = it.name
-                    icon = it.albumUri
-                    duration = it.duration
-                    isPlaying = it.isPlaying
-                }
-            }
-            mainSeen.setAndUpdateDuration()
+            musicController.setMusicList(Medias.music)
+            musicController.setBinder(this,binder)
         }
 
         Medias.mediaLive.observe(this) { code->
             if (code == Medias.AUDIO_UPDATED) {
-                mainSeen.apply {
-                    binder.getData().let {
-                        musicName = it.name
-                        icon = it.albumUri
-                        duration = it.duration
-                        isPlaying = it.isPlaying
-                    }
-                }
+                musicController.refresh()
             } else {
                 mainSeen.refreshModelList()
             }
@@ -72,14 +52,6 @@ class MainActivity : BaseActivity<MainSeen>() {
                             startActivity(MusicActivity::class.intent) else toast(getString(R.string.locked))
                         MainSeen.Touch.NOTE -> if (userConfig.lockNote == "")
                             startActivity(NoteActivity::class.intent) else toast(getString(R.string.locked))
-                        MainSeen.Touch.PlayMusic ->
-                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
-                        MainSeen.Touch.PauseMusic ->
-                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PLAY))
-                        MainSeen.Touch.PreviousMusic ->
-                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_PREVIOUS))
-                        MainSeen.Touch.NextMusic ->
-                            musicBroadCastManager.sendBroadcast(Intent().setAction(MUSIC_NEXT))
                         MainSeen.Touch.ConfigUser -> startActivity(UserConfigActivity::class.intent)
                     }
                 }
@@ -89,32 +61,5 @@ class MainActivity : BaseActivity<MainSeen>() {
 
     private fun MainSeen.beginTransition() {
         TransitionManager.beginDelayedTransition(group)
-    }
-
-    private fun MainSeen.updateDuration() {
-        musicSeek()
-        binder.getPosition().observe(this@MainActivity) {
-            progress = it
-        }
-        binder.getPlayState().observe(this@MainActivity) {
-            isPlaying = it
-        }
-    }
-
-    private fun MainSeen.setAndUpdateDuration() {
-        Medias.musicState.observe(this@MainActivity) {
-            duration = it.duration
-            musicName = it.name
-            icon = it.albumUri
-        }
-        updateDuration()
-    }
-
-    private fun MainSeen.musicSeek() {
-        musicSeek(object : ColorfulProgressBar.Progress {
-            override fun getProgress(position: Long) {
-                binder.seekTo(position)
-            }
-        })
     }
 }
