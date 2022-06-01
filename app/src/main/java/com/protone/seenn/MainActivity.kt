@@ -9,7 +9,7 @@ import com.protone.api.context.intent
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.mediamodle.Medias
 import com.protone.seen.MainSeen
-import com.protone.seen.Progress
+import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.seenn.service.WorkService
 import kotlinx.coroutines.isActive
@@ -111,7 +111,7 @@ class MainActivity : BaseActivity<MainSeen>() {
     }
 
     private fun MainSeen.musicSeek() {
-        musicSeek(object : Progress {
+        musicSeek(object : ColorfulProgressBar.Progress {
             override fun getProgress(position: Long) {
                 binder.seekTo(position)
             }

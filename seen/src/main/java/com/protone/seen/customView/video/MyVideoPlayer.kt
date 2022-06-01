@@ -14,7 +14,7 @@ import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
-import com.protone.seen.Progress
+import com.protone.seen.customView.ColorfulProgressBar
 
 class MyVideoPlayer @JvmOverloads constructor(
     context: Context,
@@ -73,7 +73,7 @@ class MyVideoPlayer @JvmOverloads constructor(
         videoController.apply {
             playVideo = { play() }
             pauseVideo = { pause() }
-            setProgressListener(object : Progress {
+            setProgressListener(object : ColorfulProgressBar.Progress {
                 override fun getProgress(position: Long) {
                     videoSeekTo(position)
                 }

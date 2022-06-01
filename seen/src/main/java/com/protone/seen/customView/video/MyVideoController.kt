@@ -8,8 +8,8 @@ import androidx.annotation.StyleRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.protone.api.context.layoutInflater
-import com.protone.seen.Progress
 import com.protone.seen.R
+import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.databinding.VideoControllerBinding
 
 class MyVideoController @JvmOverloads constructor(
@@ -82,7 +82,7 @@ class MyVideoController @JvmOverloads constructor(
 
     fun seekTo(duration: Long) = binding.vSeekBar.barSeekTo(duration)
 
-    fun setProgressListener(listener: Progress) {
+    fun setProgressListener(listener: ColorfulProgressBar.Progress) {
         binding.vSeekBar.progressListener = listener
     }
 }

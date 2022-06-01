@@ -11,7 +11,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.protone.api.context.layoutInflater
 import com.protone.api.toBitmapByteArray
-import com.protone.seen.Progress
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicplayerLayoutBinding
 
@@ -40,7 +39,7 @@ class MyMusicPlayer @JvmOverloads constructor(
             field = value
         }
 
-    var seekTo: Progress? = null
+    var seekTo: ColorfulProgressBar.Progress? = null
         set(value) {
             binding.musicProgress.progressListener = value
             field = value

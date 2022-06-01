@@ -13,6 +13,7 @@ import com.protone.api.context.root
 import com.protone.api.toDrawable
 import com.protone.api.todayDate
 import com.protone.seen.adapter.MainModelListAdapter
+import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.databinding.MainLayoutBinding
 
 class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
@@ -134,7 +135,7 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
         viewEvent.offer(event)
     }
 
-    fun musicSeek(listener: Progress) {
+    fun musicSeek(listener: ColorfulProgressBar.Progress) {
         binding.musicPlayer.seekTo = listener
     }
 

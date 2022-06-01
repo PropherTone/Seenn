@@ -5,6 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.protone.api.context.MUSIC_NEXT
 import com.protone.api.context.MUSIC_PLAY
 import com.protone.api.context.MUSIC_PREVIOUS
+import com.protone.database.room.entity.Music
 import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.customView.musicPlayer.BaseMusicPlayer
 import com.protone.seenn.broadcast.MusicSer
@@ -13,7 +14,7 @@ import com.protone.seenn.broadcast.musicBroadCastManager
 class MusicControllerIMP(
     lifecycle: LifecycleOwner,
     controller: BaseMusicPlayer,
-    binder: MusicSer.MusicBinder
+    private val binder: MusicSer.MusicBinder
 ) {
     init {
         controller.apply {
@@ -41,4 +42,8 @@ class MusicControllerIMP(
             }
         }
     }
+
+    fun getPlayList(): MutableList<Music> = binder.getPlayList()
+
+    fun play(music: Music?) = binder.play(music)
 }
