@@ -45,7 +45,7 @@
                 android:layout_marginTop="@dimen/back_margin"
                 android:contentDescription="@string/back"
                 android:onClick="@{()->self.offer(Touch.Finish)}"
-                android:src="@drawable/ic_baseline_arrow_left_24_white" />
+                android:src="@drawable/ic_round_arrow_left__white_24" />
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/galley_tab"

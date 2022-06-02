@@ -3,7 +3,9 @@ package com.protone.seen.customView.musicPlayer
 import android.content.Context
 import android.net.Uri
 import android.util.AttributeSet
+import android.view.View
 import android.widget.ImageView
+import android.widget.ViewSwitcher
 import com.protone.api.context.layoutInflater
 import com.protone.api.toBitmapByteArray
 import com.protone.seen.R
@@ -17,33 +19,36 @@ class MusicPlayerViewFull @JvmOverloads constructor(
     private val binding =
         AutoMusicPlayerLayoutFullBinding.inflate(context.layoutInflater, this, true)
 
-    override val next: ImageView
-        get() = binding.musicNext
-    override val control: ImageView
-        get() = binding.musicControl
-    override val previous: ImageView
-        get() = binding.musicPrevious
-    override val progress: ColorfulProgressBar
-        get() = binding.musicProgress
+    override val next: ImageView = binding.musicNext
+    override val control: ImageView = binding.musicControl
+    override val previous: ImageView = binding.musicPrevious
+    override val progress: ColorfulProgressBar = binding.musicProgress
+    override var background1: ImageView = binding.musicBack1
+    override var background2: ImageView = binding.musicBack2
+    override var switcher: ViewSwitcher = binding.musicBack
+    override var cover1: ImageView = binding.musicCover1
+    override var cover2: ImageView = binding.musicCover2
+    override var coverSwitcher: ViewSwitcher = binding.musicCover
+    override var looper: ImageView? = binding.loopMode
+    override val root: View = binding.musicBack
 
     override var cover: Uri = Uri.EMPTY
         set(value) {
-            loadAlbum(value.toBitmapByteArray(), binding.musicCover)
+            loadAlbum(value.toBitmapByteArray())
             field = value
         }
-
     override var duration: Long? = 0L
         set(value) {
-            binding.musicProgress.barDuration = value?:0L
+            binding.musicProgress.barDuration = value ?: 0L
             field = value
         }
 
     override fun onPlay() {
-        binding.musicControl.setImageResource(R.drawable.ic_round_on_white_24)
+        binding.musicControl.setImageResource(R.drawable.ic_round_paused_white_24)
     }
 
     override fun onPause() {
-        binding.musicControl.setImageResource(R.drawable.ic_round_paused_white_24)
+        binding.musicControl.setImageResource(R.drawable.ic_round_on_white_24)
     }
 
     override fun setName(name: String) {

@@ -32,7 +32,7 @@
                 android:contentDescription="@string/action"
                 android:onClick="@{()->self.offer(NoteEvent.Finish)}"
                 android:padding="@dimen/main_padding"
-                android:src="@drawable/ic_baseline_arrow_left_24_white" />
+                android:src="@drawable/ic_round_arrow_left__white_24" />
 
         </FrameLayout>
 

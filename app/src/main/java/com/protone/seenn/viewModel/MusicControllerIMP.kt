@@ -1,4 +1,4 @@
-package com.protone.seenn.service
+package com.protone.seenn.viewModel
 
 import android.content.Intent
 import androidx.lifecycle.LifecycleOwner
@@ -8,13 +8,14 @@ import com.protone.api.context.MUSIC_PREVIOUS
 import com.protone.database.room.entity.Music
 import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.customView.musicPlayer.BaseMusicPlayer
-import com.protone.seenn.broadcast.MusicSer
 import com.protone.seenn.broadcast.musicBroadCastManager
+import com.protone.seenn.service.MusicService
 
 class MusicControllerIMP(private val controller: BaseMusicPlayer) {
-    var binder: MusicSer.MusicBinder? = null
+    var binder: MusicService.MusicBinder? = null
+    var loopMode = 1
 
-    fun setBinder(lifecycle: LifecycleOwner, binder: MusicSer.MusicBinder) {
+    fun setBinder(lifecycle: LifecycleOwner, binder: MusicService.MusicBinder) {
         this.binder = binder
         controller.apply {
             control.setOnClickListener {
@@ -25,6 +26,10 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
             }
             previous?.setOnClickListener {
                 musicBroadCastManager.sendBroadcast(Intent(MUSIC_PREVIOUS))
+            }
+            looper?.setOnClickListener {
+                if (loopMode == 4) loopMode = 0
+                this@MusicControllerIMP.binder?.setLoopMode(++loopMode)
             }
             this@MusicControllerIMP.binder?.run {
                 refresh()
@@ -74,6 +79,14 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
             }
         }
     }
+
+    fun onClick(func: () -> Unit) {
+        controller.root.setOnClickListener {
+            func.invoke()
+        }
+    }
+
+    fun refresh(music: Music, progress: Long) = binder?.init(music, progress)
 
     fun getPlayList(): MutableList<Music>? = binder?.getPlayList()
 

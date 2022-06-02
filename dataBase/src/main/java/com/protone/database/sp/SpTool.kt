@@ -16,6 +16,18 @@ class SpTool(val spProvider: SpProvider){
         }
     }
 
+    fun long(key: String,defValue: Long): Delegate<Long> {
+        return object : Delegate<Long>{
+            override fun getValue(thisRef: Any?, property: KProperty<*>): Long {
+                return spProvider.getLong(key, defValue)
+            }
+
+            override fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) {
+                spProvider.setLong(key, value)
+            }
+        }
+    }
+
     fun string(key: String,defValue: String): Delegate<String> {
         return object : Delegate<String>{
             override fun getValue(thisRef: Any?, property: KProperty<*>): String {

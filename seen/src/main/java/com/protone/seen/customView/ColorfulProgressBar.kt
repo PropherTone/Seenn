@@ -38,6 +38,7 @@ class ColorfulProgressBar @JvmOverloads constructor(
     private var blurRadius = 0
     private var moveLength = 0f
     private var isTouch = false
+    private var isStart: Boolean = false
     var barDuration: Long = 0
 
     private val colors = intArrayOf(
@@ -155,7 +156,10 @@ class ColorfulProgressBar @JvmOverloads constructor(
     }
 
     fun startGradient() {
-        mHandler.post(colorRunnable)
+        if (!isStart) {
+            mHandler.post(colorRunnable)
+            isStart = true
+        }
     }
 
     fun stopGradient() {
@@ -183,6 +187,6 @@ class ColorfulProgressBar @JvmOverloads constructor(
     }
 
     interface Progress {
-        fun getProgress(position : Long)
+        fun getProgress(position: Long)
     }
 }

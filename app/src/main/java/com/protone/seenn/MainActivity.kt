@@ -2,11 +2,14 @@ package com.protone.seenn
 
 import android.transition.TransitionManager
 import com.protone.api.context.intent
+import com.protone.api.json.toEntity
+import com.protone.api.json.toJson
 import com.protone.database.room.dao.DataBaseDAOHelper
+import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Medias
 import com.protone.seen.MainSeen
-import com.protone.seenn.service.MusicControllerIMP
 import com.protone.seenn.service.WorkService
+import com.protone.seenn.viewModel.MusicControllerIMP
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 
@@ -17,12 +20,22 @@ class MainActivity : BaseActivity<MainSeen>() {
         setContentSeen(mainSeen)
         mainSeen.beginTransition()
         val musicController = MusicControllerIMP(mainSeen.musicController)
+        musicController.onClick {
+            startActivity(MusicViewActivity::class.intent)
+        }
         bindMusicService {
-            musicController.setMusicList(Medias.music)
-            musicController.setBinder(this,binder)
+            musicController.setBinder(this, binder)
+            Medias.musicBucket[userConfig.lastMusicBucket]?.let {
+                musicController.setMusicList(it)
+                musicController.refresh(
+                    if (userConfig.lastMusic.isNotEmpty()) userConfig.lastMusic.toEntity(
+                        Music::class.java
+                    ) else binder.getPlayList()[0], userConfig.lastMusicProgress
+                )
+            }
         }
 
-        Medias.mediaLive.observe(this) { code->
+        Medias.mediaLive.observe(this) { code ->
             if (code == Medias.AUDIO_UPDATED) {
                 musicController.refresh()
             } else {
@@ -33,6 +46,8 @@ class MainActivity : BaseActivity<MainSeen>() {
         doOnFinish {
             DataBaseDAOHelper.shutdownNow()
             stopService(WorkService::class.intent)
+            userConfig.lastMusicProgress = binder.onProgress().value ?: 0L
+            userConfig.lastMusic = binder.onMusicPlaying().value?.toJson() ?: ""
         }
         while (isActive) {
             select<Unit> {

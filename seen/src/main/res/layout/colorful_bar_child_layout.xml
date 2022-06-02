@@ -4,5 +4,5 @@
     android:id="@+id/colorful_button"
     android:layout_width="20dp"
     android:layout_height="match_parent"
-    android:background="@drawable/card"
+    android:background="@drawable/oval"
     android:contentDescription="@string/action" />

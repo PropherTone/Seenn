@@ -17,7 +17,7 @@ import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.Medias
 import com.protone.seen.SplashSeen
-import com.protone.seenn.broadcast.MusicSer
+import com.protone.seenn.service.MusicService
 import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.service.WorkService
 import kotlinx.coroutines.isActive
@@ -42,11 +42,11 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                     DataBaseDAOHelper.insertMusicMulti(Medias.music)
                     userConfig.apply {
                         isFirstBoot = true
-                        playedMusicBucket = getString(R.string.all_music)
+                        lastMusicBucket = getString(R.string.all_music)
                         playedMusicPosition = 0
                     }
                 }
-                startService(MusicSer::class.intent)
+                startService(MusicService::class.intent)
                 startActivity(MainActivity::class.intent)
                 finish()
             }

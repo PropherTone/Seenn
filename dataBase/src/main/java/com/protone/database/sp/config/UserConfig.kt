@@ -26,10 +26,14 @@ class UserConfig(context: Context) {
 
     var lockMusic by config.string("LOCK_MUSIC", "")
 
-    var playedMusicBucket by config.string(
+    var lastMusicBucket by config.string(
         "PLAYED_MUSIC_BUCKET",
         Global.application.getString(R.string.all_music)
     )
+
+    var lastMusic by config.string("LAST_TIME_PLAYED_MUSIC", "")
+
+    var lastMusicProgress by config.long("LAST_MUSIC_PROGRESS",0L)
 
     var playedMusicPosition by config.int("MUSIC_POSITION", 0)
 

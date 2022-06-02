@@ -137,7 +137,7 @@
                     android:id="@+id/musicPlayer"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    app:layout_constraintHeight_percent="0.32"
+                    app:layout_constraintHeight_percent="0.36"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/noteBook" />
 

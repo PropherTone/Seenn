@@ -15,7 +15,7 @@ import com.protone.seen.MusicSeen
 import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.seenn.broadcast.workLocalBroadCast
-import com.protone.seenn.service.MusicControllerIMP
+import com.protone.seenn.viewModel.MusicControllerIMP
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
 import kotlin.coroutines.suspendCoroutine
@@ -27,7 +27,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     override suspend fun main() {
         val musicSeen = MusicSeen(this)
 
-        musicSeen.bucket = userConfig.playedMusicBucket
+        musicSeen.bucket = userConfig.lastMusicBucket
         musicController = MusicControllerIMP(musicSeen.musicController)
         setContentSeen(musicSeen)
 
@@ -136,8 +136,8 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
         initList(
             buckets,
-            Medias.musicBucket[userConfig.playedMusicBucket] ?: Medias.music,
-            userConfig.playedMusicBucket
+            Medias.musicBucket[userConfig.lastMusicBucket] ?: Medias.music,
+            userConfig.lastMusicBucket
         )
 
         mbClickCallBack { name ->
@@ -150,7 +150,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                 Medias.musicBucket[bucket] ?: mutableListOf()
             )
             this@MusicActivity.musicController.play(music)
-            userConfig.playedMusicBucket = bucket
+            userConfig.lastMusicBucket = bucket
         }
 
         Medias.musicBucketLive.observe(this@MusicActivity) {

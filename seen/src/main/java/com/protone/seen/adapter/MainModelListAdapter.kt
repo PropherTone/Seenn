@@ -57,10 +57,6 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
         }
     }
 
-    fun loadDataUpside() {
-
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
             MUSIC -> return MusicPlayerViewHolder(

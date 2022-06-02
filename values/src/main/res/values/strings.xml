@@ -368,4 +368,9 @@ II. 幂等 的意味着对同一URL的多个请求应该返回同样的结果。
     <string name="add_dir">添加文件夹</string>
     <string name="add_cate">添加标签</string>
     <string name="add_con">添加链接</string>
+    <string name="loop_list">列表循环</string>
+    <string name="loop_single">单曲循环</string>
+    <string name="play_list">列表播放</string>
+    <string name="no_loop">无循环</string>
+    <string name="random">随机播放</string>
 </resources>

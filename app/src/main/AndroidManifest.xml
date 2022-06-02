@@ -41,6 +41,7 @@
         <activity android:name=".GalleyViewActivity" />
         <activity android:name=".PickMusicActivity" />
         <activity android:name=".UserConfigActivity" />
+        <activity android:name=".MusicViewActivity" />
         <activity
             android:name=".SplashActivity"
             android:exported="true">
@@ -53,10 +54,6 @@
 
         <service
             android:name=".service.MusicService"
-            android:enabled="true"
-            android:exported="false" />
-        <service
-            android:name=".broadcast.MusicSer"
             android:enabled="true"
             android:exported="false" />
         <service

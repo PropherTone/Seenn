@@ -15,7 +15,8 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:elevation="0dp">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appToolbar"
@@ -41,7 +42,7 @@
                     android:elevation="@dimen/small_elevation"
                     android:onClick="@{()->self.offer(Event.Finish)}"
                     android:padding="@dimen/icon_padding_mid"
-                    android:src="@drawable/ic_baseline_arrow_left_24_white"
+                    android:src="@drawable/ic_round_arrow_left__white_24"
                     app:layout_collapseMode="pin"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -130,6 +131,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
+            android:elevation="0dp"
             app:layout_anchor="@id/appToolbar"
             app:layout_anchorGravity="bottom"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
@@ -143,11 +145,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/zima_blue"
+            android:elevation="2dp"
             android:orientation="vertical">
 
             <com.protone.seen.customView.StateImageView
                 android:id="@+id/music_showBucket"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="@dimen/smaller_Icon"
                 android:clickable="true"
                 android:elevation="1dp"
@@ -155,6 +158,7 @@
                 app:ActiveDrawable="@drawable/ic_baseline_arrow_drop_up_24"
                 app:NegativeDrawable="@drawable/ic_baseline_arrow_drop_down_24"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintWidth_percent="0.4"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="ContentDescription" />
@@ -162,11 +166,10 @@
             <com.protone.seen.customView.musicPlayer.MusicPlayerViewLite
                 android:id="@+id/mySmallMusicPlayer"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="@dimen/model_icon_dimen"
                 android:background="@color/white"
                 app:layout_constraintBottom_toTopOf="@id/music_bucket"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.08"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

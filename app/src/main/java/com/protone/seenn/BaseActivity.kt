@@ -15,7 +15,7 @@ import com.protone.api.context.musicIntentFilter
 import com.protone.database.sp.config.UserConfig
 import com.protone.seen.Seen
 import com.protone.seenn.broadcast.MusicReceiver
-import com.protone.seenn.broadcast.MusicSer
+import com.protone.seenn.service.MusicService
 import com.protone.seenn.theme.ThemeProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -36,7 +36,7 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
 
     protected val userConfig by lazy { UserConfig(this) }
 
-    lateinit var binder: MusicSer.MusicBinder
+    lateinit var binder: MusicService.MusicBinder
 
     enum class Event {
         OnStart,
@@ -44,6 +44,9 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
         OnStop,
         OnDestroy
     }
+
+    @Suppress("PropertyName")
+    protected val TAG = "TAG"
 
     protected val event = Channel<Event>(Channel.UNLIMITED)
     private val themeProvider by lazy { ThemeProvider(this) }
@@ -106,7 +109,7 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     fun bindMusicService(block: () -> Unit) {
         serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-                binder = (p1 as MusicSer.MusicBinder)
+                binder = (p1 as MusicService.MusicBinder)
                 block()
             }
 
@@ -115,7 +118,7 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
 
         }
         serviceConnection?.let {
-            bindService(MusicSer::class.intent, it, BIND_AUTO_CREATE)
+            bindService(MusicService::class.intent, it, BIND_AUTO_CREATE)
         }
     }
 

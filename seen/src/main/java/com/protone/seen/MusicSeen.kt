@@ -220,9 +220,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
                     it.paddingRight,
                     context.navigationBarHeight + musicAddBucket.measuredHeight - musicAddBucket.paddingBottom
                 )
-                it.setOnTouchListener { _, _ -> false }
-                it.setOnClickListener { }
-                containerAnimator = getAni(it, mySmallMusicPlayer.height.toFloat())
+                containerAnimator = getAni(it, mySmallMusicPlayer.measuredHeight.toFloat())
 
                 it.y = toolbar.minHeight + context.statuesBarHeight.toFloat()
             }
