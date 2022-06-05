@@ -114,6 +114,10 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
 
     }
 
+    fun getChooseGalley():MutableList<GalleyMedia>?{
+        return mailers[rightMailer]?.getChooseGalley()
+    }
+
     fun selectAll() {
         mailers[rightMailer]?.selectAll()
     }

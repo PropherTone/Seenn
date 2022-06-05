@@ -12,4 +12,5 @@ interface FragMailer {
     fun addBucket(name: String, list: MutableList<GalleyMedia>)
     fun selectAll()
     fun onActionBtn()
+    fun getChooseGalley():MutableList<GalleyMedia>?
 }

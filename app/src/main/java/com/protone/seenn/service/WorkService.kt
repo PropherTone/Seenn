@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
+import android.widget.Toast
 import com.protone.api.context.Global
 import com.protone.api.context.workIntentFilter
 import com.protone.database.room.dao.DataBaseDAOHelper
@@ -132,6 +133,10 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             }
         }
         musicBucketLive.postValue(1)
+        withContext(Dispatchers.Main){
+            makeToast("歌单更新完毕")
+        }
+        cancel()
     }
 
     private fun updateMusic(uri: Uri) {
@@ -139,6 +144,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             DataBaseDAOHelper.insertMusic(it)
             mediaLive.postValue(AUDIO_UPDATED)
         }
+        makeToast("歌单更新完毕")
     }
 
     private fun updateMusic() {
@@ -169,6 +175,9 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             while (dataPool.isNotEmpty()) continue
             deleteMusicMulti(allMusic)
             mediaLive.postValue(AUDIO_UPDATED)
+            withContext(Dispatchers.Main){
+                makeToast("歌单更新完毕")
+            }
             cancel()
         }
     }
@@ -177,7 +186,12 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         scanGalleyWithUri(uri) {
             DataBaseDAOHelper.insertSignedMedia(it)
             mediaLive.postValue(GALLEY_UPDATED)
+
         }
+        withContext(Dispatchers.Main){
+            makeToast("相册更新完毕")
+        }
+        cancel()
     }
 
     private fun updateGalley() = DataBaseDAOHelper.run {
@@ -214,6 +228,9 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             while (dataPool.isNotEmpty()) continue
             deleteSignedMedias(allSignedMedia)
             mediaLive.postValue(GALLEY_UPDATED)
+            withContext(Dispatchers.Main){
+                makeToast("相册更新完毕")
+            }
             cancel()
         }
     }
@@ -230,5 +247,9 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         override fun updateGalley(data: Uri?) {
             this@WorkService.updateGalley()
         }
+    }
+
+    private fun makeToast(msg:String){
+        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show()
     }
 }

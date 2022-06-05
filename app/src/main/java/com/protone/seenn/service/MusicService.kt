@@ -73,7 +73,6 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         }
 
         override fun music() {
-            TODO("Not yet implemented")
         }
 
     }

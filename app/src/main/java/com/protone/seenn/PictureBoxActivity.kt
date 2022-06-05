@@ -7,11 +7,14 @@ import com.protone.api.json.jsonToList
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.PictureBoxSeen
 import com.protone.seen.adapter.PictureBoxAdapter
+import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 
+
 class PictureBoxActivity : BaseActivity<PictureBoxSeen>() {
 
+    @Suppress("UNCHECKED_CAST")
     override suspend fun main() {
 
         val pictureBoxSeen = PictureBoxSeen(this)
@@ -23,11 +26,17 @@ class PictureBoxActivity : BaseActivity<PictureBoxSeen>() {
                 event.onReceive {
                     when (it) {
                         Event.OnStart -> {
-                            pictureBoxSeen.initPictureBox(
-                                (intent.getStringExtra(GalleyActivity.CUSTOM)
-                                    ?.jsonToList(GalleyMedia::class.java)
-                                    ?: mutableListOf()) as MutableList<GalleyMedia>
-                            )
+                            when (val data= IntentDataHolder.get()) {
+                                null->finish()
+                                is List<*> ->{
+                                    if (data.isNotEmpty() && data[0] is GalleyMedia) {
+                                        pictureBoxSeen.initPictureBox(
+                                            data as MutableList<GalleyMedia>
+                                        )
+                                    }else finish()
+                                }
+                            }
+
                         }
                         Event.OnResume -> {
                         }

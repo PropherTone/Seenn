@@ -91,6 +91,10 @@ class GalleyFragment(
             onSelectMod = true
         }
 
+        override fun getChooseGalley(): MutableList<GalleyMedia>? {
+            return galleyMap[rightGalley] ?: galleyMap[context?.getString(R.string.all_galley)]
+        }
+
     }
 
     private fun start() {
@@ -351,7 +355,7 @@ class GalleyFragment(
     }
 
     override fun openView(galleyMedia: GalleyMedia) {
-        iGalleyFragment?.openView(galleyMedia,rightGalley)
+        iGalleyFragment?.openView(galleyMedia, rightGalley)
     }
 
     private fun toast(text: String) = requireContext().run {

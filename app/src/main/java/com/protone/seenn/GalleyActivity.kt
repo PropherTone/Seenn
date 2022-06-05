@@ -20,6 +20,7 @@ import com.protone.seen.dialog.CateDialog
 import com.protone.seen.dialog.TitleDialog
 import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seenn.fragment.GalleyFragment
+import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -100,7 +101,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                 event.onReceive {}
                 galleySeen.viewEvent.onReceive {
                     when (it) {
-                        GalleySeen.Touch.Init-> initPager()
+                        GalleySeen.Touch.Init -> initPager()
                         GalleySeen.Touch.Finish -> finish()
                         GalleySeen.Touch.MOVE_TO -> galleySeen.moveTo()
                         GalleySeen.Touch.RENAME -> galleySeen.rename()
@@ -108,18 +109,8 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                         GalleySeen.Touch.SELECT_ALL -> galleySeen.selectAll()
                         GalleySeen.Touch.DELETE -> galleySeen.delete()
                         GalleySeen.Touch.IntoBOX -> {
-                            startActivity(
-                                Intent(
-                                    this@GalleyActivity,
-                                    PictureBoxActivity::class.java
-                                ).apply {
-                                    putExtra(
-                                        CUSTOM,
-                                        (chooseData() ?: withContext(Dispatchers.IO) {
-                                            DataBaseDAOHelper.getAllMediaByType(false)
-                                        })?.toJson()
-                                    )
-                                })
+                            IntentDataHolder.put((chooseData() ?: galleySeen.getChooseGalley()))
+                            startActivity(PictureBoxActivity::class.intent)
                         }
                         GalleySeen.Touch.ConfirmChoose -> {
                             chooseData.value?.let { list ->
@@ -132,7 +123,9 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
                             }
                             finish()
                         }
-                        GalleySeen.Touch.ShowPop -> galleySeen.showPop(chooseData()?.size ?: 0 > 0)
+                        GalleySeen.Touch.ShowPop -> galleySeen.showPop(
+                            (chooseData()?.size ?: 0) > 0
+                        )
                     }
                 }
             }
