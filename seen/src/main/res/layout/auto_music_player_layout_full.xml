@@ -78,6 +78,14 @@
                 app:shapeAppearance="@style/ovalImage" />
         </ViewSwitcher>
 
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_background_fore_dark"
+            app:layout_constraintBottom_toBottomOf="@id/music_detail"
+            app:layout_constraintEnd_toEndOf="@id/music_name"
+            app:layout_constraintStart_toStartOf="@id/music_name"
+            app:layout_constraintTop_toTopOf="@id/music_name" />
 
         <com.protone.seen.customView.AutoSizeTextView
             android:id="@+id/music_name"
@@ -130,28 +138,32 @@
             android:layout_height="0dp"
             android:contentDescription="@string/action"
             app:layout_constraintBottom_toBottomOf="@id/music_control"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@id/music_previous"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintWidth_percent="0.14"
-            app:layout_constraintTop_toTopOf="@id/music_control" />
+            app:layout_constraintTop_toTopOf="@id/music_control"
+            app:layout_constraintWidth_percent="0.06" />
 
         <ImageView
             android:id="@+id/music_previous"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="@drawable/oval_fore_dark"
             android:contentDescription="@string/action"
             android:src="@drawable/ic_round_arrow_left__white_24"
             app:layout_constraintBottom_toBottomOf="@id/music_control"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toStartOf="@id/music_control"
+            app:layout_constraintHorizontal_bias="0.96"
+            app:layout_constraintStart_toStartOf="@id/music_back"
             app:layout_constraintTop_toTopOf="@id/music_control"
-            app:layout_constraintWidth_percent="0.2" />
+            app:layout_constraintWidth_percent="0.14" />
 
         <ImageView
             android:id="@+id/music_control"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="@drawable/oval_fore_dark"
             android:contentDescription="@string/action"
             android:src="@drawable/ic_round_on_white_24"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -165,13 +177,16 @@
             android:id="@+id/music_next"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="@drawable/oval_fore_dark"
             android:contentDescription="@string/action"
             android:src="@drawable/ic_round_arrow_right_white_24"
             app:layout_constraintBottom_toBottomOf="@id/music_control"
             app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="@id/music_back"
+            app:layout_constraintHorizontal_bias="0.04"
             app:layout_constraintStart_toEndOf="@id/music_control"
             app:layout_constraintTop_toTopOf="@id/music_control"
-            app:layout_constraintWidth_percent="0.2" />
+            app:layout_constraintWidth_percent="0.14" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

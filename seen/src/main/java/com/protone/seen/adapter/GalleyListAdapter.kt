@@ -18,7 +18,8 @@ import com.protone.seen.databinding.PictureBoxAdapterLayoutBinding
 class GalleyListAdapter(
     context: Context,
     private val media: MutableList<GalleyMedia>,
-    private val isVideo: Boolean = false
+    private val isVideo: Boolean = false,
+    private val useSelect: Boolean = true
 ) : SelectListAdapter<PictureBoxAdapterLayoutBinding, GalleyMedia>(context) {
 
     private var itemLength = 0
@@ -74,11 +75,13 @@ class GalleyListAdapter(
                     onSelectListener?.select(selectList)
                 } else onSelectListener?.openView(media[position])
             }
-            image.setOnLongClickListener {
-                onSelectMod = true
-                checkSelect(holder, media[position])
-                onSelectListener?.select(selectList)
-                true
+            if (useSelect) {
+                image.setOnLongClickListener {
+                    onSelectMod = true
+                    checkSelect(holder, media[position])
+                    onSelectListener?.select(selectList)
+                    true
+                }
             }
         }
     }

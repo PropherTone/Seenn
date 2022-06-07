@@ -19,7 +19,7 @@ import com.protone.api.context.root
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.adapter.CheckListAdapter
 import com.protone.seen.adapter.GalleyViewPager2Adapter
-import com.protone.seen.databinding.GalleyViewLayouyBinding
+import com.protone.seen.databinding.GalleyViewLayoutBinding
 import com.protone.seen.databinding.RichVideoLayoutBinding
 
 @SuppressLint("ClickableViewAccessibility")
@@ -38,7 +38,7 @@ class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEv
     }
 
     private val binding =
-        GalleyViewLayouyBinding.inflate(context.layoutInflater, context.root, false)
+        GalleyViewLayoutBinding.inflate(context.layoutInflater, context.root, false)
 
     override val viewRoot: View
         get() = binding.root

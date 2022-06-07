@@ -7,24 +7,18 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.Toast
 import android.widget.ViewSwitcher
 import com.protone.api.img.Blur
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 abstract class BaseMusicPlayer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs), CoroutineScope by CoroutineScope(Dispatchers.IO) {
-
-    companion object {
-        const val LOOP_SINGLE = 0
-        const val LOOP_LIST = 1
-        const val PLAY_LIST = 2
-        const val NO_LOOP = 3
-        const val RANDOM = 4
-    }
 
     abstract val next: ImageView?
     abstract val control: ImageView
@@ -55,7 +49,7 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
         loadBlurCover(embeddedPicture)
         if (embeddedPicture == null) {
             (coverSwitcher.nextView as ImageView).setImageResource(R.drawable.ic_baseline_music_note_24)
-        } else launch(Dispatchers.IO) {
+        } else launch {
             try {
                 val decodeByteArray =
                     BitmapFactory.decodeByteArray(embeddedPicture, 0, embeddedPicture.size)
@@ -66,17 +60,11 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
             } catch (e: Exception) {
             }
         }
-//
-//        Glide.with(context).asDrawable().load(embeddedPicture)
-//            .placeholder(R.drawable.ic_baseline_music_note_24)
-//            .error(R.drawable.ic_baseline_music_note_24)
-//            .circleCrop().transition(DrawableTransitionOptions.withCrossFade(500))
-//            .into(target)
     }
 
     private fun loadBlurCover(embeddedPicture: ByteArray?) {
         embeddedPicture?.let {
-            launch(Dispatchers.IO) {
+            launch {
                 try {
                     val blur =
                         Blur(context).blur(
@@ -94,31 +82,6 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
         }
     }
 
-    fun setLoopMode(mode: Int) {
-        when (mode) {
-            LOOP_LIST -> {
-                looper?.setImageResource(R.drawable.ic_round_repeat_24_white)
-                showToast(context.getString(R.string.loop_list))
-            }
-            LOOP_SINGLE -> {
-                looper?.setImageResource(R.drawable.ic_round_repeat_one_24_white)
-                showToast(context.getString(R.string.loop_single))
-            }
-            PLAY_LIST -> {
-                looper?.setImageResource(R.drawable.ic_round_playlist_play_24_white)
-                showToast(context.getString(R.string.play_list))
-            }
-            NO_LOOP -> {
-                looper?.setImageResource(R.drawable.ic_round_block_24_white)
-                showToast(context.getString(R.string.no_loop))
-            }
-            RANDOM -> {
-                looper?.setImageResource(R.drawable.ic_round_loop_24_white)
-                showToast(context.getString(R.string.random))
-            }
-        }
-    }
-
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         if (isPlay) progress?.startGradient()
@@ -127,10 +90,5 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         progress?.stopGradient()
-        cancel()
-    }
-
-    private fun showToast(msg: String) {
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
     }
 }

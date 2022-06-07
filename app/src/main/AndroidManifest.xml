@@ -42,6 +42,7 @@
         <activity android:name=".PickMusicActivity" />
         <activity android:name=".UserConfigActivity" />
         <activity android:name=".MusicViewActivity" />
+        <activity android:name=".GalleySearchActivity" />
         <activity
             android:name=".SplashActivity"
             android:exported="true">

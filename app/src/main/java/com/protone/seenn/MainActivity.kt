@@ -24,7 +24,10 @@ class MainActivity : BaseActivity<MainSeen>() {
             startActivity(MusicViewActivity::class.intent)
         }
         bindMusicService {
-            musicController.setBinder(this, binder)
+            musicController.setBinder(this, binder) {
+                userConfig.musicLoopMode = it
+            }
+            musicController.setLoopMode(userConfig.musicLoopMode)
             Medias.musicBucket[userConfig.lastMusicBucket]?.let {
                 musicController.setMusicList(it)
                 musicController.refresh(
@@ -48,6 +51,7 @@ class MainActivity : BaseActivity<MainSeen>() {
             stopService(WorkService::class.intent)
             userConfig.lastMusicProgress = binder.onProgress().value ?: 0L
             userConfig.lastMusic = binder.onMusicPlaying().value?.toJson() ?: ""
+            musicController.finish()
         }
         while (isActive) {
             select<Unit> {

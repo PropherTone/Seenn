@@ -29,6 +29,9 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
         musicSeen.bucket = userConfig.lastMusicBucket
         musicController = MusicControllerIMP(musicSeen.musicController)
+        musicController.onClick {
+            startActivity(MusicViewActivity::class.intent)
+        }
         setContentSeen(musicSeen)
 
         musicSeen.initSeen()
@@ -57,6 +60,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
 
         doOnFinish {
             musicSeen.clearMer()
+            musicController.finish()
         }
 
         while (isActive) {

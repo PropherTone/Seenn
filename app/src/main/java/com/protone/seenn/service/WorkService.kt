@@ -11,6 +11,7 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.widget.Toast
 import com.protone.api.context.Global
+import com.protone.api.context.onUiThread
 import com.protone.api.context.workIntentFilter
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMulti
@@ -34,7 +35,7 @@ import com.protone.seenn.broadcast.MediaContentObserver
 import com.protone.seenn.broadcast.WorkReceiver
 import com.protone.seenn.broadcast.workLocalBroadCast
 import kotlinx.coroutines.*
-import java.util.concurrent.LinkedBlockingDeque
+import kotlinx.coroutines.flow.*
 import java.util.function.Consumer
 import java.util.stream.Collectors
 
@@ -104,18 +105,21 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         val cacheAllMusic = arrayListOf<Music>()
         val allMusic = (getAllMusic() as ArrayList?)?.also { cacheAllMusic.addAll(it) }
         val allMusicBucket = getAllMusicBucket().let { l ->
-            (l as ArrayList).stream().filter {
+            (l as ArrayList).filter {
                 it.name != Global.application.getString(R.string.all_music)
             }
         }
-        allMusicBucket?.forEach { (name) -> musicBucket[name] = ArrayList() }
-        allMusic?.forEach { music ->
-            music.myBucket.forEach(Consumer {
-                musicBucket[it]?.add(music)
-            })
-            if (cacheList.contains(music)) {
-                cacheList.remove(music)
-                cacheAllMusic.remove(music)
+        allMusicBucket.forEach { (name) -> musicBucket[name] = ArrayList() }
+        allMusic?.also {
+            it.asFlow().onEach { music ->
+                music.myBucket.forEach(Consumer {
+                    musicBucket[it]?.add(music)
+                })
+            }.buffer().collect { music->
+                if (cacheList.contains(music)) {
+                    cacheList.remove(music)
+                    cacheAllMusic.remove(music)
+                }
             }
         }
         if (cacheList.size > 0) {
@@ -133,9 +137,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             }
         }
         musicBucketLive.postValue(1)
-        withContext(Dispatchers.Main){
-            makeToast("歌单更新完毕")
-        }
+        makeToast("歌单更新完毕")
         cancel()
     }
 
@@ -144,11 +146,10 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             DataBaseDAOHelper.insertMusic(it)
             mediaLive.postValue(AUDIO_UPDATED)
         }
-        makeToast("歌单更新完毕")
+        makeToast("音乐更新完毕")
     }
 
     private fun updateMusic() {
-        val dataPool = LinkedBlockingDeque<Music>()
         fun sortMusic(allMusic: MutableList<Music>, music: Music) {
             allMusic.stream().filter { it.uri == music.uri }
                 .collect(Collectors.toList()).let { list ->
@@ -157,27 +158,17 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         }
         launch {
             val allMusic = getAllMusic() as MutableList
-            launch(Dispatchers.IO) {
-                while (isActive) while (dataPool.isNotEmpty()) {
-                    dataPool.poll()?.let {
-                        synchronized(allMusic) { sortMusic(allMusic, it) }
-                    }
-                }
-            }
-            val scanMusic = async {
+            flow {
                 scanAudio { _, music ->
-                    dataPool.offer(music)
+                    emit(music)
                     DataBaseDAOHelper.insertMusicCheck(music)
                 }
-                true
+            }.buffer().collect {
+                synchronized(allMusic) { sortMusic(allMusic, it) }
             }
-            scanMusic.await()
-            while (dataPool.isNotEmpty()) continue
             deleteMusicMulti(allMusic)
             mediaLive.postValue(AUDIO_UPDATED)
-            withContext(Dispatchers.Main){
-                makeToast("歌单更新完毕")
-            }
+            makeToast("音乐更新完毕")
             cancel()
         }
     }
@@ -186,16 +177,12 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         scanGalleyWithUri(uri) {
             DataBaseDAOHelper.insertSignedMedia(it)
             mediaLive.postValue(GALLEY_UPDATED)
-
         }
-        withContext(Dispatchers.Main){
-            makeToast("相册更新完毕")
-        }
+        makeToast("相册更新完毕")
         cancel()
     }
 
     private fun updateGalley() = DataBaseDAOHelper.run {
-        val dataPool = LinkedBlockingDeque<GalleyMedia>()
         fun sortMedia(allSignedMedia: MutableList<GalleyMedia>, galleyMedia: GalleyMedia) {
             allSignedMedia.stream().filter { it.uri == galleyMedia.uri }
                 .collect(Collectors.toList()).let { list ->
@@ -204,33 +191,35 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         }
         launch {
             val allSignedMedia = getAllSignedMedia() as MutableList
-            launch(Dispatchers.IO) {
-                while (isActive) while (dataPool.isNotEmpty()) {
-                    dataPool.poll()?.let {
-                        synchronized(allSignedMedia) { sortMedia(allSignedMedia, it) }
+            val scanPicture = async {
+                flow {
+                    scanPicture { _, galleyMedia ->
+                        emit(galleyMedia)
+                    }
+                }.buffer().collect {
+                    sortSignedMedia(it)
+                    synchronized(allSignedMedia) {
+                        sortMedia(allSignedMedia, it)
                     }
                 }
             }
-            val scanPicture = async {
-                scanPicture { _, galleyMedia ->
-                    dataPool.offer(galleyMedia)
-                    sortSignedMedia(galleyMedia)
-                }
-            }
             val scanVideo = async {
-                scanVideo { _, galleyMedia ->
-                    dataPool.offer(galleyMedia)
-                    sortSignedMedia(galleyMedia)
+                flow {
+                    scanVideo { _, galleyMedia ->
+                        emit(galleyMedia)
+                    }
+                }.buffer().collect {
+                    sortSignedMedia(it)
+                    synchronized(allSignedMedia) {
+                        sortMedia(allSignedMedia, it)
+                    }
                 }
             }
             scanPicture.await()
             scanVideo.await()
-            while (dataPool.isNotEmpty()) continue
             deleteSignedMedias(allSignedMedia)
             mediaLive.postValue(GALLEY_UPDATED)
-            withContext(Dispatchers.Main){
-                makeToast("相册更新完毕")
-            }
+            makeToast("相册更新完毕")
             cancel()
         }
     }
@@ -249,7 +238,9 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         }
     }
 
-    private fun makeToast(msg:String){
-        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show()
+    private fun makeToast(msg: String) {
+        this.onUiThread {
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        }
     }
 }

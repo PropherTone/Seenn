@@ -12,8 +12,15 @@ class MusicViewActivity : BaseActivity<MusicViewSeen>() {
         setContentSeen(musicViewSeen)
         val musicController = MusicControllerIMP(musicViewSeen.controller)
         bindMusicService {
-            musicController.setBinder(this, binder)
+            musicController.setBinder(this, binder) {
+                userConfig.musicLoopMode = it
+            }
             musicController.refresh()
+            musicController.setLoopMode(userConfig.musicLoopMode)
+            musicViewSeen.initPlayList(binder.getPlayList())
+        }
+        doOnFinish {
+            musicController.finish()
         }
         while (isActive) {
             select<Unit> {

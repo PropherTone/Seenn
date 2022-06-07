@@ -80,6 +80,15 @@
                 app:shapeAppearance="@style/ovalImage" />
         </ViewSwitcher>
 
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/round_background_fore_dark"
+            app:layout_constraintBottom_toBottomOf="@id/music_name"
+            app:layout_constraintEnd_toEndOf="@id/music_name"
+            app:layout_constraintStart_toStartOf="@id/music_name"
+            app:layout_constraintTop_toTopOf="@id/music_name" />
+
         <com.protone.seen.customView.AutoSizeTextView
             android:id="@+id/music_name"
             android:layout_width="0dp"
@@ -102,6 +111,7 @@
             android:id="@+id/music_control"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="@drawable/oval_fore_dark"
             android:contentDescription="@string/action"
             android:src="@drawable/ic_round_on_white_24"
             app:layout_constraintBottom_toBottomOf="@id/music_cover_back"

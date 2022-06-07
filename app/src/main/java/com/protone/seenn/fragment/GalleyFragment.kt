@@ -10,14 +10,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.Toast
-import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.protone.api.Config
 import com.protone.api.animation.AnimationHelper
+import com.protone.api.context.intent
 import com.protone.api.context.onUiThread
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyBucket
@@ -30,14 +29,16 @@ import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seen.customView.StateImageView
 import com.protone.seen.databinding.GalleyFragmentLayoutBinding
 import com.protone.seen.dialog.TitleDialog
+import com.protone.seenn.GalleySearchActivity
 import com.protone.seenn.R
+import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.*
 
 class GalleyFragment(
     private val isVideo: Boolean,
     private val isLock: Boolean
 ) : Fragment(), CoroutineScope by MainScope(),
-    ViewTreeObserver.OnGlobalLayoutListener, SearchView.OnQueryTextListener,
+    ViewTreeObserver.OnGlobalLayoutListener,
     GalleyListAdapter.OnSelect {
 
     private lateinit var rightGalley: String
@@ -53,7 +54,6 @@ class GalleyFragment(
 
     private lateinit var containerAnimator: ValueAnimator
     private lateinit var toolButtonAnimator: ValueAnimator
-    private lateinit var searchAnimator: ValueAnimator
 
     private val galleyMap = mutableMapOf<String?, MutableList<GalleyMedia>>()
 
@@ -111,26 +111,6 @@ class GalleyFragment(
         toolButtonAnimator.reverse()
     }
 
-    private fun searchShow() {
-        binding.apply {
-            searchAnimator = AnimationHelper.translationY(
-                galleyBucketContainer,
-                Config.keyboardHeight.toFloat(),
-                play = true
-            )
-            galleyToolButton.isVisible = false
-            galleyShowBucket.isVisible = false
-        }
-    }
-
-    private fun searchHide() {
-        if (::searchAnimator.isInitialized) searchAnimator.reverse()
-        binding.apply {
-            galleyToolButton.isVisible = true
-            galleyShowBucket.isVisible = true
-        }
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         rightGalley = context.getString(R.string.all_galley)
@@ -143,15 +123,11 @@ class GalleyFragment(
     ): View {
         binding = GalleyFragmentLayoutBinding.inflate(inflater, container, false).apply {
             root.viewTreeObserver.addOnGlobalLayoutListener(this@GalleyFragment)
-            galleySearch.apply {
-                setOnQueryTextListener(this@GalleyFragment)
-                setOnSearchClickListener {
-                    searchShow()
-                }
-                setOnCloseListener {
-                    searchHide()
-                    false
-                }
+            galleySearch.setOnClickListener {
+                IntentDataHolder.put(galleyMap[rightGalley])
+                context?.startActivity(GalleySearchActivity::class.intent.also { intent ->
+                    intent.putExtra("GALLEY", rightGalley)
+                })
             }
             galleyToolButton.setOnClickListener {
                 if (!isBucketShowUp) {
@@ -340,15 +316,6 @@ class GalleyFragment(
     private fun getListAdapter() =
         if (binding.galleyList.adapter is GalleyListAdapter)
             binding.galleyList.adapter as GalleyListAdapter else null
-
-
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        return false
-    }
-
-    override fun onQueryTextChange(newText: String?): Boolean {
-        return false
-    }
 
     override fun select(galleyMedia: MutableList<GalleyMedia>) {
         iGalleyFragment?.select(galleyMedia)

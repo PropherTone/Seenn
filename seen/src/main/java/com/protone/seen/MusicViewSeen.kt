@@ -1,14 +1,20 @@
 package com.protone.seen
 
 import android.content.Context
+import android.transition.TransitionManager
 import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.isGone
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
+import com.protone.database.room.entity.Music
+import com.protone.seen.adapter.TransparentPlayListAdapter
 import com.protone.seen.databinding.MusicViewLayoutBinding
 
 class MusicViewSeen(context: Context) : Seen<MusicViewSeen.MusicEvent>(context) {
 
-    enum class MusicEvent{
+    enum class MusicEvent {
         Finish
     }
 
@@ -27,6 +33,19 @@ class MusicViewSeen(context: Context) : Seen<MusicViewSeen.MusicEvent>(context) 
 
     init {
         setSettleToolBar()
+        binding.self = this
+    }
+
+    fun initPlayList(playList: MutableList<Music>) {
+        binding.playList.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = TransparentPlayListAdapter(context, playList)
+        }
+    }
+
+    fun showPop() {
+        TransitionManager.beginDelayedTransition(binding.root as ViewGroup?)
+        binding.pop.isGone = !binding.pop.isGone
     }
 
 }

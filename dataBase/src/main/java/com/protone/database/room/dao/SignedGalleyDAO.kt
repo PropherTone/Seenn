@@ -21,7 +21,6 @@ interface SignedGalleyDAO {
     @Query("SELECT * FROM GalleyMedia WHERE bucket LIKE :name AND isVideo LIKE :isVideo")
     fun getAllMediaByGalley(name: String, isVideo: Boolean): List<GalleyMedia>?
 
-
     @Query("DELETE FROM GalleyMedia WHERE uri LIKE :uri")
     fun deleteSignedMediaByUri(uri: Uri)
 

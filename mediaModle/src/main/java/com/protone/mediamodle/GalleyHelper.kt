@@ -7,11 +7,8 @@ import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.concurrent.Executors
 
 object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
-
-    private val threadPool = Executors.newCachedThreadPool()
 
     inline fun saveIconToLocal(
         fileName: String, byteArray: ByteArray?,
@@ -21,7 +18,8 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
             var fileOutputStream: FileOutputStream? = null
             try {
                 byteArray?.let {
-                    val tempPath = "${Global.application.filesDir.absolutePath}/${fileName.getFileName()}.jpg"
+                    val tempPath =
+                        "${Global.application.filesDir.absolutePath}/${fileName.getFileName()}.jpg"
                     val file = File(tempPath)
                     callBack.invoke(
                         when {
@@ -40,22 +38,17 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
                 try {
                     fileOutputStream?.flush()
                     fileOutputStream?.close()
-                } catch (e: IOException) {}
+                } catch (e: IOException) {
+                }
                 callBack.invoke(null)
             }
             this.cancel()
         }
     }
 
-    private suspend fun updateMusicCO() = withContext(Dispatchers.IO) {
-        Medias.musicBucket[Global.application.getString(R.string.all_music)] = scanAudio()
+    fun updateAll(callBack: () -> Unit) = launch {
+        Medias.musicBucket[Global.application.getString(R.string.all_music)] = scanAudio { _, _ -> }
+        callBack()
         cancel()
     }
-
-    fun updateAll(callBack: () -> Unit) = threadPool.execute {
-        val job3 = launch { updateMusicCO() }
-        while (job3.isActive) continue
-        callBack()
-    }
-
 }

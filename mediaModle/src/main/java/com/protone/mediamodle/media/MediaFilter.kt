@@ -187,7 +187,7 @@ fun scanAudioWithUri(mediaUri: Uri, callBack: (Music) -> Unit) {
     }
 }
 
-fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)? = null): MutableMap<String, MutableList<GalleyMedia>> {
+inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)): MutableMap<String, MutableList<GalleyMedia>> {
     val externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val queryArray = arrayOf(
         MediaStore.Images.Media.DISPLAY_NAME,
@@ -237,7 +237,7 @@ fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)? = null): MutableMap<Stri
                 false,
                 null
             ).let { gm ->
-                function?.invoke(gm.uri, gm)
+                function.invoke(gm.uri, gm)
                 galley[bucketName]?.add(gm)
             }
         }
@@ -245,7 +245,7 @@ fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)? = null): MutableMap<Stri
     return galley
 }
 
-fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)? = null): MutableMap<String, MutableList<GalleyMedia>> {
+inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)): MutableMap<String, MutableList<GalleyMedia>> {
     val externalContentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     val query = arrayOf(
         MediaStore.Video.Media.DISPLAY_NAME,
@@ -298,7 +298,7 @@ fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)? = null): MutableMap<String
                 true,
                 null
             ).let { gm ->
-                function?.invoke(gm.uri, gm)
+                function.invoke(gm.uri, gm)
                 galley[bucketName]?.add(gm)
             }
         }
@@ -306,7 +306,7 @@ fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)? = null): MutableMap<String
     return galley
 }
 
-fun scanAudio(function: ((Uri, Music) -> Unit)? = null): MutableList<Music> {
+inline fun scanAudio(function: ((Uri, Music) -> Unit)): MutableList<Music> {
     val externalContentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     val bucketOrData =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) MediaStore.Audio.Media.BUCKET_DISPLAY_NAME
@@ -370,7 +370,7 @@ fun scanAudio(function: ((Uri, Music) -> Unit)? = null): MutableList<Music> {
                     uri,
                     arrayListOf()
                 ).also {
-                    function?.invoke(uri, it)
+                    function.invoke(uri, it)
                 }
             )
         }
@@ -378,7 +378,7 @@ fun scanAudio(function: ((Uri, Music) -> Unit)? = null): MutableList<Music> {
     return audios
 }
 
-private inline fun scan(
+public inline fun scan(
     @Nullable uri: Uri,
     @Nullable projection: Array<String>,
     block: (Cursor) -> Unit

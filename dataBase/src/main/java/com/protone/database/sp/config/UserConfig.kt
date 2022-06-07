@@ -37,6 +37,8 @@ class UserConfig(context: Context) {
 
     var playedMusicPosition by config.int("MUSIC_POSITION", 0)
 
+    var musicLoopMode by config.int("LOOP_MODE",1)
+
     data class UserData(
         val userName: String,
         val isLogin: Boolean,

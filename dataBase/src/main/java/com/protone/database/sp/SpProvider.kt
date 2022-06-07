@@ -42,7 +42,6 @@ class SpProvider(private val sharedPreferences: SharedPreferences) : Sp {
 
     override fun getBoolean(key: String, defValue: Boolean): Boolean {
         return sharedPreferences.getBoolean(key, defValue)
-
     }
 
 }
