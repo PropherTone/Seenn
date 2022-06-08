@@ -24,7 +24,7 @@ import com.protone.database.room.entity.GalleyMedia
 import com.protone.mediamodle.media.FragMailer
 import com.protone.mediamodle.media.IGalleyFragment
 import com.protone.seen.adapter.GalleyBucketAdapter
-import com.protone.seen.adapter.GalleyItemDecoration
+import com.protone.seen.itemDecoration.GalleyItemDecoration
 import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seen.customView.StateImageView
 import com.protone.seen.databinding.GalleyFragmentLayoutBinding

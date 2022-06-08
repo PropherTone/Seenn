@@ -20,7 +20,6 @@ import com.protone.seen.PickMusicSeen
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
 import java.util.*
-import kotlin.collections.ArrayList
 
 class AddMusicListAdapter(context: Context, private val bucket: String, private val mode: String) :
     SelectListAdapter<MusicListLayoutBinding, Music>(context) {
@@ -187,6 +186,13 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                 animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true)
             }, play = true)
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun noticeDataUpdate(list: MutableList<Music>) {
+        musicList.clear()
+        musicList.addAll(list)
+        notifyDataSetChanged()
     }
 
 

@@ -132,6 +132,7 @@
             android:layout_height="match_parent"
             android:background="@color/white"
             android:elevation="0dp"
+            android:overScrollMode="never"
             app:layout_anchor="@id/appToolbar"
             app:layout_anchorGravity="bottom"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
@@ -158,9 +159,9 @@
                 app:ActiveDrawable="@drawable/ic_baseline_arrow_drop_up_24"
                 app:NegativeDrawable="@drawable/ic_baseline_arrow_drop_down_24"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintWidth_percent="0.4"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.4"
                 tools:ignore="ContentDescription" />
 
             <com.protone.seen.customView.musicPlayer.MusicPlayerViewLite

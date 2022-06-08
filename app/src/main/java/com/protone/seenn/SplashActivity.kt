@@ -17,8 +17,8 @@ import com.protone.database.room.entity.MusicBucket
 import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.Medias
 import com.protone.seen.SplashSeen
-import com.protone.seenn.service.MusicService
 import com.protone.seenn.broadcast.workLocalBroadCast
+import com.protone.seenn.service.MusicService
 import com.protone.seenn.service.WorkService
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
@@ -95,6 +95,11 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     private fun updateMedia() {
         workLocalBroadCast.sendBroadcast(Intent().setAction(UPDATE_GALLEY))
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC))
-        GalleyHelper.updateAll { mHandler.sendEmptyMessage(1) }
+        GalleyHelper.updateAll {
+            mHandler.sendEmptyMessage(1)
+//            val drawable = ResourcesCompat.getDrawable(resources, R.drawable.glass_background, null)
+//            val submit = Glide.with(this).asBitmap().load(drawable).submit()
+//            Global.initGlassBackground(submit.get())
+        }
     }
 }

@@ -142,7 +142,7 @@ class RichNoteView @JvmOverloads constructor(
                     setBackgroundColor(Color.WHITE)
                     setText(note.text)
                     setOnKeyListener { _, keyCode, event ->
-                        // Noticed if no text to delete while delete key pressed
+                        //Noticed if no text to delete when delete key pressed
                         if (keyCode == KeyEvent.KEYCODE_DEL &&
                             event.action == KeyEvent.ACTION_DOWN &&
                             text.isEmpty()
@@ -150,10 +150,10 @@ class RichNoteView @JvmOverloads constructor(
                             var indexOfChild = indexOfChild(this@apply)
                             if (indexOfChild > 0) {
                                 removeViewAt(indexOfChild)
-                                //Delete next view if it's not a edittext
+                                //Delete next view if it's not an edittext
                                 if (indexOfChild-- > 0 && getChildAt(indexOfChild) !is EditText) {
                                     removeView(getChildAt(indexOfChild--))
-                                    //Insert new edittext when there is no place for input
+                                    //Insert new edittext when there is no input place
                                     if ((indexOfChild > 0 && indexOfChild in 0 until childCount && getChildAt(
                                             indexOfChild
                                         ) !is EditText) || childCount == 0
@@ -386,7 +386,7 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     /**
-     * Function used for insert different type of media that done the basic work
+     * Done the basic work for insert different type of media
      *
      * @param func Callback used for custom
      */
@@ -402,7 +402,9 @@ class RichNoteView @JvmOverloads constructor(
                 }
             }
         }
-        func(insertPosition + if (!inIndex) 1 else 0)
+        var index = insertPosition + if (!inIndex) 1 else 0
+        if (index >= childCount) index = childCount -1
+        func(index)
         //Insert a edittext to make sure there have a place for input
         if (isEditable && !inIndex) insertText(
             RichNoteStates(

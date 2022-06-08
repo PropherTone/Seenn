@@ -22,7 +22,7 @@
             android:id="@+id/addMB_search"
             android:layout_width="match_parent"
             android:layout_height="@dimen/action_icon"
-            android:background="@color/blue_1"
+            android:background="@drawable/main_background"
             android:drawableStart="@drawable/ic_baseline_search_24_white"
             android:hint="@string/search"
             android:importantForAutofill="no"
@@ -40,13 +40,14 @@
             android:id="@+id/view"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/blue_1"
+            android:background="@drawable/main_background"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/addMB_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:overScrollMode="never"
             app:layout_constraintBottom_toTopOf="@id/addMB_leave"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -93,22 +93,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/foreDark_1"
-                app:layout_constraintBottom_toTopOf="@+id/galleyV_type"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toTopOf="@+id/galleyV_type">
 
                 <TextView
-                    android:text="@string/cato"
                     android:id="@+id/galleyV_cato_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/main_padding"
+                    android:text="@string/cato"
                     android:textColor="@color/white"
                     android:textSize="@dimen/sub_text" />
 
                 <HorizontalScrollView
-                    android:layout_weight="1"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
 
                     <LinearLayout
                         android:id="@+id/galleyV_cato_container"
@@ -136,6 +136,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/huge_icon"
                 android:background="@color/foreDark_1"
+                android:overScrollMode="never"
                 android:padding="@dimen/main_padding"
                 app:layout_constraintBottom_toBottomOf="parent" />
 

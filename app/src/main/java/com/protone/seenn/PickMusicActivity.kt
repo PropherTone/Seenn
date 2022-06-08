@@ -1,20 +1,28 @@
 package com.protone.seenn
 
 import android.content.Intent
+import com.protone.api.SearchModel
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
+import com.protone.database.room.entity.Music
 import com.protone.seen.PickMusicSeen
 import com.protone.seenn.broadcast.workLocalBroadCast
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.withContext
 
 class PickMusicActivity : BaseActivity<PickMusicSeen>() {
 
     private var mode: String? = null
 
+    private val data : MutableList<Music> = mutableListOf()
     override suspend fun main() {
         val pickMusicSeen = PickMusicSeen(this)
-
         setContentSeen(pickMusicSeen)
 
         mode = intent.getStringExtra(PickMusicSeen.MODE)
@@ -31,6 +39,10 @@ class PickMusicActivity : BaseActivity<PickMusicSeen>() {
             cancel()
         }
 
+        pickMusicSeen.getList()?.let { data.addAll(it) }
+        val searchModel = SearchModel(pickMusicSeen.getQueryInput()) {
+            pickMusicSeen.offer(PickMusicSeen.Event.Query)
+        }
         while (isActive) {
             select<Unit> {
                 event.onReceive {}
@@ -49,6 +61,7 @@ class PickMusicActivity : BaseActivity<PickMusicSeen>() {
                             } else toast(getString(R.string.cancel))
                             cancel()
                         }
+                        PickMusicSeen.Event.Query -> pickMusicSeen.query(searchModel.getInput())
                     }
                 }
             }
@@ -56,4 +69,9 @@ class PickMusicActivity : BaseActivity<PickMusicSeen>() {
 
     }
 
+    private suspend fun PickMusicSeen.query(input: String) = withContext(Dispatchers.IO) {
+        refreshList(data.asFlow().filter {
+            it.displayName?.contains(input,true) == true || it.album?.contains(input,true) == true
+        }.buffer().toList() as MutableList<Music>)
+    }
 }

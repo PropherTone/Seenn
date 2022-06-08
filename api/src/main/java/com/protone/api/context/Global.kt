@@ -2,16 +2,19 @@ package com.protone.api.context
 
 import android.app.Application
 import android.content.Context.WINDOW_SERVICE
+import android.graphics.Bitmap
 import android.os.Build
-import android.os.Looper
 import android.util.DisplayMetrics
 import android.view.WindowManager
+import com.protone.api.img.Blur
 
 object Global {
 
     val application: Application
         get() = application_
+    private var bitmap_: Bitmap? = null
 
+    val bitmap : Bitmap? = bitmap_
     private lateinit var application_: Application
 
     fun init(application: Application) {
@@ -31,5 +34,9 @@ object Global {
                 .getRealMetrics(displayMetrics)
             displayMetrics.heightPixels
         }
+    }
+
+    fun initGlassBackground(bitmap: Bitmap) {
+        bitmap_ = Blur(application).blur(bitmap)
     }
 }

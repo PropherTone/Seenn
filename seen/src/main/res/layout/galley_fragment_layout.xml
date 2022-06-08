@@ -16,6 +16,7 @@
             android:layout_marginBottom="@dimen/small_Icon"
             android:background="@color/white"
             android:elevation="0dp"
+            android:overScrollMode="never"
             android:paddingEnd="1dp" />
 
         <LinearLayout
@@ -27,9 +28,9 @@
             android:orientation="vertical">
 
             <RelativeLayout
-                android:background="@color/white"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:background="@color/white">
 
                 <com.protone.seen.customView.StateImageView
                     android:id="@+id/galley_showBucket"
@@ -63,11 +64,11 @@
             </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:background="@color/white"
                 android:id="@+id/galley_bucket"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="@dimen/lists_margin" />
+                android:layout_marginTop="@dimen/lists_margin"
+                android:background="@color/white" />
 
         </LinearLayout>
 

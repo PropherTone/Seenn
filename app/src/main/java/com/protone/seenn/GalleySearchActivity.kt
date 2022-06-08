@@ -1,33 +1,22 @@
 package com.protone.seenn
 
-import android.os.Handler
-import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
+import com.protone.api.SearchModel
 import com.protone.api.context.intent
 import com.protone.api.json.toJson
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.GalleySearchSeen
 import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seenn.viewModel.IntentDataHolder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.withContext
+import java.util.*
 
-class GalleySearchActivity : BaseActivity<GalleySearchSeen>(), TextWatcher,
+class GalleySearchActivity : BaseActivity<GalleySearchSeen>(),
     GalleyListAdapter.OnSelect {
-
-    private lateinit var timerHandler: Handler
-
-    private val delayed = 500L
-
-    private var input = ""
 
     private val data = mutableListOf<GalleyMedia>()
 
@@ -35,11 +24,8 @@ class GalleySearchActivity : BaseActivity<GalleySearchSeen>(), TextWatcher,
     override suspend fun main() {
         val galleySearchSeen = GalleySearchSeen(this)
         setContentSeen(galleySearchSeen)
-        timerHandler = Handler(Looper.getMainLooper()) {
-            if (it.what == 0) {
-                galleySearchSeen.offer(GalleySearchSeen.SearchEvent.Query)
-            }
-            false
+        val searchModel = SearchModel(galleySearchSeen.queryText) {
+            galleySearchSeen.offer(GalleySearchSeen.SearchEvent.Query)
         }
         IntentDataHolder.get().let {
             if (!(it != null && it is List<*> && it.isNotEmpty() && it[0] is GalleyMedia)) {
@@ -49,12 +35,11 @@ class GalleySearchActivity : BaseActivity<GalleySearchSeen>(), TextWatcher,
             data.addAll(it as List<GalleyMedia>)
             galleySearchSeen.initList(data[0].isVideo, this)
         }
-        galleySearchSeen.queryText.addTextChangedListener(this)
         while (isActive) {
             select<Unit> {
                 galleySearchSeen.viewEvent.onReceive {
                     when (it) {
-                        GalleySearchSeen.SearchEvent.Query -> galleySearchSeen.query(input)
+                        GalleySearchSeen.SearchEvent.Query -> galleySearchSeen.query(searchModel.getInput())
                         GalleySearchSeen.SearchEvent.Finish -> finish()
                     }
                 }
@@ -63,40 +48,31 @@ class GalleySearchActivity : BaseActivity<GalleySearchSeen>(), TextWatcher,
     }
 
     private suspend fun GalleySearchSeen.query(input: String) = withContext(Dispatchers.IO) {
-        val nameFilter = async {
+        val lowercase = input.lowercase(Locale.getDefault())
+        launch(Dispatchers.IO) {
             data.asFlow().filter {
-                it.name.contains(input)
-            }.buffer().toList()
+                it.name.contains(input, true)
+            }.buffer().toList().let { nameFilterList ->
+                refreshGalleyList(nameFilterList as MutableList<GalleyMedia>)
+                cancel()
+            }
         }
-        val catoFilter = async {
+        launch(Dispatchers.IO) {
             data.asFlow().filter {
-                it.cate?.contains(input) == true
-            }.buffer().toList()
+                it.cate?.contains(input) == true || it.cate?.contains(lowercase) == true
+            }.buffer().toList().let { catoFilterList ->
+                refreshCatoList(catoFilterList as MutableList<GalleyMedia>)
+                cancel()
+            }
         }
-        val noteFilter = async {
+        launch(Dispatchers.IO) {
             data.asFlow().filter {
-                it.notes?.contains(input) == true
-            }.buffer().toList()
+                it.notes?.contains(input) == true || it.cate?.contains(lowercase) == true
+            }.buffer().toList().let { noteFilterList ->
+                refreshNoteList(noteFilterList as MutableList<GalleyMedia>)
+                cancel()
+            }
         }
-        val nameFilterList = nameFilter.await()
-        val catoFilterList = catoFilter.await()
-        val noteFilterList = noteFilter.await()
-        refreshGalleyList(nameFilterList as MutableList<GalleyMedia>)
-        refreshCatoList(catoFilterList as MutableList<GalleyMedia>)
-        refreshNoteList(noteFilterList as MutableList<GalleyMedia>)
-    }
-
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-        timerHandler.removeCallbacksAndMessages(null)
-    }
-
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-        timerHandler.removeCallbacksAndMessages(null)
-    }
-
-    override fun afterTextChanged(s: Editable?) {
-        input = s.toString()
-        timerHandler.sendEmptyMessageDelayed(0, delayed)
     }
 
     override fun select(galleyMedia: MutableList<GalleyMedia>) {}

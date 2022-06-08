@@ -6,15 +6,19 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
+import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Medias
 import com.protone.seen.adapter.AddMusicListAdapter
 import com.protone.seen.databinding.AddMusicBucketLayoutBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class PickMusicSeen(context: Context) : Seen<PickMusicSeen.Event>(context) {
 
     enum class Event {
         Finished,
-        Confirm
+        Confirm,
+        Query
     }
 
     companion object {
@@ -32,6 +36,8 @@ class PickMusicSeen(context: Context) : Seen<PickMusicSeen.Event>(context) {
             false
         )
     }
+
+    fun getQueryInput() = binding.addMBSearch
 
     override val viewRoot: View
         get() = binding.root
@@ -60,9 +66,23 @@ class PickMusicSeen(context: Context) : Seen<PickMusicSeen.Event>(context) {
         viewEvent.offer(event)
     }
 
+    suspend fun refreshList(list: MutableList<Music>) = withContext(Dispatchers.Main) {
+        binding.addMBList.adapter.let {
+            if (it is AddMusicListAdapter) {
+                it.noticeDataUpdate(list)
+            }
+        }
+    }
+
+    fun getList(): MutableList<Music>? = binding.addMBList.adapter.let {
+        if (it is AddMusicListAdapter) {
+            return it.musicList
+        } else null
+    }
+
     fun getSelectList() = binding.addMBList.adapter.let {
         if (it is AddMusicListAdapter) {
             it.selectList
-        }else null
+        } else null
     }
 }

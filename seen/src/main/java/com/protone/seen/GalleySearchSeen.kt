@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.database.room.entity.GalleyMedia
-import com.protone.seen.adapter.GalleyItemDecoration
+import com.protone.seen.itemDecoration.GalleyItemDecoration
 import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seen.databinding.GalleySearchLayoutBinding
 import kotlinx.coroutines.Dispatchers

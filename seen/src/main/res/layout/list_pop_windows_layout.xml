@@ -12,8 +12,9 @@
             android:id="@+id/list_list"
             android:layout_width="match_parent"
             android:layout_height="@dimen/huge_icon"
-            android:padding="@dimen/small_elevation"
             android:background="@color/white"
+            android:overScrollMode="never"
+            android:padding="@dimen/small_elevation"
             app:layout_constraintBottom_toTopOf="@id/list_confirm" />
 
         <ImageView
