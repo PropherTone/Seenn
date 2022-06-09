@@ -1,9 +1,9 @@
 package com.protone.seen
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
-import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.protone.api.context.hasNavigationBar
 import com.protone.api.context.navigationBarHeight
@@ -22,6 +22,9 @@ abstract class Seen<C>(val context: Context) :
     abstract fun getToolBar(): View?
 
     abstract fun offer(event: C)
+
+    private var inputManager: InputMethodManager =
+        context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
     /**
      * Let view padding top to full the toolbar
@@ -58,6 +61,17 @@ abstract class Seen<C>(val context: Context) :
                 paddingBottom + context.navigationBarHeight
             )
         }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    fun linkInput(target: View, arch: View) {
+        target.setOnTouchListener { _, _ ->
+            if (inputManager.isActive) {
+                inputManager.hideSoftInputFromWindow(arch.windowToken, 0)
+            }
+            false
+        }
+
     }
 
 }

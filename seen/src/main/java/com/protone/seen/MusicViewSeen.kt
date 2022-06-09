@@ -11,6 +11,7 @@ import com.protone.api.context.root
 import com.protone.database.room.entity.Music
 import com.protone.seen.adapter.TransparentPlayListAdapter
 import com.protone.seen.databinding.MusicViewLayoutBinding
+import com.protone.seen.itemDecoration.GalleyItemDecoration
 
 class MusicViewSeen(context: Context) : Seen<MusicViewSeen.MusicEvent>(context) {
 
@@ -36,10 +37,16 @@ class MusicViewSeen(context: Context) : Seen<MusicViewSeen.MusicEvent>(context) 
         binding.self = this
     }
 
-    fun initPlayList(playList: MutableList<Music>) {
+    fun initPlayList(
+        playList: MutableList<Music>, onPlay: Music?,
+        listener: TransparentPlayListAdapter.OnPlayListClk
+    ) {
         binding.playList.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = TransparentPlayListAdapter(context, playList)
+            adapter = TransparentPlayListAdapter(context, onPlay, playList).also {
+                it.onPlayListClkListener = listener
+            }
+            addItemDecoration(GalleyItemDecoration(paddingEnd))
         }
     }
 

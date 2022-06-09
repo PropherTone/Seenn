@@ -97,9 +97,6 @@ class SplashActivity : BaseActivity<SplashSeen>() {
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC))
         GalleyHelper.updateAll {
             mHandler.sendEmptyMessage(1)
-//            val drawable = ResourcesCompat.getDrawable(resources, R.drawable.glass_background, null)
-//            val submit = Glide.with(this).asBitmap().load(drawable).submit()
-//            Global.initGlassBackground(submit.get())
         }
     }
 }

@@ -47,6 +47,7 @@ class PickMusicSeen(context: Context) : Seen<PickMusicSeen.Event>(context) {
     init {
         setSettleToolBar()
         binding.self = this
+        linkInput(binding.addMBList,binding.addMBSearch)
     }
 
     fun initSeen(bucket: String, mode: String) {

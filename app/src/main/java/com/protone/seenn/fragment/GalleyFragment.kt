@@ -24,11 +24,11 @@ import com.protone.database.room.entity.GalleyMedia
 import com.protone.mediamodle.media.FragMailer
 import com.protone.mediamodle.media.IGalleyFragment
 import com.protone.seen.adapter.GalleyBucketAdapter
-import com.protone.seen.itemDecoration.GalleyItemDecoration
 import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seen.customView.StateImageView
 import com.protone.seen.databinding.GalleyFragmentLayoutBinding
 import com.protone.seen.dialog.TitleDialog
+import com.protone.seen.itemDecoration.GalleyItemDecoration
 import com.protone.seenn.GalleySearchActivity
 import com.protone.seenn.R
 import com.protone.seenn.viewModel.IntentDataHolder
@@ -257,6 +257,7 @@ class GalleyFragment(
                         )
                     )
                 )
+                getBucketAdapter()?.performSelect()
                 noticeListUpdate(it)
             }
             if (!isLock) launch(Dispatchers.IO) {

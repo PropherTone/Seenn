@@ -1,6 +1,7 @@
 package com.protone.seenn
 
 import android.content.Intent
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -74,11 +75,11 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
         suspend fun initPager() {
             galleySeen.initPager(arrayListOf<Fragment>().apply {
                 add(GalleyFragment(false, userConfig.lockGalley.isNotEmpty()).also {
-                    galleySeen.mailers[0] = it.fragMailer
+                    galleySeen.setMailer(frag1 = it.fragMailer)
                     it.iGalleyFragment = this@GalleyActivity.iGalleyFragment
                 })
                 add(GalleyFragment(true, userConfig.lockGalley.isNotEmpty()).also {
-                    galleySeen.mailers[1] = it.fragMailer
+                    galleySeen.setMailer(frag2 = it.fragMailer)
                     it.iGalleyFragment = this@GalleyActivity.iGalleyFragment
                 })
             }, chooseType)
@@ -86,6 +87,7 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
 
         initPager()
         Medias.mediaLive.observe(this) {
+            Log.d(TAG, "main: $it")
             if (it == Medias.GALLEY_UPDATED) {
                 galleySeen.offer(GalleySeen.Touch.Init)
             }
@@ -158,8 +160,9 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
             deleteMedia(it.uri) { result ->
                 if (result) {
                     DataBaseDAOHelper.deleteSignedMedia(it)
-                    mailers[rightMailer]?.deleteMedia(it)
-                }
+                    deleteMedia(it)
+                    toast(getString(R.string.success))
+                } else toast(getString(R.string.not_supported))
             }
         }
     }

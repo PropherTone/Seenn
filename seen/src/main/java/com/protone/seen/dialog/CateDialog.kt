@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
+import com.protone.seen.R
 import com.protone.seen.databinding.CateDialogLayoutBinding
 
 class CateDialog(
@@ -21,7 +22,7 @@ class CateDialog(
     }
 
     init {
-        AlertDialog.Builder(context).setView(binding.root).create().also { dialog ->
+        AlertDialog.Builder(context, R.style.TransparentAlertDialog).setView(binding.root).create().also { dialog ->
             binding.btnAddCate.setOnClickListener {
                 dialog.dismiss()
                 addCate.invoke()

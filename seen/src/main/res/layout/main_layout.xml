@@ -59,6 +59,8 @@
                     android:layout_marginStart="40dp"
                     android:elevation="@dimen/small_elevation"
                     android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.02"
                     android:textSize="@dimen/hug_title_text"
                     app:layout_constraintStart_toEndOf="@id/user_icon"
                     app:layout_constraintTop_toTopOf="@id/user_icon" />

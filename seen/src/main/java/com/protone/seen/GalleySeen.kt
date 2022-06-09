@@ -43,7 +43,15 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
 
     private val binding = GalleyLayoutBinding.inflate(context.layoutInflater, context.root, false)
 
-    val mailers = arrayOfNulls<FragMailer>(2)
+    private val mailers = arrayOfNulls<FragMailer>(2)
+    fun setMailer(frag1: FragMailer? = null, frag2: FragMailer? = null) {
+        if (frag1 != null) {
+            mailers[0] = frag1
+        } else if (frag2 != null) {
+            mailers[1] = frag2
+        }
+    }
+
     var rightMailer = 0
 
     override val viewRoot: View
@@ -101,20 +109,19 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
         showPop(binding.galleyActionMenu, !isSelect)
     }
 
-    fun onAction(){
+    fun onAction() {
         mailers[rightMailer]?.onActionBtn()
     }
 
-    fun addBucket(name: String,list: MutableList<GalleyMedia>) {
-        mailers[rightMailer]?.addBucket(name,list)
+    fun addBucket(name: String, list: MutableList<GalleyMedia>) {
+        mailers[rightMailer]?.addBucket(name, list)
     }
 
     fun deleteMedia(media: GalleyMedia) {
         mailers[rightMailer]?.deleteMedia(media)
-
     }
 
-    fun getChooseGalley():MutableList<GalleyMedia>?{
+    fun getChooseGalley(): MutableList<GalleyMedia>? {
         return mailers[rightMailer]?.getChooseGalley()
     }
 

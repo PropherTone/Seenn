@@ -33,6 +33,7 @@
     <color name="red_5">#FFA0A0</color>
     <color name="transparent_red">#B2FF0000</color>
     <color name="transparent_white">#40FFFFFF</color>
+    <color name="transparent_white1">#BFFFFFFF</color>
     <color name="glass">#66FFFFFF</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="foreDark_2">#0D000000</color>
@@ -49,7 +50,7 @@
     <color name="pickPurple">#E040FB</color>
     <color name="pink">#F696D5</color>
     <color name="transparent_black">#40000000</color>
-    <color name="transparent_black1">#1A000000</color>
+    <color name="transparent_black1">#26000000</color>
     <color name="gray_1">#EEEEEE</color>
     <color name="gray_2">#FAF4F4F4</color>
     <color name="gray_3">#DCDCDC</color>

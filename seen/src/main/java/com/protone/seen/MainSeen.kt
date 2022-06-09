@@ -7,7 +7,6 @@ import android.view.ViewTreeObserver
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
-import com.protone.api.context.Global
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.api.toDrawable
@@ -71,12 +70,7 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
             modelList.apply {
                 layoutManager = LinearLayoutManager(context)
                 adapter = MainModelListAdapter(context)
-                addItemDecoration(ModelListItemDecoration(0))
-            }
-            Global.bitmap?.let {
-                galley.setImageBitmap(it)
-                noteBook.setImageBitmap(it)
-                music.setImageBitmap(it)
+                addItemDecoration(ModelListItemDecoration(context.resources.getDimensionPixelSize(R.dimen.main_margin)))
             }
         }
 

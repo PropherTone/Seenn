@@ -13,10 +13,11 @@ import com.protone.api.context.onUiThread
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.seen.R
 import com.protone.seen.databinding.GalleyBucketListLayoutBinding
+import kotlin.streams.toList
 
 class GalleyBucketAdapter(
     context: Context,
-    var galleries: MutableList<Pair<Uri, Array<String>>>,
+    private var galleries: MutableList<Pair<Uri, Array<String>>>,
     val selectBucket: (String) -> Unit
 ) : SelectListAdapter<GalleyBucketListLayoutBinding, Pair<Uri, Array<String>>>(context) {
 
@@ -73,7 +74,7 @@ class GalleyBucketAdapter(
                     bucketItemNumber.text = sec[1]
                     bucket.setOnClickListener {
                         selectBucket(sec[0])
-                        checkSelect(holder, data)
+                        if (!selectList.contains(data)) checkSelect(holder, data)
                     }
                 }
             }
@@ -81,7 +82,7 @@ class GalleyBucketAdapter(
 
     }
 
-    fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
+    private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
         val index = galleries.indexOf(bucket)
         if (index != -1) {
             galleries.removeAt(index)
@@ -94,6 +95,16 @@ class GalleyBucketAdapter(
         galleries.add(item)
         context.onUiThread {
             notifyItemInserted(galleries.size)
+        }
+    }
+
+    fun performSelect() {
+        galleries.stream()
+            .filter { it.second[0] == context.getString(R.string.all_galley) }
+            .toList()
+            .let { if (it.isNotEmpty()) selectList.add(it[0]) }
+        context.onUiThread {
+            notifyItemChanged(0)
         }
     }
 

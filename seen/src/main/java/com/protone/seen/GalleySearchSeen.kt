@@ -1,5 +1,6 @@
 package com.protone.seen
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.transition.TransitionManager
 import android.view.View
@@ -8,9 +9,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.database.room.entity.GalleyMedia
-import com.protone.seen.itemDecoration.GalleyItemDecoration
 import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seen.databinding.GalleySearchLayoutBinding
+import com.protone.seen.itemDecoration.GalleyItemDecoration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -38,11 +39,13 @@ class GalleySearchSeen(context: Context) : Seen<GalleySearchSeen.SearchEvent>(co
         viewEvent.offer(event)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     fun initList(
         isVideo: Boolean,
         listener: GalleyListAdapter.OnSelect
     ) {
         binding.apply {
+            linkInput(scroll, inputSearch)
             resultGalleries.apply {
                 layoutManager = GridLayoutManager(context, 4)
                 adapter = GalleyListAdapter(context, mutableListOf(), isVideo, false).also {
@@ -50,6 +53,7 @@ class GalleySearchSeen(context: Context) : Seen<GalleySearchSeen.SearchEvent>(co
                     it.setOnSelectListener(listener)
                 }
                 addItemDecoration(GalleyItemDecoration(paddingEnd))
+                linkInput(this, inputSearch)
             }
             resultCato.apply {
                 layoutManager = GridLayoutManager(context, 4)
@@ -58,6 +62,7 @@ class GalleySearchSeen(context: Context) : Seen<GalleySearchSeen.SearchEvent>(co
                     it.setOnSelectListener(listener)
                 }
                 addItemDecoration(GalleyItemDecoration(paddingEnd))
+                linkInput(this, inputSearch)
             }
             resultNotes.apply {
                 layoutManager = GridLayoutManager(context, 4)
@@ -66,6 +71,7 @@ class GalleySearchSeen(context: Context) : Seen<GalleySearchSeen.SearchEvent>(co
                     it.setOnSelectListener(listener)
                 }
                 addItemDecoration(GalleyItemDecoration(paddingEnd))
+                linkInput(this, inputSearch)
             }
             filterGalley.setOnClickListener {
                 listGone(binding.resultGalleries)

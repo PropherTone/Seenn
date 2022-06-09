@@ -13,7 +13,7 @@ class ModelListItemDecoration(private val interval: Int) : RecyclerView.ItemDeco
         state: RecyclerView.State
     ) {
         super.getItemOffsets(outRect, view, parent, state)
-        val childPosition = parent.indexOfChild(view)
+        val childPosition = parent.getChildLayoutPosition(view)
         outRect.top = interval
         outRect.left = interval
         outRect.right = interval

@@ -43,9 +43,12 @@
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/oval_fore_dark.xml" value="0.119" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/refresh_back.xml" value="0.185" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/round_background_fore_dark.xml" value="0.119" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/round_background_tans_white_lite.xml" value="0.119" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/round_background_trans_white.xml" value="0.119" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/round_edittext.xml" value="0.119" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/select_up_down_icon.xml" value="0.119" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/trans_ripple.xml" value="0.119" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/transparent_card.xml" value="0.119" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/add_bucket_layout.xml" value="0.22826086956521738" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/add_music_adapter_layout.xml" value="0.12335359675785208" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/add_music_bucket_layout.xml" value="0.12335359675785208" />
@@ -53,6 +56,7 @@
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/auto_music_player_layout_full.xml" value="0.1" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/auto_music_player_layout_lite.xml" value="0.20820863616930313" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/auto_music_player_layout_mid.xml" value="0.20820863616930313" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/cate_dialog_layout.xml" value="0.20820863616930313" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/check_list_adapter_layout.xml" value="0.264" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/color_pop_layout.xml" value="0.37543453070683663" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/colorful_bar_child_layout.xml" value="0.2" />
