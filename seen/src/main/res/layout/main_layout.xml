@@ -79,6 +79,8 @@
                     android:id="@+id/user_icon"
                     android:layout_width="@dimen/user_icon"
                     android:layout_height="@dimen/user_icon"
+                    app:layout_constraintHorizontal_bias="0.1"
+                    app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginStart="@dimen/icon_margin"
                     android:layout_marginTop="@dimen/main_margin"
                     android:background="@color/glass"

@@ -12,10 +12,11 @@ import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
 import com.protone.mediamodle.GalleyHelper
+import com.protone.mediamodle.note.entity.RichNoteStates
 import com.protone.mediamodle.note.entity.RichPhotoStates
-import com.protone.seen.PickMusicSeen
 import com.protone.seen.GalleySeen
 import com.protone.seen.NoteEditSeen
+import com.protone.seen.PickMusicSeen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
@@ -42,12 +43,20 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
 
     companion object {
         const val NOTE_TYPE = "NoteType"
+        const val NOTE = "Note"
     }
 
     override suspend fun main() {
         val noteEditSeen = NoteEditSeen(this)
-        setContentSeen(noteEditSeen)
+        val noteName = intent.getStringExtra(NOTE)
 
+
+        noteEditSeen.initEditor(withContext(Dispatchers.IO) {
+            if (noteName == null) RichNoteStates("", arrayListOf()) else {
+                RichNoteStates()
+            }
+        })
+        setContentSeen(noteEditSeen)
         while (isActive) {
             select<Unit> {
                 event.onReceive {}
@@ -103,7 +112,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                 if (notes == null) notes = mutableListOf()
                                 (notes as MutableList<String>).add(noteEditSeen.title)
                             }
-                            withContext(Dispatchers.IO){
+                            withContext(Dispatchers.IO) {
                                 DataBaseDAOHelper.updateSignedMedia(re)
                             }
                         }

@@ -16,12 +16,14 @@ import com.protone.api.context.layoutInflater
 import com.protone.api.context.onUiThread
 import com.protone.api.context.root
 import com.protone.mediamodle.note.entity.RichMusicStates
-import com.protone.mediamodle.note.entity.RichNoteStates
 import com.protone.mediamodle.note.entity.RichPhotoStates
+import com.protone.mediamodle.note.entity.RichStates
 import com.protone.mediamodle.note.entity.RichVideoStates
 import com.protone.mediamodle.note.spans.ISpanForUse
-import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seen.databinding.NoteEditLayoutBinding
+import com.protone.seen.popWindows.ColorfulPopWindow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context), ISpanForUse {
 
@@ -56,9 +58,13 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
                     -verticalOffset / appBarLayout.totalScrollRange.toFloat()
             })
         binding.self = this
+
+    }
+
+    suspend fun initEditor(richNoteStates: RichStates) = withContext(Dispatchers.Main) {
         binding.noteEditRichNote.apply {
             isEditable = true
-            setRichList(listOf(RichNoteStates("", arrayListOf())))
+            setRichList(listOf(richNoteStates))
         }
     }
 
