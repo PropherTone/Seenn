@@ -13,6 +13,11 @@ import com.protone.seenn.viewModel.MusicControllerIMP
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
 
+
+/**
+ * Design and code by ProTone
+ *   2022/1/23
+ */
 class MainActivity : BaseActivity<MainSeen>() {
 
     override suspend fun main() {

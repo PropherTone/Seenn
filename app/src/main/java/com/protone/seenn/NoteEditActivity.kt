@@ -51,11 +51,12 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
         val noteName = intent.getStringExtra(NOTE)
 
 
-        noteEditSeen.initEditor(withContext(Dispatchers.IO) {
-            if (noteName == null) RichNoteStates("", arrayListOf()) else {
-                RichNoteStates()
+        noteName?.let {
+            val note = withContext(Dispatchers.IO) {
+                DataBaseDAOHelper.getNoteByName(it)
             }
-        })
+            note?.let { n -> noteEditSeen.initEditor(n.getRichCode(), n.getText()) }
+        }
         setContentSeen(noteEditSeen)
         while (isActive) {
             select<Unit> {

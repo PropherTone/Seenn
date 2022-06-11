@@ -15,10 +15,7 @@ import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.onUiThread
 import com.protone.api.context.root
-import com.protone.mediamodle.note.entity.RichMusicStates
-import com.protone.mediamodle.note.entity.RichPhotoStates
-import com.protone.mediamodle.note.entity.RichStates
-import com.protone.mediamodle.note.entity.RichVideoStates
+import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ISpanForUse
 import com.protone.seen.databinding.NoteEditLayoutBinding
 import com.protone.seen.popWindows.ColorfulPopWindow
@@ -58,14 +55,14 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
                     -verticalOffset / appBarLayout.totalScrollRange.toFloat()
             })
         binding.self = this
-
-    }
-
-    suspend fun initEditor(richNoteStates: RichStates) = withContext(Dispatchers.Main) {
         binding.noteEditRichNote.apply {
             isEditable = true
-            setRichList(listOf(richNoteStates))
+            setRichList(listOf(RichNoteStates("", arrayListOf())))
         }
+    }
+
+    suspend fun initEditor(richCode: Int, text: String) = withContext(Dispatchers.Main) {
+        binding.noteEditRichNote.setRichList(richCode,text)
     }
 
     override fun offer(event: NoteEditEvent) {

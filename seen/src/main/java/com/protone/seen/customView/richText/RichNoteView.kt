@@ -353,7 +353,7 @@ class RichNoteView @JvmOverloads constructor(
      * @return [Pair]
      * <[Int],[String]>
      *
-     * [Int] : A sort of number that from left to right market the [RichStates]
+     * [Int] : A sort of number that from left to right mark the [RichStates]
      *
      * [String] : Json of [RichStates]>
      */

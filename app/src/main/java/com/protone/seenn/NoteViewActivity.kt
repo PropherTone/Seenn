@@ -38,6 +38,7 @@ class NoteViewActivity : BaseActivity<NoteViewSeen>() {
                             if (noteQueue.isNotEmpty())
                                 setContentSeen(initSeen(noteQueue.poll()))
                             else finish()
+                        NoteViewSeen.NoteViewEvent.Edit -> startActivity(NoteEditActivity::class.intent)
                         NoteViewSeen.NoteViewEvent.Next -> setContentSeen(initSeen(noteQueue.peek()))
                     }
                 }

@@ -73,6 +73,18 @@
                         android:textSize="@dimen/title_text"
                         android:textStyle="bold" />
 
+                    <ImageView
+                        android:id="@+id/toolbar_edit"
+                        android:layout_width="@dimen/small_Icon"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|center_vertical"
+                        android:contentDescription="@string/action"
+                        android:onClick="@{()->self.offer(NoteViewEvent.Edit)}"
+                        android:paddingTop="@dimen/main_margin"
+                        android:paddingEnd="0dp"
+                        android:paddingBottom="@dimen/main_margin"
+                        android:src="@drawable/ic_baseline_edit_24_white" />
+
                 </androidx.appcompat.widget.Toolbar>
 
             </androidx.constraintlayout.motion.widget.MotionLayout>

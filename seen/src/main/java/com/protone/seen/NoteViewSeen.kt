@@ -15,7 +15,8 @@ class NoteViewSeen(context: Context) : Seen<NoteViewSeen.NoteViewEvent>(context)
 
     enum class NoteViewEvent {
         Finish,
-        Next
+        Next,
+        Edit
     }
 
     private val binding =
