@@ -37,7 +37,11 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
     private var numberPopWindow: ColorfulPopWindow? = null
     private var colorPopWindow: ColorfulPopWindow? = null
 
-    val title: String get() = binding.noteEditTitle.text.toString()
+    var title: String
+        set(value) {
+            binding.noteEditTitle.setText(value)
+        }
+        get() = binding.noteEditTitle.text.toString()
 
     private val binding = NoteEditLayoutBinding.inflate(context.layoutInflater, context.root, true)
 
@@ -62,7 +66,7 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
     }
 
     suspend fun initEditor(richCode: Int, text: String) = withContext(Dispatchers.Main) {
-        binding.noteEditRichNote.setRichList(richCode,text)
+        binding.noteEditRichNote.setRichList(richCode, text)
     }
 
     override fun offer(event: NoteEditEvent) {
@@ -93,7 +97,7 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
 
     override fun insertVideo() = offer(NoteEditEvent.PickVideo)
 
-    fun insertVideo(uri: Uri, list: MutableList<String>){
+    fun insertVideo(uri: Uri, list: MutableList<String>) {
         if (listPopWindow != null) {
             listPopWindow?.dismiss()
             listPopWindow = null
@@ -102,7 +106,7 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
             it.setOnDismissListener { listPopWindow = null }
         }.startListPopup(binding.noteEditTool, list) {
             listPopWindow?.dismiss()
-            binding.noteEditRichNote.insertVideo(RichVideoStates(uri,it, name = ""))
+            binding.noteEditRichNote.insertVideo(RichVideoStates(uri, it, name = ""))
         }
 
     }

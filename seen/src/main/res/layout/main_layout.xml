@@ -44,19 +44,12 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <View
-                    android:elevation="@dimen/small_elevation"
-                    android:id="@+id/color_bar"
-                    android:background="@color/blue_1"
-                    app:layout_constraintBottom_toBottomOf="@id/userCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/small_elevation"/>
-
                 <TextView
                     android:id="@+id/user_welcome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="40dp"
+                    app:layout_constraintHorizontal_bias="0.16"
+                    app:layout_constraintEnd_toEndOf="@id/userCard"
                     android:elevation="@dimen/small_elevation"
                     android:textColor="@color/white"
                     android:textStyle="bold"
@@ -80,8 +73,8 @@
                     android:layout_width="@dimen/user_icon"
                     android:layout_height="@dimen/user_icon"
                     app:layout_constraintHorizontal_bias="0.1"
+                    android:scaleType="centerCrop"
                     app:layout_constraintEnd_toEndOf="parent"
-                    android:layout_marginStart="@dimen/icon_margin"
                     android:layout_marginTop="@dimen/main_margin"
                     android:background="@color/glass"
                     android:contentDescription="@string/icon"

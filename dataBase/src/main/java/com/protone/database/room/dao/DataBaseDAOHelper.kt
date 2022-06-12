@@ -273,6 +273,14 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         return noteDAO?.getNoteByName(name)
     }
 
+    override fun updateNote(note: Note): Int? {
+        return noteDAO?.updateNote(note)
+    }
+
+    override fun deleteNote(note: Note) {
+        noteDAO?.deleteNote(note)
+    }
+
     override fun insertNote(note: Note) {
         noteDAO?.insertNote(note)
     }

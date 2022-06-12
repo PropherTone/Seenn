@@ -54,7 +54,7 @@ class MainActivity : BaseActivity<MainSeen>() {
         doOnFinish {
             DataBaseDAOHelper.shutdownNow()
             stopService(WorkService::class.intent)
-            userConfig.lastMusicProgress = binder.onProgress().value ?: 0L
+            userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
             userConfig.lastMusic = binder.onMusicPlaying().value?.toJson() ?: ""
             musicController.finish()
         }

@@ -11,7 +11,7 @@ import com.protone.api.context.Global
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 
-fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
+inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
     if (mediaUri.toString().contains("images")) {
         val queryArray = arrayOf(
             MediaStore.Images.Media.DISPLAY_NAME,
@@ -118,7 +118,7 @@ fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
     }
 }
 
-fun scanAudioWithUri(mediaUri: Uri, callBack: (Music) -> Unit) {
+inline fun scanAudioWithUri(mediaUri: Uri, callBack: (Music) -> Unit) {
     val externalContentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     val bucketOrData =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) MediaStore.Audio.Media.BUCKET_DISPLAY_NAME
@@ -378,7 +378,7 @@ inline fun scanAudio(function: ((Uri, Music) -> Unit)): MutableList<Music> {
     return audios
 }
 
-public inline fun scan(
+inline fun scan(
     @Nullable uri: Uri,
     @Nullable projection: Array<String>,
     block: (Cursor) -> Unit

@@ -71,7 +71,6 @@ abstract class Seen<C>(val context: Context) :
             }
             false
         }
-
     }
 
 }

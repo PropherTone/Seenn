@@ -30,10 +30,10 @@ class GalleySearchActivity : BaseActivity<GalleySearchSeen>(),
         IntentDataHolder.get().let {
             if (!(it != null && it is List<*> && it.isNotEmpty() && it[0] is GalleyMedia)) {
                 toast(getString(R.string.none))
-                finish()
+            }else{
+                data.addAll(it as List<GalleyMedia>)
+                galleySearchSeen.initList(data[0].isVideo, this)
             }
-            data.addAll(it as List<GalleyMedia>)
-            galleySearchSeen.initList(data[0].isVideo, this)
         }
         while (isActive) {
             select<Unit> {

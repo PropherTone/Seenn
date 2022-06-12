@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -48,6 +49,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
 
     private var musicPlayer: MediaPlayer? = null
         get() {
+            if (playList.isEmpty()) return null
             if (field == null) {
                 field = MediaPlayer.create(
                     Global.application,
@@ -69,7 +71,12 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
 
     private val appReceiver = object : ApplicationBroadCast() {
         override fun finish() {
-            TODO("Not yet implemented")
+            notificationManager?.cancelAll()
+            ActivityHolder.finish()
+            stopSelf()
+            val activityManager =
+                Global.application.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            activityManager.killBackgroundProcesses(Global.application.packageName)
         }
 
         override fun music() {
@@ -105,6 +112,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         }
 
         private fun notificationText() {
+            if (playList.isEmpty()) return
             remoteViews?.setTextViewText(
                 R.id.notify_music_name,
                 playList[playPosition].title
@@ -113,6 +121,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         }
 
         private fun notificationPlayState(state: Boolean) {
+            if (playList.isEmpty()) return
             playState.postValue(state)
             initMusicNotification()
             remoteViews?.setImageViewResource(
@@ -248,10 +257,11 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
                 }
                 val index = playList.indexOf(music)
                 playPosition = index
-                currentMusic.postValue(playList[playPosition])
+                finishMusic()
             }
             musicPlayer?.apply {
                 start()
+                currentMusic.postValue(playList[playPosition])
                 playState.postValue(true)
                 if (progressTimer == null) progressTimer = Timer()
                 progressTimer?.schedule(timerTask {
@@ -277,6 +287,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     }
 
     override fun next() {
+        if (playList.isEmpty()) return
         launch {
             if (++playPosition > playList.size - 1) playPosition = 0
             finishMusic()
@@ -286,6 +297,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     }
 
     override fun previous() {
+        if (playList.isEmpty()) return
         launch {
             if (--playPosition <= 0) playPosition = playList.size - 1
             finishMusic()
@@ -323,7 +335,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
 
     override fun init(music: Music, progress: Long) {
         currentMusic.postValue(
-            if (playList.isNotEmpty()) {
+            if (playList.isNotEmpty() && music.title != "NO MUSIC") {
                 playPosition = playList.indexOf(music)
                 playList[playPosition]
             } else getEmptyMusic()
@@ -335,8 +347,8 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
             stop()
             reset()
             release()
+            musicPlayer = null
         }
-        musicPlayer = null
     }
 
     inner class MusicBinder : Binder(), IMusicService {
@@ -356,6 +368,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     }
 
     override fun onCompletion(mp: MediaPlayer?) {
+        playState.postValue(false)
         when (loopModeLive.value) {
             LOOP_LIST -> next()
             LOOP_SINGLE -> {

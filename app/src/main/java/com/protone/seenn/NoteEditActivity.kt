@@ -1,5 +1,6 @@
 package com.protone.seenn
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.intent
@@ -51,11 +52,16 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
         val noteName = intent.getStringExtra(NOTE)
 
 
-        noteName?.let {
-            val note = withContext(Dispatchers.IO) {
+        var onEdit = false
+        val noteByName = noteName?.let {
+            withContext(Dispatchers.IO) {
                 DataBaseDAOHelper.getNoteByName(it)
+            }?.let { n ->
+                noteEditSeen.title = n.title
+                noteEditSeen.initEditor(n.getRichCode(), n.getText())
+                onEdit = true
+                n
             }
-            note?.let { n -> noteEditSeen.initEditor(n.getRichCode(), n.getText()) }
         }
         setContentSeen(noteEditSeen)
         while (isActive) {
@@ -70,7 +76,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                 return@onReceive
                             }
                             noteEditSeen.showProgress(true)
-                            DataBaseDAOHelper.insertNoteCB(
+                            val note = withContext(Dispatchers.IO) {
                                 Note(
                                     noteEditSeen.title,
                                     indexedRichNote.second,
@@ -96,7 +102,44 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                     mutableListOf(intent.getStringExtra(NOTE_TYPE)),
                                     indexedRichNote.first
                                 )
-                            ) { re, _ ->
+                            }
+                            if (onEdit) withContext(Dispatchers.IO) {
+                                if (noteName == null) {
+                                    setResult(RESULT_CANCELED)
+                                    finish()
+                                    return@withContext
+                                }
+                                if (noteByName == null) {
+                                    setResult(RESULT_CANCELED)
+                                    finish()
+                                    return@withContext
+                                }
+                                noteByName.title = note.title
+                                noteByName.type = note.type
+                                noteByName.text = note.text
+                                noteByName.imagePath = note.imagePath
+                                noteByName.richCode = note.richCode
+                                noteByName.time = note.time
+                                DataBaseDAOHelper.updateNote(noteByName).let { re ->
+                                    if (re == null && re == -1) {
+                                        DataBaseDAOHelper.insertNoteCB(noteByName) { result, _ ->
+                                            if (result) {
+                                                DataBaseDAOHelper.deleteNote(noteByName)
+                                                setResult(RESULT_OK, Intent().also { intent ->
+                                                    intent.putExtra(
+                                                        NoteViewActivity.NOTE_NAME,
+                                                        noteByName.title
+                                                    )
+                                                })
+                                                finish()
+                                            } else toast(getString(R.string.failed_msg))
+                                        }
+                                    } else {
+                                        setResult(RESULT_OK)
+                                        finish()
+                                    }
+                                }
+                            } else DataBaseDAOHelper.insertNoteCB(note) { re, _ ->
                                 if (re) finish() else toast(getString(R.string.failed_msg))
                             }
                         }
@@ -123,7 +166,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                         }
                         NoteEditSeen.NoteEditEvent.PickMusic -> startActivityForResult(
                             ActivityResultContracts.StartActivityForResult(),
-                            PickMusicSeen::class.intent.apply {
+                            PickMusicActivity::class.intent.apply {
                                 putExtra(PickMusicSeen.MODE, PickMusicSeen.PICK_MUSIC)
                             }
                         )?.let { re ->

@@ -140,6 +140,8 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
 
     fun finish() = controller.cancel()
 
+    fun getProgress() = controller.progress?.barDuration
+
     private fun showToast(msg: String) {
         Toast.makeText(controller.context, msg, Toast.LENGTH_SHORT).show()
     }

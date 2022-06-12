@@ -1,8 +1,6 @@
 package com.protone.database.room.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.protone.database.room.entity.Note
 
 @Dao
@@ -15,6 +13,12 @@ interface NoteDAO {
     fun insertNote(note: Note)
 
     @Query("SELECT * FROM Note WHERE Title LIKE :name")
-    fun getNoteByName(name: String) : Note?
+    fun getNoteByName(name: String): Note?
+
+    @Update
+    fun updateNote(note: Note): Int?
+
+    @Delete
+    fun deleteNote(note: Note)
 
 }

@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.protone.api.ActivityLifecycleOwner
+import com.protone.api.context.ActivityHolder
 import com.protone.api.context.intent
 import com.protone.api.context.musicIntentFilter
 import com.protone.database.sp.config.UserConfig
@@ -49,7 +50,6 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     protected val TAG = "TAG"
 
     protected val event = Channel<Event>(Channel.UNLIMITED)
-    private val themeProvider by lazy { ThemeProvider(this) }
     private var onFinish: suspend () -> Unit = {}
     private val increaseInteger = AtomicInteger(0)
     protected var seen: S? = null
@@ -70,11 +70,7 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (themeProvider.isCustomTheme) {
-            //
-        }
-
+        ActivityHolder.add(this)
         launch {
             main()
 
@@ -132,6 +128,7 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
         try {
 
             launch {
+                ActivityHolder.remove(this@BaseActivity)
                 onFinish()
             }
 

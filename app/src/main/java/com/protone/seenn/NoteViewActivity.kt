@@ -1,6 +1,7 @@
 package com.protone.seenn
 
 import android.net.Uri
+import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.intent
 import com.protone.api.context.onBackground
 import com.protone.api.json.toJson
@@ -19,12 +20,13 @@ class NoteViewActivity : BaseActivity<NoteViewSeen>() {
         const val NOTE_NAME = "NOTE_NAME"
     }
 
+    private lateinit var noteViewSeen: NoteViewSeen
     private val noteQueue = ArrayDeque<String>()
 
     override suspend fun main() {
         bindMusicService {}
 
-        val noteViewSeen = intent.getStringExtra(NOTE_NAME)?.let {
+        noteViewSeen = intent.getStringExtra(NOTE_NAME)?.let {
             noteQueue.offer(it)
             initSeen(noteQueue.poll())
         } ?: NoteViewSeen(this)
@@ -36,10 +38,29 @@ class NoteViewActivity : BaseActivity<NoteViewSeen>() {
                     when (it) {
                         NoteViewSeen.NoteViewEvent.Finish ->
                             if (noteQueue.isNotEmpty())
-                                setContentSeen(initSeen(noteQueue.poll()))
+                                initSeen(noteQueue.poll())
                             else finish()
-                        NoteViewSeen.NoteViewEvent.Edit -> startActivity(NoteEditActivity::class.intent)
-                        NoteViewSeen.NoteViewEvent.Next -> setContentSeen(initSeen(noteQueue.peek()))
+                        NoteViewSeen.NoteViewEvent.Edit -> startActivityForResult(
+                            ActivityResultContracts.StartActivityForResult(),
+                            NoteEditActivity::class.intent.also { intent ->
+                                intent.putExtra(
+                                    NoteEditActivity.NOTE,
+                                    this@NoteViewActivity.intent.getStringExtra(NOTE_NAME)
+                                )
+                            }
+                        ).let { re ->
+                            if (re == null) {
+                                toast(getString(R.string.none))
+                                return@let
+                            }
+                            if (re.resultCode == RESULT_OK)
+                                intent.getStringExtra(NOTE_NAME)?.let { name ->
+                                    noteQueue.remove(name)
+                                    noteQueue.offer(name)
+                                    initSeen(noteQueue.poll())
+                                }
+                        }
+                        NoteViewSeen.NoteViewEvent.Next -> initSeen(noteQueue.peek())
                     }
                 }
             }
@@ -47,6 +68,7 @@ class NoteViewActivity : BaseActivity<NoteViewSeen>() {
     }
 
     private suspend fun initSeen(noteName: String?) = NoteViewSeen(this@NoteViewActivity).apply {
+        noteViewSeen = this
         setContentSeen(this)
         if (noteName == null) return@apply
         withContext(Dispatchers.IO) {

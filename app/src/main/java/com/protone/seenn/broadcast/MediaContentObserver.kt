@@ -36,6 +36,8 @@ class MediaContentObserver(mHandler: Handler) : ContentObserver(mHandler) {
                 true
             } catch (e: TypeCastException) {
                 false
+            } catch (e: NumberFormatException) {
+                false
             }
         } else false
     }

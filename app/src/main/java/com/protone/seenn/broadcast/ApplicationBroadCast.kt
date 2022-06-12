@@ -14,7 +14,7 @@ abstract class ApplicationBroadCast : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         when (intent?.action) {
-            FINISH -> exitProcess(0)
+            FINISH -> finish()
             MUSIC -> music()
         }
     }

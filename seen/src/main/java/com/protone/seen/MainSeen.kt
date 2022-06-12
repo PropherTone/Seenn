@@ -67,11 +67,6 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
             musicPlayer.apply {
                 duration
             }
-            modelList.apply {
-                layoutManager = LinearLayoutManager(context)
-                adapter = MainModelListAdapter(context)
-                addItemDecoration(ModelListItemDecoration(context.resources.getDimensionPixelSize(R.dimen.main_margin)))
-            }
         }
 
     }
@@ -80,6 +75,7 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
         binding.modelList.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = MainModelListAdapter(context)
+            addItemDecoration(ModelListItemDecoration(context.resources.getDimensionPixelSize(R.dimen.main_margin)))
         }
     }
 
