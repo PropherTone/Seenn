@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -246,30 +245,32 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     }
 
     override fun play(music: Music?) {
-        if (playList.isEmpty()) {
-            currentMusic.postValue(getEmptyMusic())
-            return
-        }
         launch {
-            if (music != null) {
-                if (!playList.contains(music)) {
-                    playList.add(music)
+            synchronized(playList) {
+                if (playList.isEmpty()) {
+                    currentMusic.postValue(getEmptyMusic())
+                    return@launch
                 }
-                val index = playList.indexOf(music)
-                playPosition = index
-                finishMusic()
-            }
-            musicPlayer?.apply {
-                start()
-                currentMusic.postValue(playList[playPosition])
-                playState.postValue(true)
-                if (progressTimer == null) progressTimer = Timer()
-                progressTimer?.schedule(timerTask {
-                    try {
-                        if (isPlaying) progress.postValue(currentPosition.toLong())
-                    } catch (ignored: Exception) {
+                if (music != null) {
+                    if (!playList.contains(music)) {
+                        playList.add(music)
                     }
-                }, 0, 100)
+                    val index = playList.indexOf(music)
+                    playPosition = index
+                    finishMusic()
+                }
+                musicPlayer?.apply {
+                    start()
+                    currentMusic.postValue(playList[playPosition])
+                    playState.postValue(true)
+                    if (progressTimer == null) progressTimer = Timer()
+                    progressTimer?.schedule(timerTask {
+                        try {
+                            if (isPlaying) progress.postValue(currentPosition.toLong())
+                        } catch (ignored: Exception) {
+                        }
+                    }, 0, 100)
+                }
             }
         }
     }
