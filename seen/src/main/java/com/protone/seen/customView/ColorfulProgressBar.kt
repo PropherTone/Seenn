@@ -156,14 +156,14 @@ class ColorfulProgressBar @JvmOverloads constructor(
     }
 
     fun startGradient() {
-        if (!isStart) {
-            mHandler.post(colorRunnable)
-            isStart = true
-        }
+//        if (!isStart) {
+//            mHandler.post(colorRunnable)
+//            isStart = true
+//        }
     }
 
     fun stopGradient() {
-        mHandler.removeCallbacksAndMessages(null)
+//        mHandler.removeCallbacksAndMessages(null)
     }
 
     inner class ColorRunnable : Runnable {

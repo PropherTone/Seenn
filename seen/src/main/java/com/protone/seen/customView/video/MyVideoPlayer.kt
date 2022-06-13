@@ -216,6 +216,5 @@ class MyVideoPlayer @JvmOverloads constructor(
         isPrepared = true
         videoController.seekTo(0)
         p0?.let { videoController.setVideoDuration(it.duration.toLong()) }
-
     }
 }
