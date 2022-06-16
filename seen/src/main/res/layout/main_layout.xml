@@ -22,7 +22,6 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/glass"
             android:elevation="0dp">
 
             <androidx.constraintlayout.motion.widget.MotionLayout
@@ -36,7 +35,6 @@
                     android:id="@+id/userCard"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/huge_icon"
-                    android:background="@drawable/main_background"
                     android:elevation="@dimen/small_elevation"
                     android:onClick="@{()->self.offer(Touch.ConfigUser)}"
                     app:layout_constraintBottom_toTopOf="@+id/noteBook"
@@ -93,6 +91,7 @@
                     android:contentDescription="@string/model_Galley"
                     android:onClick="@{()->self.offer(Touch.GALLEY)}"
                     android:paddingTop="@dimen/main_padding"
+                    android:background="@color/glass"
                     android:paddingBottom="@dimen/main_padding"
                     android:src="@drawable/ic_baseline_image_24_white"
                     app:layout_constraintEnd_toStartOf="@id/noteBook"
@@ -105,6 +104,7 @@
                     android:layout_height="@dimen/action_icon"
                     android:layout_gravity="center"
                     android:layout_weight="1"
+                    android:background="@color/glass"
                     android:contentDescription="@string/model_noteBook"
                     android:onClick="@{()->self.offer(Touch.NOTE)}"
                     android:paddingTop="@dimen/main_padding"
@@ -119,6 +119,7 @@
                     android:layout_width="0dp"
                     android:layout_height="@dimen/action_icon"
                     android:layout_gravity="center"
+                    android:background="@color/glass"
                     android:layout_weight="1"
                     android:contentDescription="@string/model_music"
                     android:onClick="@{()->self.offer(Touch.MUSIC)}"

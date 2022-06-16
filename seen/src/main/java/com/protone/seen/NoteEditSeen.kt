@@ -15,7 +15,10 @@ import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.onUiThread
 import com.protone.api.context.root
-import com.protone.mediamodle.note.entity.*
+import com.protone.mediamodle.note.entity.RichMusicStates
+import com.protone.mediamodle.note.entity.RichNoteStates
+import com.protone.mediamodle.note.entity.RichPhotoStates
+import com.protone.mediamodle.note.entity.RichVideoStates
 import com.protone.mediamodle.note.spans.ISpanForUse
 import com.protone.seen.databinding.NoteEditLayoutBinding
 import com.protone.seen.popWindows.ColorfulPopWindow
@@ -126,7 +129,7 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
         }
     }
 
-    suspend fun indexRichNote(): Pair<Int, String> = binding.noteEditRichNote.indexRichNote()
+    suspend fun indexRichNote(): Pair<Int, String> = binding.noteEditRichNote.indexRichNote(title)
 
     override fun setColor() {
         if (colorPopWindow != null) {

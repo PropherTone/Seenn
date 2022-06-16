@@ -2,6 +2,7 @@ package com.protone.seen.customView.richText
 
 import android.animation.LayoutTransition
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Typeface
@@ -30,20 +31,21 @@ import com.protone.api.json.jsonToList
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
-import com.protone.api.toMediaBitmapByteArray
+import com.protone.api.saveToFile
+import com.protone.api.toBitmap
 import com.protone.mediamodle.note.MyTextWatcher
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ColorSpan
 import com.protone.mediamodle.note.spans.ISpanForEditor
 import com.protone.seen.R
-import com.protone.seen.customView.DragRect
 import com.protone.seen.customView.MyMusicPlayer
 import com.protone.seen.databinding.RichMusicLayoutBinding
 import com.protone.seen.databinding.RichPhotoLayoutBinding
 import com.protone.seen.databinding.VideoCardBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
 
 /**
  * RichText editor by ProTone 2022/4/15
@@ -258,31 +260,54 @@ class RichNoteView @JvmOverloads constructor(
         }
     }
 
-    private fun getBitmapWH(byteArray: ByteArray): IntArray? {
-        try {
+    private fun getBitmapWH(dba: Bitmap): IntArray? {
+        return try {
+//            val option = BitmapFactory.Options().apply {
+//                inJustDecodeBounds = true
+//            }
+            //            val dba = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size, option)
+            val height = dba.height
+            val width = dba.width
+            val index = width / height
+            val bmH = Config.screenWidth / index
+            //            dba.recycle()
+            intArrayOf(Config.screenWidth, bmH)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun getWHFromPath(path: String?): IntArray? {
+        return try {
             val option = BitmapFactory.Options().apply {
                 inJustDecodeBounds = true
             }
-            val dba = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size, option)
+            val dba = BitmapFactory.decodeFile(path, option) ?: return null
             val height = dba.height
             val width = dba.width
             val index = width / height
             val bmH = Config.screenWidth / index
             dba.recycle()
-            return intArrayOf(Config.screenWidth, bmH)
+            intArrayOf(Config.screenWidth, bmH)
         } catch (e: Exception) {
+            null
         }
-        return null
     }
 
     override fun insertImage(photo: RichPhotoStates) = insertMedia {
         addView(RichPhotoLayoutBinding.inflate(context.layoutInflater, this, false).apply {
-            val ba = photo.uri.toMediaBitmapByteArray()
-            if (ba == null) {
+            val ba = photo.uri.toBitmap()
+            if (ba == null && photo.path == null) {
                 Glide.with(context).asDrawable()
                     .load(R.drawable.ic_baseline_error_outline_24_black)
                     .into(this.richPhotoIv)
-            } else {
+            } else if (photo.path != null) {
+                ba?.recycle()
+                val bitmapWH = getWHFromPath(photo.path)
+                Glide.with(context).asDrawable().load(photo.path).let { glide ->
+                    if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
+                }.into(this.richPhotoIv)
+            } else if (ba != null) {
                 val bitmapWH = getBitmapWH(ba)
                 Glide.with(context).load(photo.uri).let { glide ->
                     if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
@@ -290,19 +315,10 @@ class RichNoteView @JvmOverloads constructor(
                 richPhotoTitle.text = photo.name
                 richPhotoDetail.text = photo.date
             }
-//            drag.isGone = !isEditable
-            if (isEditable) {
-                drag.rectSizeListener = object : DragRect.RectSize {
-                    override fun onChange(x: Int, y: Int) {
-                        root.layoutParams = LayoutParams(x, y)
-                    }
-                }
-            }
             richPhotoFull.setOnClickListener { iRichListener?.open(photo.uri, photo.name, false) }
             richPhotoTvContainer.setOnClickListener {
                 richPhotoTitle.apply {
                     isVisible = !isVisible
-                    if (!drag.isGone) drag.isVisible = isVisible
                     richPhotoDetailContainer.isVisible = isVisible
                 }
             }
@@ -353,34 +369,79 @@ class RichNoteView @JvmOverloads constructor(
      * @return [Pair]
      * <[Int],[String]>
      *
-     * [Int] : A sort of number that from left to right mark the [RichStates]
+     * [Int] : A sort of number that mark the [RichStates] from left to right
      *
      * [String] : Json of [RichStates]>
      */
-    suspend fun indexRichNote(): Pair<Int, String> {
+    suspend fun indexRichNote(title: String): Pair<Int, String> {
+        val richArray = arrayOfNulls<String>(childCount)
+        val richSer = arrayListOf<String>()
+        var richStates = 0
+        val taskChannel = Channel<Pair<String, Int>>(Channel.UNLIMITED)
+        var count = 0
         return withContext(Dispatchers.IO) {
-            suspendCancellableCoroutine { co ->
-                val richSer = arrayListOf<String>()
-                var richStates = 0
+            suspendCancellableCoroutine {
+                async(Dispatchers.IO) {
+                    while (isActive) {
+                        taskChannel.receiveAsFlow().collect {
+                            if (it.second < childCount) {
+                                richArray[it.second] = it.first
+                                count++
+                            }
+                            if (count >= childCount) {
+                                taskChannel.close()
+                            }
+                        }
+                        richArray.onEach {
+                            it?.let { state ->
+                                richSer.add(state)
+                            }
+                        }
+                        it.resumeWith(
+                            Result.success(Pair(richStates, richSer.listToJson(String::class.java)))
+                        )
+                        break
+                    }
+                }.start()
                 for (i in 0 until childCount) {
                     when (val tag = getChildAt(i).tag) {
-                        is RichNoteStates -> richSer.add(
-                            RichNoteSer(
-                                getEdittext(i)?.text.toString(),
-                                tag.spanStates.listToJson(SpanStates::class.java)
-                            ).toJson()
-                        ).apply { richStates = richStates * 10 + TEXT }
-                        is RichVideoStates -> richSer.add(tag.toJson())
-                            .apply { richStates = richStates * 10 + VIDEO }
-                        is RichPhotoStates -> richSer.add(tag.toJson())
-                            .apply { richStates = richStates * 10 + PHOTO }
-                        is RichMusicStates -> richSer.add(tag.toJson())
-                            .apply { richStates = richStates * 10 + MUSIC }
+                        is RichNoteStates -> {
+                            taskChannel.offer(
+                                Pair(
+                                    RichNoteSer(
+                                        getEdittext(i)?.text.toString(),
+                                        tag.spanStates.listToJson(SpanStates::class.java)
+                                    ).toJson(), i
+                                )
+                            )
+                            richStates = richStates * 10 + TEXT
+                        }
+                        is RichVideoStates -> {
+                            async(Dispatchers.IO) {
+                                taskChannel.offer(Pair(tag.toJson(), i))
+                                richStates = richStates * 10 + VIDEO
+                            }.start()
+                        }
+                        is RichPhotoStates -> {
+                            val child = getChildAt(i)
+                            async(Dispatchers.IO) {
+                                tag.uri.toBitmap(child.measuredWidth, child.measuredHeight)
+                                    ?.saveToFile(title + "_${System.currentTimeMillis()}")
+                                    ?.let {
+                                        if (tag.path == null) {
+                                            tag.path = it
+                                        }
+                                    }
+                                taskChannel.offer(Pair(tag.toJson(), i))
+                                richStates = richStates * 10 + PHOTO
+                            }.start()
+                        }
+                        is RichMusicStates -> {
+                            taskChannel.offer(Pair(tag.toJson(), i))
+                            richStates = richStates * 10 + MUSIC
+                        }
                     }
                 }
-                co.resumeWith(
-                    Result.success(Pair(richStates, richSer.listToJson(String::class.java)))
-                )
             }
         }
     }
@@ -403,7 +464,7 @@ class RichNoteView @JvmOverloads constructor(
             }
         }
         var index = insertPosition + if (!inIndex) 1 else 0
-        if (index >= childCount) index = childCount -1
+        if (index >= childCount) index = childCount - 1
         func(index)
         //Insert a edittext to make sure there have a place for input
         if (isEditable && !inIndex) insertText(

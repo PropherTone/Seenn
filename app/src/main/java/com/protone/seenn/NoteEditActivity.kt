@@ -13,7 +13,6 @@ import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
 import com.protone.mediamodle.GalleyHelper
-import com.protone.mediamodle.note.entity.RichNoteStates
 import com.protone.mediamodle.note.entity.RichPhotoStates
 import com.protone.seen.GalleySeen
 import com.protone.seen.NoteEditSeen
@@ -147,8 +146,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                         NoteEditSeen.NoteEditEvent.PickImage -> startGalleyPick(true)?.let { re ->
                             noteEditSeen.insertImage(
                                 RichPhotoStates(
-                                    re.uri,
-                                    re.name,
+                                    re.uri, re.name, null,
                                     re.date.toDateString().toString()
                                 )
                             )

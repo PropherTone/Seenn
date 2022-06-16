@@ -7,16 +7,14 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.os.Build
-import androidx.annotation.ChecksSdkIntAtLeast
 import com.protone.api.context.Global
 import com.protone.api.context.onBackground
 import com.protone.api.context.onUiThread
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.stream.Collectors
 
 fun String.getFileName(): String {
     return this.split("/").run { this[this.size - 1] }
@@ -39,17 +37,46 @@ fun String.getParentPath(): String {
     return this.substring(0, lastIndexOf("/"))
 }
 
+fun Bitmap.saveToFile(fileName: String): String? {
+    val fileOutputStream: FileOutputStream?
+    return try {
+        val tempPath =
+            "${Global.application.filesDir.absolutePath}/${fileName.getFileName()}.png"
+        val file = File(tempPath)
+        when {
+            file.exists() -> tempPath
+            file.createNewFile() -> {
+                fileOutputStream = FileOutputStream(file)
+                this@saveToFile.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+                tempPath
+            }
+            else -> null
+        }
+    } catch (e: Exception) {
+        null
+    }
+}
+
+fun Uri.toBitmap(
+    w: Int = Global.application.resources.getDimensionPixelSize(R.dimen.huge_icon),
+    h: Int = Global.application.resources.getDimensionPixelSize(R.dimen.huge_icon)
+): Bitmap? {
+    val ois = Global.application.contentResolver.openInputStream(this) ?: return null
+    return try {
+        BitmapFactory.decodeStream(ois, null, BitmapFactory.Options().apply {
+            inSampleSize = calculateInSampleSize(this, h, w)
+        })
+    } catch (e: Exception) {
+        null
+    }
+}
+
 fun Uri.toMediaBitmapByteArray(): ByteArray? {
     var byteArray: ByteArray? = null
-    var ois = Global.application.contentResolver.openInputStream(this) ?: return byteArray
+    val ois = Global.application.contentResolver.openInputStream(this) ?: return byteArray
     val os = ByteArrayOutputStream()
     try {
-        val options = BitmapFactory.Options().apply {
-            inJustDecodeBounds = true
-        }
-        BitmapFactory.decodeStream(ois, null, options)
-        ois.close()
-        ois = Global.application.contentResolver.openInputStream(this) ?: return byteArray
+        val options = BitmapFactory.Options()
         byteArray = options.let {
             val dimensionPixelSize =
                 Global.application.resources.getDimensionPixelSize(R.dimen.huge_icon)
