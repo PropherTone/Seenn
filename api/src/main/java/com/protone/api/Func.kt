@@ -13,6 +13,7 @@ import com.protone.api.context.onUiThread
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -61,13 +62,16 @@ fun Uri.toBitmap(
     w: Int = Global.application.resources.getDimensionPixelSize(R.dimen.huge_icon),
     h: Int = Global.application.resources.getDimensionPixelSize(R.dimen.huge_icon)
 ): Bitmap? {
-    val ois = Global.application.contentResolver.openInputStream(this) ?: return null
+    var ois: InputStream? = null
     return try {
+        ois = Global.application.contentResolver.openInputStream(this) ?: return null
         BitmapFactory.decodeStream(ois, null, BitmapFactory.Options().apply {
             inSampleSize = calculateInSampleSize(this, h, w)
         })
     } catch (e: Exception) {
         null
+    } finally {
+        ois?.close()
     }
 }
 

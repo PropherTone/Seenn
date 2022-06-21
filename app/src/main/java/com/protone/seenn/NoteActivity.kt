@@ -1,5 +1,7 @@
 package com.protone.seenn
 
+import android.transition.TransitionManager
+import android.view.ViewGroup
 import com.protone.api.context.intent
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Note
@@ -55,6 +57,7 @@ class NoteActivity : BaseActivity<NoteSeen>() {
                         }
                         NoteSeen.NoteEvent.Refresh -> {
                             noteSeen = NoteSeen(this@NoteActivity)
+                            TransitionManager.beginDelayedTransition(noteSeen.viewRoot as ViewGroup)
                             setContentSeen(noteSeen)
                             noteSeen.initSeen()
                             noteSeen.refreshList()

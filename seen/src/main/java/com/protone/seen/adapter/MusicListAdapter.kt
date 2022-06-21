@@ -35,7 +35,7 @@ class MusicListAdapter(context: Context) :
                     musicListContainer.setBackgroundColor(
                         ContextCompat.getColor(
                             context,
-                            R.color.zima_blue
+                            R.color.blue_1
                         )
                     )
                     musicListPlayState.visibility = View.VISIBLE

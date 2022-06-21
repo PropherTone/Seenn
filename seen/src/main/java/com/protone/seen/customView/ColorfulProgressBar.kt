@@ -3,8 +3,6 @@ package com.protone.seen.customView
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
-import android.os.Handler
-import android.os.Looper
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
@@ -15,6 +13,9 @@ import androidx.core.view.setPadding
 import com.protone.api.context.layoutInflater
 import com.protone.seen.R
 import com.protone.seen.databinding.ColorfulBarChildLayoutBinding
+import kotlinx.coroutines.*
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class ColorfulProgressBar @JvmOverloads constructor(
     context: Context,
@@ -23,7 +24,9 @@ class ColorfulProgressBar @JvmOverloads constructor(
     @StyleRes defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val binding = ColorfulBarChildLayoutBinding.inflate(context.layoutInflater, this, true)
+    private val binding = ColorfulBarChildLayoutBinding
+        .inflate(context.layoutInflater, this, true)
+    private var scope: CoroutineScope? = null
     private var childX: Float
         get() = binding.root.x
         set(value) {
@@ -32,28 +35,22 @@ class ColorfulProgressBar @JvmOverloads constructor(
     private var halfHeight = 0f
     private var halfChildW = 0
     private var rootWidth: Int = 0
-    private var scroll = 0
+    private var scroll = 0f
     private var steep = 10
-    private var speed = 100
     private var blurRadius = 0
     private var moveLength = 0f
     private var isTouch = false
-    private var isStart: Boolean = false
     var barDuration: Long = 0
+    private var v = 0
+    private var millis: Long = 50
 
     private val colors = intArrayOf(
         Color.parseColor("#FFBB86FC"),
         Color.parseColor("#448AFF")
     )
 
-    private var linearGradient: LinearGradient = LinearGradient(
-        scroll.toFloat(), 100f,
-        ((90 shl 2) + scroll).toFloat(), 200f,
-        colors, null, Shader.TileMode.MIRROR
-    )
+    private var linearGradient: LinearGradient? = null
 
-    private val colorRunnable: Runnable = ColorRunnable()
-    private val mHandler by lazy { Handler(Looper.getMainLooper()) }
     var progressListener: Progress? = null
 
     private val foreBarPaint = Paint().apply {
@@ -129,6 +126,15 @@ class ColorfulProgressBar @JvmOverloads constructor(
         halfChildW = binding.root.measuredWidth / 2
         backBarPath.moveTo(halfChildW.toFloat(), halfHeight)
         backBarPath.lineTo((width - halfChildW).toFloat(), halfHeight)
+        linearGradient = LinearGradient(
+            0f, 0f,
+            measuredWidth.toFloat(), 0f,
+            colors, null, Shader.TileMode.MIRROR
+        )
+        v = (measuredWidth.toDouble().pow(2.0) + 0).toInt()
+        //millis = 2000 / x
+        //x = v / steep
+        millis = (2000 / (sqrt(v.toDouble()) / steep)).toLong()
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -155,35 +161,41 @@ class ColorfulProgressBar @JvmOverloads constructor(
         invalidate()
     }
 
-    fun startGradient() {
-//        if (!isStart) {
-//            mHandler.post(colorRunnable)
-//            isStart = true
-//        }
-    }
-
-    fun stopGradient() {
-//        mHandler.removeCallbacksAndMessages(null)
-    }
-
-    inner class ColorRunnable : Runnable {
-
-        override fun run() {
-            scroll += steep
-
-            if (scroll >= (moveLength + halfChildW).toInt() shl 4) {
-                scroll = left
+    fun start() {
+        if (scope != null) return
+        scope = MainScope()
+        scope?.launch(Dispatchers.IO) {
+            while (isActive) {
+                scroll += steep
+                if (scroll >= v) {
+                    scroll = 0f
+                }
+                linearGradient = LinearGradient(
+                    scroll, 0f,
+                    measuredWidth + scroll, 0f,
+                    colors, null, Shader.TileMode.MIRROR
+                )
+                withContext(Dispatchers.Main) {
+                    invalidate()
+                }
+                delay(millis)
             }
-            linearGradient = LinearGradient(
-                scroll.toFloat(), 100f,
-                ((90 shl 2) + scroll).toFloat(), 200f,
-                colors, null, Shader.TileMode.MIRROR
-            )
+        }?.start()
+    }
 
-            postInvalidateDelayed(10)
+    fun stop() {
+        scope?.cancel()
+        scope = null
+    }
 
-            mHandler.postDelayed(colorRunnable, speed.toLong())
-        }
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        start()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        stop()
     }
 
     interface Progress {

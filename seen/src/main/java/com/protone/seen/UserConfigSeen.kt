@@ -24,7 +24,8 @@ class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context)
         Lock,
         Unlock,
         Finish,
-        Refresh
+        Refresh,
+        ClearCache
     }
 
     enum class DisplayMode {
@@ -74,7 +75,8 @@ class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context)
             initModeView("修改密码", UserEvent.PassWord),
             initModeView("笔记共享", UserEvent.ShareNote),
             initModeView("数据共享", UserEvent.ShareData),
-            initModeView("模块加密", UserEvent.Lock)
+            initModeView("模块加密", UserEvent.Lock),
+            initModeView("清理缓存", UserEvent.ClearCache)
         )
         if (mode == DisplayMode.Locked) views.add(initModeView("模块解锁", UserEvent.Unlock))
         views.forEach {

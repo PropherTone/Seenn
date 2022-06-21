@@ -50,7 +50,7 @@ class MyVideoController @JvmOverloads constructor(
         binding.vStart.setOnClickListener {
             if (!isPlaying) {
                 playVideo()
-                binding.vSeekBar.startGradient()
+                binding.vSeekBar.start()
             }
             it.isVisible = false
             binding.vContainer.isVisible = true
@@ -59,10 +59,10 @@ class MyVideoController @JvmOverloads constructor(
         binding.vControl.setOnClickListener {
             if (!isPlaying) {
                 playVideo()
-                binding.vSeekBar.startGradient()
+                binding.vSeekBar.start()
             } else {
                 pauseVideo()
-                binding.vSeekBar.stopGradient()
+                binding.vSeekBar.stop()
             }
             isPlaying = !isPlaying
         }
@@ -73,7 +73,7 @@ class MyVideoController @JvmOverloads constructor(
         isVisible = true
         binding.vStart.isVisible = true
         binding.vContainer.isVisible = false
-        binding.vSeekBar.stopGradient()
+        binding.vSeekBar.stop()
     }
 
     fun setVideoDuration(duration: Long) {

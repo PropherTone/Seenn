@@ -1,9 +1,6 @@
 package com.protone.seen.popWindows
 
 import android.content.Context
-import android.view.Gravity
-import android.view.View
-import android.widget.PopupWindow
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isGone
 import com.protone.api.context.layoutInflater
@@ -17,7 +14,7 @@ class UserPops(context: Context) {
 
     private val weakContext = WeakReference(context)
 
-    fun startLoginPopUp(isReg:Boolean,loginCall: (String, String) -> Boolean, regClk: View.OnClickListener) =
+    fun startLoginPopUp(isReg:Boolean,loginCall: (String, String) -> Boolean, regClk: ()->Boolean) =
         weakContext.get()?.let { context ->
             val binding = LoginPopLayoutBinding.inflate(context.layoutInflater, context.root, false)
             if (isReg) binding.btnReg.isGone = true
@@ -37,7 +34,9 @@ class UserPops(context: Context) {
                     }
                 }
             }
-            binding.btnReg.setOnClickListener(regClk)
+            binding.btnReg.setOnClickListener{
+                binding.btnReg.isGone = regClk.invoke()
+            }
             log.show()
         }
 
@@ -55,8 +54,4 @@ class UserPops(context: Context) {
             }
             log.show()
         }
-
-    fun startModelLockPopUp() {
-
-    }
 }

@@ -81,14 +81,4 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
             }
         }
     }
-
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        if (isPlay) progress?.startGradient()
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        progress?.stopGradient()
-    }
 }

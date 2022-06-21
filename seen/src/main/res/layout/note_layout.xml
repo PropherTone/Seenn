@@ -95,7 +95,7 @@
             android:id="@+id/note_action"
             android:layout_width="@dimen/action_icon"
             android:layout_height="@dimen/action_icon"
-            android:background="@color/blue_3"
+            android:background="@color/blue_1"
             android:onClick="@{()->self.handleBucketEvent()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

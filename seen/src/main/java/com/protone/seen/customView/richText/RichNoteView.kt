@@ -133,7 +133,6 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     private fun insertText(note: RichNoteStates) {
-//        if (!inIndex) richList.add(note)
         addView(when (isEditable) {
             true ->
                 EditText(context).apply {
@@ -141,7 +140,7 @@ class RichNoteView @JvmOverloads constructor(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
-                    setBackgroundColor(Color.WHITE)
+                    background = null
                     setText(note.text)
                     setOnKeyListener { _, keyCode, event ->
                         //Noticed if no text to delete when delete key pressed
@@ -163,14 +162,13 @@ class RichNoteView @JvmOverloads constructor(
                                         insertText(RichNoteStates("", arrayListOf()))
                                     }
                                 }
-
                             }
                         }
                         false
                     }
                     addTextChangedListener(object : MyTextWatcher {
                         override fun afterTextChanged(s: Editable?) {
-                            curPosition = this@RichNoteView.indexOfChild(this@apply)
+                            if (!inIndex) curPosition = this@RichNoteView.indexOfChild(this@apply)
                             getCurRichStates().let {
                                 if (it is RichNoteStates) it.apply {
                                     text = s
@@ -189,10 +187,12 @@ class RichNoteView @JvmOverloads constructor(
                     })
                     setOnFocusChangeListener { _, hasFocus ->
                         if (hasFocus) {
-                            curPosition = this@RichNoteView.indexOfChild(this)
+                            if (!inIndex) curPosition = this@RichNoteView.indexOfChild(this)
                         }
                     }
-                    setOnClickListener { curPosition = this@RichNoteView.indexOfChild(this) }
+                    setOnClickListener {
+                        if (!inIndex) curPosition = this@RichNoteView.indexOfChild(this)
+                    }
                     setOnTouchListener { _, _ ->
                         this@RichNoteView.indexOfChild(this)
                         performClick()
@@ -262,15 +262,10 @@ class RichNoteView @JvmOverloads constructor(
 
     private fun getBitmapWH(dba: Bitmap): IntArray? {
         return try {
-//            val option = BitmapFactory.Options().apply {
-//                inJustDecodeBounds = true
-//            }
-            //            val dba = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size, option)
             val height = dba.height
             val width = dba.width
             val index = width / height
             val bmH = Config.screenWidth / index
-            //            dba.recycle()
             intArrayOf(Config.screenWidth, bmH)
         } catch (e: Exception) {
             null
@@ -304,12 +299,15 @@ class RichNoteView @JvmOverloads constructor(
             } else if (photo.path != null) {
                 ba?.recycle()
                 val bitmapWH = getWHFromPath(photo.path)
-                Glide.with(context).asDrawable().load(photo.path).let { glide ->
-                    if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
-                }.into(this.richPhotoIv)
+                Glide.with(context).asDrawable()
+                    .load(photo.path).error(R.drawable.ic_baseline_error_outline_24_black)
+                    .let { glide ->
+                        if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
+                    }.into(this.richPhotoIv)
             } else if (ba != null) {
                 val bitmapWH = getBitmapWH(ba)
-                Glide.with(context).load(photo.uri).let { glide ->
+                Glide.with(context).asDrawable().load(photo.uri)
+                    .error(R.drawable.ic_baseline_error_outline_24_black).let { glide ->
                     if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
                 }.into(this.richPhotoIv)
                 richPhotoTitle.text = photo.name
@@ -406,6 +404,7 @@ class RichNoteView @JvmOverloads constructor(
                 for (i in 0 until childCount) {
                     when (val tag = getChildAt(i).tag) {
                         is RichNoteStates -> {
+                            richStates = richStates * 10 + TEXT
                             taskChannel.offer(
                                 Pair(
                                     RichNoteSer(
@@ -414,15 +413,13 @@ class RichNoteView @JvmOverloads constructor(
                                     ).toJson(), i
                                 )
                             )
-                            richStates = richStates * 10 + TEXT
                         }
                         is RichVideoStates -> {
-                            async(Dispatchers.IO) {
-                                taskChannel.offer(Pair(tag.toJson(), i))
-                                richStates = richStates * 10 + VIDEO
-                            }.start()
+                            richStates = richStates * 10 + VIDEO
+                            taskChannel.offer(Pair(tag.toJson(), i))
                         }
                         is RichPhotoStates -> {
+                            richStates = richStates * 10 + PHOTO
                             val child = getChildAt(i)
                             async(Dispatchers.IO) {
                                 tag.uri.toBitmap(child.measuredWidth, child.measuredHeight)
@@ -433,12 +430,11 @@ class RichNoteView @JvmOverloads constructor(
                                         }
                                     }
                                 taskChannel.offer(Pair(tag.toJson(), i))
-                                richStates = richStates * 10 + PHOTO
                             }.start()
                         }
                         is RichMusicStates -> {
-                            taskChannel.offer(Pair(tag.toJson(), i))
                             richStates = richStates * 10 + MUSIC
+                            taskChannel.offer(Pair(tag.toJson(), i))
                         }
                     }
                 }
@@ -454,7 +450,7 @@ class RichNoteView @JvmOverloads constructor(
     private inline fun insertMedia(func: (Int) -> Unit) {
         var insertPosition = curPosition
         if (!inIndex) {
-            //While inserting a view,delete the empty edittext at the top of target(Image)
+            //While inserting a view,delete the empty edittext at the top of the target(Image)
             if (isEditable && insertPosition in 0 until childCount) {
                 val child = getChildAt(insertPosition)
                 if (child is EditText && child.text.isEmpty()) {
@@ -464,7 +460,7 @@ class RichNoteView @JvmOverloads constructor(
             }
         }
         var index = insertPosition + if (!inIndex) 1 else 0
-        if (index >= childCount) index = childCount - 1
+        if (index >= childCount) index = childCount
         func(index)
         //Insert a edittext to make sure there have a place for input
         if (isEditable && !inIndex) insertText(

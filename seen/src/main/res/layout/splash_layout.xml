@@ -6,10 +6,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.protone.seen.customView.GradientView
+        <com.protone.seen.customView.AnimateGradientView
             android:layout_width="match_parent"
-            app:color1="@color/blue_1"
-            app:color2="@color/blue_5"
+            app:color1="@color/blue_5"
+            app:color2="@color/blue_1"
             android:layout_height="match_parent" />
 
         <TextView

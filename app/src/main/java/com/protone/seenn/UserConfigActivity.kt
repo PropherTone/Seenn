@@ -1,6 +1,8 @@
 package com.protone.seenn
 
 import androidx.activity.result.contract.ActivityResultContracts
+import com.bumptech.glide.Glide
+import com.protone.api.context.Global
 import com.protone.api.context.intent
 import com.protone.api.json.toEntity
 import com.protone.api.toMediaBitmapByteArray
@@ -11,8 +13,10 @@ import com.protone.seen.UserConfigSeen
 import com.protone.seen.dialog.CheckListDialog
 import com.protone.seen.dialog.TitleDialog
 import com.protone.seen.popWindows.UserPops
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.withContext
 
 class UserConfigActivity : BaseActivity<UserConfigSeen>() {
 
@@ -35,7 +39,8 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                 event.onReceive {}
                 userConfigSeen.viewEvent.onReceive {
                     when (it) {
-                        UserConfigSeen.UserEvent.Login -> UserPops(this@UserConfigActivity).startLoginPopUp(userConfig.userName != "",
+                        UserConfigSeen.UserEvent.Login -> UserPops(this@UserConfigActivity).startLoginPopUp(
+                            userConfig.userName != "",
                             { name, password ->
                                 return@startLoginPopUp when {
                                     userConfig.userName == "" -> false
@@ -49,12 +54,15 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                                 }
                             },
                             {
+                                var result = false
                                 UserPops(this@UserConfigActivity).startRegPopUp { s, s2 ->
                                     userConfig.userName = s
                                     userConfig.userPassword = s2
                                     userConfig.isLogin = true
-                                    true
+                                    result = true
+                                    result
                                 }
+                                result
                             })
                         UserConfigSeen.UserEvent.Icon -> startActivityForResult(
                             ActivityResultContracts.StartActivityForResult(),
@@ -92,6 +100,17 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                         UserConfigSeen.UserEvent.Lock -> startLockListPop()
                         UserConfigSeen.UserEvent.Unlock -> startUnlockListPop()
                         UserConfigSeen.UserEvent.Finish -> finish()
+                        UserConfigSeen.UserEvent.ClearCache -> {
+                            withContext(Dispatchers.IO){
+                                Glide.get(Global.application).apply {
+                                    clearDiskCache()
+                                    withContext(Dispatchers.Main){
+                                        clearMemory()
+                                        toast(getString(R.string.success))
+                                    }
+                                }
+                            }
+                        }
                         UserConfigSeen.UserEvent.Refresh -> userConfigSeen.refreshLayout()
                     }
                 }

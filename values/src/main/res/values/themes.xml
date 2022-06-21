@@ -9,6 +9,7 @@
         <item name="colorSecondary">@color/blue_5</item>
         <item name="colorSecondaryVariant">@color/blue_2</item>
         <item name="colorOnSecondary">@color/blue_3</item>
+
         <!-- Status bar color. -->
 
         <item name="android:windowTranslucentNavigation">true</item>
