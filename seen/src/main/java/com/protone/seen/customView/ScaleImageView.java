@@ -2,8 +2,10 @@ package com.protone.seen.customView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.net.Uri;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
@@ -19,41 +21,78 @@ public class ScaleImageView extends androidx.appcompat.widget.AppCompatImageView
     private float Finger2DownY;
     private double oldDistance;
 
-    public static final float SCALE_MAX = 5.0f;
-    //    private static final float SCALE_MIN = 1.0f;
+    private static final float SCALE_MAX = 5.0f;
+    private static final float SCALE_MID = 2.5f;
+    private static final float SCALE_MIN = 1.0f;
+
+    private float clkX;
+    private float clkY;
 
     private final long[] clk = new long[2];
 
-    private final OnClickListener listener = v -> {
-        System.arraycopy(clk, 1, clk, 0, clk.length - 1);
-        clk[clk.length - 1] = SystemClock.uptimeMillis();
-        if (clk[clk.length - 1] - clk[0] < 300) {
+    private int zoomIn = 0;
 
-        }
-    };
-
-
-    public ScaleImageView(@NonNull @NotNull Context context) {
+    public ScaleImageView(@NonNull Context context) {
         super(context);
-        setOnClickListener(listener);
     }
 
-    public ScaleImageView(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs) {
+    public ScaleImageView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+    }
+
+    public ScaleImageView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+    public void load(Uri uri){
+
+    }
+
+    public void openDoubleClick(){
+        setClickable(true);
+        setFocusable(true);
+        OnClickListener listener = v -> {
+            System.arraycopy(clk, 1, clk, 0, clk.length - 1);
+            clk[clk.length - 1] = SystemClock.uptimeMillis();
+            if (clk[clk.length - 1] - clk[0] < 300) {
+                performZoom();
+            }
+        };
         setOnClickListener(listener);
     }
 
-    @Override
-    public void setOnClickListener(@Nullable OnClickListener l) {
+    public void performZoom(){
+        switch (zoomIn) {
+            case 0:
+                setPivotXYNoCalculate(clkX, clkY);
+                animateScale(SCALE_MID, SCALE_MID);
+                zoomIn++;
+                break;
+            case 1:
+                setPivotXYNoCalculate(clkX, clkY);
+                animateScale(SCALE_MAX, SCALE_MAX);
+                zoomIn++;
+                break;
+            case 2:
+                animateScale(SCALE_MIN, SCALE_MIN);
+                zoomIn = 0;
+                break;
+        }
+    }
 
-        super.setOnClickListener(l);
+    private void setPivotXYNoCalculate(float x, float y) {
+        setPivotX(x);
+        setPivotY(y);
+    }
+
+    private void animateScale(float x, float y) {
+        animate().scaleX(x).scaleY(y).setDuration(100).start();
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         int fingerCounts = ev.getPointerCount();
-//        if (fingerCounts == 2) getParent().requestDisallowInterceptTouchEvent(true);
         switch (ev.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_UP:
                 if (fingerCounts == 2) {
@@ -86,6 +125,8 @@ public class ScaleImageView extends androidx.appcompat.widget.AppCompatImageView
                     return true;
                 }
             case MotionEvent.ACTION_POINTER_DOWN:
+                clkX = ev.getX();
+                clkY = ev.getY();
                 if (fingerCounts == 2) {
                     Finger1DownX = ev.getX(0);
                     Finger1DownY = ev.getY(0);
@@ -137,7 +178,6 @@ public class ScaleImageView extends androidx.appcompat.widget.AppCompatImageView
     }
 
     private double spacing(MotionEvent event) {
-
         if (event.getPointerCount() == 2) {
             float x = event.getX(0) - event.getX(1);
             float y = event.getY(0) - event.getY(1);
@@ -145,6 +185,6 @@ public class ScaleImageView extends androidx.appcompat.widget.AppCompatImageView
         } else {
             return 0;
         }
-
     }
 }
+

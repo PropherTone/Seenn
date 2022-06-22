@@ -50,7 +50,6 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
         val noteEditSeen = NoteEditSeen(this)
         val noteName = intent.getStringExtra(NOTE)
 
-
         var onEdit = false
         val noteByName = noteName?.let {
             withContext(Dispatchers.IO) {

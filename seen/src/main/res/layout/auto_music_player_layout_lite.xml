@@ -89,7 +89,7 @@
             app:layout_constraintStart_toStartOf="@id/music_name"
             app:layout_constraintTop_toTopOf="@id/music_name" />
 
-        <com.protone.seen.customView.AutoSizeTextView
+        <TextView
             android:id="@+id/music_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -99,7 +99,7 @@
             android:lines="1"
             android:text="@string/model_music"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="@dimen/subContent_text"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/music_cover_back"
             app:layout_constraintEnd_toStartOf="@id/music_control"

@@ -15,12 +15,13 @@ import kotlinx.coroutines.selects.select
 
 
 /**
- * Design and code by ProTone
+ * By ProTone
  *   2022/1/23
  */
 class MainActivity : BaseActivity<MainSeen>() {
 
     override suspend fun main() {
+        setTranslucentStatues()
         val mainSeen = MainSeen(this)
         setContentSeen(mainSeen)
         mainSeen.beginTransition()

@@ -30,7 +30,8 @@
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.SeennTranslucentStatus" />
         <activity android:name=".NoteSyncActivity" />
         <activity android:name=".NoteActivity" />
         <activity android:name=".PictureBoxActivity" />

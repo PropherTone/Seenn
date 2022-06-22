@@ -1,5 +1,6 @@
 package com.protone.seen
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
@@ -12,9 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.animation.AnimationHelper
-import com.protone.api.context.layoutInflater
-import com.protone.api.context.onUiThread
-import com.protone.api.context.root
+import com.protone.api.context.*
 import com.protone.mediamodle.note.entity.RichMusicStates
 import com.protone.mediamodle.note.entity.RichNoteStates
 import com.protone.mediamodle.note.entity.RichPhotoStates
@@ -62,6 +61,13 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
                     -verticalOffset / appBarLayout.totalScrollRange.toFloat()
             })
         binding.self = this
+        (context as Activity).setSoftInputStatuesListener { height, isShow ->
+            if (isShow) {
+                binding.root.marginBottom(height)
+            } else {
+                binding.root.marginBottom(0)
+            }
+        }
         binding.noteEditRichNote.apply {
             isEditable = true
             setRichList(listOf(RichNoteStates("", arrayListOf())))

@@ -26,10 +26,6 @@ class MyVideoPlayer @JvmOverloads constructor(
     MediaPlayer.OnCompletionListener,
     MediaPlayer.OnPreparedListener {
 
-
-//    private val binding =
-//        VideoPlayerLayoutBinding.inflate(context.layoutInflater, this, true)
-
     private var isPrepared: Boolean = false
     private lateinit var path: Uri
 
@@ -38,16 +34,10 @@ class MyVideoPlayer @JvmOverloads constructor(
     fun setFullScreen(listener: () -> Unit) {
         videoController.fullScreen = listener
     }
-//        get() {
-//            return binding.videoController
-//        }
 
     private var mediaPlayer: MediaPlayer? = null
     private val textureView: MyTextureView? by lazy { MyTextureView(context) }
 
-    //        get() {
-//            return binding.videoView
-//        }
     private var surface: Surface? = null
     private var surfaceTexture: SurfaceTexture? = null
         set(value) {

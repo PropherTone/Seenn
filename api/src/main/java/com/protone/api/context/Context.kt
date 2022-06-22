@@ -2,13 +2,11 @@ package com.protone.api.context
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Point
-import android.os.Build
+import android.graphics.Rect
 import android.os.Looper
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,41 +25,75 @@ val Context.root: ViewGroup?
     }
 
 val Context.statuesBarHeight: Int
-    get() = resources.getDimensionPixelSize(
-        resources.getIdentifier(
-            "status_bar_height",
-            "dimen",
-            "android"
-        )
-
-    )
+    get() {
+        val resourceId: Int = resources.getIdentifier("status_bar_height", "dimen", "android")
+        var height = 0
+        if (resourceId > 0) {
+            height = resources.getDimensionPixelSize(resourceId)
+        }
+        return height
+    }
 
 val Context.navigationBarHeight: Int
-    get() = resources.getDimensionPixelSize(
-        resources.getIdentifier(
-            "navigation_bar_height",
-            "dimen",
-            "android"
-        )
-    )
-
-val Context.currentHeight: Int
-    get() = if (this is Activity) {
-        val display = windowManager.defaultDisplay
-        val outPoint = Point()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            windowManager.currentWindowMetrics.bounds.height()
-        } else {
-            display.getRealSize(outPoint)
-            outPoint.y
+    get() {
+        val resourceId: Int = resources.getIdentifier("navigation_bar_height", "dimen", "android")
+        var height = 0
+        if (resourceId > 0) {
+            height = resources.getDimensionPixelSize(resourceId)
         }
-    } else 0
+        return height
+    }
 
-val Context.getHeight: Int
-    get() = resources.displayMetrics.heightPixels
+fun Activity.setSoftInputStatuesListener(onSoftInput: ((Int, Boolean) -> Unit)? = null) {
+    window.decorView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+        val rect = Rect()
+        window.decorView.getWindowVisibleDisplayFrame(rect)
+        val i = window.decorView.height - rect.bottom - navigationBarHeight
+        onSoftInput?.invoke(i, i > 0)
+    }
+}
 
-val Context.hasNavigationBar: Boolean
-    get() = currentHeight > getHeight
+fun androidx.appcompat.app.AlertDialog.fitSoftInput(context: Context, len: Int) {
+    val attributes = window?.attributes
+    val oldY = attributes?.y
+    if (context is Activity) {
+        context.setSoftInputStatuesListener { _, b ->
+            if (b) {
+                attributes?.y = attributes?.y?.minus(len)
+                onWindowAttributesChanged(attributes)
+            } else {
+                attributes?.y = oldY
+                onWindowAttributesChanged(attributes)
+            }
+        }
+    }
+}
+
+fun View.marginBottom(margin: Int) {
+    if (this !is ViewGroup) return
+    val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams
+    marginLayoutParams.bottomMargin = margin
+    layoutParams = marginLayoutParams
+}
+
+val Activity.hasNavigationBar: Boolean
+    get() {
+        return this.baseContext.navigationBarHeight > 0
+    }
+
+val Activity.isNavigationBar: Boolean
+    get() {
+        val vp = window.decorView as? ViewGroup
+        if (vp != null) {
+            for (i in 0 until vp.childCount) {
+                vp.getChildAt(i).context.packageName
+                if (vp.getChildAt(i).id != -1 && "navigationBarBackground" ==
+                    resources.getResourceEntryName(vp.getChildAt(i).id)
+                ) return true
+            }
+        }
+        return false
+    }
 
 inline fun Context.onUiThread(crossinline function: () -> Unit) {
     if (Looper.getMainLooper() == Looper.myLooper()) {

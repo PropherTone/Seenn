@@ -14,7 +14,8 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:elevation="0dp">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/noteEdit_toolbar"
@@ -26,6 +27,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:elevation="@dimen/small_elevation"
                 android:minHeight="@dimen/list_icon"
                 app:layoutDescription="@xml/note_edit_layout_scene"
                 app:layout_constraintTop_toTopOf="parent"
@@ -123,7 +125,8 @@
             <com.protone.seen.customView.richText.RichNoteView
                 android:id="@+id/noteEdit_richNote"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:elevation="0dp" />
 
         </androidx.core.widget.NestedScrollView>
 

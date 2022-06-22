@@ -17,7 +17,6 @@
                 android:id="@+id/music_back_1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/main_background"
                 android:contentDescription="@string/icon"
                 android:scaleType="centerCrop"
                 app:layout_constraintHeight_percent="1"
@@ -88,7 +87,7 @@
             app:layout_constraintStart_toStartOf="@id/music_name"
             app:layout_constraintTop_toTopOf="@id/music_name" />
 
-        <com.protone.seen.customView.AutoSizeTextView
+        <TextView
             android:id="@+id/music_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -98,7 +97,6 @@
             android:lines="1"
             android:text="@string/model_music"
             android:textColor="@color/white"
-            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/music_progress"
             app:layout_constraintEnd_toEndOf="@id/music_back"

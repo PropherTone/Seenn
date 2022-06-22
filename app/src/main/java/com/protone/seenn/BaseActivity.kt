@@ -2,9 +2,11 @@ package com.protone.seenn
 
 import android.content.ComponentName
 import android.content.ServiceConnection
+import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.appcompat.app.AppCompatActivity
@@ -17,7 +19,6 @@ import com.protone.database.sp.config.UserConfig
 import com.protone.seen.Seen
 import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seenn.service.MusicService
-import com.protone.seenn.theme.ThemeProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import java.util.concurrent.atomic.AtomicInteger
@@ -100,6 +101,16 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
                 it.resume(Unit)
             }
         }
+    }
+
+    fun setTranslucentStatues(){
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+        var systemUiVisibility = window.decorView.systemUiVisibility
+        systemUiVisibility = systemUiVisibility or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        systemUiVisibility = systemUiVisibility or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        window.decorView.systemUiVisibility = systemUiVisibility
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = Color.TRANSPARENT
     }
 
     fun bindMusicService(block: () -> Unit) {

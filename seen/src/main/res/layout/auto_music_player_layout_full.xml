@@ -83,11 +83,11 @@
             android:layout_height="0dp"
             android:background="@drawable/round_background_fore_dark"
             app:layout_constraintBottom_toBottomOf="@id/music_detail"
-            app:layout_constraintEnd_toEndOf="@id/music_name"
-            app:layout_constraintStart_toStartOf="@id/music_name"
+            app:layout_constraintEnd_toEndOf="@id/music_detail"
+            app:layout_constraintStart_toStartOf="@id/music_detail"
             app:layout_constraintTop_toTopOf="@id/music_name" />
 
-        <com.protone.seen.customView.AutoSizeTextView
+        <TextView
             android:id="@+id/music_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -106,7 +106,7 @@
             app:layout_constraintVertical_bias="0.04"
             app:layout_constraintWidth_percent="0.46" />
 
-        <com.protone.seen.customView.AutoSizeTextView
+        <TextView
             android:id="@+id/music_detail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -114,7 +114,6 @@
             android:lines="1"
             android:text="@string/music_bucket_name"
             android:textColor="@color/white"
-            android:textSize="@dimen/small_title_text"
             app:layout_constraintEnd_toEndOf="@id/music_name"
             app:layout_constraintStart_toStartOf="@id/music_name"
             app:layout_constraintTop_toBottomOf="@id/music_name"

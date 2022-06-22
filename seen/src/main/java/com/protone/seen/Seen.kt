@@ -1,11 +1,13 @@
 package com.protone.seen
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.protone.api.context.hasNavigationBar
+import com.protone.api.context.isNavigationBar
 import com.protone.api.context.navigationBarHeight
 import com.protone.api.context.statuesBarHeight
 import kotlinx.coroutines.CoroutineScope
@@ -27,7 +29,7 @@ abstract class Seen<C>(val context: Context) :
         context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
     /**
-     * Let view padding top to full the toolbar
+     * Let the view padding top to full the toolbar
      */
     protected fun initToolBar() {
         getToolBar()?.apply {
@@ -51,9 +53,8 @@ abstract class Seen<C>(val context: Context) :
         setNavigation()
     }
 
-
     fun setNavigation() {
-        if (context.hasNavigationBar) viewRoot.apply {
+        if (context is Activity && (context.hasNavigationBar || context.isNavigationBar)) viewRoot.apply {
             setPadding(
                 paddingLeft,
                 paddingTop,

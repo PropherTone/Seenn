@@ -1,12 +1,7 @@
 package com.protone.seen.adapter
 
-import android.content.ContentResolver
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
-import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -18,7 +13,6 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.databinding.PictureBoxAdapterLayoutBinding
-import java.net.URL
 import kotlin.math.roundToInt
 
 class PictureBoxAdapter(context: Context, private val picUri: MutableList<GalleyMedia>) :
@@ -35,9 +29,10 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galley
 
     override fun onBindViewHolder(holder: Holder<PictureBoxAdapterLayoutBinding>, position: Int) {
         holder.binding.imageView.let { image ->
+            image.openDoubleClick()
             image.scaleType = ImageView.ScaleType.FIT_XY
             Glide.with(context).load(picUri[position].uri)
-                .addListener(object : RequestListener<Drawable>{
+                .addListener(object : RequestListener<Drawable> {
                     override fun onResourceReady(
                         resource: Drawable?,
                         model: Any?,

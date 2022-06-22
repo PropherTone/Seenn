@@ -6,7 +6,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <ImageView
+        <com.protone.seen.customView.ScaleImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="500dp"

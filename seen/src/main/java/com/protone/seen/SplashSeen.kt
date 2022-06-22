@@ -1,11 +1,9 @@
 package com.protone.seen
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import com.protone.api.Config
-import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.seen.databinding.SplashLayoutBinding

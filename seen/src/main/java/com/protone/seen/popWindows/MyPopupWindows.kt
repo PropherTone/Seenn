@@ -1,10 +1,12 @@
 package com.protone.seen.popWindows
 
+import android.app.Activity
 import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isGone
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
+import com.protone.api.context.setSoftInputStatuesListener
 import com.protone.seen.databinding.LoginPopLayoutBinding
 import com.protone.seen.databinding.RegPopLayoutBinding
 import java.lang.ref.WeakReference
@@ -38,6 +40,19 @@ class UserPops(context: Context) {
                 binding.btnReg.isGone = regClk.invoke()
             }
             log.show()
+            val attributes = log.window?.attributes
+            val oldY = attributes?.y
+            if (context is Activity) {
+                context.setSoftInputStatuesListener { i, b ->
+                    if (b) {
+                        attributes?.y = attributes?.y?.minus(binding.root.measuredHeight / 2)
+                        log.onWindowAttributesChanged(attributes)
+                    } else {
+                        attributes?.y = oldY
+                        log.onWindowAttributesChanged(attributes)
+                    }
+                }
+            }
         }
 
     fun startRegPopUp(confirmCall: (String, String) -> Boolean) =
@@ -53,5 +68,18 @@ class UserPops(context: Context) {
                 }
             }
             log.show()
+            val attributes = log.window?.attributes
+            val oldY = attributes?.y
+            if (context is Activity) {
+                context.setSoftInputStatuesListener { i, b ->
+                    if (b) {
+                        attributes?.y = attributes?.y?.minus(binding.root.measuredHeight / 2)
+                        log.onWindowAttributesChanged(attributes)
+                    } else {
+                        attributes?.y = oldY
+                        log.onWindowAttributesChanged(attributes)
+                    }
+                }
+            }
         }
 }

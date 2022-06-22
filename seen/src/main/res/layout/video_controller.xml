@@ -21,8 +21,10 @@
         android:id="@+id/v_start"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:background="@drawable/ic_baseline_play_arrow_24_white"
+        android:background="@drawable/oval_fore_dark"
         android:contentDescription="@string/action"
+        android:padding="@dimen/icon_padding_lite"
+        android:src="@drawable/ic_baseline_play_arrow_24_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -30,10 +32,10 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/v_Container"
-        android:visibility="invisible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/transparent_black"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <com.protone.seen.customView.ColorfulProgressBar
@@ -45,10 +47,11 @@
 
         <ImageView
             android:id="@+id/v_control"
-            android:layout_width="@dimen/action_icon"
+            android:layout_width="@dimen/action_icon_p"
             android:layout_height="@dimen/action_icon_p"
-            android:background="@drawable/ic_baseline_play_arrow_24_white"
             android:contentDescription="@string/action"
+            android:padding="@dimen/icon_padding_lite"
+            android:src="@drawable/ic_baseline_play_arrow_24_white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -58,8 +61,8 @@
             android:id="@+id/v_full"
             android:layout_width="@dimen/action_icon"
             android:layout_height="@dimen/action_icon"
-            android:contentDescription="@string/action"
             android:layout_marginEnd="@dimen/main_margin"
+            android:contentDescription="@string/action"
             android:src="@drawable/ic_baseline_fullscreen_24_white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
