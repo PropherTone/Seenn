@@ -58,6 +58,12 @@ class MusicActivity : BaseActivity<MusicSeen>() {
             musicSeen.playPosition()
         }
 
+        Medias.mediaLive.observe(this) {
+            if (it == Medias.AUDIO_UPDATED) {
+                workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
+            }
+        }
+
         doOnFinish {
             musicSeen.clearMer()
             musicController.finish()

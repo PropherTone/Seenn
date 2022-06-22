@@ -6,6 +6,7 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.protone.api.context.layoutInflater
+import com.protone.api.context.navigationBarHeight
 import com.protone.api.context.root
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.adapter.PictureBoxAdapter
@@ -25,7 +26,6 @@ class PictureBoxSeen(context: Context) : Seen<PictureBoxSeen.PictureBox>(context
     override fun getToolBar(): View = binding.root
 
     init {
-        initToolBar()
         binding.self = this
     }
 

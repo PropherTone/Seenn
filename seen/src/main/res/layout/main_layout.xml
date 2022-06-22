@@ -28,7 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layoutDescription="@xml/main_layout_scene"
-                app:layout_scrollFlags="scroll|snap|exitUntilCollapsed">
+                app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <View
                     android:id="@+id/userCard"

@@ -21,12 +21,13 @@ class MusicListAdapter(context: Context) :
         set(value) {
             field.clear()
             field.addAll(value)
+            if (selectList.size >= 1) playPosition = field.indexOf(selectList[0])
             notifyDataSetChanged()
         }
 
     var clickCallback: (Music) -> Unit? = {}
 
-    private var playPosition = 0
+    private var playPosition = -1
 
     override val select: (holder: Holder<MusicListLayoutBinding>, isSelect: Boolean) -> Unit =
         { holder, isSelect ->
@@ -115,6 +116,8 @@ class MusicListAdapter(context: Context) :
             notifyItemChanged(playPosition)
             playPosition = musicList.indexOf(music)
             notifyItemChanged(playPosition)
+        } else {
+            playPosition = -1
         }
     }
 

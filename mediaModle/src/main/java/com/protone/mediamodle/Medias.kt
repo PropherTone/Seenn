@@ -40,7 +40,9 @@ object Medias {
         allPhoto?.forEach {
             ca.timeInMillis = it.date * 1000
             if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH)
-                && ca.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)
+                && ca.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH) && ca.get(
+                    Calendar.YEAR
+                ) != now.get(Calendar.YEAR)
             ) {
                 return it
             }
@@ -59,7 +61,9 @@ object Medias {
         allVideo?.forEach {
             ca.timeInMillis = it.date * 1000
             if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH)
-                && ca.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)
+                && ca.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH) && ca.get(
+                    Calendar.YEAR
+                ) != now.get(Calendar.YEAR)
             ) {
                 return it
             }
@@ -75,7 +79,9 @@ object Medias {
         music.forEach {
             ca.timeInMillis = it.year * 1000
             if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH)
-                && ca.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)
+                && ca.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH) && ca.get(
+                    Calendar.YEAR
+                ) != now.get(Calendar.YEAR)
             ) {
                 return it
             }
@@ -83,26 +89,12 @@ object Medias {
         return music.let { it[(it.indices).random()] }
     }
 
-    fun noteInToday(): Note? {
-        val ca = Calendar.getInstance(Locale.getDefault())
-        val now = Calendar.getInstance(Locale.getDefault()).apply {
-            timeInMillis = System.currentTimeMillis()
-        }
+    fun randomNote(): Note? {
         val allNote = runBlocking(Dispatchers.IO) {
             DataBaseDAOHelper.getAllNote()
         }
-        allNote?.forEach {
-            ca.timeInMillis = it.time * 1000
-            if (ca.get(Calendar.MONTH) == now.get(Calendar.MONTH)
-                && ca.get(Calendar.DAY_OF_MONTH) == now.get(Calendar.DAY_OF_MONTH)
-            ) {
-                return it
-            }
-        }
         return allNote?.let { if (it.isEmpty()) null else it[(it.indices).random()] }
     }
-
-    val musicState by lazy { MutableLiveData<MusicState>() }
 }
 
 data class MusicState(

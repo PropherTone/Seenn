@@ -101,10 +101,10 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                         UserConfigSeen.UserEvent.Unlock -> startUnlockListPop()
                         UserConfigSeen.UserEvent.Finish -> finish()
                         UserConfigSeen.UserEvent.ClearCache -> {
-                            withContext(Dispatchers.IO){
+                            withContext(Dispatchers.IO) {
                                 Glide.get(Global.application).apply {
                                     clearDiskCache()
-                                    withContext(Dispatchers.Main){
+                                    withContext(Dispatchers.Main) {
                                         clearMemory()
                                         toast(getString(R.string.success))
                                     }

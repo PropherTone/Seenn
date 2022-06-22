@@ -5,7 +5,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_marginBottom="@dimen/small_elevation"
+        android:background="@color/white"
+        android:elevation="@dimen/small_elevation"
         android:layout_height="@dimen/user_icon">
 
         <ImageView

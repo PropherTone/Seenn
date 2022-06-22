@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
+import com.protone.api.Config
 import com.protone.api.context.layoutInflater
 import com.protone.api.toDateString
 import com.protone.api.toDrawable
@@ -33,7 +34,7 @@ class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBindi
             }
             noteList[holder.layoutPosition].let {
                 it.imagePath.toDrawable(context) { drawable ->
-                    noteBack.background = drawable
+                    noteBack.setImageDrawable(drawable)
                 }
                 noteTitle.text = it.title
                 noteDate.text = it.time.toDateString()

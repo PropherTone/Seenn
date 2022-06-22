@@ -16,7 +16,7 @@ class PictureBoxActivity : BaseActivity<PictureBoxSeen>() {
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun main() {
-
+        setTranslucentStatues()
         val pictureBoxSeen = PictureBoxSeen(this)
 
         setContentSeen(pictureBoxSeen)

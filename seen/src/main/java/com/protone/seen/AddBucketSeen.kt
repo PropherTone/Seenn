@@ -1,5 +1,6 @@
 package com.protone.seen
 
+import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -7,7 +8,9 @@ import android.view.View
 import com.bumptech.glide.Glide
 import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
+import com.protone.api.context.marginBottom
 import com.protone.api.context.root
+import com.protone.api.context.setSoftInputStatuesListener
 import com.protone.api.toMediaBitmapByteArray
 import com.protone.seen.databinding.AddBucketLayoutBinding
 
@@ -48,6 +51,13 @@ class AddBucketSeen(context: Context) : Seen<AddBucketSeen.Event>(context) {
     init {
         initToolBar()
         binding.self = this
+        if (context is Activity) context.setSoftInputStatuesListener { i, b ->
+            if (b) {
+                binding.root.marginBottom(i)
+            } else {
+                binding.root.marginBottom(0)
+            }
+        }
     }
 
     override fun offer(event: Event) {

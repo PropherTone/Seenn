@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.context.layoutInflater
+import com.protone.api.context.navigationBarHeight
 import com.protone.api.context.root
 import com.protone.api.toDrawable
 import com.protone.api.todayDate
@@ -67,8 +68,21 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
             musicPlayer.apply {
                 duration
             }
+            actionBtnContainer.apply {
+                val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams
+                marginLayoutParams.bottomMargin = context.navigationBarHeight
+                layoutParams = marginLayoutParams
+            }
+            modelList.apply {
+                setPadding(
+                    paddingLeft,
+                    paddingTop,
+                    paddingRight,
+                    context.navigationBarHeight + btnH
+                )
+            }
+            refreshModelList()
         }
-
     }
 
     fun refreshModelList() {

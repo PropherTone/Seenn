@@ -53,7 +53,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                     musicListContainer.setBackgroundColor(
                         ContextCompat.getColor(
                             context,
-                            R.color.zima_blue
+                            R.color.blue_1
                         )
                     )
                     musicListName.setTextColor(ContextCompat.getColor(context, R.color.white))
@@ -62,13 +62,6 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                     startAnimation(musicListInContainer)
                 } else {
                     musicListPlayState.visibility = View.GONE
-//                    musicListPlayState.setImageDrawable(
-//                        ResourcesCompat.getDrawable(
-//                            context.resources,
-//                            R.drawable.ic_baseline_check_24,
-//                            null
-//                        )
-//                    )
                     musicListContainer.setBackgroundColor(
                         ContextCompat.getColor(
                             context,
@@ -163,7 +156,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
     }
 
     private fun notifyItemChanged() {
-        while (!viewQueue.isNullOrEmpty()) {
+        while (!viewQueue.isEmpty()) {
             val poll = viewQueue.poll()
             if (poll != null) {
                 context.onUiThread {
@@ -179,7 +172,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                 view.setImageDrawable(
                     ResourcesCompat.getDrawable(
                         context.resources,
-                        R.drawable.ic_baseline_check_24,
+                        R.drawable.ic_baseline_check_24_white,
                         null
                     )
                 )

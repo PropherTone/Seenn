@@ -1,6 +1,7 @@
 package com.protone.seen.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -41,6 +42,7 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+        Log.d("TAG", "onAttachedToRecyclerView: ")
         loadDataBelow()
     }
 
@@ -50,7 +52,7 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
             notifyItemInserted(itemList.size - 1)
             videoInToday()?.toJson()?.let { itemList.add("video:$it") }
             notifyItemInserted(itemList.size - 1)
-            noteInToday()?.toJson()?.let { itemList.add("tNote:$it") }
+            randomNote()?.toJson()?.let { itemList.add("tNote:$it") }
             notifyItemInserted(itemList.size - 1)
 //            musicInToday().toJson().let { itemList.add("music:$it") }
 //            notifyItemInserted(itemList.size - 1)
