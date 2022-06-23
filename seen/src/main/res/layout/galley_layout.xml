@@ -78,7 +78,7 @@
                 android:layout_marginEnd="@dimen/main_margin"
                 android:contentDescription="@string/action"
                 android:padding="@dimen/icon_padding"
-                android:src="@drawable/ic_baseline_check_24"
+                android:src="@drawable/ic_baseline_check_24_white"
                 android:visibility="gone" />
 
             <ImageView

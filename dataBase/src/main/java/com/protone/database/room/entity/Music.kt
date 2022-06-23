@@ -50,16 +50,11 @@ data class Music(
         result = 31 * result + title.hashCode()
         result = 31 * result + size.hashCode()
         result = 31 * result + album.hashCode()
-        result = 31 * result + albumID.hashCode()
         result = 31 * result + artist.hashCode()
         result = 31 * result + mimeType.hashCode()
         result = 31 * result + bucketDisplayName.hashCode()
-        result = 31 * result + (displayName?.hashCode() ?: 0)
         result = 31 * result + duration.hashCode()
         result = 31 * result + year.hashCode()
-        result = 31 * result + uri.hashCode()
-        result = 31 * result + myBucket.hashCode()
-        result = 31 * result + id.hashCode()
         return result
     }
 

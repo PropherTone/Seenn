@@ -7,6 +7,7 @@ import com.protone.api.context.intent
 import com.protone.api.json.toEntity
 import com.protone.api.toMediaBitmapByteArray
 import com.protone.database.room.entity.GalleyMedia
+import com.protone.database.sp.config.userConfig
 import com.protone.mediamodle.GalleyHelper
 import com.protone.seen.GalleySeen
 import com.protone.seen.UserConfigSeen

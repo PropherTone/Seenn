@@ -15,7 +15,6 @@ import com.protone.api.ActivityLifecycleOwner
 import com.protone.api.context.ActivityHolder
 import com.protone.api.context.intent
 import com.protone.api.context.musicIntentFilter
-import com.protone.database.sp.config.UserConfig
 import com.protone.seen.Seen
 import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seenn.service.MusicService
@@ -35,8 +34,6 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
         }
 
     private var serviceConnection: ServiceConnection? = null
-
-    protected val userConfig by lazy { UserConfig(this) }
 
     lateinit var binder: MusicService.MusicBinder
 

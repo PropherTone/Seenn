@@ -1,6 +1,7 @@
 package com.protone.api
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
@@ -114,15 +115,21 @@ private fun calculateInSampleSize(option: BitmapFactory.Options, h: Int, w: Int)
     return sampleSize
 }
 
+fun isInDebug(): Boolean {
+    return try {
+        val info: ApplicationInfo = Global.application.applicationInfo
+        (info.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+    } catch (e: java.lang.Exception) {
+        false
+    }
+}
+
 fun Uri.toBitmapByteArray(): ByteArray? {
     val mediaMetadataRetriever = MediaMetadataRetriever()
     var embeddedPicture: ByteArray? = null
     try {
         mediaMetadataRetriever.setDataSource(Global.application, this)
         embeddedPicture = mediaMetadataRetriever.embeddedPicture
-        embeddedPicture?.let {
-            BitmapFactory.decodeByteArray(it, 0, it.size)
-        }
     } catch (e: Exception) {
         e.printStackTrace()
     } finally {

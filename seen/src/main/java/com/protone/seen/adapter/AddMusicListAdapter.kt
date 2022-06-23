@@ -129,6 +129,9 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                                         if (re != -1 && re != 0) {
                                             changeIconAni(musicListPlayState)
                                         } else {
+                                            music.myBucket.apply {
+                                                (this as ArrayList).remove(bucket)
+                                            }
                                             selectList.remove(music)
                                             notifyItemChanged()
                                         }

@@ -21,12 +21,15 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="0dp">
+            android:background="@color/transparent"
+            android:elevation="0dp"
+            android:minHeight="0dp">
 
             <androidx.constraintlayout.motion.widget.MotionLayout
                 android:id="@+id/tool_motion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:elevation="0dp"
                 app:layoutDescription="@xml/main_layout_scene"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
@@ -136,10 +139,8 @@
                 <com.protone.seen.customView.musicPlayer.MusicPlayerViewMid
                     android:id="@+id/musicPlayer"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="150dp"
                     android:layout_marginTop="@dimen/main_margin"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintHeight_percent="0.36"
                     app:layout_constraintTop_toBottomOf="@id/noteBook" />
 
             </androidx.constraintlayout.motion.widget.MotionLayout>
@@ -153,6 +154,8 @@
             android:elevation="0dp"
             android:overScrollMode="never"
             android:paddingBottom="@dimen/action_icon_p"
+            app:layout_anchor="@id/toolbar"
+            app:layout_anchorGravity="bottom"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
         <LinearLayout

@@ -89,7 +89,7 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
         binding.modelList.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = MainModelListAdapter(context)
-            addItemDecoration(ModelListItemDecoration(context.resources.getDimensionPixelSize(R.dimen.main_margin)))
+            addItemDecoration(ModelListItemDecoration(0))
         }
     }
 

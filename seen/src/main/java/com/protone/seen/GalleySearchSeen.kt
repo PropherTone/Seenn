@@ -15,11 +15,17 @@ import com.protone.seen.itemDecoration.GalleyItemDecoration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class GalleySearchSeen(context: Context) : Seen<GalleySearchSeen.SearchEvent>(context) {
+class GalleySearchSeen(context: Context) : PopupCoverSeen<GalleySearchSeen.SearchEvent>(context) {
 
     enum class SearchEvent {
         Finish,
-        Query
+        Query,
+        DELETE,
+        MOVE_TO,
+        RENAME,
+        SELECT_ALL,
+        ADD_CATE,
+        IntoBOX
     }
 
     private val binding =
@@ -116,4 +122,11 @@ class GalleySearchSeen(context: Context) : Seen<GalleySearchSeen.SearchEvent>(co
         TransitionManager.beginDelayedTransition(binding.resultContainer)
         view.isGone = !view.isGone
     }
+
+    override fun popDelete() = offer(SearchEvent.DELETE)
+    override fun popMoveTo() = offer(SearchEvent.MOVE_TO)
+    override fun popRename() = offer(SearchEvent.RENAME)
+    override fun popSelectAll() = offer(SearchEvent.SELECT_ALL)
+    override fun popSetCate() = offer(SearchEvent.ADD_CATE)
+    override fun popIntoBox() = offer(SearchEvent.IntoBOX)
 }

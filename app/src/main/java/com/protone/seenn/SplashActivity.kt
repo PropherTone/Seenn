@@ -14,6 +14,7 @@ import com.protone.api.toBitmapByteArray
 import com.protone.api.todayDate
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
+import com.protone.database.sp.config.userConfig
 import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.Medias
 import com.protone.seen.SplashSeen
@@ -29,7 +30,7 @@ class SplashActivity : BaseActivity<SplashSeen>() {
     private val mHandler: Handler = Handler(Looper.getMainLooper()) {
         when (it.what) {
             1 -> {
-                if (!userConfig.isFirstBoot) {
+                if (userConfig.isFirstBoot) {
                     DataBaseDAOHelper.addMusicBucketThread(
                         MusicBucket(
                             getString(R.string.all_music),
@@ -41,9 +42,9 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                     )
                     DataBaseDAOHelper.insertMusicMulti(Medias.music)
                     userConfig.apply {
-                        isFirstBoot = true
+                        isFirstBoot = false
                         lastMusicBucket = getString(R.string.all_music)
-                        playedMusicPosition = 0
+                        playedMusicPosition = -1
                     }
                 }
                 startService(MusicService::class.intent)

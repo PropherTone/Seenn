@@ -213,6 +213,12 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
 
     override fun onGlobalLayout() {
         binding.apply {
+            appToolbar.setPadding(
+                appToolbar.paddingLeft,
+                appToolbar.paddingTop + context.statuesBarHeight,
+                appToolbar.paddingRight,
+                appToolbar.paddingBottom
+            )
             musicBucketContainer.let {
                 it.setPadding(
                     it.paddingLeft,
@@ -228,10 +234,10 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
             musicMusicList.setPadding(0, 0, 0, mySmallMusicPlayer.height)
             var value: ViewTreeObserver.OnGlobalLayoutListener? = null
             value = ViewTreeObserver.OnGlobalLayoutListener {
-                binding.appToolbar.setExpanded(false, false)
-                binding.appToolbar.viewTreeObserver.removeOnGlobalLayoutListener(value)
+                appToolbar.setExpanded(false, false)
+                appToolbar.viewTreeObserver.removeOnGlobalLayoutListener(value)
             }
-            binding.appToolbar.viewTreeObserver.addOnGlobalLayoutListener(value)
+            appToolbar.viewTreeObserver.addOnGlobalLayoutListener(value)
             root.viewTreeObserver.removeOnGlobalLayoutListener(this@MusicSeen)
         }
     }

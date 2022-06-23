@@ -14,6 +14,7 @@ import com.protone.api.json.toJson
 import com.protone.api.json.toUriJson
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
+import com.protone.database.sp.config.userConfig
 import com.protone.mediamodle.Medias
 import com.protone.mediamodle.media.IGalleyFragment
 import com.protone.seen.GalleySeen
@@ -135,10 +136,6 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
     }
 
     private fun GalleySeen.rename() = chooseData.value?.get(0)?.let {
-        if (it.path == null) {
-            toast(getString(R.string.not_supported))
-            return@let
-        }
         val mimeType = it.name.getFileMimeType()
         TitleDialog(
             context,

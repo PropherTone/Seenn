@@ -53,10 +53,10 @@
 
             <EditText
                 android:id="@+id/input_search"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="@dimen/action_icon"
                 android:layout_gravity="bottom"
-                android:layout_marginEnd="@dimen/texts_margin"
                 android:background="@drawable/round_background_fore_dark"
                 android:hint="@string/search"
                 android:inputType="textNoSuggestions"
@@ -65,6 +65,15 @@
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"
                 tools:ignore="Autofill,LabelFor" />
+
+            <ImageView
+                android:id="@+id/action_menu"
+                android:layout_width="@dimen/action_icon"
+                android:layout_height="@dimen/action_icon"
+                android:layout_gravity="bottom"
+                android:contentDescription="@string/action"
+                android:padding="@dimen/main_padding"
+                android:src="@drawable/ic_baseline_more_horiz_24_white" />
 
         </LinearLayout>
 

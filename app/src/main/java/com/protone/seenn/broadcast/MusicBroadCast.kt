@@ -29,12 +29,15 @@ abstract class MusicReceiver : BroadcastReceiver() {
             }
             MUSIC_FINISH -> {
                 finish()
+                isPlaying = false
             }
             MUSIC_PREVIOUS -> {
                 previous()
+                isPlaying = true
             }
             MUSIC_NEXT -> {
                 next()
+                isPlaying = true
             }
         }
     }

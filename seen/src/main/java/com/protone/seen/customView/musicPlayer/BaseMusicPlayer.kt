@@ -1,6 +1,7 @@
 package com.protone.seen.customView.musicPlayer
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.AttributeSet
@@ -9,6 +10,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ViewSwitcher
 import com.protone.api.img.Blur
+import com.protone.api.isInDebug
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
 import kotlinx.coroutines.CoroutineScope
@@ -45,30 +47,37 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
     abstract fun setName(name: String)
     abstract fun setDetail(detail: String)
 
+    private var albumBitmap: Bitmap? = null
+
     fun loadAlbum(embeddedPicture: ByteArray?) {
-        loadBlurCover(embeddedPicture)
         if (embeddedPicture == null) {
             (coverSwitcher.nextView as ImageView).setImageResource(R.drawable.ic_baseline_music_note_24)
+            coverSwitcher.showNext()
+            albumBitmap = null
         } else launch {
             try {
-                val decodeByteArray =
+                albumBitmap =
                     BitmapFactory.decodeByteArray(embeddedPicture, 0, embeddedPicture.size)
+                loadBlurCover()
                 withContext(Dispatchers.Main) {
-                    (coverSwitcher.nextView as ImageView).setImageBitmap(decodeByteArray)
+                    (coverSwitcher.nextView as ImageView).setImageBitmap(albumBitmap)
                     coverSwitcher.showNext()
                 }
             } catch (e: Exception) {
+                if (isInDebug()) e.printStackTrace()
+                (coverSwitcher.nextView as ImageView).setImageResource(R.drawable.ic_baseline_music_note_24)
+                coverSwitcher.showNext()
             }
         }
     }
 
-    private fun loadBlurCover(embeddedPicture: ByteArray?) {
-        embeddedPicture?.let {
-            launch {
+    private fun loadBlurCover() {
+        if (albumBitmap != null) {
+            launch(Dispatchers.IO) {
                 try {
                     val blur =
                         Blur(context).blur(
-                            BitmapFactory.decodeByteArray(it, 0, it.size, null),
+                            albumBitmap!!,
                             radius = 30,
                             sampling = 10
                         )
@@ -77,8 +86,14 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
                         switcher.showNext()
                     }
                 } catch (e: Exception) {
+                    if (isInDebug()) e.printStackTrace()
+                    (switcher.nextView as ImageView).setImageResource(R.drawable.main_background)
+                    switcher.showNext()
                 }
             }
+        } else {
+            (switcher.nextView as ImageView).setImageResource(R.drawable.main_background)
+            switcher.showNext()
         }
     }
 }

@@ -111,40 +111,48 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         }
 
         private fun notificationText() {
-            if (playList.isEmpty()) return
-            remoteViews?.setTextViewText(
-                R.id.notify_music_name,
-                playList[playPosition].title
-            )
-            notificationManager?.notify(NOTIFICATION_ID, notification)
+            synchronized(this@MusicService) {
+                if (playList.isEmpty()) return
+                launch {
+                    remoteViews?.setTextViewText(
+                        R.id.notify_music_name,
+                        playList[playPosition].title
+                    )
+                    notificationManager?.notify(NOTIFICATION_ID, notification)
+                }
+            }
         }
 
         private fun notificationPlayState(state: Boolean) {
-            if (playList.isEmpty()) return
-            playState.postValue(state)
-            initMusicNotification()
-            remoteViews?.setImageViewResource(
-                R.id.notify_music_control,
-                if (state) R.drawable.ic_baseline_pause_24
-                else R.drawable.ic_baseline_play_arrow_24
-            )
-            if (state) {
-                remoteViews?.setTextViewText(
-                    R.id.notify_music_name,
-                    playList[playPosition].title
-                )
-                playList[playPosition].uri.toBitmapByteArray()?.let { ba ->
-                    remoteViews?.setImageViewBitmap(
-                        R.id.notify_music_icon,
-                        BitmapFactory.decodeByteArray(
-                            ba,
-                            0,
-                            ba.size
-                        )
+            synchronized(this@MusicService) {
+                if (playList.isEmpty()) return
+                launch {
+                    playState.postValue(state)
+                    initMusicNotification()
+                    remoteViews?.setImageViewResource(
+                        R.id.notify_music_control,
+                        if (state) R.drawable.ic_baseline_pause_24
+                        else R.drawable.ic_baseline_play_arrow_24
                     )
+                    if (state) {
+                        remoteViews?.setTextViewText(
+                            R.id.notify_music_name,
+                            playList[playPosition].title
+                        )
+                        playList[playPosition].uri.toBitmapByteArray()?.let { ba ->
+                            remoteViews?.setImageViewBitmap(
+                                R.id.notify_music_icon,
+                                BitmapFactory.decodeByteArray(
+                                    ba,
+                                    0,
+                                    ba.size
+                                )
+                            )
+                        }
+                    }
+                    notificationManager?.notify(NOTIFICATION_ID, notification)
                 }
             }
-            notificationManager?.notify(NOTIFICATION_ID, notification)
         }
     }
 
@@ -156,8 +164,12 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        if (playList.isNotEmpty())
-            currentMusic.postValue(playList[playPosition])
+        launch(Dispatchers.IO) {
+            synchronized(playList) {
+                if (playList.isNotEmpty())
+                    currentMusic.postValue(playList[playPosition])
+            }
+        }
         return MusicBinder()
     }
 
@@ -246,7 +258,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
 
     override fun play(music: Music?) {
         launch {
-            synchronized(playList) {
+            synchronized(this@MusicService) {
                 if (playList.isEmpty()) {
                     currentMusic.postValue(getEmptyMusic())
                     return@launch
@@ -277,13 +289,15 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
 
     override fun pause() {
         launch {
-            if (musicPlayer?.isPlaying == true)
-                musicPlayer?.apply {
-                    pause()
-                    playState.postValue(false)
-                    progressTimer?.cancel()
-                    progressTimer = null
-                }
+            synchronized(this@MusicService) {
+                if (musicPlayer?.isPlaying == true)
+                    musicPlayer?.apply {
+                        pause()
+                        playState.postValue(false)
+                        progressTimer?.cancel()
+                        progressTimer = null
+                    }
+            }
         }
     }
 
@@ -307,12 +321,19 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         }
     }
 
-    override fun getPlayList(): MutableList<Music> =
-        playList.ifEmpty { mutableListOf(getEmptyMusic()) }
+    override fun getPlayList(): MutableList<Music> {
+        synchronized(playList) {
+            return playList.ifEmpty { mutableListOf(getEmptyMusic()) }
+        }
+    }
 
     override fun setPlayList(list: MutableList<Music>) {
-        playList.clear()
-        playList.addAll(list)
+        launch {
+            synchronized(playList) {
+                playList.clear()
+                playList.addAll(list)
+            }
+        }
     }
 
     override fun onProgress(): LiveData<Long> = progress
@@ -335,20 +356,28 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     override fun onMusicPlaying(): LiveData<Music> = currentMusic
 
     override fun init(music: Music, progress: Long) {
-        currentMusic.postValue(
-            if (playList.isNotEmpty() && music.title != "NO MUSIC") {
-                playPosition = playList.indexOf(music)
-                playList[playPosition]
-            } else getEmptyMusic()
-        )
+        launch {
+            synchronized(this@MusicService) {
+                currentMusic.postValue(
+                    if (playList.isNotEmpty() && music.title != "NO MUSIC") {
+                        playPosition = playList.indexOf(music)
+                        playList[playPosition]
+                    } else getEmptyMusic()
+                )
+            }
+        }
     }
 
     private fun finishMusic() {
-        musicPlayer?.apply {
-            stop()
-            reset()
-            release()
-            musicPlayer = null
+        launch {
+            synchronized(this@MusicService) {
+                musicPlayer?.apply {
+                    stop()
+                    reset()
+                    release()
+                    musicPlayer = null
+                }
+            }
         }
     }
 

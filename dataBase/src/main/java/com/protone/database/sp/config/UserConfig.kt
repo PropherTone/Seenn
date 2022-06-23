@@ -1,16 +1,22 @@
 package com.protone.database.sp.config
 
 import android.content.Context
+import androidx.datastore.preferences.preferencesDataStore
 import com.protone.api.context.Global
 import com.protone.database.R
-import com.protone.database.sp.SpTool
-import com.protone.database.sp.toSpProvider
+import com.protone.database.sp.DataTool
+import com.protone.database.sp.toDataProvider
+
+val userConfig = UserConfig(Global.application)
 
 class UserConfig(context: Context) {
-    private val config =
-        SpTool(context.getSharedPreferences("USER_CONFIG", Context.MODE_PRIVATE).toSpProvider())
 
-    var isFirstBoot by config.boolean("FIRST_BOOT", false)
+    private val Context.dataProvider by preferencesDataStore(name = "USER_CONFIG")
+
+    private val config =
+        DataTool(context.dataProvider.toDataProvider())
+
+    var isFirstBoot by config.boolean("FIRST_BOOT", true)
 
     var userName by config.string("USER_NAME", "")
 
@@ -33,11 +39,11 @@ class UserConfig(context: Context) {
 
     var lastMusic by config.string("LAST_TIME_PLAYED_MUSIC", "")
 
-    var lastMusicProgress by config.long("LAST_MUSIC_PROGRESS",0L)
+    var lastMusicProgress by config.long("LAST_MUSIC_PROGRESS", 0L)
 
     var playedMusicPosition by config.int("MUSIC_POSITION", 0)
 
-    var musicLoopMode by config.int("LOOP_MODE",1)
+    var musicLoopMode by config.int("LOOP_MODE", 1)
 
     data class UserData(
         val userName: String,

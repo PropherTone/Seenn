@@ -6,13 +6,10 @@ import android.content.ContentValues
 import android.content.IntentSender
 import android.net.Uri
 import android.os.Build
-import android.os.Looper
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.protone.api.R
-import com.protone.api.TAG
 
 fun Activity.renameMedia(name: String, uri: Uri, callBack: (Boolean) -> Unit) {
     onBackground {
@@ -24,14 +21,13 @@ fun Activity.renameMedia(name: String, uri: Uri, callBack: (Boolean) -> Unit) {
                 null,
                 null,
                 null
-            )
-                ?.apply {
-                    val dn = getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
-                    while (moveToNext()) {
-                        changed = getString(dn)
-                    }
-                    close()
+            )?.also {
+                val dn = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+                while (it.moveToNext()) {
+                    changed = getString(dn)
                 }
+                it.close()
+            }
             if (changed == name) {
                 callBack.invoke(true)
                 return@onBackground
@@ -111,15 +107,14 @@ fun Activity.renameMedia(name: String, uri: Uri, callBack: (Boolean) -> Unit) {
                 null,
                 null,
                 null
-            )
-                ?.apply {
-                    val dn = getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
-                    while (moveToNext()) {
-                        changed = getString(dn)
-                    }
-                    close()
-                    callBack.invoke(name == changed)
+            )?.also {
+                val dn = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+                while (it.moveToNext()) {
+                    changed = getString(dn)
                 }
+                it.close()
+                callBack.invoke(name == changed)
+            }
         }
     }
 }
