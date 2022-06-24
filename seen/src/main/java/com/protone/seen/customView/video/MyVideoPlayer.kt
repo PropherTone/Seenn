@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import androidx.annotation.AttrRes
 import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
+import com.protone.api.isInDebug
 import com.protone.seen.customView.ColorfulProgressBar
 
 class MyVideoPlayer @JvmOverloads constructor(
@@ -89,7 +90,7 @@ class MyVideoPlayer @JvmOverloads constructor(
             release()
             mediaPlayer = MediaPlayer()
         } catch (e: Exception) {
-            e.printStackTrace()
+            if (isInDebug()) e.printStackTrace()
         }
     }
 
@@ -121,7 +122,7 @@ class MyVideoPlayer @JvmOverloads constructor(
                 startProgress()
             }
         } catch (e: IllegalStateException) {
-            e.printStackTrace()
+            if (isInDebug()) e.printStackTrace()
         }
     }
 
@@ -132,7 +133,7 @@ class MyVideoPlayer @JvmOverloads constructor(
                 progressHandler.removeCallbacksAndMessages(null)
             }
         } catch (e: IllegalStateException) {
-            e.printStackTrace()
+            if (isInDebug()) e.printStackTrace()
         }
 
     }

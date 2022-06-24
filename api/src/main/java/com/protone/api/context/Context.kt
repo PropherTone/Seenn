@@ -53,22 +53,6 @@ fun Activity.setSoftInputStatuesListener(onSoftInput: ((Int, Boolean) -> Unit)? 
     }
 }
 
-fun androidx.appcompat.app.AlertDialog.fitSoftInput(context: Context, len: Int) {
-    val attributes = window?.attributes
-    val oldY = attributes?.y
-    if (context is Activity) {
-        context.setSoftInputStatuesListener { _, b ->
-            if (b) {
-                attributes?.y = attributes?.y?.minus(len)
-                onWindowAttributesChanged(attributes)
-            } else {
-                attributes?.y = oldY
-                onWindowAttributesChanged(attributes)
-            }
-        }
-    }
-}
-
 fun View.marginBottom(margin: Int) {
     if (this !is ViewGroup) return
     val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams

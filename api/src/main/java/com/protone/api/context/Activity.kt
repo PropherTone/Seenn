@@ -1,196 +1,114 @@
 package com.protone.api.context
 
 import android.app.Activity
-import android.app.RecoverableSecurityException
 import android.content.ContentValues
-import android.content.IntentSender
+import android.content.Intent
+import android.database.ContentObserver
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import com.protone.api.R
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 
-fun Activity.renameMedia(name: String, uri: Uri, callBack: (Boolean) -> Unit) {
-    onBackground {
-        var changed: String? = null
-        try {
-            contentResolver.query(
-                uri,
-                arrayOf(MediaStore.MediaColumns.DISPLAY_NAME),
-                null,
-                null,
-                null
-            )?.also {
-                val dn = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
-                while (it.moveToNext()) {
-                    changed = getString(dn)
-                }
-                it.close()
+private fun Activity.observeChange(uri: Uri, targetName: String): Boolean {
+    var name = ""
+    contentResolver.query(
+        uri,
+        arrayOf(MediaStore.MediaColumns.DISPLAY_NAME),
+        null,
+        null,
+        null
+    )?.also {
+        val dn = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
+        while (it.moveToNext()) {
+            name = it.getString(dn)
+        }
+        it.close()
+    }
+    return name == targetName
+}
+
+fun Activity.renameMedia(
+    name: String,
+    uri: Uri,
+    scope: CoroutineScope,
+    callBack: (Boolean) -> Unit
+) {
+    scope.launch(Dispatchers.IO) {
+        var observer: ContentObserver? = null
+        observer = object : ContentObserver(null) {
+            override fun onChange(selfChange: Boolean) {
+                super.onChange(selfChange)
+                callBack.invoke(observeChange(uri, name))
+                observer?.let { contentResolver.unregisterContentObserver(it) }
             }
-            if (changed == name) {
-                callBack.invoke(true)
-                return@onBackground
-            }
-            when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                    checkUriPermission(uri) {
-                        if (it) {
-                            contentResolver.update(
-                                uri,
-                                ContentValues().apply {
-                                    put(
-                                        MediaStore.MediaColumns.DISPLAY_NAME,
-                                        name
-                                    )
-                                },
-                                null,
-                                null
-                            )
-                        } else callBack.invoke(false)
-                    }
+        }
+        contentResolver.registerContentObserver(uri, true, observer)
+        flow {
+            try {
+                if (observeChange(uri, name)) {
+                    emit(true)
                 }
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                    try {
-                        contentResolver.update(
-                            uri,
-                            ContentValues().apply {
-                                put(
-                                    MediaStore.MediaColumns.DISPLAY_NAME,
-                                    name
-                                )
-                            },
-                            null,
-                            null
+                grantUriPermission(
+                    packageName,
+                    uri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                contentResolver.update(
+                    uri,
+                    ContentValues().apply {
+                        put(
+                            MediaStore.MediaColumns.DISPLAY_NAME,
+                            name
                         )
-                    } catch (e: RecoverableSecurityException) {
-                        try {
-                            startIntentSenderForResult(
-                                e.userAction.actionIntent.intentSender,
-                                10,
-                                null,
-                                0,
-                                0,
-                                0
-                            )
-                            contentResolver.update(
-                                uri,
-                                ContentValues().apply {
-                                    put(
-                                        MediaStore.MediaColumns.DISPLAY_NAME,
-                                        name
-                                    )
-                                },
-                                null,
-                                null
-                            )
-                        } catch (e: IntentSender.SendIntentException) {
-                            showErrorToast()
-                        }
-                    }
-                }
-                else -> {
-                    contentResolver.update(
-                        uri,
-                        ContentValues().apply { put(MediaStore.MediaColumns.DISPLAY_NAME, name) },
-                        null,
-                        null
-                    )
-                }
+                    },
+                    null,
+                    null
+                )
+                cancel()
+            } catch (e: Exception) {
+                emit(false)
             }
-        } catch (e: Exception) {
-            callBack.invoke(false)
-        } finally {
-            contentResolver.query(
-                uri,
-                arrayOf(MediaStore.MediaColumns.DISPLAY_NAME),
-                null,
-                null,
-                null
-            )?.also {
-                val dn = it.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)
-                while (it.moveToNext()) {
-                    changed = getString(dn)
-                }
-                it.close()
-                callBack.invoke(name == changed)
+        }.collect {
+            withContext(Dispatchers.Main) {
+                callBack.invoke(it)
             }
+            cancel()
         }
     }
 }
 
-fun Activity.deleteMedia(uri: Uri, callBack: (Boolean) -> Unit) {
-    onBackground {
-        try {
-            when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-                    checkUriPermission(uri) {
-                        if (it) {
-                            contentResolver.delete(
-                                uri,
-                                null,
-                                null
-                            )
-                        } else callBack.invoke(false)
-                    }
-                }
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                    try {
-                        contentResolver.delete(
-                            uri,
-                            null,
-                            null
-                        )
-                    } catch (e: RecoverableSecurityException) {
-                        try {
-                            startIntentSenderForResult(
-                                e.userAction.actionIntent.intentSender,
-                                10,
-                                null,
-                                0,
-                                0,
-                                0
-                            )
-                            contentResolver.delete(
-                                uri,
-                                null,
-                                null
-                            )
-                        } catch (e: IntentSender.SendIntentException) {
-                            showErrorToast()
-                        }
-                    }
-                }
-                else -> {
-                    contentResolver.delete(
-                        uri,
-                        null,
-                        null
-                    )
-                }
+fun Activity.deleteMedia(
+    uri: Uri,
+    scope: CoroutineScope,
+    callBack: (Boolean) -> Unit
+) {
+    scope.launch(Dispatchers.IO) {
+        flow {
+            try {
+                grantUriPermission(
+                    packageName,
+                    uri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                contentResolver.delete(
+                    uri,
+                    null,
+                    null
+                )
+                emit(true)
+            } catch (e: Exception) {
+                emit(false)
             }
-        } catch (e: Exception) {
-            callBack.invoke(false)
-        } finally {
-            callBack.invoke(true)
+        }.collect {
+            withContext(Dispatchers.Main) {
+                callBack.invoke(it)
+            }
+            cancel()
         }
     }
-}
-
-@RequiresApi(Build.VERSION_CODES.R)
-fun Activity.checkUriPermission(uri: Uri, callBack: (Boolean) -> Unit) {
-    try {
-        val writeRequest = MediaStore.createWriteRequest(contentResolver, listOf(uri)).intentSender
-        startIntentSenderForResult(writeRequest, 10, null, 0, 0, 0)
-        callBack.invoke(true)
-    } catch (e: IntentSender.SendIntentException) {
-        showErrorToast()
-        callBack.invoke(false)
-    }
-}
-
-fun Activity.showErrorToast() = runOnUiThread {
-    Toast.makeText(this, R.string.no_permission, Toast.LENGTH_SHORT).show()
 }
 
 fun Activity.showFailedToast() = runOnUiThread {

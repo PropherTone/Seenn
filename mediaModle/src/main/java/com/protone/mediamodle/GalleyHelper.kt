@@ -2,6 +2,7 @@ package com.protone.mediamodle
 
 import com.protone.api.context.Global
 import com.protone.api.getFileName
+import com.protone.api.isInDebug
 import com.protone.mediamodle.media.scanAudio
 import kotlinx.coroutines.*
 import java.io.File
@@ -34,7 +35,7 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
                     )
                 }
             } catch (e: IOException) {
-                e.printStackTrace()
+                if (isInDebug()) e.printStackTrace()
                 try {
                     fileOutputStream?.flush()
                     fileOutputStream?.close()

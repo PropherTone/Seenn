@@ -35,10 +35,6 @@ fun String.toDrawable(context: Context, callBack: (Drawable?) -> Unit) {
     }
 }
 
-fun String.getParentPath(): String {
-    return this.substring(0, lastIndexOf("/"))
-}
-
 fun Bitmap.saveToFile(fileName: String): String? {
     val fileOutputStream: FileOutputStream?
     return try {
@@ -93,7 +89,7 @@ fun Uri.toMediaBitmapByteArray(): ByteArray? {
             os.toByteArray()
         }
     } catch (e: Exception) {
-        e.printStackTrace()
+        if (isInDebug()) e.printStackTrace()
     } finally {
         ois.close()
         os.close()
@@ -131,19 +127,11 @@ fun Uri.toBitmapByteArray(): ByteArray? {
         mediaMetadataRetriever.setDataSource(Global.application, this)
         embeddedPicture = mediaMetadataRetriever.embeddedPicture
     } catch (e: Exception) {
-        e.printStackTrace()
+        if (isInDebug()) e.printStackTrace()
     } finally {
         mediaMetadataRetriever.release()
     }
     return embeddedPicture
-}
-
-fun Int.to16to9Width(): Int {
-    return this * 16 / 9
-}
-
-fun Int.to16to9Height(): Int {
-    return this * 9 / 16
 }
 
 fun Long.toDateString(format: String = "HH:mm:ss yyyy/MM/dd E"): String? =
@@ -156,7 +144,7 @@ fun Long.toDateString(format: String = "HH:mm:ss yyyy/MM/dd E"): String? =
 fun Long.toDateString(): String? =
     SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(
         Calendar.getInstance(Locale.getDefault()).also {
-            it.timeInMillis = this
+            it.timeInMillis = this * 1000
         }.time
     )
 
