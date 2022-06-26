@@ -36,7 +36,7 @@ class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context) {
     }
 
     override fun offer(event: NoteEvent) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     fun initList() {

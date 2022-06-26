@@ -74,7 +74,7 @@ class GalleySeen(context: Context) : PopupCoverSeen<GalleySeen.Touch>(context),
     }
 
     override fun offer(event: Touch) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     suspend fun initPager(

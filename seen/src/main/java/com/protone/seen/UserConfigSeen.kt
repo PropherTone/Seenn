@@ -42,7 +42,7 @@ class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context)
     override fun getToolBar(): View? = null
 
     override fun offer(event: UserEvent) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     init {

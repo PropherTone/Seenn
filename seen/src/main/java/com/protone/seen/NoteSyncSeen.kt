@@ -26,6 +26,6 @@ class NoteSyncSeen(context: Context) : Seen<NoteSyncSeen.NoteSync>(context) {
     }
 
     override fun offer(event : NoteSync){
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 }

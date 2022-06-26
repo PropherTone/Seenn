@@ -405,7 +405,7 @@ class RichNoteView @JvmOverloads constructor(
                     when (val tag = getChildAt(i).tag) {
                         is RichNoteStates -> {
                             richStates = richStates * 10 + TEXT
-                            taskChannel.offer(
+                            taskChannel.trySend(
                                 Pair(
                                     RichNoteSer(
                                         getEdittext(i)?.text.toString(),
@@ -416,7 +416,7 @@ class RichNoteView @JvmOverloads constructor(
                         }
                         is RichVideoStates -> {
                             richStates = richStates * 10 + VIDEO
-                            taskChannel.offer(Pair(tag.toJson(), i))
+                            taskChannel.trySend(Pair(tag.toJson(), i))
                         }
                         is RichPhotoStates -> {
                             richStates = richStates * 10 + PHOTO
@@ -429,12 +429,12 @@ class RichNoteView @JvmOverloads constructor(
                                             tag.path = it
                                         }
                                     }
-                                taskChannel.offer(Pair(tag.toJson(), i))
+                                taskChannel.trySend(Pair(tag.toJson(), i))
                             }.start()
                         }
                         is RichMusicStates -> {
                             richStates = richStates * 10 + MUSIC
-                            taskChannel.offer(Pair(tag.toJson(), i))
+                            taskChannel.trySend(Pair(tag.toJson(), i))
                         }
                     }
                 }

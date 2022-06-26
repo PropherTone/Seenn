@@ -68,7 +68,7 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
     }
 
     override fun offer(event: Event) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     suspend fun initList(

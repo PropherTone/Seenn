@@ -79,7 +79,7 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
     }
 
     override fun offer(event: NoteEditEvent) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     override fun setBold() = binding.noteEditRichNote.setBold()

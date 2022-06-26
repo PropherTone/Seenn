@@ -30,7 +30,7 @@ class PictureBoxSeen(context: Context) : Seen<PictureBoxSeen.PictureBox>(context
     }
 
     override fun offer(event: PictureBox) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     fun initPictureBox(picUri: MutableList<GalleyMedia>) {

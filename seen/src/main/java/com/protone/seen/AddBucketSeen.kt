@@ -61,7 +61,7 @@ class AddBucketSeen(context: Context) : Seen<AddBucketSeen.Event>(context) {
     }
 
     override fun offer(event: Event) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     fun loadIcon(model: ByteArray?) = binding.musicBucketIcon.apply {

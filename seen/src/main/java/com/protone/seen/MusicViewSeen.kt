@@ -29,7 +29,7 @@ class MusicViewSeen(context: Context) : Seen<MusicViewSeen.MusicEvent>(context) 
     val controller = binding.musicPlayer
 
     override fun offer(event: MusicEvent) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     init {

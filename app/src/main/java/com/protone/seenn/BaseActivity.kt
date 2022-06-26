@@ -1,7 +1,6 @@
 package com.protone.seenn
 
-import android.content.ComponentName
-import android.content.ServiceConnection
+import android.content.*
 import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
@@ -33,11 +32,23 @@ import kotlin.coroutines.suspendCoroutine
 abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     CoroutineScope by MainScope() {
 
+    companion object{
+        const val FINISH = "ACTIVITY_FINISH"
+    }
+
     var musicReceiver: MusicReceiver? = null
         set(value) {
             value?.let { registerReceiver(it, musicIntentFilter) }
             field = value
         }
+
+    private val activityOperationReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == FINISH) {
+                finish()
+            }
+        }
+    }
 
     private var serviceConnection: ServiceConnection? = null
 
@@ -74,7 +85,9 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ActivityHolder.add(this)
+        activityOperationBroadcast.registerReceiver(activityOperationReceiver,
+            IntentFilter(FINISH)
+        )
         launch {
             main()
 
@@ -141,7 +154,6 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
         try {
 
             launch {
-                ActivityHolder.remove(this@BaseActivity)
                 onFinish()
             }
 
@@ -152,22 +164,23 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
 
     override fun onStart() {
         super.onStart()
-        event.offer(Event.OnStart)
+        event.trySend(Event.OnStart)
     }
 
     override fun onResume() {
         super.onResume()
-        event.offer(Event.OnResume)
+        event.trySend(Event.OnResume)
     }
 
     override fun onStop() {
         super.onStop()
-        event.offer(Event.OnStop)
+        event.trySend(Event.OnStop)
     }
 
     override fun onDestroy() {
         seen?.cancel()
         cancel()
+        activityOperationBroadcast.unregisterReceiver(activityOperationReceiver)
         serviceConnection?.let { unbindService(it) }
         musicReceiver?.let { unregisterReceiver(it) }
         Glide.get(this).clearMemory()

@@ -1,16 +1,21 @@
 package com.protone.api.context
 
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.database.ContentObserver
 import android.net.Uri
 import android.provider.MediaStore
 import android.widget.Toast
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.protone.api.R
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+
+val activityOperationBroadcast : LocalBroadcastManager = LocalBroadcastManager.getInstance(Global.application)
 
 private fun Activity.observeChange(uri: Uri, targetName: String): Boolean {
     var name = ""

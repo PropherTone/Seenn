@@ -26,7 +26,7 @@ class NoteViewSeen(context: Context) : Seen<NoteViewSeen.NoteViewEvent>(context)
         get() = binding.root
 
     override fun offer(event: NoteViewEvent) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     override fun getToolBar(): View = binding.root

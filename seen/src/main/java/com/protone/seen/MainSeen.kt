@@ -94,7 +94,7 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
     }
 
     override fun offer(event: Touch) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     override fun onGlobalLayout() {

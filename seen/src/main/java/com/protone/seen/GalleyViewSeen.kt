@@ -144,7 +144,7 @@ class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEv
     override fun popSetCate() = offer(GalleyVEvent.AddCato)
     override fun popIntoBox() = offer(GalleyVEvent.IntoBox)
     override fun offer(event: GalleyVEvent) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     class GalleyViewFragment(private val galleyMedia: GalleyMedia) : Fragment() {

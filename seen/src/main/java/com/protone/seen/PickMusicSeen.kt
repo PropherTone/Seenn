@@ -64,7 +64,7 @@ class PickMusicSeen(context: Context) : Seen<PickMusicSeen.Event>(context) {
     }
 
     override fun offer(event: Event) {
-        viewEvent.offer(event)
+        viewEvent.trySend(event)
     }
 
     suspend fun refreshList(list: MutableList<Music>) = withContext(Dispatchers.Main) {
