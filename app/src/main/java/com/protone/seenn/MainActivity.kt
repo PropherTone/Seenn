@@ -2,6 +2,7 @@ package com.protone.seenn
 
 import android.content.Intent
 import android.transition.TransitionManager
+import android.util.Log
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.intent
 import com.protone.api.json.toEntity

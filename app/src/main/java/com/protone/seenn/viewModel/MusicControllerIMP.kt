@@ -3,9 +3,7 @@ package com.protone.seenn.viewModel
 import android.content.Intent
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
-import com.protone.api.context.MUSIC_NEXT
-import com.protone.api.context.MUSIC_PLAY
-import com.protone.api.context.MUSIC_PREVIOUS
+import com.protone.api.context.*
 import com.protone.database.room.entity.Music
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
@@ -30,6 +28,7 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
     fun setBinder(
         lifecycle: LifecycleOwner,
         binder: MusicService.MusicBinder,
+        onPlaying: ((Music) -> Unit)? = null,
         onLoop: ((Int) -> Unit)? = null
     ) {
         this.binder = binder
@@ -66,6 +65,7 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
                 }
                 onMusicPlaying().observe(lifecycle) {
                     setDetail(it)
+                    onPlaying?.invoke(it)
                 }
             }
         }
@@ -128,13 +128,23 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
                 showToast(controller.context.getString(R.string.random))
             }
         }
+        binder?.setLoopMode(mode)
     }
 
-    fun refresh(music: Music, progress: Long) = binder?.init(music, progress)
+    fun refresh(music: Music, progress: Long)  {
+        binder?.init(music, progress)
+        musicBroadCastManager.sendBroadcast(Intent(MUSIC_REFRESH))
+    }
 
-    fun play(music: Music?) = binder?.play(music)
+    fun play(music: Music?)  {
+        binder?.play(music)
+        musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY_CUR))
+    }
 
-    fun setMusicList(mutableList: MutableList<Music>) = binder?.setPlayList(mutableList)
+    fun setMusicList(mutableList: MutableList<Music>) {
+        binder?.setPlayList(mutableList)
+        musicBroadCastManager.sendBroadcast(Intent(MUSIC_REFRESH))
+    }
 
     fun getPlayingMusic() = binder?.onMusicPlaying()?.value
 

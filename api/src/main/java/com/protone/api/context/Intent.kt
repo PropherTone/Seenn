@@ -5,10 +5,12 @@ import android.content.IntentFilter
 import kotlin.reflect.KClass
 
 const val MUSIC_PLAY = "ControlMusic"
+const val MUSIC_PLAY_CUR = "ControlMusicCurrent"
 const val MUSIC_PAUSE = "PauseMusic"
 const val MUSIC_NEXT = "NextMusic"
 const val MUSIC_PREVIOUS = "PreviousMusic"
 const val MUSIC_FINISH = "FinishMusic"
+const val MUSIC_REFRESH = "RefreshNotification"
 
 const val FINISH = "FINISH"
 const val ACTIVITY_FINISH = "ACTIVITY_FINISH"
@@ -27,6 +29,8 @@ val musicIntentFilter: IntentFilter
             addAction(MUSIC_FINISH)
             addAction(MUSIC_NEXT)
             addAction(MUSIC_PREVIOUS)
+            addAction(MUSIC_REFRESH)
+            addAction(MUSIC_PLAY_CUR)
         }
     }
 

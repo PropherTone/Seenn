@@ -6,10 +6,6 @@ import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.protone.api.context.*
 
-const val LOOPING = 1
-const val LIST_LOOPING = 2
-const val RANDOM = 3
-
 val musicBroadCastManager by lazy { LocalBroadcastManager.getInstance(Global.application) }
 
 abstract class MusicReceiver : BroadcastReceiver() {
@@ -26,6 +22,7 @@ abstract class MusicReceiver : BroadcastReceiver() {
                     pause()
                     false
                 }
+                refresh(isPlaying)
             }
             MUSIC_FINISH -> {
                 finish()
@@ -34,10 +31,18 @@ abstract class MusicReceiver : BroadcastReceiver() {
             MUSIC_PREVIOUS -> {
                 previous()
                 isPlaying = true
+                refresh(isPlaying)
             }
             MUSIC_NEXT -> {
                 next()
                 isPlaying = true
+                refresh(isPlaying)
+            }
+            MUSIC_REFRESH ->{
+                refresh(isPlaying, ref = true)
+            }
+            MUSIC_PLAY_CUR->{
+                refresh(true)
             }
         }
     }
@@ -47,4 +52,5 @@ abstract class MusicReceiver : BroadcastReceiver() {
     abstract fun finish()
     abstract fun previous()
     abstract fun next()
+    abstract fun refresh(b:Boolean,ref:Boolean = false)
 }

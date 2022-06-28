@@ -86,12 +86,10 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     private val receiver = object : MusicReceiver() {
         override fun play() {
             this@MusicService.play()
-            notificationPlayState(true)
         }
 
         override fun pause() {
             this@MusicService.pause()
-            notificationPlayState(false)
         }
 
         override fun finish() {
@@ -100,31 +98,18 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
 
         override fun previous() {
             this@MusicService.previous()
-            notificationText()
-            notificationPlayState(true)
         }
 
         override fun next() {
             this@MusicService.next()
-            notificationText()
-            notificationPlayState(true)
         }
 
-        private fun notificationText() {
-            synchronized(this@MusicService) {
-                if (playList.isEmpty()) return
-                launch {
-                    remoteViews?.setTextViewText(
-                        R.id.notify_music_name,
-                        playList[playPosition].title
-                    )
-                    notificationManager?.notify(NOTIFICATION_ID, notification)
-                }
-            }
+        override fun refresh(b: Boolean, ref: Boolean) {
+            notificationPlayState(b, ref)
         }
 
-        private fun notificationPlayState(state: Boolean) {
-            synchronized(this@MusicService) {
+        private fun notificationPlayState(state: Boolean, ref: Boolean = false) {
+            synchronized(playList) {
                 if (playList.isEmpty()) return
                 launch {
                     playState.postValue(state)
@@ -134,7 +119,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
                         if (state) R.drawable.ic_baseline_pause_24
                         else R.drawable.ic_baseline_play_arrow_24
                     )
-                    if (state) {
+                    if (state || ref) {
                         remoteViews?.setTextViewText(
                             R.id.notify_music_name,
                             playList[playPosition].title
@@ -306,8 +291,8 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         launch {
             if (++playPosition > playList.size - 1) playPosition = 0
             finishMusic()
-            currentMusic.postValue(playList[playPosition])
             play()
+//            currentMusic.postValue(playList[playPosition])
         }
     }
 
@@ -316,8 +301,8 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         launch {
             if (--playPosition <= 0) playPosition = playList.size - 1
             finishMusic()
-            currentMusic.postValue(playList[playPosition])
             play()
+//            currentMusic.postValue(playList[playPosition])
         }
     }
 

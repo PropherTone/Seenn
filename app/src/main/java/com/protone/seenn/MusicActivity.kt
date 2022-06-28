@@ -38,25 +38,10 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         musicSeen.initSeen()
         musicSeen.setBucket()
         bindMusicService {
-            musicReceiver = object : MusicReceiver() {
-                override fun play() {}
-
-                override fun pause() {}
-
-                override fun finish() {}
-
-                override fun previous() {
-                    musicSeen.playPosition()
-                }
-
-                override fun next() {
-                    musicSeen.playPosition()
-                }
-
-            }
-            this@MusicActivity.musicController.setBinder(this@MusicActivity, binder)
+            this@MusicActivity.musicController.setBinder(this@MusicActivity, binder, onPlaying = {
+                musicSeen.playPosition(it)
+            })
             musicController.setMusicList(Medias.musicBucket[musicSeen.bucket] ?: Medias.music)
-            musicSeen.playPosition()
         }
 
         Medias.mediaLive.observe(this) {
@@ -157,9 +142,11 @@ class MusicActivity : BaseActivity<MusicSeen>() {
             updateBucket()
         }
         mlClickCallBack { music ->
-            this@MusicActivity.musicController.setMusicList(
-                Medias.musicBucket[bucket] ?: mutableListOf()
-            )
+            if (userConfig.lastMusicBucket != bucket) {
+                this@MusicActivity.musicController.setMusicList(
+                    Medias.musicBucket[bucket] ?: mutableListOf()
+                )
+            }
             this@MusicActivity.musicController.play(music)
             userConfig.lastMusicBucket = bucket
         }
@@ -177,10 +164,6 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     private suspend fun MusicSeen.refreshBucket() = withContext(Dispatchers.IO) {
         DataBaseDAOHelper.getMusicBucketByName(bucket)
             ?.let { b -> refreshBucket(b) }
-    }
-
-    private fun MusicSeen.playPosition() {
-        this@MusicActivity.musicController.getPlayingMusic()?.let { playPosition(it) }
     }
 
     private suspend fun MusicSeen.addBucket(name: String) = launch(Dispatchers.IO) {

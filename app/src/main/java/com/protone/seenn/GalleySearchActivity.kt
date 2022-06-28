@@ -47,30 +47,33 @@ class GalleySearchActivity : BaseActivity<GalleySearchSeen>(),
         }
     }
 
-    private suspend fun GalleySearchSeen.query(input: String) = withContext(Dispatchers.IO) {
-        val lowercase = input.lowercase(Locale.getDefault())
-        launch(Dispatchers.IO) {
-            data.asFlow().filter {
-                it.name.contains(input, true)
-            }.buffer().toList().let { nameFilterList ->
-                refreshGalleyList(nameFilterList as MutableList<GalleyMedia>)
-                cancel()
+    private suspend fun GalleySearchSeen.query(input: String) {
+        if (input.isEmpty()) return
+        withContext(Dispatchers.IO) {
+            val lowercase = input.lowercase(Locale.getDefault())
+            launch(Dispatchers.IO) {
+                data.asFlow().filter {
+                    it.name.contains(input, true)
+                }.buffer().toList().let { nameFilterList ->
+                    refreshGalleyList(nameFilterList as MutableList<GalleyMedia>)
+                    cancel()
+                }
             }
-        }
-        launch(Dispatchers.IO) {
-            data.asFlow().filter {
-                it.cate?.contains(input) == true || it.cate?.contains(lowercase) == true
-            }.buffer().toList().let { catoFilterList ->
-                refreshCatoList(catoFilterList as MutableList<GalleyMedia>)
-                cancel()
+            launch(Dispatchers.IO) {
+                data.asFlow().filter {
+                    it.cate?.contains(input) == true || it.cate?.contains(lowercase) == true
+                }.buffer().toList().let { catoFilterList ->
+                    refreshCatoList(catoFilterList as MutableList<GalleyMedia>)
+                    cancel()
+                }
             }
-        }
-        launch(Dispatchers.IO) {
-            data.asFlow().filter {
-                it.notes?.contains(input) == true || it.cate?.contains(lowercase) == true
-            }.buffer().toList().let { noteFilterList ->
-                refreshNoteList(noteFilterList as MutableList<GalleyMedia>)
-                cancel()
+            launch(Dispatchers.IO) {
+                data.asFlow().filter {
+                    it.notes?.contains(input) == true || it.cate?.contains(lowercase) == true
+                }.buffer().toList().let { noteFilterList ->
+                    refreshNoteList(noteFilterList as MutableList<GalleyMedia>)
+                    cancel()
+                }
             }
         }
     }

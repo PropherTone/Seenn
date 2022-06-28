@@ -12,10 +12,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.animation.AnimationHelper
-import com.protone.api.context.layoutInflater
-import com.protone.api.context.navigationBarHeight
-import com.protone.api.context.root
-import com.protone.api.context.statuesBarHeight
+import com.protone.api.context.*
 import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.adapter.MusicBucketAdapter
@@ -194,8 +191,10 @@ class MusicSeen(context: Context) : Seen<MusicSeen.Event>(context), StateImageVi
     }
 
     fun playPosition(music: Music) {
-        if (binding.musicMusicList.adapter is MusicListAdapter)
-            (binding.musicMusicList.adapter as MusicListAdapter).playPosition(music)
+        context.onUiThread {
+            if (binding.musicMusicList.adapter is MusicListAdapter)
+                (binding.musicMusicList.adapter as MusicListAdapter).playPosition(music)
+        }
     }
 
     override fun onActive() {

@@ -22,10 +22,7 @@ class LogSeen(context: Context) : Seen<LogSeen.LogEvent>(context) {
 
     init {
         initToolBar()
-        binding.logList.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = LogListAdapter(context)
-        }
+        binding.self = this
     }
 
     override fun offer(event: LogEvent) {
@@ -37,6 +34,10 @@ class LogSeen(context: Context) : Seen<LogSeen.LogEvent>(context) {
     }
 
     fun setLogEvent(event : LogListAdapter.LogEvent){
+        binding.logList.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = LogListAdapter(context)
+        }
         (binding.logList.adapter as LogListAdapter).logEvent = event
     }
 

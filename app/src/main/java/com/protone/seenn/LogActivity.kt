@@ -18,31 +18,32 @@ class LogActivity : BaseActivity<LogSeen>() {
         val logSeen = LogSeen(this)
         setContentSeen(logSeen)
 
+        logSeen.setLogEvent(object : LogListAdapter.LogEvent {
+            override fun shareLog(path: String) {
+                startActivity(Intent(Intent.ACTION_SEND).apply {
+                    putExtra(
+                        Intent.EXTRA_STREAM,
+                        FileProvider.getUriForFile(
+                            this@LogActivity,
+                            "com.protone.seenn.fileProvider",
+                            File(path)
+                        )
+                    )
+                    type = "text/plain"
+                })
+            }
+
+            override fun viewLog(path: String) {
+
+            }
+
+        })
+
         while (isActive) {
             select<Unit> {
                 event.onReceive {
                     when (it) {
                         Event.OnStart -> {
-                            logSeen.setLogEvent(object : LogListAdapter.LogEvent {
-                                override fun shareLog(path: String) {
-                                    startActivity(Intent(Intent.ACTION_SEND).apply {
-                                        putExtra(
-                                            Intent.EXTRA_STREAM,
-                                            FileProvider.getUriForFile(
-                                                this@LogActivity,
-                                                "com.protone.seenn.fileProvider",
-                                                File(path)
-                                            )
-                                        )
-                                        type = "text/plain"
-                                    })
-                                }
-
-                                override fun viewLog(path: String) {
-
-                                }
-
-                            })
                             SCrashHandler.path?.let { path ->
                                 withContext(Dispatchers.IO) {
                                     val file = File(path.getParentPath())
