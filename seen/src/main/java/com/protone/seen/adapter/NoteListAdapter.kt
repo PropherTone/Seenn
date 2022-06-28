@@ -2,15 +2,12 @@ package com.protone.seen.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
-import com.protone.api.Config
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.protone.api.context.layoutInflater
 import com.protone.api.toDateString
-import com.protone.api.toDrawable
 import com.protone.database.room.entity.Note
-import com.protone.seen.databinding.MainLayoutBinding
 import com.protone.seen.databinding.NoteListAdapterLayoutBinding
 
 class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBinding>(context) {
@@ -33,9 +30,11 @@ class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBindi
                 noteClk?.invoke(noteList[holder.layoutPosition].title)
             }
             noteList[holder.layoutPosition].let {
-                it.imagePath.toDrawable(context) { drawable ->
-                    noteBack.setImageDrawable(drawable)
-                }
+                Glide.with(context)
+                    .asDrawable()
+                    .load(it.imagePath)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(noteBack)
                 noteTitle.text = it.title
                 noteDate.text = it.time.toDateString()
             }

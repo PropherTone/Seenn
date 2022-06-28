@@ -3,7 +3,6 @@ package com.protone.seen
 import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Animatable
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.widget.ImageView
@@ -149,13 +148,17 @@ class NoteEditSeen(context: Context) : Seen<NoteEditSeen.NoteEditEvent>(context)
         }
     }
 
-    fun setNoteIcon(drawable: Drawable?) {
-        binding.noteEditIcon.setImageDrawable(drawable)
+    fun setNoteIcon(path:String) {
+        Glide.with(context)
+            .asDrawable()
+            .load(path)
+            .skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .into(binding.noteEditIcon)
     }
 
     fun setNoteIconCache(uri: Uri?) {
-        Glide.with(context).asDrawable().load(uri).skipMemoryCache(true)
-            .diskCacheStrategy(DiskCacheStrategy.NONE).into(binding.noteEditIcon)
+        Glide.with(context).asDrawable().load(uri).into(binding.noteEditIcon)
     }
 
     fun showProgress(isShow: Boolean) = context.onUiThread {

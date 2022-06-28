@@ -25,7 +25,8 @@ class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context)
         Unlock,
         Finish,
         Refresh,
-        ClearCache
+        ClearCache,
+        Log
     }
 
     enum class DisplayMode {
@@ -50,11 +51,12 @@ class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context)
         binding.self = this
     }
 
-    fun clear(){
+    fun clear() {
         binding.userRoot.removeAllViews()
     }
 
     suspend fun chooseMode(mode: DisplayMode) {
+        val logView = initModeView("日志", UserEvent.Log)
         if (mode == DisplayMode.UnRegis) {
             UserConfigItemLayoutBinding.inflate(context.layoutInflater, context.root, false)
                 .apply {
@@ -63,10 +65,11 @@ class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context)
                 }.root.run {
                     layoutParams = ConstraintLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
-                        Config.screenHeight
+                        Config.screenHeight - context.resources.getDimensionPixelSize(R.dimen.user_icon)
                     )
                     binding.userRoot.addView(this)
                 }
+            binding.userRoot.addView(logView)
             return
         }
         val views = mutableListOf<View>(
@@ -76,7 +79,8 @@ class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context)
             initModeView("笔记共享", UserEvent.ShareNote),
             initModeView("数据共享", UserEvent.ShareData),
             initModeView("模块加密", UserEvent.Lock),
-            initModeView("清理缓存", UserEvent.ClearCache)
+            initModeView("清理缓存", UserEvent.ClearCache),
+            logView
         )
         if (mode == DisplayMode.Locked) views.add(initModeView("模块解锁", UserEvent.Unlock))
         views.forEach {

@@ -15,7 +15,6 @@ import androidx.lifecycle.MutableLiveData
 import com.protone.api.context.*
 import com.protone.api.toBitmapByteArray
 import com.protone.database.room.entity.Music
-import com.protone.seenn.BaseActivity
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.ApplicationBroadCast
 import com.protone.seenn.broadcast.MusicReceiver
@@ -72,7 +71,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     private val appReceiver = object : ApplicationBroadCast() {
         override fun finish() {
             notificationManager?.cancelAll()
-            activityOperationBroadcast.sendBroadcast(Intent(BaseActivity.FINISH))
+            activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
             stopSelf()
             val activityManager =
                 Global.application.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -370,14 +369,12 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     }
 
     private fun finishMusic() {
-        launch {
-            synchronized(this@MusicService) {
-                musicPlayer?.apply {
-                    stop()
-                    reset()
-                    release()
-                    musicPlayer = null
-                }
+        synchronized(this@MusicService) {
+            musicPlayer?.apply {
+                stop()
+                reset()
+                release()
+                musicPlayer = null
             }
         }
     }

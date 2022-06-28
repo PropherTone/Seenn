@@ -19,7 +19,7 @@
         <ScrollView
             android:layout_weight="1"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp">
 
             <LinearLayout
                 android:id="@+id/userRoot"
@@ -35,7 +35,7 @@
             android:id="@+id/user_leave"
             android:layout_width="match_parent"
             android:layout_height="@dimen/action_icon_p"
-            android:background="@drawable/background_ripple_blue"
+            android:background="@drawable/trans_ripple"
             android:contentDescription="@string/action"
             android:onClick="@{()-> self.offer(UserEvent.Finish)}"
             android:padding="@dimen/icon_padding_lite"

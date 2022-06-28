@@ -86,7 +86,6 @@ class MySmallMusicPlayer @JvmOverloads constructor(
         Glide.with(context).asDrawable().load(embeddedPicture)
             .error(R.drawable.ic_baseline_music_note_24)
             .circleCrop().transition(DrawableTransitionOptions.withCrossFade())
-            .skipMemoryCache(true)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .placeholder(R.drawable.ic_baseline_music_note_24)
             .override(binding.smallMusicIcon.measuredWidth, binding.smallMusicIcon.measuredHeight)

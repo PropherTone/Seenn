@@ -11,6 +11,8 @@ const val MUSIC_PREVIOUS = "PreviousMusic"
 const val MUSIC_FINISH = "FinishMusic"
 
 const val FINISH = "FINISH"
+const val ACTIVITY_FINISH = "ACTIVITY_FINISH"
+const val ACTIVITY_RESTART = "ACTIVITY_RESTART"
 const val MUSIC = "MUSIC"
 
 const val UPDATE_MUSIC_BUCKET = "UPDATE_MUSIC_BUCKET"

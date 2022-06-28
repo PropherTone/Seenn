@@ -7,7 +7,6 @@ import com.protone.api.context.intent
 import com.protone.api.json.toEntity
 import com.protone.api.json.toUriJson
 import com.protone.api.toDateString
-import com.protone.api.toDrawable
 import com.protone.api.toMediaBitmapByteArray
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
@@ -85,10 +84,8 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                         ) { s ->
                                             if (!s.isNullOrEmpty()) {
                                                 savedIconPath = s
-                                                savedIconPath.toDrawable(this@NoteEditActivity) { dra ->
-                                                    noteEditSeen.setNoteIcon(dra)
-                                                    co.resumeWith(Result.success(savedIconPath))
-                                                }
+                                                noteEditSeen.setNoteIcon(savedIconPath)
+                                                co.resumeWith(Result.success(savedIconPath))
                                             } else {
                                                 toast(getString(R.string.failed_upload_image))
                                                 co.resumeWith(Result.success(iconUri!!.toUriJson()))

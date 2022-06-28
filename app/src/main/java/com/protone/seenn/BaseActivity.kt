@@ -32,10 +32,6 @@ import kotlin.coroutines.suspendCoroutine
 abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     CoroutineScope by MainScope() {
 
-    companion object{
-        const val FINISH = "ACTIVITY_FINISH"
-    }
-
     var musicReceiver: MusicReceiver? = null
         set(value) {
             value?.let { registerReceiver(it, musicIntentFilter) }
@@ -44,8 +40,11 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
 
     private val activityOperationReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == FINISH) {
-                finish()
+            when (intent?.action) {
+                ACTIVITY_FINISH -> finish()
+                ACTIVITY_RESTART -> {
+                    startActivity(SplashActivity::class.intent)
+                }
             }
         }
     }
@@ -85,8 +84,9 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activityOperationBroadcast.registerReceiver(activityOperationReceiver,
-            IntentFilter(FINISH)
+        activityOperationBroadcast.registerReceiver(
+            activityOperationReceiver,
+            IntentFilter(ACTIVITY_FINISH)
         )
         launch {
             main()

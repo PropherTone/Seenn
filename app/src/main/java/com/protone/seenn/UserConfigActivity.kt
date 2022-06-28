@@ -113,6 +113,7 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                             }
                         }
                         UserConfigSeen.UserEvent.Refresh -> userConfigSeen.refreshLayout()
+                        UserConfigSeen.UserEvent.Log -> startActivity(LogActivity::class.intent)
                     }
                 }
             }

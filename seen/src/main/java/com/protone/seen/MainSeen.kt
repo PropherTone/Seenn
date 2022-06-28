@@ -6,11 +6,12 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.navigationBarHeight
 import com.protone.api.context.root
-import com.protone.api.toDrawable
 import com.protone.api.todayDate
 import com.protone.seen.adapter.MainModelListAdapter
 import com.protone.seen.databinding.MainLayoutBinding
@@ -41,10 +42,12 @@ class MainSeen(context: Context) : Seen<MainSeen.Touch>(context),
 
     var userIcon: String = ""
         set(value) {
-            value.toDrawable(context) {
-                if (it != null) {
-                    binding.userIcon.background = it
-                }
+            if (value.isNotEmpty()) {
+                Glide.with(context)
+                    .asDrawable()
+                    .load(value)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(binding.userIcon)
             }
             field = value
         }

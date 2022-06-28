@@ -1,16 +1,11 @@
 package com.protone.api
 
-import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import com.protone.api.context.Global
-import com.protone.api.context.onBackground
-import com.protone.api.context.onUiThread
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -26,13 +21,8 @@ fun String.getFileMimeType(): String {
     return "." + this.split(".").let { it[it.size - 1] }
 }
 
-fun String.toDrawable(context: Context, callBack: (Drawable?) -> Unit) {
-    onBackground {
-        val file = File(this)
-        val drawable: Drawable? = if (!file.isFile || !file.exists()) null
-        else BitmapDrawable.createFromPath(this)
-        context.onUiThread { callBack.invoke(drawable) }
-    }
+fun String.getParentPath(): String {
+    return this.substring(0, lastIndexOf("/"))
 }
 
 fun Bitmap.saveToFile(fileName: String): String? {
@@ -144,7 +134,7 @@ fun Long.toDateString(format: String = "HH:mm:ss yyyy/MM/dd E"): String? =
 fun Long.toDateString(): String? =
     SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(
         Calendar.getInstance(Locale.getDefault()).also {
-            it.timeInMillis = this * 1000
+            it.timeInMillis = this
         }.time
     )
 
