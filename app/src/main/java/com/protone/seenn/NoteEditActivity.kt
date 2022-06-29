@@ -4,7 +4,9 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.intent
+import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
+import com.protone.api.json.toJson
 import com.protone.api.json.toUriJson
 import com.protone.api.toDateString
 import com.protone.api.toMediaBitmapByteArray
@@ -12,10 +14,13 @@ import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
 import com.protone.mediamodle.GalleyHelper
+import com.protone.mediamodle.note.entity.RichNoteSer
 import com.protone.mediamodle.note.entity.RichPhotoStates
+import com.protone.mediamodle.note.entity.SpanStates
 import com.protone.seen.GalleySeen
 import com.protone.seen.NoteEditSeen
 import com.protone.seen.PickMusicSeen
+import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
@@ -43,23 +48,44 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
     companion object {
         const val NOTE_TYPE = "NoteType"
         const val NOTE = "Note"
+        const val CONTENT_TITLE = "NoteContentTitle"
     }
 
     override suspend fun main() {
         val noteEditSeen = NoteEditSeen(this)
+        val contentTitle = intent.getStringExtra(CONTENT_TITLE)
         val noteName = intent.getStringExtra(NOTE)
-
+        var noteByName: Note? = null
         var onEdit = false
-        val noteByName = noteName?.let {
-            withContext(Dispatchers.IO) {
-                DataBaseDAOHelper.getNoteByName(it)
-            }?.let { n ->
-                noteEditSeen.title = n.title
-                noteEditSeen.initEditor(n.getRichCode(), n.getText())
-                onEdit = true
-                n
+        if (contentTitle != null) {
+            noteEditSeen.title = contentTitle
+            noteEditSeen.initEditor(
+                1,
+                mutableListOf(
+                    RichNoteSer(
+                        try {
+                            IntentDataHolder.get() as String?
+                        } catch (e: Exception) {
+                            null
+                        } ?: getString(R.string.none),
+                        arrayListOf<SpanStates>().listToJson(SpanStates::class.java)
+                    ).toJson()
+                ).listToJson(String::class.java)
+            )
+        } else {
+            noteByName = noteName?.let {
+                withContext(Dispatchers.IO) {
+                    DataBaseDAOHelper.getNoteByName(it)
+                }?.let { n ->
+                    noteEditSeen.title = n.title
+                    noteEditSeen.initEditor(n.getRichCode(), n.getText())
+                    onEdit = true
+                    n
+                }
             }
         }
+
+
         setContentSeen(noteEditSeen)
         while (isActive) {
             select<Unit> {

@@ -3,10 +3,8 @@ package com.protone.seen.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Animatable
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import com.protone.api.animation.AnimationHelper
@@ -41,8 +39,16 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
     override val select: (holder: Holder<MusicListLayoutBinding>, isSelect: Boolean) -> Unit =
         { holder, isSelect ->
             holder.binding.apply {
+                clickAnimation(
+                    isSelect,
+                    musicListInContainer,
+                    musicListInContainer,
+                    musicListPlayState,
+                    musicListName,
+                    musicListTime,
+                    musicListDetail
+                )
                 if (isSelect) {
-                    musicListPlayState.visibility = View.VISIBLE
                     musicListPlayState.setImageDrawable(
                         ResourcesCompat.getDrawable(
                             context.resources,
@@ -50,42 +56,9 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                             null
                         )
                     )
-                    musicListContainer.setBackgroundColor(
-                        ContextCompat.getColor(
-                            context,
-                            R.color.blue_1
-                        )
-                    )
-                    musicListName.setTextColor(ContextCompat.getColor(context, R.color.white))
-                    musicListTime.setTextColor(ContextCompat.getColor(context, R.color.white))
-                    musicListDetail.setTextColor(ContextCompat.getColor(context, R.color.white))
-                    startAnimation(musicListInContainer)
-                } else {
-                    musicListPlayState.visibility = View.GONE
-                    musicListContainer.setBackgroundColor(
-                        ContextCompat.getColor(
-                            context,
-                            R.color.white
-                        )
-                    )
-                    musicListName.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    musicListTime.setTextColor(ContextCompat.getColor(context, R.color.black))
-                    musicListDetail.setTextColor(ContextCompat.getColor(context, R.color.black))
                 }
             }
         }
-
-    private fun startAnimation(target: ViewGroup) {
-        AnimationHelper.apply {
-            val x = scaleX(target, 0.96f, duration = 50)
-            val y = scaleY(target, 0.96f, duration = 50)
-            val x1 = scaleX(target, 1f, duration = 360)
-            val y1 = scaleY(target, 1f, duration = 360)
-            animatorSet(x, y, play = true, doOnEnd = {
-                animatorSet(x1, y1, play = true)
-            })
-        }
-    }
 
     override fun itemIndex(path: Music): Int = musicList.indexOf(path)
 

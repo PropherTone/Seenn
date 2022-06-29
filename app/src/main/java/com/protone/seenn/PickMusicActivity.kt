@@ -69,9 +69,12 @@ class PickMusicActivity : BaseActivity<PickMusicSeen>() {
 
     }
 
-    private suspend fun PickMusicSeen.query(input: String) = withContext(Dispatchers.IO) {
-        refreshList(data.asFlow().filter {
-            it.displayName?.contains(input,true) == true || it.album?.contains(input,true) == true
-        }.buffer().toList() as MutableList<Music>)
+    private suspend fun PickMusicSeen.query(input: String) {
+        if (input.isEmpty()) return
+        withContext(Dispatchers.IO) {
+            refreshList(data.asFlow().filter {
+                it.displayName?.contains(input,true) == true || it.album?.contains(input,true) == true
+            }.buffer().toList() as MutableList<Music>)
+        }
     }
 }
