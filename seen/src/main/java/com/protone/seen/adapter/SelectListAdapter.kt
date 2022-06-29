@@ -52,9 +52,10 @@ abstract class SelectListAdapter<V : ViewDataBinding, T>(context: Context) :
     fun clickAnimation(
         pressed: Boolean,
         background: View?,
-        container:ViewGroup?,
+        container: ViewGroup?,
         visible: View?,
-        vararg texts: TextView
+        vararg texts: TextView,
+        dispatch: Boolean = true
     ) {
         background?.setBackgroundColor(
             ContextCompat.getColor(
@@ -68,6 +69,35 @@ abstract class SelectListAdapter<V : ViewDataBinding, T>(context: Context) :
                 ContextCompat.getColor(
                     context,
                     if (pressed) R.color.white else R.color.black
+                )
+            )
+        }
+        itemClickChange(
+            if (pressed) R.color.blue_1 else R.color.white,
+            if (pressed) R.color.white else R.color.black,
+            background, container, texts, pressed && dispatch
+        )
+    }
+
+    fun itemClickChange(
+        backgroundColor: Int,
+        textsColor: Int,
+        background: View?,
+        container: ViewGroup?,
+        texts: Array<out TextView>,
+        pressed: Boolean,
+    ) {
+        background?.setBackgroundColor(
+            ContextCompat.getColor(
+                context,
+                backgroundColor
+            )
+        )
+        texts.forEach {
+            it.setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    textsColor
                 )
             )
         }

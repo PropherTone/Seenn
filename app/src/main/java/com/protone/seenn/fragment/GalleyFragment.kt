@@ -33,6 +33,7 @@ import com.protone.seenn.GalleySearchActivity
 import com.protone.seenn.R
 import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 
 class GalleyFragment(
     private val isVideo: Boolean,
@@ -58,6 +59,8 @@ class GalleyFragment(
     private val galleyMap = mutableMapOf<String?, MutableList<GalleyMedia>>()
 
     var iGalleyFragment: IGalleyFragment? = null
+    private val channel = Channel<String>(Channel.BUFFERED)
+    private var onViewCreated = false
     var fragMailer: FragMailer = object : FragMailer {
 
         override fun deleteMedia(galleyMedia: GalleyMedia) {
@@ -148,20 +151,25 @@ class GalleyFragment(
                 }
             }
         }
+        channel.trySend("onCreateView")
         return binding.root
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        launch(Dispatchers.IO) {
-            while (true) {
-                if (::binding.isInitialized) {
-                    launch(Dispatchers.Main) {
-                        initList()
-                        sortData()
-                        if (!isLock) sortPrivateData()
+        launch {
+            while (!onViewCreated) {
+                kotlinx.coroutines.selects.select<Unit> {
+                    channel.onReceive {
+                        when (it) {
+                            "onCreateView" -> {
+                                onViewCreated = true
+                                initList()
+                                sortData()
+                                if (!isLock) sortPrivateData()
+                            }
+                        }
                     }
-                    break
                 }
             }
         }
@@ -197,9 +205,7 @@ class GalleyFragment(
                 ) {
                     super.getItemOffsets(outRect, view, parent, state)
                     if (parent.getChildLayoutPosition(view) != 0) {
-                        outRect.top =
-                            resources.getDimension(R.dimen.icon_padding)
-                                .toInt() shr 1
+                        outRect.top = resources.getDimension(R.dimen.icon_padding).toInt() shr 1
                     }
                 }
             })

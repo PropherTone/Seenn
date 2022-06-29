@@ -7,6 +7,7 @@ import androidx.core.view.isGone
 import com.protone.api.context.layoutInflater
 import com.protone.api.toStringMinuteTime
 import com.protone.database.room.entity.Music
+import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
 
 class MusicListAdapter(context: Context) :
@@ -35,7 +36,8 @@ class MusicListAdapter(context: Context) :
                     musicListPlayState,
                     musicListName,
                     musicListTime,
-                    musicListDetail
+                    musicListDetail,
+                    dispatch = false
                 )
             }
         }
@@ -62,8 +64,18 @@ class MusicListAdapter(context: Context) :
                 setSelect(holder, selectList.contains(music))
                 musicListContainer.setOnClickListener {
                     if (playPosition == holder.layoutPosition) return@setOnClickListener
-                    checkSelect(holder, music)
-                    playPosition = holder.layoutPosition
+                    itemClickChange(
+                        R.color.blue_2,
+                        R.color.white,
+                        musicListContainer,
+                        musicListInContainer,
+                        arrayOf(
+                            musicListName,
+                            musicListTime,
+                            musicListDetail
+                        ),
+                        true
+                    )
                     clickCallback(music)
                 }
                 musicListName.text = music.title

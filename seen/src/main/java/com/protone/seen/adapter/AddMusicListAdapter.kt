@@ -41,7 +41,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
             holder.binding.apply {
                 clickAnimation(
                     isSelect,
-                    musicListInContainer,
+                    musicListContainer,
                     musicListInContainer,
                     musicListPlayState,
                     musicListName,
