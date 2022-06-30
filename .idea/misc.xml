@@ -95,6 +95,9 @@
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/xml/note_bucket_layout_scene.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/activity_main.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/colors.xml" value="0.25364583333333335" />
+        <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/galley_activity.xml" value="0.2085222121486854" />
+        <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/main_activity.xml" value="0.2085222121486854" />
+        <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/note_activity.xml" value="0.30055579307396324" />
         <entry key="..\:/AndroidStudioProject/Seenn/richNote/src/main/res/layout/activity_connect.xml" value="0.155622060709705" />
         <entry key="..\:/AndroidStudioProject/Seenn/richNote/src/main/res/layout/activity_cut.xml" value="0.155622060709705" />
         <entry key="..\:/AndroidStudioProject/Seenn/richNote/src/main/res/layout/activity_guide.xml" value="0.155622060709705" />
@@ -223,6 +226,7 @@
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/text_cate_layout.xml" value="0.2902949978623343" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/text_icon_layout.xml" value="0.36614583333333334" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/user_card_layout.xml" value="0.25" />
+        <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/user_config_item_layout.xml" value="0.30055579307396324" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/user_config_layout.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/video_card.xml" value="0.25" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/layout/video_card_layout.xml" value="0.25" />

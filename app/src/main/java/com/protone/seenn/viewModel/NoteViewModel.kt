@@ -12,7 +12,7 @@ import kotlin.coroutines.suspendCoroutine
 
 class NoteViewModel : ViewModel() {
 
-    val noteList = mutableMapOf<String, MutableList<Note>>()
+    private val noteList = mutableMapOf<String, MutableList<Note>>()
 
     var selected: String? = null
 
@@ -29,7 +29,7 @@ class NoteViewModel : ViewModel() {
                         if (noteList[type] == null) {
                             noteList[type] = mutableListOf()
                         }
-                        if (type != Global.app.getString(R.string.all)) noteList[type]?.add(note)
+                        if (type != Global.app.getString(R.string.all) && noteList[type]?.contains(note) == false) noteList[type]?.add(note)
                     }
                 }
                 co.resumeWith(Result.success(noteList[selected] ?: mutableListOf()))

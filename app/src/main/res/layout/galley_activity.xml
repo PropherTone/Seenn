@@ -13,19 +13,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <View
-            android:id="@+id/view"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_width="match_parent"
-            android:background="@drawable/main_background"
-            android:layout_height="1dp"/>
-
         <RelativeLayout
             android:id="@+id/galley_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/main_background"
-            app:layout_constraintTop_toBottomOf="@id/view">
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/galley_back"

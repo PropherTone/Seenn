@@ -22,6 +22,12 @@ class GalleyViewModel : ViewModel(), TabLayout.OnTabSelectedListener {
 
         @JvmStatic
         val GALLEY_DATA = "GalleyData"
+
+        @JvmStatic
+        val CHOOSE_PHOTO = "PHOTO"
+
+        @JvmStatic
+        val CHOOSE_VIDEO = "VIDEO"
     }
 
     var chooseType = ""
@@ -33,7 +39,7 @@ class GalleyViewModel : ViewModel(), TabLayout.OnTabSelectedListener {
     val chooseData: MutableLiveData<MutableList<GalleyMedia>> =
         MutableLiveData<MutableList<GalleyMedia>>()
 
-    var startActivity : ((GalleyMedia,String)->Unit)? = null
+    var startActivity: ((GalleyMedia, String) -> Unit)? = null
 
     val iGalleyFragment = object : IGalleyFragment {
         override fun select(galleyMedia: MutableList<GalleyMedia>) {
@@ -41,7 +47,7 @@ class GalleyViewModel : ViewModel(), TabLayout.OnTabSelectedListener {
         }
 
         override fun openView(galleyMedia: GalleyMedia, galley: String) {
-            startActivity?.invoke(galleyMedia,galley)
+            startActivity?.invoke(galleyMedia, galley)
         }
     }
 

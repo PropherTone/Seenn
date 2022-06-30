@@ -19,6 +19,7 @@ import com.protone.seenn.databinding.NoteActivityBinding
 import com.protone.seenn.viewModel.NoteViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
@@ -27,6 +28,7 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>() {
 
     override suspend fun initView() {
         binding = NoteActivityBinding.inflate(layoutInflater, root, false)
+        binding.activity = this
         fitStatuesBar(binding.root)
         fitNavigationBar(binding.root)
     }
@@ -45,6 +47,13 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>() {
             startActivity(NoteViewActivity::class.intent.also {
                 it.putExtra(NoteViewActivity.NOTE_NAME, s)
             })
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        launch {
+            refreshList()
         }
     }
 
@@ -71,14 +80,15 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>() {
     }
 
     fun refresh() {
+        handleBucketEvent()
+        TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
         launch {
-            TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
             init()
-            refreshList()
         }
+        refreshList()
     }
 
-    private suspend fun refreshList() {
+    private fun refreshList() {
         launch {
             refreshNoteList(viewModel.queryAllNote())
             refreshNoteType(viewModel.queryAllNoteType())

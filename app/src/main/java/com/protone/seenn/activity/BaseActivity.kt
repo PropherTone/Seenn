@@ -101,16 +101,13 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel> : AppCompatAct
 
     inline fun startActivityForResult(
         intent: Intent?,
-        crossinline callback: suspend (ActivityResult?) -> Unit
+        crossinline callback: (ActivityResult?) -> Unit
     ) {
         activityResultRegistry.register(
             code.incrementAndGet().toString(),
-            this,
             ActivityResultContracts.StartActivityForResult(),
         ) {
-            launch {
-                callback.invoke(it)
-            }
+            callback.invoke(it)
         }.launch(intent)
     }
 

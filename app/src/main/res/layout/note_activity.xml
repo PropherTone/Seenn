@@ -43,6 +43,7 @@
                 android:text="@string/model_noteBook"
                 android:textColor="@color/white"
                 android:textSize="@dimen/title_text"
+                android:letterSpacing="0.02"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -102,14 +103,17 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <View
+        <ImageView
+            android:padding="@dimen/icon_padding_mid"
+            android:src="@drawable/ic_baseline_book_24_white"
             android:id="@+id/note_action"
             android:layout_width="@dimen/action_icon"
             android:layout_height="@dimen/action_icon"
             android:background="@color/blue_1"
             android:onClick="@{()->activity.handleBucketEvent()}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            android:contentDescription="@string/action" />
 
     </androidx.constraintlayout.motion.widget.MotionLayout>
 

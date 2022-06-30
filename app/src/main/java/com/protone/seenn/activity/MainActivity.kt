@@ -125,11 +125,11 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(),
 
     fun onGalley() = startActivity(GalleyActivity::class.intent)
 
-    fun onNote() = if (userConfig.lockMusic == "")
-        startActivity(MusicActivity::class.intent) else toast(getString(R.string.locked))
-
-    fun onMusic() = if (userConfig.lockNote == "")
+    fun onNote() = if (userConfig.lockNote == "")
         startActivity(NoteActivity::class.intent) else toast(getString(R.string.locked))
+
+    fun onMusic() = if (userConfig.lockMusic == "")
+        startActivity(MusicActivity::class.intent) else toast(getString(R.string.locked))
 
     fun onUserConfig() = startActivity(UserConfigActivity::class.intent)
 
@@ -153,7 +153,8 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(),
                         -verticalOffset / appBarLayout.totalScrollRange.toFloat().also {
                             binding.musicPlayer.isVisible = it > 0.7f
                             binding.actionBtnContainer.also { btn ->
-                                btn.y = viewModel.btnY - (viewModel.btnH * binding.toolMotion.progress) * 2
+                                btn.y =
+                                    viewModel.btnY - (viewModel.btnH * binding.toolMotion.progress) * 2
                             }
                         }
                 })

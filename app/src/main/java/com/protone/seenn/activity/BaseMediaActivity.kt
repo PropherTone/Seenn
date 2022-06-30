@@ -1,6 +1,7 @@
 package com.protone.seenn.activity
 
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isGone
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModel
@@ -14,8 +15,8 @@ import com.protone.seen.dialog.CateDialog
 import com.protone.seen.dialog.TitleDialog
 import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seen.popWindows.GalleyOptionPop
-import com.protone.seenn.GalleyActivity
 import com.protone.seenn.R
+import com.protone.seenn.viewModel.GalleyViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,7 +36,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel> : BaseAct
     abstract fun popSetCate()
     abstract fun popIntoBox()
 
-    fun initPop(){
+    fun initPop() {
         if (pop == null) {
             popLayout = GalleyOptionPopBinding.inflate(layoutInflater, root, false).apply {
                 pop = GalleyOptionPop(this@BaseMediaActivity, root)
@@ -113,20 +114,18 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel> : BaseAct
                 addCate(re, gms)
             }
         }) {
-            launch(Dispatchers.IO) {
-                startActivityForResult(
-                    GalleyActivity::class.intent.also { intent ->
-                        intent.putExtra(
-                            GalleyActivity.CHOOSE_MODE,
-                            GalleySeen.CHOOSE_PHOTO
-                        )
-                    }
-                ) { result ->
-                    val uri = result?.data?.getStringExtra(GalleyActivity.URI)
-                    if (uri != null) {
-                        addCate(uri, gms)
-                    } else showFailedToast()
+            startActivityForResult(
+                GalleyActivity::class.intent.also { intent ->
+                    intent.putExtra(
+                        GalleyViewModel.CHOOSE_MODE,
+                        GalleyViewModel.CHOOSE_PHOTO
+                    )
                 }
+            ) { result ->
+                val uri = result?.data?.getStringExtra(GalleyViewModel.URI)
+                if (uri != null) {
+                    addCate(uri, gms)
+                } else showFailedToast()
             }
         }
     }
@@ -148,7 +147,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel> : BaseAct
         isVideo: Boolean,
         gms: MutableList<GalleyMedia>,
         callback: (String, MutableList<GalleyMedia>) -> Unit
-    ) = withContext(Dispatchers.Main){
+    ) = withContext(Dispatchers.Main) {
         val pop = ColorfulPopWindow(this@BaseMediaActivity)
         pop.startListPopup(
             anchor,

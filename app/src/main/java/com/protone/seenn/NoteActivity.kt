@@ -11,6 +11,7 @@ import com.protone.seen.R
 import com.protone.seen.dialog.TitleDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.suspendCoroutine
@@ -41,13 +42,15 @@ class NoteActivity : BaseActivity<NoteSeen>() {
                         NoteSeen.NoteEvent.AddBucket -> {
                             TitleDialog(this@NoteActivity, getString(R.string.add_dir), "") { re ->
                                 if (re.isNotEmpty()) {
-                                    DataBaseDAOHelper.insertNoteTypeRs(
-                                        NoteType(re, "")
-                                    ) { suc, name ->
-                                        if (suc) {
-                                            noteSeen.insertNoteType(NoteType(name, ""))
-                                        } else {
-                                            toast(getString(R.string.failed_msg))
+                                    launch {
+                                        DataBaseDAOHelper.insertNoteTypeRs(
+                                            NoteType(re, "")
+                                        ).let { pair ->
+                                            if (pair.first) {
+                                                noteSeen.insertNoteType(NoteType(pair.second, ""))
+                                            } else {
+                                                toast(getString(R.string.failed_msg))
+                                            }
                                         }
                                     }
                                 } else {
