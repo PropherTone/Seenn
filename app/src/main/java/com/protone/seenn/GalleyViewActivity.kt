@@ -5,6 +5,7 @@ import com.protone.api.context.intent
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.onUiThread
 import com.protone.api.context.root
+import com.protone.api.getStorageSize
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.json.toUri
@@ -85,7 +86,7 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
         setInfo()
     }
 
-    private fun GalleyViewSeen.setInfo() {
+    private suspend fun GalleyViewSeen.setInfo() {
         DataBaseDAOHelper.getSignedMediaCB(
             galleyMedias[curPosition].uri
         ) { galleyMedia ->
@@ -101,12 +102,12 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
                             onUiThread {
                                 Glide.with(context).asDrawable().load(it.toUri()).into(catoBack)
                                 catoName.text = galleyMedia.name
-                                root.setOnClickListener {
-                                    startActivity(GalleyViewActivity::class.intent.apply {
-                                        putExtra(MEDIA, galleyMedia.toJson())
-                                        putExtra(TYPE, galleyMedia.isVideo)
-                                    })
-                                }
+                            }
+                            root.setOnClickListener {
+                                startActivity(GalleyViewActivity::class.intent.apply {
+                                    putExtra(MEDIA, galleyMedia.toJson())
+                                    putExtra(TYPE, galleyMedia.isVideo)
+                                })
                             }
                         }.root
                     )
@@ -130,7 +131,7 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
         setMediaInfo(
             m.name,
             m.date.toDateString("yyyy/MM/dd").toString(),
-            "${m.size / 1024}Kb",
+            m.size.getStorageSize(),
             m.path ?: m.uri.toString()
         )
     }

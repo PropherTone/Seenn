@@ -150,3 +150,30 @@ fun todayDate(format: String): String = SimpleDateFormat(
 ).format(Calendar.getInstance(Locale.getDefault()).apply {
     timeInMillis = System.currentTimeMillis()
 }.time)
+
+val sizeFormatMap = mapOf(Pair(0, "B"), Pair(1, "KB"), Pair(2, "MB"), Pair(3, "GB"))
+
+fun Long.getFormatStorageSize(): String {
+    var i = this@getFormatStorageSize
+    var times = 0
+    val size = sizeFormatMap.size - 1
+    while (i > 1024) {
+        i /= 1024
+        if (++times >= size) break
+    }
+    return if (times <= size) "$i${sizeFormatMap[times]}" else {
+        "$i${sizeFormatMap[0]}"
+    }
+}
+
+fun Long.getStorageSize(): String {
+    return getSST(0)
+}
+
+private fun Long.getSST(times: Int): String {
+    if (times >= sizeFormatMap.size - 1) return "$this${sizeFormatMap[0]}"
+    if (this < 1024) return "$this${sizeFormatMap[times]}"
+    val i = this / 1024
+    var count = times
+    return if (i > 1024) i.getSST(++count) else "$i${sizeFormatMap[0]}"
+}
