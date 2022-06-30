@@ -27,14 +27,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Seenn"
         tools:ignore="DataExtractionRules">
-        <activity
-            android:name=".MainActivity"
-            android:exported="false"
-            android:launchMode="singleTop" />
         <activity android:name=".NoteSyncActivity" />
-        <activity android:name=".NoteActivity" />
+        <activity android:name=".activity.NoteActivity" />
         <activity android:name=".PictureBoxActivity" />
-        <activity android:name=".GalleyActivity" />
+        <activity android:name=".activity.GalleyActivity" />
         <activity android:name=".MusicActivity" />
         <activity android:name=".AddBucketActivity" />
         <activity android:name=".NoteEditActivity" />
@@ -45,6 +41,9 @@
         <activity android:name=".LogActivity" />
         <activity android:name=".MusicViewActivity" />
         <activity android:name=".GalleySearchActivity" />
+        <activity android:name=".activity.MainActivity"
+            android:exported="false"
+            android:launchMode="singleTop"/>
         <activity
             android:name=".SplashActivity"
             android:exported="true">

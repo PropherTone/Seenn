@@ -21,6 +21,8 @@ import com.protone.seen.adapter.CheckListAdapter
 import com.protone.seen.adapter.GalleyViewPager2Adapter
 import com.protone.seen.databinding.GalleyViewLayoutBinding
 import com.protone.seen.databinding.RichVideoLayoutBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @SuppressLint("ClickableViewAccessibility")
 class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEvent>(context) {
@@ -121,7 +123,7 @@ class GalleyViewSeen(context: Context) : PopupCoverSeen<GalleyViewSeen.GalleyVEv
         }
     }
 
-    fun addCato(view:View) {
+    suspend fun addCato(view:View)  = withContext(Dispatchers.Main){
         context.onUiThread {
             binding.galleyVCatoContainer.addView(view)
         }

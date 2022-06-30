@@ -11,7 +11,7 @@ import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.json.toUri
 import com.protone.mediamodle.IWorkService
 
-val workLocalBroadCast by lazy { LocalBroadcastManager.getInstance(Global.application) }
+val workLocalBroadCast by lazy { LocalBroadcastManager.getInstance(Global.app) }
 
 abstract class WorkReceiver : BroadcastReceiver() , IWorkService {
 

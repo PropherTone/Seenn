@@ -103,22 +103,7 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                                 Note(
                                     noteEditSeen.title,
                                     indexedRichNote.second,
-                                    if (iconUri != null) suspendCancellableCoroutine { co ->
-                                        GalleyHelper.saveIconToLocal(
-                                            noteEditSeen.title,
-                                            iconUri?.toMediaBitmapByteArray()
-                                        ) { s ->
-                                            if (!s.isNullOrEmpty()) {
-                                                savedIconPath = s
-                                                noteEditSeen.setNoteIcon(savedIconPath)
-                                                co.resumeWith(Result.success(savedIconPath))
-                                            } else {
-                                                toast(getString(R.string.failed_upload_image))
-                                                co.resumeWith(Result.success(iconUri!!.toUriJson()))
-                                            }
-                                            noteEditSeen.showProgress(false)
-                                        }
-                                    } else "",
+                                    savedIconPath,
                                     System.currentTimeMillis(),
                                     mutableListOf(intent.getStringExtra(NOTE_TYPE)),
                                     indexedRichNote.first
@@ -204,8 +189,26 @@ class NoteEditActivity : BaseActivity<NoteEditSeen>() {
                             }
                         }
                         NoteEditSeen.NoteEditEvent.PickIcon -> startGalleyPick(true)?.let { re ->
-                            noteEditSeen.setNoteIconCache(re.uri)
                             iconUri = re.uri
+                            noteEditSeen.setNoteIconCache(re.uri)
+                            noteEditSeen.showProgress(true)
+                            savedIconPath = if (iconUri != null) withContext(Dispatchers.IO) {
+                                suspendCancellableCoroutine { co ->
+                                    GalleyHelper.saveIconToLocal(
+                                        noteEditSeen.title,
+                                        iconUri?.toMediaBitmapByteArray()
+                                    ) { s ->
+                                        if (!s.isNullOrEmpty()) {
+                                            noteEditSeen.setNoteIcon(savedIconPath)
+                                            co.resumeWith(Result.success(savedIconPath))
+                                        } else {
+                                            toast(getString(R.string.failed_upload_image))
+                                            co.resumeWith(Result.success(iconUri!!.toUriJson()))
+                                        }
+                                        noteEditSeen.showProgress(false)
+                                    }
+                                }
+                            } else ""
                         }
 
                     }

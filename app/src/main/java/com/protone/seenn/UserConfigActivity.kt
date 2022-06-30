@@ -103,7 +103,7 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                         UserConfigSeen.UserEvent.Finish -> finish()
                         UserConfigSeen.UserEvent.ClearCache -> {
                             withContext(Dispatchers.IO) {
-                                Glide.get(Global.application).apply {
+                                Glide.get(Global.app).apply {
                                     clearDiskCache()
                                     withContext(Dispatchers.Main) {
                                         clearMemory()

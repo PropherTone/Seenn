@@ -20,7 +20,7 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
             try {
                 byteArray?.let {
                     val tempPath =
-                        "${Global.application.filesDir.absolutePath}/${fileName.getFileName()}.jpg"
+                        "${Global.app.filesDir.absolutePath}/${fileName.getFileName()}.jpg"
                     val file = File(tempPath)
                     callBack.invoke(
                         when {
@@ -48,7 +48,7 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     }
 
     fun updateAll(callBack: () -> Unit) = launch {
-        Medias.musicBucket[Global.application.getString(R.string.all_music)] = scanAudio { _, _ -> }
+        Medias.musicBucket[Global.app.getString(R.string.all_music)] = scanAudio { _, _ -> }
         callBack()
         cancel()
     }

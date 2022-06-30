@@ -1,9 +1,7 @@
 package com.protone.api.context
 
 import android.app.Activity
-import android.content.BroadcastReceiver
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
 import android.database.ContentObserver
 import android.net.Uri
@@ -15,7 +13,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 
-val activityOperationBroadcast : LocalBroadcastManager = LocalBroadcastManager.getInstance(Global.application)
+val activityOperationBroadcast : LocalBroadcastManager = LocalBroadcastManager.getInstance(Global.app)
 
 private fun Activity.observeChange(uri: Uri, targetName: String): Boolean {
     var name = ""

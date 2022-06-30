@@ -7,7 +7,7 @@ import com.protone.database.R
 import com.protone.database.sp.DataTool
 import com.protone.database.sp.toDataProvider
 
-val userConfig = UserConfig(Global.application)
+val userConfig = UserConfig(Global.app)
 
 class UserConfig(context: Context) {
 
@@ -34,7 +34,7 @@ class UserConfig(context: Context) {
 
     var lastMusicBucket by config.string(
         "PLAYED_MUSIC_BUCKET",
-        Global.application.getString(R.string.all_music)
+        Global.app.getString(R.string.all_music)
     )
 
     var lastMusic by config.string("LAST_TIME_PLAYED_MUSIC", "")

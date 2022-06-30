@@ -20,10 +20,10 @@ object Medias {
 
     var music: MutableList<Music> = mutableListOf()
         set(value) {
-            musicBucket[Global.application.getString(R.string.all_music)] = value
+            musicBucket[Global.app.getString(R.string.all_music)] = value
             field = value
         }
-        get() = musicBucket[Global.application.getString(R.string.all_music)] ?: mutableListOf()
+        get() = musicBucket[Global.app.getString(R.string.all_music)] ?: mutableListOf()
 
     val musicBucketLive = MutableLiveData<Int>()
 

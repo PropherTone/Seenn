@@ -7,7 +7,7 @@
         <Constraint
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/list_icon"
+            android:layout_height="@dimen/action_icon"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
@@ -64,7 +64,7 @@
         <Constraint
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/list_icon"
+            android:layout_height="@dimen/action_icon"
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint

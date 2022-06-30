@@ -13,6 +13,8 @@ import com.protone.api.context.onUiThread
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.seen.R
 import com.protone.seen.databinding.GalleyBucketListLayoutBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
 class GalleyBucketAdapter(
@@ -48,8 +50,10 @@ class GalleyBucketAdapter(
             setSelect(holder, selectList.contains(data))
             holder.binding.apply {
                 root.setOnLongClickListener {
-                    DataBaseDAOHelper.getGalleyBucket(galleries[position].second[0]) { galley ->
-                        if (galley != null) context.onUiThread {
+                    DataBaseDAOHelper.execute {
+                        val galley =
+                            DataBaseDAOHelper.getGalleyBucketRs(galleries[position].second[0])
+                        if (galley != null) withContext(Dispatchers.Main) {
                             AlertDialog.Builder(context)
                                 .setTitle(context.getString(R.string.delete))
                                 .setPositiveButton(

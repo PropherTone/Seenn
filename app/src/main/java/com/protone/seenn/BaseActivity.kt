@@ -145,7 +145,7 @@ abstract class BaseActivity<S : Seen<*>> : AppCompatActivity(),
     }
 
     fun toast(msg: CharSequence) {
-        runOnUiThread {
+        onUiThread {
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         }
     }

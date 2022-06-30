@@ -383,7 +383,7 @@ inline fun scan(
     @Nullable projection: Array<String>,
     block: (Cursor) -> Unit
 ) {
-    Global.application.contentResolver.query(
+    Global.app.contentResolver.query(
         uri,
         projection,
         MediaStore.MediaColumns.SIZE + ">0",

@@ -3,7 +3,6 @@ package com.protone.seenn
 import com.bumptech.glide.Glide
 import com.protone.api.context.intent
 import com.protone.api.context.layoutInflater
-import com.protone.api.context.onUiThread
 import com.protone.api.context.root
 import com.protone.api.getStorageSize
 import com.protone.api.json.toEntity
@@ -87,44 +86,39 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
     }
 
     private suspend fun GalleyViewSeen.setInfo() {
-        DataBaseDAOHelper.getSignedMediaCB(
-            galleyMedias[curPosition].uri
-        ) { galleyMedia ->
-            removeCato()
-            galleyMedia?.cate?.onEach {
-                if (it.contains("content://")) {
-                    addCato(
-                        ImageCateLayoutBinding.inflate(
-                            context.layoutInflater,
-                            context.root,
-                            false
-                        ).apply {
-                            onUiThread {
-                                Glide.with(context).asDrawable().load(it.toUri()).into(catoBack)
-                                catoName.text = galleyMedia.name
-                            }
-                            root.setOnClickListener {
-                                startActivity(GalleyViewActivity::class.intent.apply {
-                                    putExtra(MEDIA, galleyMedia.toJson())
-                                    putExtra(TYPE, galleyMedia.isVideo)
-                                })
-                            }
-                        }.root
-                    )
-                } else {
-                    addCato(
-                        TextCateLayoutBinding.inflate(
-                            context.layoutInflater,
-                            context.root,
-                            false
-                        ).apply {
-                            cato.text = it
-                        }.root
-                    )
-                }
+        val galleyMedia = DataBaseDAOHelper.getSignedMediaRs(galleyMedias[curPosition].uri)
+        removeCato()
+        galleyMedia?.cate?.onEach {
+            if (it.contains("content://")) {
+                addCato(
+                    ImageCateLayoutBinding.inflate(
+                        context.layoutInflater,
+                        context.root,
+                        false
+                    ).apply {
+                        Glide.with(context).asDrawable().load(it.toUri()).into(catoBack)
+                        catoName.text = galleyMedia.name
+                        root.setOnClickListener {
+                            startActivity(GalleyViewActivity::class.intent.apply {
+                                putExtra(MEDIA, galleyMedia.toJson())
+                                putExtra(TYPE, galleyMedia.isVideo)
+                            })
+                        }
+                    }.root
+                )
+            } else {
+                addCato(
+                    TextCateLayoutBinding.inflate(
+                        context.layoutInflater,
+                        context.root,
+                        false
+                    ).apply {
+                        cato.text = it
+                    }.root
+                )
             }
-            setNotes(((galleyMedia?.notes ?: mutableListOf()) as MutableList<String>))
         }
+        setNotes(((galleyMedia?.notes ?: mutableListOf()) as MutableList<String>))
     }
 
     private fun GalleyViewSeen.setMediaInfo(position: Int) = galleyMedias[position].let { m ->

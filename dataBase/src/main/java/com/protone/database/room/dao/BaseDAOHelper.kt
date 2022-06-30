@@ -1,15 +1,26 @@
 package com.protone.database.room.dao
 
-import java.util.concurrent.Executors
+import kotlinx.coroutines.*
 
 abstract class BaseDAOHelper {
-    private val executorService by lazy { Executors.newSingleThreadExecutor() }
+    val executorService by lazy { CoroutineScope(Dispatchers.IO) }
 
-    fun execute(runnable: Runnable) = executorService.execute(runnable)
+    inline fun execute(crossinline runnable: suspend () -> Unit) {
+        executorService.launch(Dispatchers.IO) {
+            runnable.invoke()
+        }
+    }
+
+    suspend inline fun <T> onResult(crossinline runnable: (CancellableContinuation<T>) -> Unit) =
+        withContext(Dispatchers.IO) {
+            suspendCancellableCoroutine<T> {
+                runnable.invoke(it)
+            }
+        }
 
     fun shutdownNow() {
-        if (executorService.isShutdown) {
-            executorService.shutdownNow()
+        if (executorService.isActive) {
+            executorService.cancel()
         }
     }
 }

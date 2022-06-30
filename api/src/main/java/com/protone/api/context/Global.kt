@@ -8,24 +8,24 @@ import android.view.WindowManager
 
 object Global {
 
-    val application: Application
-        get() = application_
+    val app: Application
+        get() = application
 
-    private lateinit var application_: Application
+    private lateinit var application: Application
 
     fun init(application: Application) {
-        application_ = application
+        this.application = application
     }
 
     fun getScreenHeight(): Int {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            (application.getSystemService(WINDOW_SERVICE) as WindowManager)
+            (app.getSystemService(WINDOW_SERVICE) as WindowManager)
                 .currentWindowMetrics
                 .bounds
                 .height()
         } else {
             val displayMetrics = DisplayMetrics()
-            (application.getSystemService(WINDOW_SERVICE) as WindowManager)
+            (app.getSystemService(WINDOW_SERVICE) as WindowManager)
                 .defaultDisplay
                 .getRealMetrics(displayMetrics)
             displayMetrics.heightPixels

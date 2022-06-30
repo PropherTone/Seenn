@@ -133,7 +133,7 @@ class PictureListScrollView @JvmOverloads constructor(
         var count = 0
         var mixHeight = 0
         val doubledScreenHeight = Global.getScreenHeight() * 2
-        val contentResolver = Global.application.contentResolver
+        val contentResolver = Global.app.contentResolver
         val options = BitmapFactory.Options().apply {
             inJustDecodeBounds = true
         }
@@ -156,7 +156,7 @@ class PictureListScrollView @JvmOverloads constructor(
         }
     }
 
-    private val contentResolver by lazy { Global.application.contentResolver }
+    private val contentResolver by lazy { Global.app.contentResolver }
 
     private suspend fun onPreLoad(uri: Uri) = withContext(Dispatchers.IO) {
         suspendCancellableCoroutine<Int> { c ->

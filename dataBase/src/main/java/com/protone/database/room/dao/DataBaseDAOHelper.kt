@@ -20,11 +20,9 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    inline fun getAllMusicBucket(crossinline callBack: (result: List<MusicBucket>?) -> Unit) {
+    suspend fun getAllMusicBucketRs() = onResult<List<MusicBucket>?> {
         execute {
-            getAllMusicBucket()?.let {
-                callBack(it)
-            }
+            it.resumeWith(Result.success(getAllMusicBucket()))
         }
     }
 
@@ -48,7 +46,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     inline fun addMusicBucketWithCallBack(
         musicBucket: MusicBucket,
-        crossinline callBack: (result: Boolean, name: String) -> Unit
+        crossinline callBack: suspend (result: Boolean, name: String) -> Unit
     ) {
         execute {
             var count = 0
@@ -79,16 +77,16 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    inline fun updateMusicBucketCB(bucket: MusicBucket, crossinline callBack: (Int) -> Unit) {
+    suspend fun updateMusicBucketRs(bucket: MusicBucket) = onResult<Int> {
         execute {
-            callBack.invoke(updateMusicBucket(bucket))
+            it.resumeWith(Result.success(updateMusicBucket(bucket)))
         }
     }
 
-    fun deleteMusicBucketCB(bucket: MusicBucket, callBack: (Boolean) -> Unit) {
+    suspend fun deleteMusicBucketRs(bucket: MusicBucket) = onResult<Boolean> {
         execute {
             musicBucketDAO?.deleteMusicBucket(bucket)
-            callBack(musicBucketDAO?.getMusicBucketByName(bucket.name) == null)
+            it.resumeWith(Result.success(musicBucketDAO?.getMusicBucketByName(bucket.name) == null))
         }
     }
 
@@ -125,11 +123,9 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
 
-    inline fun getAllMusic(crossinline callBack: (List<Music>) -> Unit) {
+    suspend fun getAllMusicRs() = onResult<List<Music>?> {
         execute {
-            getAllMusic()?.let {
-                callBack(it)
-            }
+            it.resumeWith(Result.success(getAllMusic()))
         }
     }
 
@@ -158,19 +154,15 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     override fun getMusicByUri(uri: Uri): Music? = musicDAO?.getMusicByUri(uri)
 
-    inline fun updateMusicCB(music: Music, crossinline callBack: (Int) -> Unit) {
+    suspend fun updateMusicRs(music: Music) = onResult<Int> {
         execute {
-            callBack(updateMusic(music))
+            it.resumeWith(Result.success(updateMusic(music)))
         }
     }
 
-    inline fun updateMusicMyBucketCB(
-        name: String,
-        bucket: List<String>,
-        crossinline callBack: (Int) -> Unit
-    ) {
+    suspend fun updateMusicMyBucketRs(name: String, bucket: List<String>) = onResult<Int> {
         execute {
-            callBack(updateMusicMyBucket(name, bucket))
+            it.resumeWith(Result.success(updateMusicMyBucket(name, bucket)))
         }
     }
 
@@ -183,15 +175,15 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    inline fun getAllSignedMedia(crossinline callBack: (List<GalleyMedia>) -> Unit) {
+    suspend fun getAllSignedMediaRs() = onResult<List<GalleyMedia>?> {
         execute {
-            getAllSignedMedia()?.let {
-                callBack(it)
-            }
+            it.resumeWith(Result.success(getAllSignedMedia()))
         }
     }
 
-    override fun getAllSignedMedia(): List<GalleyMedia>? = signedGalleyDAO?.getAllSignedMedia()
+    override fun getAllSignedMedia(): List<GalleyMedia>? =
+        signedGalleyDAO?.getAllSignedMedia()
+
     override fun getAllMediaByType(isVideo: Boolean): List<GalleyMedia>? =
         signedGalleyDAO?.getAllMediaByType(isVideo)
 
@@ -242,13 +234,15 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    override fun getSignedMedia(uri: Uri): GalleyMedia? = signedGalleyDAO?.getSignedMedia(uri)
+    override fun getSignedMedia(uri: Uri): GalleyMedia? =
+        signedGalleyDAO?.getSignedMedia(uri)
 
-    override fun getSignedMedia(path: String): GalleyMedia? = signedGalleyDAO?.getSignedMedia(path)
+    override fun getSignedMedia(path: String): GalleyMedia? =
+        signedGalleyDAO?.getSignedMedia(path)
 
-    fun getSignedMediaCB(uri: Uri, callBack: (GalleyMedia?) -> Unit) {
+    suspend fun getSignedMediaRs(uri: Uri) = onResult<GalleyMedia?> {
         execute {
-            callBack.invoke(getSignedMedia(uri))
+            it.resumeWith(Result.success(getSignedMedia(uri)))
         }
     }
 
@@ -285,7 +279,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         noteDAO?.insertNote(note)
     }
 
-    inline fun insertNoteCB(note: Note, crossinline callBack: (Boolean, String) -> Unit) {
+    inline fun insertNoteCB(note: Note, crossinline callBack: suspend (Boolean, String) -> Unit) {
         execute {
             var count = 0
             val tempName = note.title
@@ -313,10 +307,9 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    inline fun insertNoteTypeCB(
+    suspend fun insertNoteTypeRs(
         noteType: NoteType,
-        crossinline callBack: (Boolean, String) -> Unit
-    ) {
+    ) = onResult<Pair<Boolean,String>>{
         execute {
             var count = 0
             val tempName = noteType.type
@@ -331,7 +324,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
                 noteType.type = "${tempName}(${++count})"
             }
             insertNoteType(noteType)
-            callBack.invoke(getNoteType(noteType.type) != null, noteType.type)
+            it.resumeWith(Result.success(Pair(getNoteType(noteType.type) != null, noteType.type)))
         }
     }
 
@@ -346,10 +339,10 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         noteTypeDAO?.deleteNoteType(noteType)
     }
 
-    fun doDeleteNoteType(noteType: NoteType, callBack: (Boolean) -> Unit) {
+    suspend fun doDeleteNoteTypeRs(noteType: NoteType) = onResult<Boolean> {
         execute {
             deleteNoteType(noteType)
-            callBack.invoke(getNoteType(noteType.type) != null)
+            it.resumeWith(Result.success(getNoteType(noteType.type) != null))
         }
     }
 
@@ -366,7 +359,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     inline fun insertGalleyBucketCB(
         galleyBucket: GalleyBucket,
-        crossinline callBack: (Boolean, String) -> Unit
+        crossinline callBack: suspend (Boolean, String) -> Unit
     ) {
         execute {
             var count = 0
@@ -399,10 +392,9 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-
-    fun getGalleyBucket(name: String, callBack: (GalleyBucket?) -> Unit) {
+    suspend fun getGalleyBucketRs(name: String) = onResult<GalleyBucket?> {
         execute {
-            callBack.invoke(getGalleyBucket(name))
+            it.resumeWith(Result.success(getGalleyBucket(name)))
         }
     }
 

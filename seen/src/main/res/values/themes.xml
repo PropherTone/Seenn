@@ -2,13 +2,15 @@
     <!-- Base application theme. -->
     <style name="Theme.Seenn" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/blue_1</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/blue_5</item>
+        <item name="colorPrimaryVariant">@color/blue_1</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/blue_1</item>
         <item name="colorSecondaryVariant">@color/blue_5</item>
         <item name="colorOnSecondary">@color/blue_3</item>
+
+        <item name="android:windowBackground">@drawable/main_background</item>
 
         <!-- Status bar color. -->
 

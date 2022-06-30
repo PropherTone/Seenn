@@ -13,7 +13,6 @@ import com.protone.database.room.entity.MusicBucket
 import com.protone.database.sp.config.userConfig
 import com.protone.mediamodle.Medias
 import com.protone.seen.MusicSeen
-import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.viewModel.MusicControllerIMP
@@ -106,28 +105,21 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     }
 
     private suspend fun MusicSeen.initSeen() {
+        val list = DataBaseDAOHelper.getAllMusicBucketRs()
         val buckets = suspendCoroutine<MutableList<MusicBucket>> { co ->
-            DataBaseDAOHelper.getAllMusicBucket { list ->
-                if (list == null || list.isEmpty()) {
-                    DataBaseDAOHelper.addMusicBucketWithCallBack(
-                        MusicBucket(
-                            getString(R.string.all_music),
-                            if (Medias.music.size > 0) Medias.music[0].uri.toBitmapByteArray() else null,
-                            Medias.music.size,
-                            null,
-                            todayDate("yyyy/MM/dd")
-                        )
-                    ) { re, _ ->
-                        if (re) {
-                            DataBaseDAOHelper.getAllMusicBucket {
-                                co.resumeWith(Result.success(it as MutableList<MusicBucket>))
-                            }
-                        }
-                    }
-                } else {
-                    co.resumeWith(Result.success(list as MutableList<MusicBucket>))
+            if (list == null || list.isEmpty()) {
+                DataBaseDAOHelper.addMusicBucketWithCallBack(
+                    MusicBucket(
+                        getString(R.string.all_music),
+                        if (Medias.music.size > 0) Medias.music[0].uri.toBitmapByteArray() else null,
+                        Medias.music.size,
+                        null,
+                        todayDate("yyyy/MM/dd")
+                    )
+                ) { re, _ ->
+                    if (re) co.resumeWith(Result.success(DataBaseDAOHelper.getAllMusicBucketRs() as MutableList<MusicBucket>))
                 }
-            }
+            } else co.resumeWith(Result.success(list as MutableList<MusicBucket>))
         }
 
         initList(
@@ -157,8 +149,10 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     }
 
     private fun MusicSeen.updateBucket() {
-        setBucket()
-        updateMusicList(Medias.musicBucket[bucket] ?: mutableListOf())
+        onUiThread {
+            setBucket()
+            updateMusicList(Medias.musicBucket[bucket] ?: mutableListOf())
+        }
     }
 
     private suspend fun MusicSeen.refreshBucket() = withContext(Dispatchers.IO) {
@@ -177,18 +171,15 @@ class MusicActivity : BaseActivity<MusicSeen>() {
         }
         if (musicBucket != null) {
             if (deleteBucket(musicBucket)) {
-                DataBaseDAOHelper.deleteMusicBucketCB(musicBucket) { re ->
-                    onUiThread {
-                        if (re) {
-                            toast(getString(R.string.success))
-                            workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
-                            bucket = getString(R.string.all_music)
-                            updateBucket()
-                        } else {
-                            toast(getString(R.string.failed_msg))
-                            addBucketNoCheck(musicBucket)
-                        }
-                    }
+                val re = DataBaseDAOHelper.deleteMusicBucketRs(musicBucket)
+                if (re) {
+                    toast(getString(R.string.success))
+                    workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
+                    bucket = getString(R.string.all_music)
+                    updateBucket()
+                } else {
+                    toast(getString(R.string.failed_msg))
+                    addBucketNoCheck(musicBucket)
                 }
             } else {
                 toast(getString(R.string.failed_msg))

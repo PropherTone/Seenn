@@ -17,6 +17,8 @@ import com.protone.mediamodle.Medias
 import com.protone.seen.PickMusicSeen
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class AddMusicListAdapter(context: Context, private val bucket: String, private val mode: String) :
@@ -82,9 +84,10 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                     if (selectList.contains(music)) {
                         if (mode == PickMusicSeen.PICK_MUSIC) return@setOnClickListener
                         (music.myBucket as ArrayList).remove(bucket)
-                        DataBaseDAOHelper.updateMusicCB(music) { re ->
+                        DataBaseDAOHelper.execute {
+                            val re = DataBaseDAOHelper.updateMusicRs(music)
                             if (re != -1 && re != 0) {
-                                context.onUiThread { checkSelect(holder, music) }
+                                withContext(Dispatchers.Main) { checkSelect(holder, music) }
                             }
                         }
                         return@setOnClickListener
@@ -98,7 +101,8 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                                     music.myBucket.apply {
                                         (this as ArrayList).add(bucket)
                                     }
-                                    DataBaseDAOHelper.updateMusicCB(music) { re ->
+                                    DataBaseDAOHelper.execute {
+                                        val re = DataBaseDAOHelper.updateMusicRs(music)
                                         if (re != -1 && re != 0) {
                                             changeIconAni(musicListPlayState)
                                         } else {

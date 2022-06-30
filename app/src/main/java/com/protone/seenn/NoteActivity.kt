@@ -41,7 +41,7 @@ class NoteActivity : BaseActivity<NoteSeen>() {
                         NoteSeen.NoteEvent.AddBucket -> {
                             TitleDialog(this@NoteActivity, getString(R.string.add_dir), "") { re ->
                                 if (re.isNotEmpty()) {
-                                    DataBaseDAOHelper.insertNoteTypeCB(
+                                    DataBaseDAOHelper.insertNoteTypeRs(
                                         NoteType(re, "")
                                     ) { suc, name ->
                                         if (suc) {

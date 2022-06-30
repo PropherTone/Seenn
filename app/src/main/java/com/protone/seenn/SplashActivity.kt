@@ -18,6 +18,7 @@ import com.protone.database.sp.config.userConfig
 import com.protone.mediamodle.GalleyHelper
 import com.protone.mediamodle.Medias
 import com.protone.seen.SplashSeen
+import com.protone.seenn.activity.MainActivity
 import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.service.MusicService
 import com.protone.seenn.service.WorkService

@@ -3,7 +3,6 @@ package com.protone.seenn
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
 import com.protone.api.context.intent
-import com.protone.api.context.onUiThread
 import com.protone.api.json.toUri
 import com.protone.api.toMediaBitmapByteArray
 import com.protone.api.todayDate
@@ -37,6 +36,7 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
             if (musicBucket == null) {
                 toast(getString(R.string.come_up_unknown_error))
                 finish()
+                return
             }
         }
 
@@ -57,28 +57,36 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                                     )
                                 }
                             )?.let { result ->
-                                addBucketSeen.uri = result.data?.getStringExtra(GalleyActivity.URI)?.toUri()
+                                addBucketSeen.uri =
+                                    result.data?.getStringExtra(GalleyActivity.URI)?.toUri()
                             }
                         }
                         AddBucketSeen.Event.Confirm ->
                             if (name != null) {
-                                addBucketSeen.updateMusicBucket(musicBucket!!) { re ->
-                                    Intent().apply {
-                                        setResult(
-                                            if (re != 0 || re != -1) {
-                                                if (Medias.musicBucket.containsKey(name)) {
-                                                    Medias.musicBucket[addBucketSeen.name] =
-                                                        Medias.musicBucket.remove(name)
-                                                            ?: mutableListOf()
-                                                }
-                                                putExtra(BUCKET_NAME, addBucketSeen.name)
-                                                RESULT_OK
-                                            } else RESULT_CANCELED, this
-                                        )
-                                    }
-                                    finish()
+                                val re = addBucketSeen.updateMusicBucket(musicBucket!!)
+                                Intent().apply {
+                                    setResult(
+                                        if (re != 0 || re != -1) {
+                                            if (Medias.musicBucket.containsKey(name)) {
+                                                Medias.musicBucket[addBucketSeen.name] =
+                                                    Medias.musicBucket.remove(name)
+                                                        ?: mutableListOf()
+                                            }
+                                            putExtra(BUCKET_NAME, addBucketSeen.name)
+                                            RESULT_OK
+                                        } else RESULT_CANCELED, this
+                                    )
                                 }
-                            } else addBucketSeen.addMusicBucket { re, name ->
+                                finish()
+                            } else DataBaseDAOHelper.addMusicBucketWithCallBack(
+                                MusicBucket(
+                                    addBucketSeen.name,
+                                    addBucketSeen.uri?.toMediaBitmapByteArray(),
+                                    0,
+                                    addBucketSeen.detail,
+                                    todayDate("yyyy/MM/dd")
+                                )
+                            ) { re, name ->
                                 Intent().apply {
                                     setResult(
                                         if (re) {
@@ -101,39 +109,23 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
 
     private suspend fun AddBucketSeen.refresh(name: String) = withContext(Dispatchers.IO) {
         val musicBucket = DataBaseDAOHelper.getMusicBucketByName(name)
-        onUiThread {
+        withContext(Dispatchers.Main) {
             this@refresh.name = musicBucket?.name.toString()
             this@refresh.detail = musicBucket?.detail.toString()
             this@refresh.loadIcon(musicBucket?.icon)
         }
     }
 
-    private inline fun AddBucketSeen.updateMusicBucket(
-        musicBucket: MusicBucket,
-        crossinline callBack: (Int) -> Unit
-    ) {
-        DataBaseDAOHelper.updateMusicBucketCB(
-            musicBucket.also { mb ->
-                if (mb.name != name) mb.name = name
-                val toMediaBitmapByteArray = uri?.toMediaBitmapByteArray()
-                if (!mb.icon.contentEquals(toMediaBitmapByteArray)) mb.icon = toMediaBitmapByteArray
-                if (mb.detail != detail) mb.detail = detail
-                todayDate("yyyy/MM/dd")
-            }, callBack
-        )
-    }
-
-
-    private inline fun AddBucketSeen.addMusicBucket(crossinline callBack: (result: Boolean, name: String) -> Unit) =
-        DataBaseDAOHelper.addMusicBucketWithCallBack(
-            MusicBucket(
-                name,
-                if (uri != null) uri?.toMediaBitmapByteArray() else null,
-                0,
-                detail,
-                todayDate("yyyy/MM/dd")
-            ),
-            callBack
-        )
+    private suspend fun AddBucketSeen.updateMusicBucket(
+        musicBucket: MusicBucket
+    ) = DataBaseDAOHelper.updateMusicBucketRs(
+        musicBucket.also { mb ->
+            if (mb.name != name) mb.name = name
+            val toMediaBitmapByteArray = uri?.toMediaBitmapByteArray()
+            if (!mb.icon.contentEquals(toMediaBitmapByteArray)) mb.icon = toMediaBitmapByteArray
+            if (mb.detail != detail) mb.detail = detail
+            todayDate("yyyy/MM/dd")
+        }
+    )
 
 }

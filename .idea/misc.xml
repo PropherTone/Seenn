@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/galley_activity.xml" value="0.19794784095767423" />
+        <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/main_activity.xml" value="0.19794784095767423" />
+        <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/note_activity.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/background_ripple_red.xml" value="0.1315" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/background_ripple_transparent_white.xml" value="0.1315" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/drawable/color_pop_layout.xml" value="0.155" />
@@ -57,6 +60,7 @@
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/galley_vp2_adapter_layout.xml" value="0.20820863616930313" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/list_pop_windows_layout.xml" value="0.176" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/list_pop_windwos_layout.xml" value="0.8197674418604651" />
+        <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/log_layout.xml" value="0.1" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/main_layout.xml" value="0.1" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/music_bucket_adapter_layout.xml" value="0.22826086956521738" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/music_card.xml" value="0.23007246376811594" />

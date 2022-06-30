@@ -34,7 +34,7 @@ abstract class SeennDataBase : RoomDatabase() {
 
         private fun init(): SeennDataBase {
             return Room.databaseBuilder(
-                Global.application,
+                Global.app,
                 SeennDataBase::class.java,
                 "SeennDB"
             ).build()

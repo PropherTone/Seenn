@@ -17,6 +17,7 @@ import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMulti
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusic
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusicBucket
+import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusicRs
 import com.protone.database.room.dao.DataBaseDAOHelper.getMusicBucketByName
 import com.protone.database.room.dao.DataBaseDAOHelper.insertMusicMulti
 import com.protone.database.room.dao.DataBaseDAOHelper.updateMusicBucketBack
@@ -106,7 +107,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         val allMusic = (getAllMusic() as ArrayList?)?.also { cacheAllMusic.addAll(it) }
         val allMusicBucket = getAllMusicBucket().let { l ->
             (l as ArrayList).filter {
-                it.name != Global.application.getString(R.string.all_music)
+                it.name != Global.app.getString(R.string.all_music)
             }
         }
         allMusicBucket.forEach { (name) -> musicBucket[name] = ArrayList() }
@@ -115,7 +116,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                 music.myBucket.forEach(Consumer {
                     musicBucket[it]?.add(music)
                 })
-            }.buffer().collect { music->
+            }.buffer().collect { music ->
                 if (cacheList.contains(music)) {
                     cacheList.remove(music)
                     cacheAllMusic.remove(music)
@@ -127,7 +128,9 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         } else if (cacheAllMusic.size > 0) {
             deleteMusicMulti(cacheAllMusic)
         }
-        getAllMusic { music = it as MutableList<Music> }
+        getAllMusicRs()?.let {
+            music = it as MutableList<Music>
+        }
         musicBucket.keys.forEach {
             getMusicBucketByName(it)?.let { mb ->
                 musicBucket[it]?.size?.let { size ->

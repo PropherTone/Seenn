@@ -29,7 +29,7 @@ fun Bitmap.saveToFile(fileName: String): String? {
     val fileOutputStream: FileOutputStream?
     return try {
         val tempPath =
-            "${Global.application.filesDir.absolutePath}/${fileName.getFileName()}.png"
+            "${Global.app.filesDir.absolutePath}/${fileName.getFileName()}.png"
         val file = File(tempPath)
         when {
             file.exists() -> tempPath
@@ -46,12 +46,12 @@ fun Bitmap.saveToFile(fileName: String): String? {
 }
 
 fun Uri.toBitmap(
-    w: Int = Global.application.resources.getDimensionPixelSize(R.dimen.huge_icon),
-    h: Int = Global.application.resources.getDimensionPixelSize(R.dimen.huge_icon)
+    w: Int = Global.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
+    h: Int = Global.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
 ): Bitmap? {
     var ois: InputStream? = null
     return try {
-        ois = Global.application.contentResolver.openInputStream(this) ?: return null
+        ois = Global.app.contentResolver.openInputStream(this) ?: return null
         BitmapFactory.decodeStream(ois, null, BitmapFactory.Options().apply {
             inSampleSize = calculateInSampleSize(this, h, w)
         })
@@ -64,13 +64,13 @@ fun Uri.toBitmap(
 
 fun Uri.toMediaBitmapByteArray(): ByteArray? {
     var byteArray: ByteArray? = null
-    val ois = Global.application.contentResolver.openInputStream(this) ?: return byteArray
+    val ois = Global.app.contentResolver.openInputStream(this) ?: return byteArray
     val os = ByteArrayOutputStream()
     try {
         val options = BitmapFactory.Options()
         byteArray = options.let {
             val dimensionPixelSize =
-                Global.application.resources.getDimensionPixelSize(R.dimen.huge_icon)
+                Global.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
             it.inSampleSize = calculateInSampleSize(it, dimensionPixelSize, dimensionPixelSize)
             it.inJustDecodeBounds = false
             BitmapFactory
@@ -103,7 +103,7 @@ private fun calculateInSampleSize(option: BitmapFactory.Options, h: Int, w: Int)
 
 fun isInDebug(): Boolean {
     return try {
-        val info: ApplicationInfo = Global.application.applicationInfo
+        val info: ApplicationInfo = Global.app.applicationInfo
         (info.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
     } catch (e: java.lang.Exception) {
         false
@@ -114,7 +114,7 @@ fun Uri.toBitmapByteArray(): ByteArray? {
     val mediaMetadataRetriever = MediaMetadataRetriever()
     var embeddedPicture: ByteArray? = null
     try {
-        mediaMetadataRetriever.setDataSource(Global.application, this)
+        mediaMetadataRetriever.setDataSource(Global.app, this)
         embeddedPicture = mediaMetadataRetriever.embeddedPicture
     } catch (e: Exception) {
         if (isInDebug()) e.printStackTrace()

@@ -52,4 +52,4 @@ val appIntentFilter: IntentFilter
     }
 
 val KClass<*>.intent
-    get() = Intent(Global.application, this.java)
+    get() = Intent(Global.app, this.java)

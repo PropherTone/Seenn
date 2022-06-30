@@ -6,7 +6,7 @@ import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.protone.api.context.*
 
-val musicBroadCastManager by lazy { LocalBroadcastManager.getInstance(Global.application) }
+val musicBroadCastManager by lazy { LocalBroadcastManager.getInstance(Global.app) }
 
 abstract class MusicReceiver : BroadcastReceiver() {
 

@@ -3,15 +3,15 @@ package com.protone.seen.adapter
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import com.protone.api.context.onUiThread
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.NoteType
 import com.protone.seen.R
 import com.protone.seen.databinding.NoteTpyeListAdapterBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class NoteTypeListAdapter(
     context: Context,
@@ -45,14 +45,15 @@ class NoteTypeListAdapter(
                     context.getString(R.string.confirm)
                 ) { dialog, _ ->
                     val noteType = noteTypeList[position]
-                    DataBaseDAOHelper.doDeleteNoteType(noteType) { re ->
+                    DataBaseDAOHelper.execute {
+                        val re = DataBaseDAOHelper.doDeleteNoteTypeRs(noteType)
                         if (re) {
                             val index = noteTypeList.indexOf(noteType)
                             noteTypeList.removeAt(index)
-                            context.onUiThread {
+                            withContext(Dispatchers.Main) {
                                 notifyItemRemoved(index)
                             }
-                        } else {
+                        } else withContext(Dispatchers.Main) {
                             Toast.makeText(
                                 context,
                                 context.getString(R.string.failed_msg),
