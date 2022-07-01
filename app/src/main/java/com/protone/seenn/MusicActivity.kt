@@ -6,6 +6,7 @@ import com.protone.api.context.MUSIC_PLAY
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.intent
 import com.protone.api.context.onUiThread
+import com.protone.api.json.toUri
 import com.protone.api.toBitmapByteArray
 import com.protone.api.todayDate
 import com.protone.database.room.dao.DataBaseDAOHelper
@@ -13,8 +14,10 @@ import com.protone.database.room.entity.MusicBucket
 import com.protone.database.sp.config.userConfig
 import com.protone.mediamodle.Medias
 import com.protone.seen.MusicSeen
+import com.protone.seenn.activity.AddBucketActivity
 import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.seenn.broadcast.workLocalBroadCast
+import com.protone.seenn.viewModel.AddBucketViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
@@ -65,7 +68,7 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                                 AddBucketActivity::class.intent
                             ).also { re ->
                                 when (re.resultCode) {
-                                    RESULT_OK -> re.data?.getStringExtra(AddBucketActivity.BUCKET_NAME)
+                                    RESULT_OK -> re.data?.getStringExtra(AddBucketViewModel.BUCKET_NAME)
                                         ?.let { musicSeen.addBucket(it) }
                                     RESULT_CANCELED -> toast(getString(R.string.cancel))
                                 }
@@ -83,12 +86,12 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                                 ActivityResultContracts.StartActivityForResult(),
                                 AddBucketActivity::class.intent.apply {
                                     putExtra(
-                                        AddBucketActivity.BUCKET_NAME,
+                                        AddBucketViewModel.BUCKET_NAME,
                                         musicSeen.bucket
                                     )
                                 }).also { re ->
                                 if (re.resultCode == RESULT_OK)
-                                    re.data?.getStringExtra(AddBucketActivity.BUCKET_NAME)
+                                    re.data?.getStringExtra(AddBucketViewModel.BUCKET_NAME)
                                         ?.let {
                                             musicSeen.bucket = it
                                             musicSeen.performListClick(musicSeen.bucket)
@@ -111,7 +114,8 @@ class MusicActivity : BaseActivity<MusicSeen>() {
                 DataBaseDAOHelper.addMusicBucketWithCallBack(
                     MusicBucket(
                         getString(R.string.all_music),
-                        if (Medias.music.size > 0) Medias.music[0].uri.toBitmapByteArray() else null,
+                        //TODO Implement changed
+                        if (Medias.music.size > 0) Medias.music[0].uri.toBitmapByteArray().toString() else null,
                         Medias.music.size,
                         null,
                         todayDate("yyyy/MM/dd")
@@ -190,7 +194,8 @@ class MusicActivity : BaseActivity<MusicSeen>() {
     private fun MusicSeen.setBucket() = launch(Dispatchers.IO) {
         DataBaseDAOHelper.getMusicBucketByName(bucket)?.let {
             setBucket(
-                it.icon,
+                //TODO Implement changed
+                it.icon?.toUri()?.toBitmapByteArray(),
                 it.name,
                 if (it.date != null && it.detail != null) "${it.date} ${it.detail}" else getString(R.string.none)
             )

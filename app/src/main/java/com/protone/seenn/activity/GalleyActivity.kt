@@ -26,7 +26,7 @@ import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>() {
+class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>(false) {
     override val viewModel: GalleyViewModel by viewModels()
 
     override suspend fun initView() {
@@ -36,6 +36,9 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
         fitNavigationBar(binding.root)
         initPop()
     }
+
+
+    override suspend fun onViewEvent(event: String) = Unit
 
     override suspend fun init() = viewModel.run {
         chooseType = intent.getStringExtra(GalleyActivity.CHOOSE_MODE) ?: ""
@@ -175,4 +178,5 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
             }
         }
     }
+
 }

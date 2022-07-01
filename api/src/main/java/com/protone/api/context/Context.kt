@@ -1,5 +1,6 @@
 package com.protone.api.context
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Rect
@@ -7,6 +8,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,13 +46,60 @@ val Context.navigationBarHeight: Int
         return height
     }
 
+var isKeyBroadShow = false
+
 fun Activity.setSoftInputStatuesListener(onSoftInput: ((Int, Boolean) -> Unit)? = null) {
+    isKeyBroadShow = false
     window.decorView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
         val rect = Rect()
         window.decorView.getWindowVisibleDisplayFrame(rect)
         val i = window.decorView.height - rect.bottom - navigationBarHeight
-        onSoftInput?.invoke(i, i > 0)
+        if (i > 0 && !isKeyBroadShow) {
+            isKeyBroadShow = true
+            onSoftInput?.invoke(i, i > 0)
+        } else if (i <= 0 && isKeyBroadShow) {
+            isKeyBroadShow = false
+            onSoftInput?.invoke(i, false)
+        }
     }
+}
+
+@SuppressLint("ClickableViewAccessibility")
+fun Context.linkInput(target: View, input: View) {
+    target.setOnTouchListener { _, _ ->
+        val inputManager: InputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (inputManager.isActive) {
+            inputManager.hideSoftInputFromWindow(input.windowToken, 0)
+            isKeyBroadShow = false
+        }
+        false
+    }
+}
+
+fun View.paddingTop(padding: Int) {
+    setPadding(
+        paddingLeft,
+        paddingTop + padding,
+        paddingRight,
+        paddingBottom
+    )
+}
+
+fun View.paddingBottom(padding: Int) {
+    setPadding(
+        paddingLeft,
+        paddingTop,
+        paddingRight,
+        paddingBottom + padding
+    )
+}
+
+fun View.marginTop(margin: Int) {
+    if (this !is ViewGroup) return
+    val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams
+    marginLayoutParams.topMargin = margin
+    layoutParams = marginLayoutParams
 }
 
 fun View.marginBottom(margin: Int) {

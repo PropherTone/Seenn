@@ -1,7 +1,6 @@
 package com.protone.seenn.activity
 
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isGone
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModel
@@ -9,7 +8,6 @@ import com.protone.api.context.*
 import com.protone.api.getFileMimeType
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
-import com.protone.seen.GalleySeen
 import com.protone.seen.databinding.GalleyOptionPopBinding
 import com.protone.seen.dialog.CateDialog
 import com.protone.seen.dialog.TitleDialog
@@ -19,10 +17,10 @@ import com.protone.seenn.R
 import com.protone.seenn.viewModel.GalleyViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel> : BaseActivity<VB, VM>(),
+abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEvent: Boolean) :
+    BaseActivity<VB, VM>(handleEvent),
     View.OnClickListener {
 
     var popLayout: GalleyOptionPopBinding? = null

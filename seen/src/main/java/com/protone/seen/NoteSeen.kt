@@ -2,10 +2,8 @@ package com.protone.seen
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.protone.api.TAG
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.database.room.entity.Note
@@ -53,7 +51,7 @@ class NoteSeen(context: Context) : Seen<NoteSeen.NoteEvent>(context) {
     }
 
     fun setNoteClk(it: ((String) -> Unit)?) {
-        (binding.noteList.adapter as NoteListAdapter?)?.noteClk = it
+//        (binding.noteList.adapter as NoteListAdapter?)?.noteClk = it
     }
 
     fun addNoteType(it: ((String?) -> Unit)?) {

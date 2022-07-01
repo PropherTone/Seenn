@@ -3,7 +3,7 @@ package com.protone.seenn.viewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.material.tabs.TabLayout
-import com.protone.api.context.Global
+import com.protone.api.context.APP
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.mediamodle.media.FragMailer
 import com.protone.mediamodle.media.IGalleyFragment
@@ -83,8 +83,8 @@ class GalleyViewModel : ViewModel(), TabLayout.OnTabSelectedListener {
 
     override fun onTabSelected(tab: TabLayout.Tab?) {
         when (tab?.text) {
-            Global.app.getString(R.string.photo) -> rightMailer = 0
-            Global.app.getString(R.string.video) -> rightMailer = 1
+            APP.app.getString(R.string.photo) -> rightMailer = 0
+            APP.app.getString(R.string.video) -> rightMailer = 1
         }
     }
 

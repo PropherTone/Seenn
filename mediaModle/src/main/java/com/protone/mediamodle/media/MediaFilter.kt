@@ -7,7 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.Nullable
-import com.protone.api.context.Global
+import com.protone.api.context.APP
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 
@@ -383,7 +383,7 @@ inline fun scan(
     @Nullable projection: Array<String>,
     block: (Cursor) -> Unit
 ) {
-    Global.app.contentResolver.query(
+    APP.app.contentResolver.query(
         uri,
         projection,
         MediaStore.MediaColumns.SIZE + ">0",

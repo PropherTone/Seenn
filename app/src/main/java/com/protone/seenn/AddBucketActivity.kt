@@ -81,7 +81,8 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
                             } else DataBaseDAOHelper.addMusicBucketWithCallBack(
                                 MusicBucket(
                                     addBucketSeen.name,
-                                    addBucketSeen.uri?.toMediaBitmapByteArray(),
+                                    //TODO Implement changed
+                                    addBucketSeen.uri?.toMediaBitmapByteArray().toString(),
                                     0,
                                     addBucketSeen.detail,
                                     todayDate("yyyy/MM/dd")
@@ -112,7 +113,8 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
         withContext(Dispatchers.Main) {
             this@refresh.name = musicBucket?.name.toString()
             this@refresh.detail = musicBucket?.detail.toString()
-            this@refresh.loadIcon(musicBucket?.icon)
+            //TODO Implement changed
+//            this@refresh.loadIcon(musicBucket?.icon)
         }
     }
 
@@ -122,7 +124,8 @@ class AddBucketActivity : BaseActivity<AddBucketSeen>() {
         musicBucket.also { mb ->
             if (mb.name != name) mb.name = name
             val toMediaBitmapByteArray = uri?.toMediaBitmapByteArray()
-            if (!mb.icon.contentEquals(toMediaBitmapByteArray)) mb.icon = toMediaBitmapByteArray
+            //TODO Implement changed
+//            if (!mb.icon.contentEquals(toMediaBitmapByteArray)) mb.icon = toMediaBitmapByteArray
             if (mb.detail != detail) mb.detail = detail
             todayDate("yyyy/MM/dd")
         }

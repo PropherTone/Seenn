@@ -1,14 +1,16 @@
 package com.protone.database.room.entity
 
-import android.net.Uri
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import com.protone.database.room.converters.UriTypeConverter
 
 @Entity
 @TypeConverters(UriTypeConverter::class)
 data class MusicBucket(
     var name: String,
-    var icon: ByteArray?,
+    var icon: String?,
     var size: Int,
     var detail: String?,
     var date: String?
@@ -35,16 +37,14 @@ data class MusicBucket(
 
     override fun hashCode(): Int {
         var result = name.hashCode()
-        result = 31 * result + (icon?.contentHashCode() ?: 0)
         result = 31 * result + size
         result = 31 * result + (detail?.hashCode() ?: 0)
         result = 31 * result + (date?.hashCode() ?: 0)
-        result = 31 * result + id.hashCode()
         return result
     }
 
     override fun toString(): String {
-        return "MusicBucket(name='$name', icon=${icon?.contentToString()}, size=$size, detail=$detail, date=$date, id=$id)"
+        return "MusicBucket(name='$name', icon=$icon, size=$size, detail=$detail, date=$date, id=$id)"
     }
 
 

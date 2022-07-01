@@ -23,7 +23,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import com.bumptech.glide.Glide
-import com.protone.api.Config
+import com.protone.api.context.APP
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.onBackground
 import com.protone.api.context.onUiThread
@@ -265,8 +265,8 @@ class RichNoteView @JvmOverloads constructor(
             val height = dba.height
             val width = dba.width
             val index = width / height
-            val bmH = Config.screenWidth / index
-            intArrayOf(Config.screenWidth, bmH)
+            val bmH = APP.screenWidth / index
+            intArrayOf(APP.screenWidth, bmH)
         } catch (e: Exception) {
             null
         }
@@ -281,9 +281,9 @@ class RichNoteView @JvmOverloads constructor(
             val height = dba.height
             val width = dba.width
             val index = width / height
-            val bmH = Config.screenWidth / index
+            val bmH = APP.screenWidth / index
             dba.recycle()
-            intArrayOf(Config.screenWidth, bmH)
+            intArrayOf(APP.screenWidth, bmH)
         } catch (e: Exception) {
             null
         }

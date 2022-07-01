@@ -6,10 +6,7 @@ import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.protone.api.context.hasNavigationBar
-import com.protone.api.context.isNavigationBar
-import com.protone.api.context.navigationBarHeight
-import com.protone.api.context.statuesBarHeight
+import com.protone.api.context.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -25,7 +22,7 @@ abstract class Seen<C>(val context: Context) :
 
     abstract fun offer(event: C)
 
-    private var inputManager: InputMethodManager =
+    private val inputManager: InputMethodManager =
         context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
     /**
@@ -69,6 +66,7 @@ abstract class Seen<C>(val context: Context) :
         target.setOnTouchListener { _, _ ->
             if (inputManager.isActive) {
                 inputManager.hideSoftInputFromWindow(arch.windowToken, 0)
+                isKeyBroadShow = false
             }
             false
         }

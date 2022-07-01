@@ -13,7 +13,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 
-val activityOperationBroadcast : LocalBroadcastManager = LocalBroadcastManager.getInstance(Global.app)
+val activityOperationBroadcast : LocalBroadcastManager = LocalBroadcastManager.getInstance(APP.app)
 
 private fun Activity.observeChange(uri: Uri, targetName: String): Boolean {
     var name = ""

@@ -5,7 +5,7 @@ import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.protone.api.Config
+import com.protone.api.context.APP
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.seen.databinding.UserConfigItemLayoutBinding
@@ -65,7 +65,7 @@ class UserConfigSeen(context: Context) : Seen<UserConfigSeen.UserEvent>(context)
                 }.root.run {
                     layoutParams = ConstraintLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
-                        Config.screenHeight - context.resources.getDimensionPixelSize(R.dimen.user_icon)
+                        APP.screenHeight - context.resources.getDimensionPixelSize(R.dimen.user_icon)
                     )
                     binding.userRoot.addView(this)
                 }

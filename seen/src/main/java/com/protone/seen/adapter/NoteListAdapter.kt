@@ -14,8 +14,6 @@ class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBindi
 
     private val noteList = arrayListOf<Note>()
 
-    var noteClk: ((String) -> Unit)? = null
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -27,7 +25,11 @@ class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBindi
     override fun onBindViewHolder(holder: Holder<NoteListAdapterLayoutBinding>, position: Int) {
         holder.binding.apply {
             root.setOnClickListener {
-                noteClk?.invoke(noteList[holder.layoutPosition].title)
+                noteListEventListener?.onNote(noteList[holder.layoutPosition].title)
+            }
+            root.setOnLongClickListener {
+                noteListEventListener?.onDelete(noteList[holder.layoutPosition])
+                true
             }
             noteList[holder.layoutPosition].let {
                 Glide.with(context)
@@ -50,4 +52,10 @@ class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBindi
         notifyDataSetChanged()
     }
 
+    var noteListEventListener: NoteListEvent? = null
+
+    interface NoteListEvent {
+        fun onNote(title: String)
+        fun onDelete(note: Note)
+    }
 }

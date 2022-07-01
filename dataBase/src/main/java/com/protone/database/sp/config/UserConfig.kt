@@ -2,12 +2,12 @@ package com.protone.database.sp.config
 
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
-import com.protone.api.context.Global
+import com.protone.api.context.APP
 import com.protone.database.R
 import com.protone.database.sp.DataTool
 import com.protone.database.sp.toDataProvider
 
-val userConfig = UserConfig(Global.app)
+val userConfig = UserConfig(APP.app)
 
 class UserConfig(context: Context) {
 
@@ -34,7 +34,7 @@ class UserConfig(context: Context) {
 
     var lastMusicBucket by config.string(
         "PLAYED_MUSIC_BUCKET",
-        Global.app.getString(R.string.all_music)
+        APP.app.getString(R.string.all_music)
     )
 
     var lastMusic by config.string("LAST_TIME_PLAYED_MUSIC", "")

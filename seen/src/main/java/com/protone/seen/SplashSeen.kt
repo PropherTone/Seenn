@@ -3,7 +3,7 @@ package com.protone.seen
 import android.content.Context
 import android.view.View
 import android.view.ViewTreeObserver
-import com.protone.api.Config
+import com.protone.api.context.APP
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.root
 import com.protone.seen.databinding.SplashLayoutBinding
@@ -24,7 +24,7 @@ class SplashSeen(context: Context) : Seen<SplashSeen.Event>(context),
 
     override fun onGlobalLayout() {
         binding.root.let {
-            Config.apply {
+            APP.apply {
                 screenHeight = it.measuredHeight
                 screenWidth = it.measuredWidth
             }

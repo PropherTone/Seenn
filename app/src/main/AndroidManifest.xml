@@ -31,8 +31,8 @@
         <activity android:name=".activity.NoteActivity" />
         <activity android:name=".PictureBoxActivity" />
         <activity android:name=".activity.GalleyActivity" />
-        <activity android:name=".MusicActivity" />
-        <activity android:name=".AddBucketActivity" />
+        <activity android:name=".activity.MusicActivity" />
+        <activity android:name=".activity.AddBucketActivity" />
         <activity android:name=".NoteEditActivity" />
         <activity android:name=".NoteViewActivity" />
         <activity android:name=".GalleyViewActivity" />

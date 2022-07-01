@@ -8,8 +8,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.AttrRes
-import androidx.core.widget.NestedScrollView
-import com.protone.api.Config
+import com.protone.api.context.APP
 import com.protone.seen.R
 
 class RefreshCoverView @JvmOverloads constructor(
@@ -38,7 +37,7 @@ class RefreshCoverView @JvmOverloads constructor(
         context.theme.obtainStyledAttributes(attrs, R.styleable.RefreshCover, 0, 0).let {
             val dimension = it.getDimension(R.styleable.RefreshCover_refresh_icon_size, 20f)
             val top = it.getDimension(R.styleable.RefreshCover_refresh_margin_top, 0f)
-            val width = Config.screenWidth / 2
+            val width = APP.screenWidth / 2
             rect.set(width - dimension, top, width + dimension, top + dimension * 2)
             it.recycle()
         }

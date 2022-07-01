@@ -10,7 +10,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
 import android.widget.Toast
-import com.protone.api.context.Global
+import com.protone.api.context.APP
 import com.protone.api.context.onUiThread
 import com.protone.api.context.workIntentFilter
 import com.protone.database.room.dao.DataBaseDAOHelper
@@ -107,7 +107,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         val allMusic = (getAllMusic() as ArrayList?)?.also { cacheAllMusic.addAll(it) }
         val allMusicBucket = getAllMusicBucket().let { l ->
             (l as ArrayList).filter {
-                it.name != Global.app.getString(R.string.all_music)
+                it.name != APP.app.getString(R.string.all_music)
             }
         }
         allMusicBucket.forEach { (name) -> musicBucket[name] = ArrayList() }

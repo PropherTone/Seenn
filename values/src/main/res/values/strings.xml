@@ -374,4 +374,5 @@ II. 幂等 的意味着对同一URL的多个请求应该返回同样的结果。
     <string name="no_loop">无循环</string>
     <string name="random">随机播放</string>
     <string name="log">日志</string>
+    <string name="music_bucket">MusicBucket</string>
 </resources>

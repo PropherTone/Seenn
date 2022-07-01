@@ -20,7 +20,6 @@ import com.protone.database.sp.config.userConfig
 import com.protone.mediamodle.Medias
 import com.protone.seen.adapter.MainModelListAdapter
 import com.protone.seen.itemDecoration.ModelListItemDecoration
-import com.protone.seenn.MusicActivity
 import com.protone.seenn.MusicViewActivity
 import com.protone.seenn.R
 import com.protone.seenn.UserConfigActivity
@@ -30,7 +29,7 @@ import com.protone.seenn.service.WorkService
 import com.protone.seenn.viewModel.MainViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
 
-class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(),
+class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
     ViewTreeObserver.OnGlobalLayoutListener {
     override val viewModel: MainViewModel by viewModels()
 
@@ -77,6 +76,8 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(),
         }
         refreshModelList()
     }
+
+    override suspend fun onViewEvent(event: String) = Unit
 
     override suspend fun init() {
         val musicController = MusicControllerIMP(binding.musicPlayer)

@@ -3,7 +3,7 @@ package com.protone.database.room
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.protone.api.context.Global
+import com.protone.api.context.APP
 import com.protone.database.room.dao.*
 import com.protone.database.room.entity.*
 import java.lang.ref.SoftReference
@@ -34,7 +34,7 @@ abstract class SeennDataBase : RoomDatabase() {
 
         private fun init(): SeennDataBase {
             return Room.databaseBuilder(
-                Global.app,
+                APP.app,
                 SeennDataBase::class.java,
                 "SeennDB"
             ).build()

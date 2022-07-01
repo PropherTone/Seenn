@@ -5,13 +5,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
-import com.protone.api.checkNeededPermission
+import com.protone.api.*
 import com.protone.api.context.UPDATE_GALLEY
 import com.protone.api.context.UPDATE_MUSIC
 import com.protone.api.context.intent
-import com.protone.api.requestContentPermission
-import com.protone.api.toBitmapByteArray
-import com.protone.api.todayDate
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket
 import com.protone.database.sp.config.userConfig
@@ -35,7 +32,10 @@ class SplashActivity : BaseActivity<SplashSeen>() {
                     DataBaseDAOHelper.addMusicBucketThread(
                         MusicBucket(
                             getString(R.string.all_music),
-                            if (Medias.music.size > 0) Medias.music[0].uri.toBitmapByteArray() else null,
+                            if (Medias.music.size > 0) Medias.music[0].uri.saveToFile(
+                                R.string.all_music.getString(),
+                                R.string.music_bucket.getString()
+                            ) else null,
                             Medias.music.size,
                             null,
                             todayDate("yyyy/MM/dd")

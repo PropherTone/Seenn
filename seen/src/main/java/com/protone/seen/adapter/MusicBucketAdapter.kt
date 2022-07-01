@@ -70,7 +70,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
             musicBucketIcon.apply {
                 when {
                     musicBuckets[position].icon != null -> {
-                        loadIcon(this, byteArray = musicBuckets[position].icon)
+                        loadIcon(this, iconPath = musicBuckets[position].icon)
                     }
                     else -> {
                         loadIcon(
@@ -149,11 +149,11 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
 
     private fun loadIcon(
         imageView: ImageView,
-        byteArray: ByteArray? = null,
+        iconPath: String? = null,
         drawable: Drawable? = null
     ) {
         Glide.with(context).asDrawable().apply {
-            (if (byteArray != null) load(byteArray) else load(drawable))
+            (if (iconPath != null) load(iconPath) else load(drawable))
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)

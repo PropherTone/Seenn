@@ -1,7 +1,7 @@
 package com.protone.seenn.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.protone.api.context.Global
+import com.protone.api.context.APP
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Note
 import com.protone.database.room.entity.NoteType
@@ -12,6 +12,11 @@ import kotlin.coroutines.suspendCoroutine
 
 class NoteViewModel : ViewModel() {
 
+    enum class ViewEvent{
+        Init,
+        RefreshList
+    }
+
     private val noteList = mutableMapOf<String, MutableList<Note>>()
 
     var selected: String? = null
@@ -21,7 +26,7 @@ class NoteViewModel : ViewModel() {
     suspend fun queryAllNote() = withContext(Dispatchers.IO) {
         suspendCoroutine<MutableList<Note>> { co ->
             DataBaseDAOHelper.getAllNote()?.let {
-                noteList[Global.app.getString(R.string.all).also { s ->
+                noteList[APP.app.getString(R.string.all).also { s ->
                     selected = s
                 }] = mutableListOf<Note>().apply { addAll(it) }
                 it.forEach { note ->
@@ -29,7 +34,7 @@ class NoteViewModel : ViewModel() {
                         if (noteList[type] == null) {
                             noteList[type] = mutableListOf()
                         }
-                        if (type != Global.app.getString(R.string.all) && noteList[type]?.contains(note) == false) noteList[type]?.add(note)
+                        if (type != APP.app.getString(R.string.all) && noteList[type]?.contains(note) == false) noteList[type]?.add(note)
                     }
                 }
                 co.resumeWith(Result.success(noteList[selected] ?: mutableListOf()))

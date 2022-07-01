@@ -2,7 +2,7 @@ package com.protone.seenn
 
 import androidx.activity.result.contract.ActivityResultContracts
 import com.bumptech.glide.Glide
-import com.protone.api.context.Global
+import com.protone.api.context.APP
 import com.protone.api.context.intent
 import com.protone.api.json.toEntity
 import com.protone.api.toMediaBitmapByteArray
@@ -103,7 +103,7 @@ class UserConfigActivity : BaseActivity<UserConfigSeen>() {
                         UserConfigSeen.UserEvent.Finish -> finish()
                         UserConfigSeen.UserEvent.ClearCache -> {
                             withContext(Dispatchers.IO) {
-                                Glide.get(Global.app).apply {
+                                Glide.get(APP.app).apply {
                                     clearDiskCache()
                                     withContext(Dispatchers.Main) {
                                         clearMemory()

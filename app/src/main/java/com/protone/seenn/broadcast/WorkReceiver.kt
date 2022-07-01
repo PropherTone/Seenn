@@ -4,14 +4,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.protone.api.context.Global
+import com.protone.api.context.APP
 import com.protone.api.context.UPDATE_GALLEY
 import com.protone.api.context.UPDATE_MUSIC
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.json.toUri
 import com.protone.mediamodle.IWorkService
 
-val workLocalBroadCast by lazy { LocalBroadcastManager.getInstance(Global.app) }
+val workLocalBroadCast by lazy { LocalBroadcastManager.getInstance(APP.app) }
 
 abstract class WorkReceiver : BroadcastReceiver() , IWorkService {
 

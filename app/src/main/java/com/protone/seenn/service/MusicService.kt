@@ -51,7 +51,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
             if (playList.isEmpty()) return null
             if (field == null) {
                 field = MediaPlayer.create(
-                    Global.app,
+                    APP.app,
                     playList[playPosition].uri
                 ).also {
                     it.setOnCompletionListener(this)
@@ -74,8 +74,8 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
             activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
             stopSelf()
             val activityManager =
-                Global.app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.killBackgroundProcesses(Global.app.packageName)
+                APP.app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            activityManager.killBackgroundProcesses(APP.app.packageName)
         }
 
         override fun music() {

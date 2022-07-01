@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -20,31 +19,52 @@ import com.protone.seenn.SplashActivity
 import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seenn.service.MusicService
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.selects.select
 import java.util.concurrent.atomic.AtomicInteger
 
-abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel> : AppCompatActivity(),
+abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Boolean) :
+    AppCompatActivity(),
     CoroutineScope by MainScope() {
     protected abstract val viewModel: VM
     protected lateinit var binding: VB
 
     abstract suspend fun initView()
     abstract suspend fun init()
-    var onFinish: (suspend () -> Unit)? = null
+    abstract suspend fun onViewEvent(event: String)
+    private var viewEvent: Channel<String>? = null
+    private var viewEventTask: Job? = null
+    protected var onFinish: (suspend () -> Unit)? = null
 
-    fun fitStatuesBar(root: View) {
-        root.apply {
-            val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams
-            marginLayoutParams.topMargin = context.statuesBarHeight
-            layoutParams = marginLayoutParams
+    init {
+        if (handleEven) {
+            viewEvent = Channel(Channel.UNLIMITED)
+            viewEventTask = launch(Dispatchers.Main) {
+                while (isActive) {
+                    select<Unit> {
+                        viewEvent?.onReceive {
+                            onViewEvent(it)
+                        }
+                    }
+                }
+            }
         }
     }
 
-    fun fitNavigationBar(root: View) {
-        if (hasNavigationBar) root.apply {
-            val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams
-            marginLayoutParams.bottomMargin = context.navigationBarHeight
-            layoutParams = marginLayoutParams
-        }
+    protected fun fitStatuesBar(root: View) {
+        root.marginTop(statuesBarHeight)
+    }
+
+    protected fun fitNavigationBar(root: View) {
+        if (hasNavigationBar) root.marginBottom(navigationBarHeight)
+    }
+
+    fun fitStatuesBarUsePadding(view: View) {
+        view.paddingTop(statuesBarHeight)
+    }
+
+    fun fitNavigationBarUsePadding(view: View) {
+        if (hasNavigationBar) view.paddingBottom(navigationBarHeight)
     }
 
     val code = AtomicInteger(0)
@@ -79,6 +99,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel> : AppCompatAct
         runBlocking {
             initView()
             if (::binding.isInitialized) setContentView(binding.root)
+            viewEventTask?.start()
             init()
         }
     }
@@ -97,6 +118,17 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel> : AppCompatAct
         serviceConnection?.let { unbindService(it) }
         musicReceiver?.let { unregisterReceiver(it) }
         super.onDestroy()
+    }
+
+    fun closeEvent() {
+        viewEventTask?.cancel()
+        viewEventTask = null
+        viewEvent?.close()
+        viewEvent = null
+    }
+
+    fun sendViewEvent(event: String) {
+        viewEvent?.trySend(event)
     }
 
     inline fun startActivityForResult(

@@ -2,9 +2,8 @@ package com.protone.seenn
 
 import android.app.Application
 import android.content.Context
-import com.protone.api.Config
 import com.protone.api.SCrashHandler
-import com.protone.api.context.Global
+import com.protone.api.context.APP
 import com.protone.api.todayDate
 import java.io.File
 
@@ -13,7 +12,7 @@ class SeennApplication : Application() {
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
-        Global.init(this)
+        APP.init(this)
         val file = File("${base?.externalCacheDir?.path}/CrashLog")
         val result = if (!file.exists()) {
             file.mkdirs()
@@ -23,12 +22,5 @@ class SeennApplication : Application() {
             if (result) "${base?.externalCacheDir?.path}/CrashLog/s_crash_log_${todayDate}.txt"
             else "${base?.externalCacheDir?.path}/s_crash_log_${todayDate}.txt"
 
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        Config.statusBarHeight = resources.getDimensionPixelSize(
-            resources.getIdentifier("status_bar_height", "dimen", "android")
-        )
     }
 }

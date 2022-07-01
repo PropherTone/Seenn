@@ -19,22 +19,42 @@ import com.protone.seenn.databinding.NoteActivityBinding
 import com.protone.seenn.viewModel.NoteViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
-class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>() {
+class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     override val viewModel: NoteViewModel by viewModels()
 
     override suspend fun initView() {
         binding = NoteActivityBinding.inflate(layoutInflater, root, false)
-        binding.activity = this
         fitStatuesBar(binding.root)
         fitNavigationBar(binding.root)
+        binding.activity = this
+    }
+
+    override suspend fun onViewEvent(event: String) {
+        when (event) {
+            NoteViewModel.ViewEvent.Init.name -> init()
+            NoteViewModel.ViewEvent.RefreshList.name -> refreshList()
+        }
     }
 
     override suspend fun init() {
         initList()
+        binding.noteList.adapter.apply {
+            this as NoteListAdapter
+            this.noteListEventListener = object : NoteListAdapter.NoteListEvent {
+                override fun onNote(title: String) {
+                    startActivity(NoteViewActivity::class.intent.also {
+                        it.putExtra(NoteViewActivity.NOTE_NAME, title)
+                    })
+                }
+
+                override fun onDelete(note: Note) {
+                    //TODO Delete note not IMP yet
+                }
+            }
+        }
         addNoteType {
             startActivity(NoteEditActivity::class.intent.also { intent ->
                 intent.putExtra(NoteEditActivity.NOTE_TYPE, it)
@@ -43,18 +63,11 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>() {
         onTypeSelected { type ->
             refreshNoteList(viewModel.getNoteList(type))
         }
-        setNoteClk { s ->
-            startActivity(NoteViewActivity::class.intent.also {
-                it.putExtra(NoteViewActivity.NOTE_NAME, s)
-            })
-        }
     }
 
     override fun onResume() {
         super.onResume()
-        launch {
-            refreshList()
-        }
+        sendViewEvent(NoteViewModel.ViewEvent.RefreshList.name)
     }
 
     fun addBucket() {
@@ -82,17 +95,13 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>() {
     fun refresh() {
         handleBucketEvent()
         TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
-        launch {
-            init()
-        }
-        refreshList()
+        sendViewEvent(NoteViewModel.ViewEvent.Init.name)
+        sendViewEvent(NoteViewModel.ViewEvent.RefreshList.name)
     }
 
-    private fun refreshList() {
-        launch {
-            refreshNoteList(viewModel.queryAllNote())
-            refreshNoteType(viewModel.queryAllNoteType())
-        }
+    private suspend fun refreshList() {
+        refreshNoteList(viewModel.queryAllNote())
+        refreshNoteType(viewModel.queryAllNoteType())
     }
 
     private fun initList() {
@@ -106,10 +115,6 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>() {
                 it.adapter = NoteTypeListAdapter(this@NoteActivity)
             }
         }
-    }
-
-    private fun setNoteClk(it: ((String) -> Unit)?) {
-        (binding.noteList.adapter as NoteListAdapter?)?.noteClk = it
     }
 
     private fun addNoteType(it: ((String?) -> Unit)?) {
