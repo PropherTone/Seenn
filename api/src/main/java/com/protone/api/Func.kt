@@ -87,7 +87,7 @@ fun Uri.toBitmap(
                 0,
                 bitmap.width,
                 bitmap.height,
-                getMatrix(bitmap.width, bitmap.height, w),
+                getMatrix(bitmap.height, bitmap.width, w),
                 true
             )
         } else null
@@ -116,7 +116,7 @@ fun Uri.toMediaBitmapByteArray(): ByteArray? {
             BitmapFactory
                 .decodeStream(ois, null, options)
             byteArray = os.toByteArray()
-        }else return null
+        } else return null
     } catch (e: Exception) {
         if (isInDebug()) e.printStackTrace()
     } finally {
@@ -141,30 +141,25 @@ fun Uri.toBitmapByteArray(): ByteArray? {
 }
 
 private fun getMatrix(h: Int, w: Int, output: Int): Matrix {
-    val rotate = h > w
     val matrix = Matrix()
     var scale = 1f
-    val scale1: Float
-    val target1: Int
     val revers: Boolean
-    val target = if (h > w) {
-        target1 = h
-        revers = !rotate
+    val shorterLen = if (h > w) {
+        revers = true
         w
     } else {
-        target1 = w
-        revers = rotate
+        revers = false
         h
     }
-    if (target > output) {
-        scale = target.toFloat() / output
+
+    if (output < shorterLen) {
+        scale = output.toFloat() / shorterLen
     }
-    val fl = target1.toFloat() * scale
-    scale1 = fl / output
+
     if (revers) {
-        matrix.setScale(scale, scale1)
+        matrix.setScale(scale, scale)
     } else {
-        matrix.setScale(scale1, scale)
+        matrix.setScale(scale, scale)
     }
     return matrix
 }

@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import androidx.activity.viewModels
 import androidx.core.content.res.ResourcesCompat
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -58,7 +59,8 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
         }
     }
 
-    override suspend fun init() = viewModel.run {
+    @Suppress("ObjectLiteralToLambda")
+    override suspend fun MusicModel.init() = viewModel.run {
         bucket = userConfig.lastMusicBucket
         val musicController = MusicControllerIMP(binding.mySmallMusicPlayer)
         musicController.onClick {
@@ -97,11 +99,13 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
             musicController.setMusicList(Medias.musicBucket[bucket] ?: Medias.music)
         }
 
-        Medias.mediaLive.observe(this@MusicActivity) {
-            if (it == Medias.AUDIO_UPDATED) {
-                workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
+        Medias.mediaLive.observe(this@MusicActivity, object : Observer<Int> {
+            override fun onChanged(t: Int?) {
+                if (t == Medias.AUDIO_UPDATED) {
+                    workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
+                }
             }
-        }
+        })
 
         onFinish = {
             musicController.finish()
@@ -176,9 +180,11 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
             if (getMusicBucketAdapter().deleteBucket(musicBucket)) {
                 val re = doDeleteBucket(musicBucket)
                 if (re) {
-                    R.string.success.getString().toast()
                     workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
                     bucket = R.string.all_music.getString()
+                    musicBucket.icon?.let { deleteMusicBucketCover(it) }
+                    R.string.success.getString().toast()
+                    actionPosition = 0
                     updateBucket()
                 } else {
                     R.string.failed_msg.getString().toast()

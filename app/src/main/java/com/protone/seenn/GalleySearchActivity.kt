@@ -6,6 +6,8 @@ import com.protone.api.json.toJson
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.GalleySearchSeen
 import com.protone.seen.adapter.GalleyListAdapter
+import com.protone.seenn.activity.GalleyViewActivity
+import com.protone.seenn.viewModel.GalleyViewViewModel
 import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.asFlow
@@ -78,14 +80,18 @@ class GalleySearchActivity : BaseActivity<GalleySearchSeen>(),
         }
     }
 
+    override fun select(galleyMedia: GalleyMedia) {
+
+    }
+
     override fun select(galleyMedia: MutableList<GalleyMedia>) {}
 
     override fun openView(galleyMedia: GalleyMedia) {
         startActivity(GalleyViewActivity::class.intent.apply {
-            putExtra(GalleyViewActivity.MEDIA, galleyMedia.toJson())
-            putExtra(GalleyViewActivity.TYPE, galleyMedia.isVideo)
+            putExtra(GalleyViewViewModel.MEDIA, galleyMedia.toJson())
+            putExtra(GalleyViewViewModel.TYPE, galleyMedia.isVideo)
             putExtra(
-                GalleyViewActivity.GALLEY,
+                GalleyViewViewModel.GALLEY,
                 intent.getStringExtra("GALLEY") ?: getString(R.string.all_galley)
             )
         })

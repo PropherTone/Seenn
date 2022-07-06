@@ -57,7 +57,7 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
         }
     }
 
-    override suspend fun init(): Unit = viewModel.run {
+    override suspend fun AddBucketViewModel.init(): Unit = viewModel.run {
         editName = intent.getStringExtra(AddBucketViewModel.BUCKET_NAME)
         editName?.let { eName ->
             musicBucket = getMusicBucketByName(eName)
@@ -94,8 +94,7 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
     }
 
     private suspend fun confirm(): Unit = viewModel.run {
-        var intent: Intent? = null
-        var result = false
+        var intent: Intent?
         if (editName != null) {
             val re = musicBucket?.let {
                 updateMusicBucket(it, name, uri, detail)
@@ -103,16 +102,19 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
             if (re != 0 || re != -1) {
                 filterMusicBucket(name)
                 intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
-                result = true
+                setResult(RESULT_OK, intent)
+                finish()
+            } else {
+                setResult(RESULT_CANCELED)
+                finish()
             }
         } else addMusicBucket(name, uri, detail) { re, name ->
             if (re) {
                 intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
-                result = true
+                setResult(RESULT_OK, intent)
+                finish()
             }
         }
-        setResult(if (result) RESULT_OK else RESULT_CANCELED, intent)
-        finish()
     }
 
     private fun refresh(musicBucket: MusicBucket) {

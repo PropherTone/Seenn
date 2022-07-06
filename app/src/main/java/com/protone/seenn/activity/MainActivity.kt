@@ -79,14 +79,14 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
 
     override suspend fun onViewEvent(event: String) = Unit
 
-    override suspend fun init() {
+    override suspend fun MainViewModel.init() {
         val musicController = MusicControllerIMP(binding.musicPlayer)
         musicController.onClick {
             startActivity(MusicViewActivity::class.intent)
         }
 
         bindMusicService {
-            musicController.setBinder(this, binder) {
+            musicController.setBinder(this@MainActivity, binder) {
                 userConfig.musicLoopMode = it
             }
             musicController.setLoopMode(userConfig.musicLoopMode)
@@ -100,7 +100,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
             }
         }
 
-        Medias.mediaLive.observe(this) { code ->
+        Medias.mediaLive.observe(this@MainActivity) { code ->
             if (code == Medias.AUDIO_UPDATED) {
                 musicController.refresh()
                 workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))

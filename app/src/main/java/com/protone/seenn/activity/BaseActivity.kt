@@ -30,7 +30,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     protected lateinit var binding: VB
 
     abstract suspend fun initView()
-    abstract suspend fun init()
+    abstract suspend fun VM.init()
     abstract suspend fun onViewEvent(event: String)
     private var viewEvent: Channel<String>? = null
     private var viewEventTask: Job? = null
@@ -100,7 +100,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
             initView()
             if (::binding.isInitialized) setContentView(binding.root)
             viewEventTask?.start()
-            init()
+            viewModel.init()
         }
     }
 

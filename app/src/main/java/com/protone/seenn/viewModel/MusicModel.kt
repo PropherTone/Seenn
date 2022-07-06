@@ -13,6 +13,7 @@ import com.protone.mediamodle.Medias
 import com.protone.seenn.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.util.stream.Collectors
 import kotlin.coroutines.suspendCoroutine
 
@@ -72,6 +73,13 @@ class MusicModel : ViewModel() {
 
     suspend fun doDeleteBucket(musicBucket: MusicBucket) =
         DataBaseDAOHelper.deleteMusicBucketRs(musicBucket)
+
+    suspend fun deleteMusicBucketCover(path: String) = withContext(Dispatchers.IO) {
+        val file = File(path)
+        if (file.isFile && file.exists()) {
+            file.delete()
+        }
+    }
 
     fun getMusicBucketByName(name: String) = DataBaseDAOHelper.getMusicBucketByName(name)
 

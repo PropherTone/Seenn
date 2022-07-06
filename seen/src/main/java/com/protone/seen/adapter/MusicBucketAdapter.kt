@@ -3,7 +3,6 @@ package com.protone.seen.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
@@ -173,6 +172,8 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
     fun deleteBucket(musicBucket: MusicBucket): Boolean {
         val index = musicBuckets.indexOf(musicBucket)
         musicBuckets.removeAt(index)
+        selectList.clear()
+        selectList.add(musicBuckets[0])
         notifyItemRemoved(index)
         return index != -1
     }
@@ -181,7 +182,6 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
         val indexOfFirst = musicBuckets.indexOfFirst { it.name == name }
         if (indexOfFirst != -1 && indexOfFirst != 0) {
             musicBuckets[indexOfFirst] = bucket
-            Log.d("TAG", "refreshBucket: $indexOfFirst")
             notifyItemChanged(indexOfFirst)
         }
     }

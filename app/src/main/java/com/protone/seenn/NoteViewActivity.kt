@@ -9,6 +9,8 @@ import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Note
 import com.protone.seen.NoteViewSeen
 import com.protone.seen.customView.richText.RichNoteView
+import com.protone.seenn.activity.GalleyViewActivity
+import com.protone.seenn.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.selects.select
 import java.util.*
@@ -110,8 +112,8 @@ class NoteViewActivity : BaseActivity<NoteViewSeen>() {
                                 ?.collect(Collectors.toList())
                             if (collect != null && collect.size > 0) {
                                 startActivity(GalleyViewActivity::class.intent.apply {
-                                    putExtra(GalleyViewActivity.MEDIA, collect[0].toJson())
-                                    putExtra(GalleyViewActivity.TYPE, isVideo)
+                                    putExtra(GalleyViewViewModel.MEDIA, collect[0].toJson())
+                                    putExtra(GalleyViewViewModel.TYPE, isVideo)
                                 })
                             } else toast(getString(R.string.none))
                         }

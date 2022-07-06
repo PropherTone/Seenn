@@ -12,7 +12,9 @@ import com.protone.database.sp.config.userConfig
 import com.protone.mediamodle.Medias
 import com.protone.mediamodle.media.IGalleyFragment
 import com.protone.seen.GalleySeen
+import com.protone.seenn.activity.GalleyViewActivity
 import com.protone.seenn.fragment.GalleyFragment
+import com.protone.seenn.viewModel.GalleyViewViewModel
 import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
@@ -45,9 +47,9 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
 
         override fun openView(galleyMedia: GalleyMedia, galley: String) {
             startActivity(GalleyViewActivity::class.intent.apply {
-                putExtra(GalleyViewActivity.MEDIA, galleyMedia.toJson())
-                putExtra(GalleyViewActivity.TYPE, galleyMedia.isVideo)
-                putExtra(GalleyViewActivity.GALLEY, galley)
+                putExtra(GalleyViewViewModel.MEDIA, galleyMedia.toJson())
+                putExtra(GalleyViewViewModel.TYPE, galleyMedia.isVideo)
+                putExtra(GalleyViewViewModel.GALLEY, galley)
             })
         }
     }
@@ -124,23 +126,23 @@ class GalleyActivity : BaseActivity<GalleySeen>() {
     }
 
     private fun rename() = chooseData.value?.get(0)?.let {
-        rename(it, this)
+//        rename(it, this)
     }
 
     private fun GalleySeen.delete() = chooseData.value?.get(0)?.let {
-        delete(it, this) { re ->
-            deleteMedia(re)
-        }
+//        delete(it, this) { re ->
+//            deleteMedia(re)
+//        }
     }
 
     private fun addCate() = chooseData.value?.let { list ->
-        addCate(list)
+//        addCate(list)
     }
 
     private suspend fun GalleySeen.moveTo() = chooseData.value?.let {
-        moveTo(getBar(), rightMailer != 0, it) { target, list ->
-            addBucket(target, list)
-        }
+//        moveTo(getBar(), rightMailer != 0, it) { target, list ->
+//            addBucket(target, list)
+//        }
     }
 
     private fun chooseData() = chooseData.value

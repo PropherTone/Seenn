@@ -1,5 +1,6 @@
 package com.protone.seenn.activity
 
+import android.net.Uri
 import android.view.View
 import androidx.core.view.isGone
 import androidx.databinding.ViewDataBinding
@@ -17,7 +18,9 @@ import com.protone.seenn.R
 import com.protone.seenn.viewModel.GalleyViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.stream.Collectors
 
 abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEvent: Boolean) :
     BaseActivity<VB, VM>(handleEvent),
@@ -48,12 +51,12 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
         }
     }
 
-    fun showPop(anchor: View, isSelect: Boolean) {
+    fun showPop(anchor: View, onSelect: Boolean) {
         popLayout?.apply {
-            galleyDelete.isGone = isSelect
-            galleyMoveTo.isGone = isSelect
-            galleyRename.isGone = isSelect
-            galleySetCate.isGone = isSelect
+            galleyDelete.isGone = onSelect
+            galleyMoveTo.isGone = onSelect
+            galleyRename.isGone = onSelect
+            galleySetCate.isGone = onSelect
         }
         pop?.showPop(anchor)
     }
@@ -72,7 +75,25 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
         pop?.dismiss()
     }
 
-    fun rename(gm: GalleyMedia, scope: CoroutineScope) {
+    fun tryRename(gm: List<GalleyMedia>, scope: CoroutineScope) {
+        when {
+            gm.size == 1 -> rename(gm[0], scope)
+            gm.size > 1 -> renameMulti(gm)
+        }
+    }
+
+    fun tryDelete(
+        gm: List<GalleyMedia>,
+        scope: CoroutineScope,
+        callBack: (GalleyMedia) -> Unit
+    ) {
+        when {
+            gm.size == 1 -> delete(gm[0], scope, callBack)
+            gm.size > 1 -> deleteMulti(gm, scope, callBack)
+        }
+    }
+
+    private fun rename(gm: GalleyMedia, scope: CoroutineScope) {
         val mimeType = gm.name.getFileMimeType()
         TitleDialog(
             this,
@@ -88,7 +109,29 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
         }
     }
 
-    fun delete(
+    private fun renameMulti(gm: List<GalleyMedia>) {
+        TitleDialog(
+            this,
+            getString(R.string.rename),
+            ""
+        ) { name ->
+            launch(Dispatchers.IO) {
+                gm.forEach {
+                    funcForMultiRename(
+                        "$name(${gm.indexOf(it)}).${it.name.getFileMimeType()}",
+                        it.uri
+                    ) { result ->
+                        if (result != null) {
+                            it.name = result
+                            toast(getString(R.string.success))
+                        } else toast(getString(R.string.not_supported))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun delete(
         gm: GalleyMedia,
         scope: CoroutineScope,
         callBack: (GalleyMedia) -> Unit
@@ -99,6 +142,25 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
                 callBack.invoke(gm)
                 toast(getString(R.string.success))
             } else toast(getString(R.string.not_supported))
+        }
+    }
+
+    private fun deleteMulti(
+        gm: List<GalleyMedia>,
+        scope: CoroutineScope,
+        callBack: (GalleyMedia) -> Unit
+    ) {
+        val list = gm.stream().map {
+            it.uri
+        }.collect(Collectors.toList()) as List<Uri>
+        var count = 0
+        multiDeleteMedia(list, scope) { result ->
+            if (result) {
+                DataBaseDAOHelper.deleteSignedMedia(gm[count])
+                callBack.invoke(gm[count])
+                toast(getString(R.string.success))
+            } else toast(getString(R.string.not_supported))
+            count++
         }
     }
 

@@ -17,11 +17,11 @@ import com.protone.seen.GalleySeen
 import com.protone.seen.R
 import com.protone.seen.adapter.MyFragmentStateAdapter
 import com.protone.seenn.GalleyActivity
-import com.protone.seenn.GalleyViewActivity
 import com.protone.seenn.PictureBoxActivity
 import com.protone.seenn.databinding.GalleyActivityBinding
 import com.protone.seenn.fragment.GalleyFragment
 import com.protone.seenn.viewModel.GalleyViewModel
+import com.protone.seenn.viewModel.GalleyViewViewModel
 import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +40,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
 
     override suspend fun onViewEvent(event: String) = Unit
 
-    override suspend fun init() = viewModel.run {
+    override suspend fun GalleyViewModel.init() = viewModel.run {
         chooseType = intent.getStringExtra(GalleyActivity.CHOOSE_MODE) ?: ""
 
         if (chooseType.isNotEmpty()) showActionBtn()
@@ -60,9 +60,9 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
 
         startActivity = { galleyMedia: GalleyMedia, galley: String ->
             startActivity(GalleyViewActivity::class.intent.apply {
-                putExtra(GalleyViewActivity.MEDIA, galleyMedia.toJson())
-                putExtra(GalleyViewActivity.TYPE, galleyMedia.isVideo)
-                putExtra(GalleyViewActivity.GALLEY, galley)
+                putExtra(GalleyViewViewModel.MEDIA, galleyMedia.toJson())
+                putExtra(GalleyViewViewModel.TYPE, galleyMedia.isVideo)
+                putExtra(GalleyViewViewModel.GALLEY, galley)
             })
         }
 
@@ -137,8 +137,8 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
     }
 
     override fun popDelete() {
-        viewModel.chooseData()?.get(0)?.let {
-            delete(it, this) { re ->
+        viewModel.chooseData()?.let {
+            tryDelete(it, this) { re ->
                 viewModel.deleteMedia(re)
             }
         }
@@ -155,8 +155,8 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
     }
 
     override fun popRename() {
-        viewModel.chooseData()?.get(0)?.let {
-            rename(it, this)
+        viewModel.chooseData()?.let {
+            tryRename(it, this)
         }
     }
 

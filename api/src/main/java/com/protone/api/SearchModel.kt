@@ -6,11 +6,11 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
 
-class SearchModel(editText: EditText, private val query: () -> Unit) : TextWatcher {
+class SearchModel(editText: EditText, private val query: SearchModel.() -> Unit) : TextWatcher {
 
     private val timerHandler = Handler(Looper.getMainLooper()) {
         if (it.what == 0) {
-            query.invoke()
+            query.invoke(this)
         }
         false
     }

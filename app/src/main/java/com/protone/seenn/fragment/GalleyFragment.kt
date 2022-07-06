@@ -29,8 +29,8 @@ import com.protone.seen.customView.StateImageView
 import com.protone.seen.databinding.GalleyFragmentLayoutBinding
 import com.protone.seen.dialog.TitleDialog
 import com.protone.seen.itemDecoration.GalleyItemDecoration
-import com.protone.seenn.GalleySearchActivity
 import com.protone.seenn.R
+import com.protone.seenn.activity.GalleySearchActivity
 import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -323,6 +323,8 @@ class GalleyFragment(
     private fun getListAdapter() =
         if (binding.galleyList.adapter is GalleyListAdapter)
             binding.galleyList.adapter as GalleyListAdapter else null
+
+    override fun select(galleyMedia: GalleyMedia)  = Unit
 
     override fun select(galleyMedia: MutableList<GalleyMedia>) {
         iGalleyFragment?.select(galleyMedia)

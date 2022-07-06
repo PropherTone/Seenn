@@ -14,6 +14,7 @@ import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.GalleyViewSeen
 import com.protone.seen.databinding.ImageCateLayoutBinding
 import com.protone.seen.databinding.TextCateLayoutBinding
+import com.protone.seenn.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.selects.select
@@ -23,12 +24,6 @@ import java.util.stream.Collectors
 
 class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
 
-    companion object {
-        const val MEDIA = "GalleyViewActivity:MediaData"
-        const val TYPE = "GalleyViewActivity:IsVideo"
-        const val GALLEY = "GalleyViewActivity:Galley"
-    }
-
     private var curPosition: Int = 0
     private lateinit var galleyMedias: MutableList<GalleyMedia>
 
@@ -36,10 +31,10 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
         val galleyViewSeen = GalleyViewSeen(this)
         setContentSeen(galleyViewSeen)
 
-        val isVideo = intent.getBooleanExtra(TYPE, false)
+        val isVideo = intent.getBooleanExtra(GalleyViewViewModel.TYPE, false)
 
         galleyMedias = withContext(Dispatchers.IO) {
-            val galley = intent.getStringExtra(GALLEY) ?: getString(R.string.all_galley)
+            val galley = intent.getStringExtra(GalleyViewViewModel.GALLEY) ?: getString(R.string.all_galley)
             var allMedia = (DataBaseDAOHelper.getAllMediaByType(isVideo)
                 ?: mutableListOf()) as MutableList<GalleyMedia>
             if (galley != this@GalleyViewActivity.getString(R.string.all_galley)) allMedia =
@@ -100,8 +95,8 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
                         catoName.text = galleyMedia.name
                         root.setOnClickListener {
                             startActivity(GalleyViewActivity::class.intent.apply {
-                                putExtra(MEDIA, galleyMedia.toJson())
-                                putExtra(TYPE, galleyMedia.isVideo)
+                                putExtra(GalleyViewViewModel.MEDIA, galleyMedia.toJson())
+                                putExtra(GalleyViewViewModel.TYPE, galleyMedia.isVideo)
                             })
                         }
                     }.root
@@ -133,7 +128,7 @@ class GalleyViewActivity : BaseActivity<GalleyViewSeen>() {
     private suspend fun getMediaIndex() = withContext(Dispatchers.IO) {
         suspendCancellableCoroutine<Int> { co ->
             val galleyMedia =
-                intent.getStringExtra(MEDIA)?.toEntity(GalleyMedia::class.java)
+                intent.getStringExtra(GalleyViewViewModel.MEDIA)?.toEntity(GalleyMedia::class.java)
             val indexOf = galleyMedias.indexOf(galleyMedia)
             curPosition = indexOf
             co.resumeWith(Result.success(indexOf))

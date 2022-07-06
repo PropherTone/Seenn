@@ -35,12 +35,12 @@
         <activity android:name=".activity.AddBucketActivity" />
         <activity android:name=".NoteEditActivity" />
         <activity android:name=".NoteViewActivity" />
-        <activity android:name=".GalleyViewActivity" />
+        <activity android:name=".activity.GalleyViewActivity" />
         <activity android:name=".PickMusicActivity" />
         <activity android:name=".UserConfigActivity" />
         <activity android:name=".LogActivity" />
         <activity android:name=".MusicViewActivity" />
-        <activity android:name=".GalleySearchActivity" />
+        <activity android:name=".activity.GalleySearchActivity" />
         <activity android:name=".activity.MainActivity"
             android:exported="false"
             android:launchMode="singleTop"/>

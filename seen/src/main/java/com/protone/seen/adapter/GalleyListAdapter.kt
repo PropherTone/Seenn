@@ -72,6 +72,7 @@ class GalleyListAdapter(
             image.setOnClickListener {
                 if (onSelectMod) {
                     checkSelect(holder, media[position])
+                    onSelectListener?.select(media[position])
                     onSelectListener?.select(selectList)
                 } else onSelectListener?.openView(media[position])
             }
@@ -79,6 +80,7 @@ class GalleyListAdapter(
                 image.setOnLongClickListener {
                     onSelectMod = true
                     checkSelect(holder, media[position])
+                    onSelectListener?.select(media[position])
                     onSelectListener?.select(selectList)
                     true
                 }
@@ -87,11 +89,20 @@ class GalleyListAdapter(
     }
 
     fun quitSelectMod() {
+        if (!onSelectMod) return
         onSelectMod = false
         context.onUiThread {
             clearAllSelected()
         }
         onSelectListener?.select(selectList)
+    }
+
+    fun noticeSelectChange(item: GalleyMedia) {
+        val indexOf = media.indexOf(item)
+        if (indexOf != -1) {
+            onSelectMod = true
+            notifyItemChanged(indexOf)
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -106,9 +117,13 @@ class GalleyListAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun selectAll() {
-        selectList.addAll(media)
-        context.onUiThread {
-            notifyDataSetChanged()
+        media.onEach {
+            if (!selectList.contains(it)) {
+                selectList.add(it)
+                context.onUiThread {
+                    notifyItemChanged(media.indexOf(it))
+                }
+            }
         }
     }
 
@@ -128,8 +143,13 @@ class GalleyListAdapter(
     private var onSelectListener: OnSelect? = null
 
     interface OnSelect {
+        fun select(galleyMedia: GalleyMedia)
         fun select(galleyMedia: MutableList<GalleyMedia>)
         fun openView(galleyMedia: GalleyMedia)
+    }
+
+    fun setNewSelectList(list: MutableList<GalleyMedia>) {
+        selectList = list
     }
 
     fun setOnSelectListener(listener: OnSelect?) {

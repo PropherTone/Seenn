@@ -34,12 +34,12 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
 
     override suspend fun onViewEvent(event: String) {
         when (event) {
-            NoteViewModel.ViewEvent.Init.name -> init()
+            NoteViewModel.ViewEvent.Init.name -> viewModel.init()
             NoteViewModel.ViewEvent.RefreshList.name -> refreshList()
         }
     }
 
-    override suspend fun init() {
+    override suspend fun NoteViewModel.init() {
         initList()
         binding.noteList.adapter.apply {
             this as NoteListAdapter

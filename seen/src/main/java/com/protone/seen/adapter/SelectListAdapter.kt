@@ -12,7 +12,7 @@ import com.protone.seen.R
 abstract class SelectListAdapter<V : ViewDataBinding, T>(context: Context) :
     BaseAdapter<V>(context) {
 
-    val selectList = mutableListOf<T>()
+    var selectList = mutableListOf<T>()
     var multiChoose = false
 
     open fun checkSelect(holder: Holder<V>, item: T) {
