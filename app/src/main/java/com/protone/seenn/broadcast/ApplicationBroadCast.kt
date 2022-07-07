@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import com.protone.api.context.FINISH
 import com.protone.api.context.MUSIC
-import kotlin.system.exitProcess
 
 abstract class ApplicationBroadCast : BroadcastReceiver() {
 

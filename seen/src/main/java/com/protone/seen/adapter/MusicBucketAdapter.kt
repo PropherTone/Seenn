@@ -5,13 +5,14 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
+import com.protone.api.getDrawable
+import com.protone.api.getString
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicBucketAdapterLayoutBinding
@@ -74,11 +75,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                     else -> {
                         loadIcon(
                             this,
-                            drawable = ResourcesCompat.getDrawable(
-                                resources,
-                                R.drawable.ic_baseline_music_note_24,
-                                null
-                            )
+                            drawable = R.drawable.ic_baseline_music_note_24.getDrawable()
                         )
                     }
                 }
@@ -104,7 +101,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 )
             }
 
-            if (musicBuckets[holder.layoutPosition].name != context.getString(R.string.all_music)) musicBucketAction.setOnClickListener {
+            if (musicBuckets[holder.layoutPosition].name != R.string.all_music.getString()) musicBucketAction.setOnClickListener {
                 when (musicBucketBack.isVisible) {
                     true -> {
                         AnimationHelper.translationX(
@@ -124,16 +121,16 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 }
             }
             musicBucketEdit.setOnClickListener {
-                musicBucketEvent?.edit(musicBuckets[holder.layoutPosition].name,position)
+                musicBucketEvent?.edit(musicBuckets[holder.layoutPosition].name, position)
                 closeMusicBucketBack()
             }
             musicBucketDelete.setOnClickListener {
-                musicBucketEvent?.delete(musicBuckets[holder.layoutPosition].name,position)
+                musicBucketEvent?.delete(musicBuckets[holder.layoutPosition].name, position)
                 closeMusicBucketBack()
             }
             musicBucketAddList.setOnClickListener {
                 closeMusicBucketBack()
-                musicBucketEvent?.addList(musicBuckets[holder.layoutPosition].name,position)
+                musicBucketEvent?.addList(musicBuckets[holder.layoutPosition].name, position)
             }
         }
     }
@@ -141,9 +138,9 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
     var musicBucketEvent: MusicBucketEvent? = null
 
     interface MusicBucketEvent {
-        fun addList(bucket: String,position: Int)
-        fun delete(bucket: String,position: Int)
-        fun edit(bucket: String,position: Int)
+        fun addList(bucket: String, position: Int)
+        fun delete(bucket: String, position: Int)
+        fun edit(bucket: String, position: Int)
     }
 
     private fun loadIcon(

@@ -20,9 +20,7 @@ import com.protone.database.sp.config.userConfig
 import com.protone.mediamodle.Medias
 import com.protone.seen.adapter.MainModelListAdapter
 import com.protone.seen.itemDecoration.ModelListItemDecoration
-import com.protone.seenn.MusicViewActivity
 import com.protone.seenn.R
-import com.protone.seenn.UserConfigActivity
 import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.databinding.MainActivityBinding
 import com.protone.seenn.service.WorkService
@@ -56,7 +54,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
             field = value
         }
 
-    override suspend fun initView() {
+    override fun initView() {
         binding = MainActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MainActivity
             fitNavigationBar(root)
@@ -118,8 +116,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    override suspend fun doStart() {
         userName = userConfig.userName
         userIcon = userConfig.userIcon
     }

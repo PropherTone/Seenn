@@ -48,7 +48,7 @@ val Context.navigationBarHeight: Int
 
 var isKeyBroadShow = false
 
-fun Activity.setSoftInputStatuesListener(onSoftInput: ((Int, Boolean) -> Unit)? = null) {
+inline fun Activity.setSoftInputStatuesListener(crossinline onSoftInput: (Int, Boolean) -> Unit={ _, _->}) {
     isKeyBroadShow = false
     window.decorView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
         val rect = Rect()
@@ -56,10 +56,10 @@ fun Activity.setSoftInputStatuesListener(onSoftInput: ((Int, Boolean) -> Unit)? 
         val i = window.decorView.height - rect.bottom - navigationBarHeight
         if (i > 0 && !isKeyBroadShow) {
             isKeyBroadShow = true
-            onSoftInput?.invoke(i, i > 0)
+            onSoftInput.invoke(i, i > 0)
         } else if (i <= 0 && isKeyBroadShow) {
             isKeyBroadShow = false
-            onSoftInput?.invoke(i, false)
+            onSoftInput.invoke(i, false)
         }
     }
 }

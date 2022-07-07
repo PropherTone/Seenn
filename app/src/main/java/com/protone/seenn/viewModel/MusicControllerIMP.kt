@@ -4,6 +4,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import com.protone.api.context.*
+import com.protone.api.getString
 import com.protone.database.room.entity.Music
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
@@ -109,34 +110,34 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
         when (mode) {
             LOOP_LIST -> {
                 controller.looper?.setImageResource(R.drawable.ic_round_repeat_24_white)
-                showToast(controller.context.getString(R.string.loop_list))
+                showToast(R.string.loop_list.getString())
             }
             LOOP_SINGLE -> {
                 controller.looper?.setImageResource(R.drawable.ic_round_repeat_one_24_white)
-                showToast(controller.context.getString(R.string.loop_single))
+                showToast(R.string.loop_single.getString())
             }
             PLAY_LIST -> {
                 controller.looper?.setImageResource(R.drawable.ic_round_playlist_play_24_white)
-                showToast(controller.context.getString(R.string.play_list))
+                showToast(R.string.play_list.getString())
             }
             NO_LOOP -> {
                 controller.looper?.setImageResource(R.drawable.ic_round_block_24_white)
-                showToast(controller.context.getString(R.string.no_loop))
+                showToast(R.string.no_loop.getString())
             }
             RANDOM -> {
                 controller.looper?.setImageResource(R.drawable.ic_round_loop_24_white)
-                showToast(controller.context.getString(R.string.random))
+                showToast(R.string.random.getString())
             }
         }
         binder?.setLoopMode(mode)
     }
 
-    fun refresh(music: Music, progress: Long)  {
+    fun refresh(music: Music, progress: Long) {
         binder?.init(music, progress)
         musicBroadCastManager.sendBroadcast(Intent(MUSIC_REFRESH))
     }
 
-    fun play(music: Music?)  {
+    fun play(music: Music?) {
         binder?.play(music)
         musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY_CUR))
     }

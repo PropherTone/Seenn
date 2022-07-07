@@ -5,27 +5,26 @@ import android.content.Context
 import android.graphics.drawable.Animatable
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isGone
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.onUiThread
+import com.protone.api.getDrawable
 import com.protone.api.toStringMinuteTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Medias
-import com.protone.seen.PickMusicSeen
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class AddMusicListAdapter(context: Context, private val bucket: String, private val mode: String) :
+class AddMusicListAdapter(context: Context, private val bucket: String, private val multiSelect: Boolean) :
     SelectListAdapter<MusicListLayoutBinding, Music>(context) {
 
     init {
-        multiChoose = (mode != PickMusicSeen.PICK_MUSIC).also { b ->
+        multiChoose = multiSelect.also { b ->
             if (b) Medias.musicBucket[bucket]?.let { selectList.addAll(it) }
         }
     }
@@ -51,13 +50,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                     musicListDetail
                 )
                 if (isSelect) {
-                    musicListPlayState.setImageDrawable(
-                        ResourcesCompat.getDrawable(
-                            context.resources,
-                            R.drawable.load_animation,
-                            null
-                        )
-                    )
+                    musicListPlayState.setImageDrawable(R.drawable.load_animation.getDrawable())
                 }
             }
         }
@@ -82,7 +75,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                 musicListContainer.setOnClickListener {
                     viewQueue.add(position)
                     if (selectList.contains(music)) {
-                        if (mode == PickMusicSeen.PICK_MUSIC) return@setOnClickListener
+                        if (!multiSelect) return@setOnClickListener
                         (music.myBucket as ArrayList).remove(bucket)
                         DataBaseDAOHelper.execute {
                             val re = DataBaseDAOHelper.updateMusicRs(music)
@@ -97,7 +90,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                         when (d) {
                             is Animatable -> {
                                 d.start()
-                                if (mode != PickMusicSeen.PICK_MUSIC) {
+                                if (multiSelect) {
                                     music.myBucket.apply {
                                         (this as ArrayList).add(bucket)
                                     }
@@ -149,13 +142,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
     private fun changeIconAni(view: ImageView) = context.onUiThread {
         AnimationHelper.apply {
             animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
-                view.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        context.resources,
-                        R.drawable.ic_baseline_check_24_white,
-                        null
-                    )
-                )
+                view.setImageDrawable(R.drawable.ic_baseline_check_24_white.getDrawable())
                 animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true)
             }, play = true)
         }

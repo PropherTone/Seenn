@@ -6,10 +6,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.protone.seen.customView.MyMusicPlayer
+        <com.protone.seen.customView.musicPlayer.MusicPlayerViewMid
             android:id="@+id/rich_music"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/music_player_mid"
             android:background="@color/white"
             android:clickable="true"
             android:focusable="true"

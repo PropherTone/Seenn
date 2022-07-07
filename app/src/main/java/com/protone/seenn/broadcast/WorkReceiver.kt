@@ -3,17 +3,17 @@ package com.protone.seenn.broadcast
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.protone.api.context.APP
 import com.protone.api.context.UPDATE_GALLEY
 import com.protone.api.context.UPDATE_MUSIC
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.json.toUri
-import com.protone.mediamodle.IWorkService
 
 val workLocalBroadCast by lazy { LocalBroadcastManager.getInstance(APP.app) }
 
-abstract class WorkReceiver : BroadcastReceiver() , IWorkService {
+abstract class WorkReceiver : BroadcastReceiver(), IWorkService {
 
     override fun onReceive(p0: Context?, p1: Intent?) {
         when (p1?.action) {
@@ -22,4 +22,10 @@ abstract class WorkReceiver : BroadcastReceiver() , IWorkService {
             UPDATE_GALLEY -> updateGalley(p1.getStringExtra("uri")?.toUri())
         }
     }
+}
+
+interface IWorkService {
+    fun updateMusicBucket()
+    fun updateMusic(data: Uri?)
+    fun updateGalley(data: Uri?)
 }

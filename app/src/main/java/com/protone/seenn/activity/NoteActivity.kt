@@ -7,16 +7,18 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.intent
 import com.protone.api.context.root
+import com.protone.api.getString
+import com.protone.api.toast
 import com.protone.database.room.entity.Note
 import com.protone.database.room.entity.NoteType
 import com.protone.seen.R
 import com.protone.seen.adapter.NoteListAdapter
 import com.protone.seen.adapter.NoteTypeListAdapter
 import com.protone.seen.dialog.TitleDialog
-import com.protone.seenn.NoteEditActivity
-import com.protone.seenn.NoteViewActivity
 import com.protone.seenn.databinding.NoteActivityBinding
+import com.protone.seenn.viewModel.NoteEditViewModel
 import com.protone.seenn.viewModel.NoteViewModel
+import com.protone.seenn.viewModel.NoteViewViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,7 +27,7 @@ import kotlin.math.abs
 class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     override val viewModel: NoteViewModel by viewModels()
 
-    override suspend fun initView() {
+    override fun initView() {
         binding = NoteActivityBinding.inflate(layoutInflater, root, false)
         fitStatuesBar(binding.root)
         fitNavigationBar(binding.root)
@@ -46,7 +48,7 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
             this.noteListEventListener = object : NoteListAdapter.NoteListEvent {
                 override fun onNote(title: String) {
                     startActivity(NoteViewActivity::class.intent.also {
-                        it.putExtra(NoteViewActivity.NOTE_NAME, title)
+                        it.putExtra(NoteViewViewModel.NOTE_NAME, title)
                     })
                 }
 
@@ -56,17 +58,14 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
             }
         }
         addNoteType {
-            startActivity(NoteEditActivity::class.intent.also { intent ->
-                intent.putExtra(NoteEditActivity.NOTE_TYPE, it)
-            })
+            startActivity(NoteEditActivity::class.intent.putExtra(NoteEditViewModel.NOTE_TYPE, it))
         }
         onTypeSelected { type ->
             refreshNoteList(viewModel.getNoteList(type))
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override suspend fun doResume() {
         sendViewEvent(NoteViewModel.ViewEvent.RefreshList.name)
     }
 
@@ -81,13 +80,13 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
                                     .insertNoteType(NoteType(pair.second, ""))
                         } else {
                             withContext(Dispatchers.Main) {
-                                toast(getString(R.string.failed_msg))
+                                R.string.failed_msg.getString().toast()
                             }
                         }
                     }
                 }
             } else {
-                toast(getString(R.string.enter))
+                R.string.enter.getString().toast()
             }
         }
     }

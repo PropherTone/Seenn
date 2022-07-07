@@ -14,7 +14,6 @@ import com.protone.api.json.toJson
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seen.itemDecoration.GalleyItemDecoration
-import com.protone.seenn.PictureBoxActivity
 import com.protone.seenn.R
 import com.protone.seenn.databinding.GalleySearchActivityBinding
 import com.protone.seenn.viewModel.GalleySearchViewModel
@@ -28,7 +27,7 @@ class GalleySearchActivity :
     GalleyListAdapter.OnSelect, GalleySearchViewModel.OnQuery {
     override val viewModel: GalleySearchViewModel by viewModels()
 
-    override suspend fun initView() {
+    override fun initView() {
         binding = GalleySearchActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitNavigationBar(binding.root)

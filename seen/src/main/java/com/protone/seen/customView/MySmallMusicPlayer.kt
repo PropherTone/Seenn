@@ -8,11 +8,11 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
-import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.protone.api.context.layoutInflater
+import com.protone.api.getDrawable
 import com.protone.api.toBitmapByteArray
 import com.protone.seen.R
 import com.protone.seen.databinding.SmallMusicPlayerLayoutBinding
@@ -28,19 +28,8 @@ class MySmallMusicPlayer @JvmOverloads constructor(
     private val binding = SmallMusicPlayerLayoutBinding.inflate(context.layoutInflater, this, true)
     var isPlaying = false
         set(value) {
-            if (value) binding.smallMusicStart.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_pause_24,
-                    null
-                )
-            ) else binding.smallMusicStart.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_play_arrow_24,
-                    null
-                )
-            )
+            if (value) binding.smallMusicStart.setImageDrawable(R.drawable.ic_baseline_pause_24.getDrawable())
+            else binding.smallMusicStart.setImageDrawable(R.drawable.ic_baseline_play_arrow_24.getDrawable())
             field = value
         }
 

@@ -10,9 +10,9 @@ import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
 import android.widget.Toast
-import com.protone.api.context.APP
 import com.protone.api.context.onUiThread
 import com.protone.api.context.workIntentFilter
+import com.protone.api.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMulti
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusic
@@ -23,7 +23,6 @@ import com.protone.database.room.dao.DataBaseDAOHelper.insertMusicMulti
 import com.protone.database.room.dao.DataBaseDAOHelper.updateMusicBucketBack
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
-import com.protone.mediamodle.IWorkService
 import com.protone.mediamodle.Medias.AUDIO_UPDATED
 import com.protone.mediamodle.Medias.GALLEY_UPDATED
 import com.protone.mediamodle.Medias.mediaLive
@@ -32,6 +31,7 @@ import com.protone.mediamodle.Medias.musicBucket
 import com.protone.mediamodle.Medias.musicBucketLive
 import com.protone.mediamodle.media.*
 import com.protone.seenn.R
+import com.protone.seenn.broadcast.IWorkService
 import com.protone.seenn.broadcast.MediaContentObserver
 import com.protone.seenn.broadcast.WorkReceiver
 import com.protone.seenn.broadcast.workLocalBroadCast
@@ -107,7 +107,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         val allMusic = (getAllMusic() as ArrayList?)?.also { cacheAllMusic.addAll(it) }
         val allMusicBucket = getAllMusicBucket().let { l ->
             (l as ArrayList).filter {
-                it.name != APP.app.getString(R.string.all_music)
+                it.name != R.string.all_music.getString()
             }
         }
         allMusicBucket.forEach { (name) -> musicBucket[name] = ArrayList() }
@@ -227,7 +227,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         }
     }
 
-    private inner class WorkBinder : Binder(), IWorkService {
+    private inner class WorkBinder : Binder(),IWorkService {
         override fun updateMusicBucket() {
             this@WorkService.updateMusicBucket()
         }

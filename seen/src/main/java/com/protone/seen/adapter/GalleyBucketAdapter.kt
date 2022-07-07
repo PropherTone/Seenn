@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide
 import com.protone.api.context.APP
 import com.protone.api.context.layoutInflater
 import com.protone.api.context.onUiThread
+import com.protone.api.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.seen.R
 import com.protone.seen.databinding.GalleyBucketListLayoutBinding
@@ -55,7 +56,7 @@ class GalleyBucketAdapter(
                             DataBaseDAOHelper.getGalleyBucketRs(galleries[position].second[0])
                         if (galley != null) withContext(Dispatchers.Main) {
                             AlertDialog.Builder(context)
-                                .setTitle(context.getString(R.string.delete))
+                                .setTitle(R.string.delete.getString())
                                 .setPositiveButton(
                                     R.string.confirm
                                 ) { dialog, _ ->
@@ -104,7 +105,7 @@ class GalleyBucketAdapter(
 
     fun performSelect() {
         galleries.stream()
-            .filter { it.second[0] == context.getString(R.string.all_galley) }
+            .filter { it.second[0] == R.string.all_galley.getString() }
             .toList()
             .let { if (it.isNotEmpty()) selectList.add(it[0]) }
         context.onUiThread {

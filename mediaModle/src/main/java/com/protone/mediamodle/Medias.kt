@@ -2,7 +2,7 @@ package com.protone.mediamodle
 
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
-import com.protone.api.context.APP
+import com.protone.api.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
@@ -20,10 +20,10 @@ object Medias {
 
     var music: MutableList<Music> = mutableListOf()
         set(value) {
-            musicBucket[APP.app.getString(R.string.all_music)] = value
+            musicBucket[R.string.all_music.getString()] = value
             field = value
         }
-        get() = musicBucket[APP.app.getString(R.string.all_music)] ?: mutableListOf()
+        get() = musicBucket[R.string.all_music.getString()] ?: mutableListOf()
 
     val musicBucketLive = MutableLiveData<Int>()
 

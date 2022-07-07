@@ -5,6 +5,8 @@ import com.protone.api.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seenn.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.stream.Collectors
 
 class GalleyViewViewModel : ViewModel() {
@@ -15,14 +17,14 @@ class GalleyViewViewModel : ViewModel() {
         const val GALLEY = "GalleyViewActivity:Galley"
     }
 
-    enum class ViewEvent{
+    enum class ViewEvent {
         SetNote
     }
 
     var curPosition: Int = 0
     lateinit var galleyMedias: MutableList<GalleyMedia>
 
-    fun initGalleyData(galley: String, isVideo: Boolean) {
+    suspend fun initGalleyData(galley: String, isVideo: Boolean) = withContext(Dispatchers.IO) {
         var allMedia = (DataBaseDAOHelper.getAllMediaByType(isVideo)
             ?: mutableListOf()) as MutableList<GalleyMedia>
         if (galley != R.string.all_galley.getString()) allMedia =
@@ -34,5 +36,5 @@ class GalleyViewViewModel : ViewModel() {
 
     suspend fun getSignedMedia() = DataBaseDAOHelper.getSignedMediaRs(galleyMedias[curPosition].uri)
 
-    fun getCurrentMedia() =  galleyMedias[curPosition]
+    fun getCurrentMedia() = galleyMedias[curPosition]
 }

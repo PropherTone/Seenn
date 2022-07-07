@@ -5,9 +5,9 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import com.protone.api.context.layoutInflater
+import com.protone.api.getDrawable
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.databinding.VideoControllerBinding
@@ -26,25 +26,19 @@ class MyVideoController @JvmOverloads constructor(
 
     private var isPlaying = false
         set(value) {
-            binding.vStart.background = ResourcesCompat.getDrawable(
-                resources,
-                if (!value) R.drawable.ic_baseline_play_arrow_24_white
-                else R.drawable.ic_baseline_pause_24_white,
-                null
-            )
-            binding.vControl.background = ResourcesCompat.getDrawable(
-                resources,
-                if (!value) R.drawable.ic_baseline_play_arrow_24_white
-                else R.drawable.ic_baseline_pause_24_white,
-                null
-            )
+            binding.vStart.background =
+                if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
+                else R.drawable.ic_baseline_pause_24_white.getDrawable()
+            binding.vControl.background =
+                if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
+                else R.drawable.ic_baseline_pause_24_white.getDrawable()
             field = value
         }
 
-    var fullScreen : (()->Unit)? = null
+    var fullScreen: (() -> Unit)? = null
 
     init {
-        binding.vFull.setOnClickListener{
+        binding.vFull.setOnClickListener {
             fullScreen?.invoke()
         }
         binding.vStart.setOnClickListener {

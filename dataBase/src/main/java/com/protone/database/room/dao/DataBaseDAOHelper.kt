@@ -279,24 +279,25 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         noteDAO?.insertNote(note)
     }
 
-    inline fun insertNoteCB(note: Note, crossinline callBack: suspend (Boolean, String) -> Unit) {
-        execute {
-            var count = 0
-            val tempName = note.title
-            val names = mutableMapOf<String, Int>()
-            getAllNote()?.forEach {
-                names[it.title] = 1
-                if (it.title == note.title) {
+    suspend fun insertNoteRs(note: Note) =
+        onResult<Pair<Boolean, String>> {
+            execute {
+                var count = 0
+                val tempName = note.title
+                val names = mutableMapOf<String, Int>()
+                getAllNote()?.forEach {
+                    names[it.title] = 1
+                    if (it.title == note.title) {
+                        note.title = "${tempName}(${++count})"
+                    }
+                }
+                while (names[note.title] != null) {
                     note.title = "${tempName}(${++count})"
                 }
+                insertNote(note)
+                it.resumeWith(Result.success(Pair(getNoteByName(note.title) != null, note.title)))
             }
-            while (names[note.title] != null) {
-                note.title = "${tempName}(${++count})"
-            }
-            insertNote(note)
-            callBack.invoke(getNoteByName(note.title) != null, note.title)
         }
-    }
 
     //NoteType
     private var noteTypeDAO: NoteTypeDAO? = null
@@ -309,7 +310,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     suspend fun insertNoteTypeRs(
         noteType: NoteType,
-    ) = onResult<Pair<Boolean,String>>{
+    ) = onResult<Pair<Boolean, String>> {
         execute {
             var count = 0
             val tempName = noteType.type

@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
-import androidx.core.content.res.ResourcesCompat
+import com.protone.api.getDrawable
 import com.protone.seen.R
 
 class StateImageView @JvmOverloads constructor(
@@ -16,16 +16,8 @@ class StateImageView @JvmOverloads constructor(
     private var positive = false
     private var stateListener: StateListener? = null
 
-    private var activeDrawable = ResourcesCompat.getDrawable(
-        context.resources,
-        R.drawable.ic_baseline_arrow_drop_down_24,
-        null
-    )
-    private var negativeDrawable = ResourcesCompat.getDrawable(
-        context.resources,
-        R.drawable.ic_baseline_arrow_drop_up_24,
-        null
-    )
+    private var activeDrawable = R.drawable.ic_baseline_arrow_drop_down_24.getDrawable()
+    private var negativeDrawable = R.drawable.ic_baseline_arrow_drop_up_24.getDrawable()
 
     init {
         setImageDrawable(activeDrawable)

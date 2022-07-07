@@ -32,20 +32,26 @@ class TitleDialog(val context: Context, val title : String, val name: String, va
             ) { p0, _ ->
                 callBack(binding.renameInput.text.toString())
                 p0?.dismiss()
+                create = null
             }
-            it.setNegativeButton(R.string.cancel, null)
+            it.setNegativeButton(R.string.cancel){
+                p0,_->
+                p0?.dismiss()
+                create = null
+            }
         }.create().also {
             create = it
         }.show()
         val attributes = create?.window?.attributes
-        val oldY = attributes?.y
         if (context is Activity) {
             context.setSoftInputStatuesListener { i, b ->
                 if (b) {
                     attributes?.y = attributes?.y?.minus(binding.root.measuredHeight / 2)
+//                    create?.window?.attributes = attributes
                     create?.onWindowAttributesChanged(attributes)
                 } else {
-                    attributes?.y = oldY
+                    attributes?.y = 0
+//                    create?.window?.attributes = attributes
                     create?.onWindowAttributesChanged(attributes)
                 }
             }

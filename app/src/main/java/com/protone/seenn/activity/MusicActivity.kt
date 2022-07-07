@@ -4,7 +4,6 @@ import android.content.Intent
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.activity.viewModels
-import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -13,6 +12,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.*
+import com.protone.api.getDrawable
 import com.protone.api.getString
 import com.protone.api.toast
 import com.protone.database.room.entity.Music
@@ -22,8 +22,6 @@ import com.protone.mediamodle.Medias
 import com.protone.seen.adapter.MusicBucketAdapter
 import com.protone.seen.adapter.MusicListAdapter
 import com.protone.seen.customView.StateImageView
-import com.protone.seenn.MusicViewActivity
-import com.protone.seenn.PickMusicActivity
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.databinding.MusicActivtiyBinding
@@ -39,7 +37,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
     ViewTreeObserver.OnGlobalLayoutListener {
     override val viewModel: MusicModel by viewModels()
 
-    override suspend fun initView() {
+    override fun initView() {
         binding = MusicActivtiyBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MusicActivity
             root.viewTreeObserver.addOnGlobalLayoutListener(this@MusicActivity)
@@ -124,41 +122,37 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
     }
 
     fun edit() {
-        if (!viewModel.compareName())
-            startActivityForResult(
-                AddBucketActivity::class.intent.apply {
-                    putExtra(
-                        AddBucketViewModel.BUCKET_NAME,
-                        viewModel.bucket
-                    )
-                }) { ar ->
-                ar?.also { re ->
-                    if (re.resultCode == RESULT_OK)
-                        re.data?.getStringExtra(AddBucketViewModel.BUCKET_NAME)
-                            ?.let {
-                                viewModel.bucket = it
-                                getMusicBucketAdapter().clickCallback(viewModel.bucket)
-                                sendRefreshBucket()
-                            }
+        if (viewModel.compareName()) return
+        launch {
+            val ar = startActivityForResult(
+                AddBucketActivity::class.intent.putExtra(
+                    AddBucketViewModel.BUCKET_NAME,
+                    viewModel.bucket
+                )
+            )
+            ar?.also { re ->
+                if (re.resultCode != RESULT_OK) return@also
+                re.data?.getStringExtra(AddBucketViewModel.BUCKET_NAME)?.let {
+                    viewModel.bucket = it
+                    getMusicBucketAdapter().clickCallback(viewModel.bucket)
+                    sendRefreshBucket()
                 }
             }
+        }
     }
 
     fun addList() {
-        if (!viewModel.compareName())
-            startActivity(
-                PickMusicActivity::class.intent
-                    .also { it.putExtra("BUCKET", viewModel.bucket) })
+        if (viewModel.compareName()) return
+        startActivity(PickMusicActivity::class.intent.putExtra("BUCKET", viewModel.bucket))
     }
 
     fun addBucket() {
-        startActivityForResult(
-            AddBucketActivity::class.intent
-        ) { re ->
+        launch {
+            val re = startActivityForResult(AddBucketActivity::class.intent)
             when (re?.resultCode) {
                 RESULT_OK -> re.data?.getStringExtra(AddBucketViewModel.BUCKET_NAME)
                     ?.let { addBucket(it) }
-                RESULT_CANCELED -> toast(getString(R.string.cancel))
+                RESULT_CANCELED -> R.string.cancel.getString().toast()
             }
         }
     }
@@ -258,14 +252,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                     .override(musicBucketIcon.measuredWidth, musicBucketIcon.measuredHeight)
                     .into(musicBucketIcon)
             } else {
-                musicBucketIcon.setImageDrawable(
-                    ResourcesCompat
-                        .getDrawable(
-                            resources,
-                            R.drawable.ic_baseline_music_note_24,
-                            null
-                        )
-                )
+                musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
             }
             musicBucketName.text = bucketName
             musicBucketMsg.text = detail

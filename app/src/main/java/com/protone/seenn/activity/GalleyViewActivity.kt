@@ -14,7 +14,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.protone.api.context.intent
-import com.protone.api.context.onBackground
 import com.protone.api.context.root
 import com.protone.api.getStorageSize
 import com.protone.api.getString
@@ -28,10 +27,10 @@ import com.protone.seen.adapter.GalleyViewPager2Adapter
 import com.protone.seen.databinding.ImageCateLayoutBinding
 import com.protone.seen.databinding.RichVideoLayoutBinding
 import com.protone.seen.databinding.TextCateLayoutBinding
-import com.protone.seenn.NoteViewActivity
 import com.protone.seenn.R
 import com.protone.seenn.databinding.GalleyViewActivityBinding
 import com.protone.seenn.viewModel.GalleyViewViewModel
+import com.protone.seenn.viewModel.NoteViewViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -41,7 +40,7 @@ class GalleyViewActivity :
     BaseMediaActivity<GalleyViewActivityBinding, GalleyViewViewModel>(true) {
     override val viewModel: GalleyViewViewModel by viewModels()
 
-    override suspend fun initView() {
+    override fun initView() {
         binding = GalleyViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBarUsePadding(binding.galleyVTitle)
@@ -55,12 +54,8 @@ class GalleyViewActivity :
         val isVideo = intent.getBooleanExtra(GalleyViewViewModel.TYPE, false)
         val galley =
             intent.getStringExtra(GalleyViewViewModel.GALLEY) ?: getString(R.string.all_galley)
-        onBackground {
-            initGalleyData(galley, isVideo)
-            launch {
-                init(isVideo)
-            }
-        }
+        initGalleyData(galley, isVideo)
+        init(isVideo)
     }
 
     override suspend fun onViewEvent(event: String) {
@@ -72,7 +67,7 @@ class GalleyViewActivity :
     private suspend fun GalleyViewViewModel.init(isVideo: Boolean) {
         initList {
             startActivity(NoteViewActivity::class.intent.apply {
-                putExtra(NoteViewActivity.NOTE_NAME, it)
+                putExtra(NoteViewViewModel.NOTE_NAME, it)
             })
         }
         val mediaIndex = getMediaIndex()

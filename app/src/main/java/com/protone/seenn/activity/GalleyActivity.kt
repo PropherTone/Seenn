@@ -13,11 +13,8 @@ import com.protone.api.json.toUriJson
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.sp.config.userConfig
 import com.protone.mediamodle.Medias
-import com.protone.seen.GalleySeen
 import com.protone.seen.R
 import com.protone.seen.adapter.MyFragmentStateAdapter
-import com.protone.seenn.GalleyActivity
-import com.protone.seenn.PictureBoxActivity
 import com.protone.seenn.databinding.GalleyActivityBinding
 import com.protone.seenn.fragment.GalleyFragment
 import com.protone.seenn.viewModel.GalleyViewModel
@@ -29,7 +26,7 @@ import kotlinx.coroutines.launch
 class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>(false) {
     override val viewModel: GalleyViewModel by viewModels()
 
-    override suspend fun initView() {
+    override fun initView() {
         binding = GalleyActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBar(binding.root)
@@ -41,7 +38,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
     override suspend fun onViewEvent(event: String) = Unit
 
     override suspend fun GalleyViewModel.init() = viewModel.run {
-        chooseType = intent.getStringExtra(GalleyActivity.CHOOSE_MODE) ?: ""
+        chooseType = intent.getStringExtra(GalleyViewModel.CHOOSE_MODE) ?: ""
 
         if (chooseType.isNotEmpty()) showActionBtn()
 
@@ -105,8 +102,8 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
             it.adapter = MyFragmentStateAdapter(
                 this@GalleyActivity,
                 when (chooseType) {
-                    GalleySeen.CHOOSE_PHOTO -> arrayListOf(fragments[0])
-                    GalleySeen.CHOOSE_VIDEO -> arrayListOf(fragments[1])
+                    GalleyViewModel.CHOOSE_PHOTO -> arrayListOf(fragments[0])
+                    GalleyViewModel.CHOOSE_VIDEO -> arrayListOf(fragments[1])
                     else -> fragments
                 }
             )
@@ -115,8 +112,8 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
             }, it) { tab, position ->
                 tab.setText(
                     when (chooseType) {
-                        GalleySeen.CHOOSE_PHOTO -> arrayOf(R.string.photo)
-                        GalleySeen.CHOOSE_VIDEO -> arrayOf(R.string.video)
+                        GalleyViewModel.CHOOSE_PHOTO -> arrayOf(R.string.photo)
+                        GalleyViewModel.CHOOSE_VIDEO -> arrayOf(R.string.video)
                         else -> arrayOf(R.string.photo, R.string.video)
                     }[position]
                 )
@@ -128,8 +125,8 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
         viewModel.chooseData()?.let { list ->
             if (list.size > 0) {
                 setResult(RESULT_OK, Intent().apply {
-                    putExtra(GalleyActivity.URI, list[0].uri.toUriJson())
-                    putExtra(GalleyActivity.GALLEY_DATA, list[0].toJson())
+                    putExtra(GalleyViewModel.URI, list[0].uri.toUriJson())
+                    putExtra(GalleyViewModel.GALLEY_DATA, list[0].toJson())
                 })
             }
         }

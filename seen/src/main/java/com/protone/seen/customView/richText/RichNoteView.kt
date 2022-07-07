@@ -225,13 +225,21 @@ class RichNoteView @JvmOverloads constructor(
         }.root.also { r -> r.tag = video }, it)
     }
 
+    private var isPlaying = false
+
     override fun insertMusic(music: RichMusicStates) = insertMedia {
         addView(RichMusicLayoutBinding.inflate(context.layoutInflater, this, false).apply {
-            richMusic.playMusic = {
-                iRichListener?.play(music.uri, richMusic.progress)
+            richMusic.control.setOnClickListener {
+                if (isPlaying) {
+                    iRichListener?.play(music.uri, richMusic.progress.barDuration)
+                } else {
+                    iRichListener?.pause()
+                }
                 curPlaying = this@RichNoteView.indexOfChild(root)
             }
-            richMusic.pauseMusic = { iRichListener?.pause() }
+            richMusic.next.isGone = true
+            richMusic.previous.isGone = true
+            richMusic.looper?.isGone = true
             richLinkContainer.isGone = music.link == null
             if (!isEditable) {
                 richLinkContainer.setOnClickListener {
@@ -239,8 +247,8 @@ class RichNoteView @JvmOverloads constructor(
                 }
                 richLink.text = music.link ?: ""
             }
-            richMusic.icon = music.uri
-            richMusic.name = music.name
+            richMusic.cover = music.uri
+            richMusic.setName(music.name)
         }.root.also { r -> r.tag = music }, it)
     }
 
@@ -308,8 +316,8 @@ class RichNoteView @JvmOverloads constructor(
                 val bitmapWH = getBitmapWH(ba)
                 Glide.with(context).asDrawable().load(photo.uri)
                     .error(R.drawable.ic_baseline_error_outline_24_black).let { glide ->
-                    if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
-                }.into(this.richPhotoIv)
+                        if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
+                    }.into(this.richPhotoIv)
                 richPhotoTitle.text = photo.name
                 richPhotoDetail.text = photo.date
             }

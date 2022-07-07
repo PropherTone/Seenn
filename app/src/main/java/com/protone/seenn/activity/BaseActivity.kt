@@ -15,9 +15,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModel
 import com.protone.api.context.*
-import com.protone.seenn.SplashActivity
 import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seenn.service.MusicService
+import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.selects.select
@@ -29,12 +29,16 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     protected abstract val viewModel: VM
     protected lateinit var binding: VB
 
-    abstract suspend fun initView()
+    abstract fun initView()
     abstract suspend fun VM.init()
     abstract suspend fun onViewEvent(event: String)
     private var viewEvent: Channel<String>? = null
     private var viewEventTask: Job? = null
     protected var onFinish: (suspend () -> Unit)? = null
+    protected var onResume: (suspend () -> Unit)? = null
+    protected var onRestart: (suspend () -> Unit)? = null
+    protected var onPause: (suspend () -> Unit)? = null
+    protected var onStop: (suspend () -> Unit)? = null
 
     init {
         if (handleEven) {
@@ -49,22 +53,6 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
                 }
             }
         }
-    }
-
-    protected fun fitStatuesBar(root: View) {
-        root.marginTop(statuesBarHeight)
-    }
-
-    protected fun fitNavigationBar(root: View) {
-        if (hasNavigationBar) root.marginBottom(navigationBarHeight)
-    }
-
-    fun fitStatuesBarUsePadding(view: View) {
-        view.paddingTop(statuesBarHeight)
-    }
-
-    fun fitNavigationBarUsePadding(view: View) {
-        if (hasNavigationBar) view.paddingBottom(navigationBarHeight)
     }
 
     val code = AtomicInteger(0)
@@ -96,28 +84,54 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
             activityOperationReceiver,
             IntentFilter(ACTIVITY_FINISH)
         )
-        runBlocking {
-            initView()
-            if (::binding.isInitialized) setContentView(binding.root)
+        initView()
+        setContentView(binding.root)
+        launch {
             viewEventTask?.start()
             viewModel.init()
         }
     }
 
-    override fun finish() {
-        try {
-            launch { onFinish?.invoke() }
-        } finally {
-            super.finish()
+
+    fun <T> startActivityWithGainData(data: T, intent: Intent?) {
+        IntentDataHolder.put(data)
+        startActivity(intent)
+    }
+
+    inline fun <reified T> getGainData(): T? {
+        return IntentDataHolder.get().let {
+            if (it is T) {
+                val re = it as T
+                re
+            } else null
         }
     }
 
-    override fun onDestroy() {
-        cancel()
-        activityOperationBroadcast.unregisterReceiver(activityOperationReceiver)
-        serviceConnection?.let { unbindService(it) }
-        musicReceiver?.let { unregisterReceiver(it) }
-        super.onDestroy()
+    @Suppress("UNCHECKED_CAST")
+    inline fun <reified T> getGainListData(): List<T>? {
+        return IntentDataHolder.get().let {
+            if (it is List<*> && it.size > 0 && it[0] is T) {
+                val list = it as List<T>
+                list
+            } else null
+        }
+    }
+
+    suspend inline fun startActivityForResult(
+        intent: Intent?,
+    ) = withContext(Dispatchers.Main) {
+        suspendCancellableCoroutine<ActivityResult?> { co ->
+            activityResultRegistry.register(
+                code.incrementAndGet().toString(),
+                ActivityResultContracts.StartActivityForResult(),
+            ) {
+                co.resumeWith(Result.success(it))
+            }.launch(intent)
+        }
+    }
+
+    fun sendViewEvent(event: String) {
+        viewEvent?.trySend(event)
     }
 
     fun closeEvent() {
@@ -125,29 +139,6 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
         viewEventTask = null
         viewEvent?.close()
         viewEvent = null
-    }
-
-    fun sendViewEvent(event: String) {
-        viewEvent?.trySend(event)
-    }
-
-    inline fun startActivityForResult(
-        intent: Intent?,
-        crossinline callback: (ActivityResult?) -> Unit
-    ) {
-        activityResultRegistry.register(
-            code.incrementAndGet().toString(),
-            ActivityResultContracts.StartActivityForResult(),
-        ) {
-            callback.invoke(it)
-        }.launch(intent)
-    }
-
-    fun setTranslucentStatues() {
-        val controller = ViewCompat.getWindowInsetsController(window.decorView)
-        controller?.hide(WindowInsetsCompat.Type.statusBars())
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = Color.TRANSPARENT
     }
 
     fun bindMusicService(block: () -> Unit) {
@@ -166,9 +157,116 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
         }
     }
 
+    protected fun fitStatuesBar(root: View) {
+        root.marginTop(statuesBarHeight)
+    }
+
+    protected fun fitNavigationBar(root: View) {
+        if (hasNavigationBar) root.marginBottom(navigationBarHeight)
+    }
+
+    protected fun fitStatuesBarUsePadding(view: View) {
+        view.paddingTop(statuesBarHeight)
+    }
+
+    protected fun fitNavigationBarUsePadding(view: View) {
+        if (hasNavigationBar) view.paddingBottom(navigationBarHeight)
+    }
+
+    fun setTranslucentStatues() {
+        val controller = ViewCompat.getWindowInsetsController(window.decorView)
+        controller?.hide(WindowInsetsCompat.Type.statusBars())
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = Color.TRANSPARENT
+    }
+
     fun toast(msg: CharSequence) {
         onUiThread {
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         }
     }
+
+    open suspend fun doStart() = Unit
+    open suspend fun doResume() = Unit
+    open suspend fun doRestart() = Unit
+    open suspend fun doPause() = Unit
+    open suspend fun doStop() = Unit
+    open suspend fun doFinish() = Unit
+
+    override fun onStart() {
+        try {
+            launch {
+                doStart()
+            }
+        } finally {
+            super.onStart()
+        }
+    }
+
+    override fun onResume() {
+        try {
+            launch {
+                onResume?.invoke()
+                doResume()
+            }
+        } finally {
+            super.onResume()
+        }
+    }
+
+    override fun onRestart() {
+        try {
+            launch {
+                onRestart?.invoke()
+                doRestart()
+            }
+        } finally {
+            super.onRestart()
+        }
+    }
+
+    override fun onPause() {
+        try {
+            launch {
+                onPause?.invoke()
+                doPause()
+            }
+        } finally {
+            super.onPause()
+        }
+    }
+
+    override fun onStop() {
+        try {
+            launch {
+                onStop?.invoke()
+                doStop()
+            }
+        } finally {
+            super.onStop()
+        }
+    }
+
+    override fun finish() {
+        try {
+            launch {
+                onFinish?.invoke()
+                doFinish()
+            }
+        } finally {
+            super.finish()
+        }
+    }
+
+    override fun onDestroy() {
+        try {
+            cancel()
+            activityOperationBroadcast.unregisterReceiver(activityOperationReceiver)
+            serviceConnection?.let { unbindService(it) }
+            musicReceiver?.let { unregisterReceiver(it) }
+        } finally {
+            super.onDestroy()
+        }
+    }
+
 }

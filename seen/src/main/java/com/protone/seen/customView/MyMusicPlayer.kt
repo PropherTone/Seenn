@@ -6,10 +6,10 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
-import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.protone.api.context.layoutInflater
+import com.protone.api.getDrawable
 import com.protone.api.toBitmapByteArray
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicplayerLayoutBinding
@@ -23,19 +23,8 @@ class MyMusicPlayer @JvmOverloads constructor(
     private val binding = MusicplayerLayoutBinding.inflate(context.layoutInflater, this, true)
     var isPlaying = false
         set(value) {
-            if (value) binding.musicControl.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_pause_24,
-                    null
-                )
-            ) else binding.musicControl.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_baseline_play_arrow_24,
-                    null
-                )
-            )
+            if (value) binding.musicControl.setImageDrawable(R.drawable.ic_baseline_pause_24.getDrawable())
+            else binding.musicControl.setImageDrawable(R.drawable.ic_baseline_play_arrow_24.getDrawable())
             field = value
         }
 

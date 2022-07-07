@@ -6,10 +6,11 @@ import android.content.Intent
 import android.database.ContentObserver
 import android.net.Uri
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.protone.api.R
+import com.protone.api.getString
 import com.protone.api.isInDebug
+import com.protone.api.toast
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
@@ -178,9 +179,5 @@ fun Activity.multiDeleteMedia(uris: List<Uri>, scope: CoroutineScope, callBack: 
 }
 
 fun Activity.showFailedToast() = runOnUiThread {
-    Toast.makeText(
-        this,
-        R.string.failed_msg,
-        Toast.LENGTH_SHORT
-    ).show()
+    R.string.failed_msg.getString().toast()
 }

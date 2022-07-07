@@ -174,18 +174,20 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
                 addCate(re, gms)
             }
         }) {
-            startActivityForResult(
-                GalleyActivity::class.intent.also { intent ->
-                    intent.putExtra(
-                        GalleyViewModel.CHOOSE_MODE,
-                        GalleyViewModel.CHOOSE_PHOTO
-                    )
+            launch {
+                startActivityForResult(
+                    GalleyActivity::class.intent.also { intent ->
+                        intent.putExtra(
+                            GalleyViewModel.CHOOSE_MODE,
+                            GalleyViewModel.CHOOSE_PHOTO
+                        )
+                    }
+                ) .let{ result ->
+                    val uri = result?.data?.getStringExtra(GalleyViewModel.URI)
+                    if (uri != null) {
+                        addCate(uri, gms)
+                    } else showFailedToast()
                 }
-            ) { result ->
-                val uri = result?.data?.getStringExtra(GalleyViewModel.URI)
-                if (uri != null) {
-                    addCate(uri, gms)
-                } else showFailedToast()
             }
         }
     }

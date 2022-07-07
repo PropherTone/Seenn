@@ -27,25 +27,24 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Seenn"
         tools:ignore="DataExtractionRules">
-        <activity android:name=".NoteSyncActivity" />
         <activity android:name=".activity.NoteActivity" />
-        <activity android:name=".PictureBoxActivity" />
+        <activity android:name=".activity.PictureBoxActivity" />
         <activity android:name=".activity.GalleyActivity" />
         <activity android:name=".activity.MusicActivity" />
         <activity android:name=".activity.AddBucketActivity" />
-        <activity android:name=".NoteEditActivity" />
-        <activity android:name=".NoteViewActivity" />
+        <activity android:name=".activity.NoteEditActivity" />
+        <activity android:name=".activity.NoteViewActivity" />
         <activity android:name=".activity.GalleyViewActivity" />
-        <activity android:name=".PickMusicActivity" />
-        <activity android:name=".UserConfigActivity" />
-        <activity android:name=".LogActivity" />
-        <activity android:name=".MusicViewActivity" />
+        <activity android:name=".activity.PickMusicActivity" />
+        <activity android:name=".activity.UserConfigActivity" />
+        <activity android:name=".activity.LogActivity" />
+        <activity android:name=".activity.MusicViewActivity" />
         <activity android:name=".activity.GalleySearchActivity" />
         <activity android:name=".activity.MainActivity"
             android:exported="false"
             android:launchMode="singleTop"/>
         <activity
-            android:name=".SplashActivity"
+            android:name=".activity.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -90,7 +89,7 @@
         </receiver>
 
         <receiver
-            android:name="com.protone.seenn.broadcast.ApplicationBroadCast"
+            android:name=".broadcast.ApplicationBroadCast"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

@@ -8,9 +8,9 @@ import android.view.MotionEvent
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.setPadding
 import com.protone.api.context.layoutInflater
+import com.protone.api.getColor
 import com.protone.seen.R
 import com.protone.seen.databinding.ColorfulBarChildLayoutBinding
 import kotlinx.coroutines.*
@@ -67,7 +67,7 @@ class ColorfulProgressBar @JvmOverloads constructor(
         isDither = true
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
-        color = ResourcesCompat.getColor(resources, R.color.glass, null)
+        color = R.color.glass.getColor()
     }
     private val foreBarPath = Path()
     private val backBarPath = Path()

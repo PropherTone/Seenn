@@ -4,9 +4,11 @@ import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.widget.Toast
+import androidx.core.content.res.ResourcesCompat
 import com.protone.api.context.APP
 import java.io.*
 import java.text.SimpleDateFormat
@@ -243,4 +245,16 @@ private fun Long.getSST(times: Int): String {
 
 fun Int.getString(): String {
     return APP.app.getString(this)
+}
+
+fun Int.getDrawable(): Drawable? {
+    return ResourcesCompat.getDrawable(APP.app.resources, this, null)
+}
+
+fun Int.getColor(): Int {
+    return ResourcesCompat.getColor(APP.app.resources, this, null)
+}
+
+fun Int.toStringColor():String{
+    return String.format("#%06X", 0xFFFFFF and this)
 }

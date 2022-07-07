@@ -15,6 +15,7 @@ import com.protone.seenn.R
 import com.protone.seenn.databinding.AddBucketActivityBinding
 import com.protone.seenn.viewModel.AddBucketViewModel
 import com.protone.seenn.viewModel.GalleyViewModel
+import kotlinx.coroutines.launch
 
 class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewModel>(true) {
     override val viewModel: AddBucketViewModel by viewModels()
@@ -37,7 +38,7 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
             field = value
         }
 
-    override suspend fun initView() {
+    override fun initView() {
         binding = AddBucketActivityBinding.inflate(layoutInflater, root, false)
         fitStatuesBarUsePadding(binding.root)
         fitNavigationBarUsePadding(binding.root)
@@ -72,15 +73,17 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
     }
 
     fun chooseIcon() {
-        startActivityForResult(
-            GalleyActivity::class.intent.also { intent ->
-                intent.putExtra(
-                    GalleyViewModel.CHOOSE_MODE,
-                    GalleyViewModel.CHOOSE_PHOTO
-                )
+        launch {
+            startActivityForResult(
+                GalleyActivity::class.intent.also { intent ->
+                    intent.putExtra(
+                        GalleyViewModel.CHOOSE_MODE,
+                        GalleyViewModel.CHOOSE_PHOTO
+                    )
+                }
+            ).let { result ->
+                uri = result?.data?.getStringExtra(GalleyViewModel.URI)?.toUri()
             }
-        ) { result ->
-            uri = result?.data?.getStringExtra(GalleyViewModel.URI)?.toUri()
         }
     }
 
