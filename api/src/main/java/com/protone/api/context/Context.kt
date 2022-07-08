@@ -50,10 +50,10 @@ var isKeyBroadShow = false
 
 inline fun Activity.setSoftInputStatuesListener(crossinline onSoftInput: (Int, Boolean) -> Unit={ _, _->}) {
     isKeyBroadShow = false
-    window.decorView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+    window.decorView.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
         val rect = Rect()
-        window.decorView.getWindowVisibleDisplayFrame(rect)
-        val i = window.decorView.height - rect.bottom - navigationBarHeight
+        v.getWindowVisibleDisplayFrame(rect)
+        val i = v.height - rect.bottom - navigationBarHeight
         if (i > 0 && !isKeyBroadShow) {
             isKeyBroadShow = true
             onSoftInput.invoke(i, i > 0)

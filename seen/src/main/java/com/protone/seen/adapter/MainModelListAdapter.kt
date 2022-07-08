@@ -1,14 +1,13 @@
 package com.protone.seen.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.protone.api.baseType.toDateString
 import com.protone.api.context.newLayoutInflater
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
-import com.protone.api.baseType.toDateString
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.Note
@@ -42,7 +41,6 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        Log.d("TAG", "onAttachedToRecyclerView: ")
         loadDataBelow()
     }
 

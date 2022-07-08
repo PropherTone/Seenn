@@ -36,12 +36,12 @@ fun Activity.loginDialog(
         }
     }
     binding.btnReg.setOnClickListener {
-        binding.btnReg.isGone = regClk.invoke()
+        log.dismiss()
+        regClk.invoke()
     }
     log.show()
     val attributes = log.window?.attributes
     val oldY = attributes?.y
-
     setSoftInputStatuesListener { i, b ->
         if (b) {
             attributes?.y = attributes?.y?.minus(binding.root.measuredHeight / 2)
