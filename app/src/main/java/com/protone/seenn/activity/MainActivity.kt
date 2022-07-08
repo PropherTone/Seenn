@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.appbar.AppBarLayout
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.intent
 import com.protone.api.context.root
@@ -112,7 +114,6 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
             stopService(WorkService::class.intent)
             userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
             userConfig.lastMusic = binder.onMusicPlaying().value?.toJson() ?: ""
-            musicController.finish()
         }
     }
 
@@ -124,10 +125,10 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
     fun onGalley() = startActivity(GalleyActivity::class.intent)
 
     fun onNote() = if (userConfig.lockNote == "")
-        startActivity(NoteActivity::class.intent) else toast(getString(R.string.locked))
+        startActivity(NoteActivity::class.intent) else R.string.locked.getString().toast()
 
     fun onMusic() = if (userConfig.lockMusic == "")
-        startActivity(MusicActivity::class.intent) else toast(getString(R.string.locked))
+        startActivity(MusicActivity::class.intent) else R.string.locked.getString().toast()
 
     fun onUserConfig() = startActivity(UserConfigActivity::class.intent)
 

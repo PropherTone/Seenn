@@ -29,14 +29,13 @@
             android:layout_width="@dimen/small_Icon"
             android:layout_height="@dimen/small_Icon"
             android:layout_marginStart="@dimen/back_margin"
-            android:layout_marginTop="@dimen/back_margin"
             android:background="@drawable/oval_fore_dark"
             android:contentDescription="@string/action"
             android:onClick="@{()->activity.finish()}"
             android:padding="@dimen/icon_padding"
             android:src="@drawable/ic_round_arrow_left__white_24"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolBar" />
+            app:layout_constraintTop_toTopOf="@id/showPlayList" />
 
         <ImageView
             android:id="@+id/showPlayList"

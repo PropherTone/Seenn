@@ -5,10 +5,10 @@ import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.protone.api.context.layoutInflater
+import com.protone.api.context.newLayoutInflater
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
-import com.protone.api.toDateString
+import com.protone.api.baseType.toDateString
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.Note
@@ -63,42 +63,42 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
         when (viewType) {
             MUSIC -> return MusicPlayerViewHolder(
                 MusicCardBinding.inflate(
-                    context.layoutInflater,
+                    context.newLayoutInflater,
                     parent,
                     false
                 )
             )
             NOTE -> return NoteCardViewHolder(
                 NoteCardBinding.inflate(
-                    context.layoutInflater,
+                    context.newLayoutInflater,
                     parent,
                     false
                 )
             )
             VIDEO -> return VideoPlayerViewHolder(
                 VideoCardBinding.inflate(
-                    context.layoutInflater,
+                    context.newLayoutInflater,
                     parent,
                     false
                 )
             )
             PHOTO -> return PhotoCardViewHolder(
                 PhotoCardBinding.inflate(
-                    context.layoutInflater,
+                    context.newLayoutInflater,
                     parent,
                     false
                 )
             )
             TIME -> return DateViewHolder(
                 DateLayoutBinding.inflate(
-                    context.layoutInflater,
+                    context.newLayoutInflater,
                     parent,
                     false
                 )
             )
             else -> return DateViewHolder(
                 DateLayoutBinding.inflate(
-                    context.layoutInflater,
+                    context.newLayoutInflater,
                     parent,
                     false
                 )

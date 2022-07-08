@@ -12,9 +12,9 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.context.*
-import com.protone.api.getDrawable
-import com.protone.api.getString
-import com.protone.api.toast
+import com.protone.api.baseType.getDrawable
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.MusicBucket
 import com.protone.database.sp.config.userConfig
@@ -104,10 +104,6 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                 }
             }
         })
-
-        onFinish = {
-            musicController.finish()
-        }
     }
 
     private fun MusicModel.updateBucket() {

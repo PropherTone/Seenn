@@ -8,7 +8,7 @@ import android.widget.NumberPicker
 import android.widget.PopupWindow
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.protone.api.context.layoutInflater
+import com.protone.api.context.newLayoutInflater
 import com.protone.api.context.root
 import com.protone.seen.R
 import com.protone.seen.adapter.CheckListAdapter
@@ -24,7 +24,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
 
     inline fun startColorPickerPopup(anchor: View, crossinline onCall: (Int) -> Unit) =
         weakContext.get()?.let { context ->
-            val binder = ColorPopLayoutBinding.inflate(context.layoutInflater, context.root, false)
+            val binder = ColorPopLayoutBinding.inflate(context.newLayoutInflater, context.root, false)
             startPopup(context, binder.root, anchor) {
                 (contentView.findViewById(R.id.pop_Color_picker) as MyColorPicker).onColorChangeListener {
                     onCall(
@@ -37,7 +37,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
     inline fun startNumberPickerPopup(anchor: View, crossinline onCall: (Int) -> Unit) =
         weakContext.get()?.let { context ->
             val binder =
-                NumberPickerPopLayoutBinding.inflate(context.layoutInflater, context.root, false)
+                NumberPickerPopLayoutBinding.inflate(context.newLayoutInflater, context.root, false)
             startPopup(context, binder.root, anchor) {
                 (contentView.findViewById(R.id.number_picker) as NumberPicker).apply {
                     maxValue = 999
@@ -55,7 +55,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
     ) =
         weakContext.get()?.let { context ->
             val binder =
-                ListPopWindowsLayoutBinding.inflate(context.layoutInflater, context.root, false)
+                ListPopWindowsLayoutBinding.inflate(context.newLayoutInflater, context.root, false)
             binder.listList.apply {
                 layoutManager = LinearLayoutManager(context)
                 adapter = CheckListAdapter(context, dataList)

@@ -16,7 +16,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
-import com.protone.api.context.APP
+import com.protone.api.context.SApplication
 import kotlinx.coroutines.*
 import java.io.InputStream
 
@@ -131,8 +131,8 @@ class PictureListScrollView @JvmOverloads constructor(
     private suspend fun countFirstLoad(): Int = withContext(Dispatchers.IO) {
         var count = 0
         var mixHeight = 0
-        val doubledScreenHeight = APP.screenHeight * 2
-        val contentResolver = APP.app.contentResolver
+        val doubledScreenHeight = SApplication.screenHeight * 2
+        val contentResolver = SApplication.app.contentResolver
         val options = BitmapFactory.Options().apply {
             inJustDecodeBounds = true
         }
@@ -155,7 +155,7 @@ class PictureListScrollView @JvmOverloads constructor(
         }
     }
 
-    private val contentResolver by lazy { APP.app.contentResolver }
+    private val contentResolver by lazy { SApplication.app.contentResolver }
 
     private suspend fun onPreLoad(uri: Uri) = withContext(Dispatchers.IO) {
         suspendCancellableCoroutine<Int> { c ->

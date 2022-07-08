@@ -21,15 +21,9 @@ class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>
     override fun initView() {
         binding = MusicViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
-        fitNavigationBarUsePadding(binding.musicPlayer)
-        binding.toolBar.apply {
-            setPadding(
-                paddingLeft,
-                paddingTop + context.statuesBarHeight,
-                paddingRight,
-                paddingBottom
-            )
-        }
+        fitNavigationBar(binding.musicPlayer.root)
+        binding.toolBar.layoutParams =
+            binding.toolBar.layoutParams.apply { height = statuesBarHeight }
     }
 
     override suspend fun MusicViewModel.init() {
@@ -47,9 +41,6 @@ class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>
                         musicController.play(music)
                     }
                 })
-        }
-        onFinish = {
-            musicController.finish()
         }
     }
 

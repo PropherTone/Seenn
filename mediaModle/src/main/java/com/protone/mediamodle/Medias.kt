@@ -2,7 +2,7 @@ package com.protone.mediamodle
 
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
-import com.protone.api.getString
+import com.protone.api.baseType.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music

@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.SystemClock
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
-import com.protone.api.context.layoutInflater
+import com.protone.api.context.newLayoutInflater
 import com.protone.api.context.onUiThread
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.customView.ScaleImageView
@@ -25,7 +25,7 @@ class GalleyViewPager2Adapter(context: Context, private val data: MutableList<Ga
         parent: ViewGroup,
         viewType: Int
     ): Holder<GalleyVp2AdapterLayoutBinding> =
-        Holder(GalleyVp2AdapterLayoutBinding.inflate(context.layoutInflater, parent, false))
+        Holder(GalleyVp2AdapterLayoutBinding.inflate(context.newLayoutInflater, parent, false))
 
     override fun onBindViewHolder(holder: Holder<GalleyVp2AdapterLayoutBinding>, position: Int) {
         (holder.binding.root as ScaleImageView).also { iv ->

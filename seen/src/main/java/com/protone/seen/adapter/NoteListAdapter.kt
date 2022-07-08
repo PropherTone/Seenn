@@ -5,8 +5,8 @@ import android.content.Context
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.protone.api.context.layoutInflater
-import com.protone.api.toDateString
+import com.protone.api.context.newLayoutInflater
+import com.protone.api.baseType.toDateString
 import com.protone.database.room.entity.Note
 import com.protone.seen.databinding.NoteListAdapterLayoutBinding
 
@@ -18,7 +18,7 @@ class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBindi
         parent: ViewGroup,
         viewType: Int
     ): Holder<NoteListAdapterLayoutBinding> {
-        val binding = NoteListAdapterLayoutBinding.inflate(context.layoutInflater, parent, false)
+        val binding = NoteListAdapterLayoutBinding.inflate(context.newLayoutInflater, parent, false)
         return Holder(binding)
     }
 

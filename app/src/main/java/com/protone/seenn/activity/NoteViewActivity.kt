@@ -4,11 +4,11 @@ import android.net.Uri
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.root
-import com.protone.api.getString
 import com.protone.api.json.toJson
-import com.protone.api.toast
 import com.protone.database.room.entity.Note
 import com.protone.seen.customView.richText.RichNoteView
 import com.protone.seenn.R
@@ -97,7 +97,7 @@ class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel
                 }
 
             })
-        } else toast(getString(R.string.come_up_unknown_error))
+        } else R.string.come_up_unknown_error.getString().toast()
     }
 
     private suspend fun edit() = viewModel.apply {

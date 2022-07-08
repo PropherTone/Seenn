@@ -5,16 +5,16 @@ import android.transition.TransitionManager
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.root
-import com.protone.api.getString
-import com.protone.api.toast
 import com.protone.database.room.entity.Note
 import com.protone.database.room.entity.NoteType
 import com.protone.seen.R
 import com.protone.seen.adapter.NoteListAdapter
 import com.protone.seen.adapter.NoteTypeListAdapter
-import com.protone.seen.dialog.TitleDialog
+import com.protone.seen.dialog.titleDialog
 import com.protone.seenn.databinding.NoteActivityBinding
 import com.protone.seenn.viewModel.NoteEditViewModel
 import com.protone.seenn.viewModel.NoteViewModel
@@ -70,7 +70,7 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     }
 
     fun addBucket() {
-        TitleDialog(this@NoteActivity, getString(R.string.add_dir), "") { re ->
+        titleDialog( getString(R.string.add_dir), "") { re ->
             if (re.isNotEmpty()) {
                 launch(Dispatchers.IO) {
                     viewModel.insertNoteType(re, "").let { pair ->

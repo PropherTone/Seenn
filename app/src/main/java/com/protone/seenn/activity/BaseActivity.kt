@@ -180,12 +180,6 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
         window.statusBarColor = Color.TRANSPARENT
     }
 
-    fun toast(msg: CharSequence) {
-        onUiThread {
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-        }
-    }
-
     open suspend fun doStart() = Unit
     open suspend fun doResume() = Unit
     open suspend fun doRestart() = Unit

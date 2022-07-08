@@ -2,7 +2,7 @@ package com.protone.api.context
 
 import android.app.Application
 
-object APP {
+object SApplication {
 
     val app: Application get() = application
 

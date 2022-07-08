@@ -4,9 +4,11 @@ import android.content.Intent
 import androidx.activity.viewModels
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.protone.api.baseType.getFileName
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.root
-import com.protone.api.getFileName
 import com.protone.seen.adapter.LogListAdapter
 import com.protone.seenn.R
 import com.protone.seenn.databinding.LogActivityBinding
@@ -49,7 +51,7 @@ class LogActivity : BaseActivity<LogActivityBinding, LogViewModel>(false) {
                                 putExtra(NoteEditViewModel.CONTENT_TITLE, path.getFileName())
                             })
                     } catch (e: Exception) {
-                        toast(getString(R.string.failed_msg))
+                        R.string.failed_msg.getString().toast()
                     }
                 }
             }

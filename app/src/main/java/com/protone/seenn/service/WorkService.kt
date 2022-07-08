@@ -12,7 +12,7 @@ import android.provider.MediaStore
 import android.widget.Toast
 import com.protone.api.context.onUiThread
 import com.protone.api.context.workIntentFilter
-import com.protone.api.getString
+import com.protone.api.baseType.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMulti
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusic

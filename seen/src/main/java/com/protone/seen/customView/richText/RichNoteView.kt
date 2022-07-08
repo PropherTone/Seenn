@@ -23,22 +23,22 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import com.bumptech.glide.Glide
-import com.protone.api.context.APP
-import com.protone.api.context.layoutInflater
+import com.protone.api.baseType.saveToFile
+import com.protone.api.baseType.toBitmap
+import com.protone.api.context.SApplication
+import com.protone.api.context.newLayoutInflater
 import com.protone.api.context.onBackground
 import com.protone.api.context.onUiThread
 import com.protone.api.json.jsonToList
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
-import com.protone.api.saveToFile
-import com.protone.api.toBitmap
 import com.protone.mediamodle.note.MyTextWatcher
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ColorSpan
 import com.protone.mediamodle.note.spans.ISpanForEditor
 import com.protone.seen.R
-import com.protone.seen.customView.MyMusicPlayer
+import com.protone.seen.customView.musicPlayer.BaseMusicPlayer
 import com.protone.seen.databinding.RichMusicLayoutBinding
 import com.protone.seen.databinding.RichPhotoLayoutBinding
 import com.protone.seen.databinding.VideoCardBinding
@@ -217,7 +217,7 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     override fun insertVideo(video: RichVideoStates) = insertMedia {
-        addView(VideoCardBinding.inflate(context.layoutInflater, this, false).apply {
+        addView(VideoCardBinding.inflate(context.newLayoutInflater, this, false).apply {
             videoPlayer.setVideoPath(video.uri)
             videoPlayer.setFullScreen {
                 iRichListener?.open(video.uri, "", true)
@@ -228,7 +228,7 @@ class RichNoteView @JvmOverloads constructor(
     private var isPlaying = false
 
     override fun insertMusic(music: RichMusicStates) = insertMedia {
-        addView(RichMusicLayoutBinding.inflate(context.layoutInflater, this, false).apply {
+        addView(RichMusicLayoutBinding.inflate(context.newLayoutInflater, this, false).apply {
             richMusic.control.setOnClickListener {
                 if (isPlaying) {
                     iRichListener?.play(music.uri, richMusic.progress.barDuration)
@@ -254,15 +254,15 @@ class RichNoteView @JvmOverloads constructor(
 
     fun setMusicProgress(progress: Long) {
         getChildAt(curPlaying)?.let {
-            if (it is MyMusicPlayer) {
-                it.progress = progress
+            if (it is BaseMusicPlayer) {
+                it.progress?.barSeekTo(progress)
             }
         }
     }
 
     fun setMusicDuration(duration: Long) {
         getChildAt(curPosition)?.let {
-            if (it is MyMusicPlayer) {
+            if (it is BaseMusicPlayer) {
                 it.duration = duration
             }
         }
@@ -273,8 +273,8 @@ class RichNoteView @JvmOverloads constructor(
             val height = dba.height
             val width = dba.width
             val index = width / height
-            val bmH = APP.screenWidth / index
-            intArrayOf(APP.screenWidth, bmH)
+            val bmH = SApplication.screenWidth / index
+            intArrayOf(SApplication.screenWidth, bmH)
         } catch (e: Exception) {
             null
         }
@@ -289,16 +289,16 @@ class RichNoteView @JvmOverloads constructor(
             val height = dba.height
             val width = dba.width
             val index = width / height
-            val bmH = APP.screenWidth / index
+            val bmH = SApplication.screenWidth / index
             dba.recycle()
-            intArrayOf(APP.screenWidth, bmH)
+            intArrayOf(SApplication.screenWidth, bmH)
         } catch (e: Exception) {
             null
         }
     }
 
     override fun insertImage(photo: RichPhotoStates) = insertMedia {
-        addView(RichPhotoLayoutBinding.inflate(context.layoutInflater, this, false).apply {
+        addView(RichPhotoLayoutBinding.inflate(context.newLayoutInflater, this, false).apply {
             val ba = photo.uri.toBitmap()
             if (ba == null && photo.path == null) {
                 Glide.with(context).asDrawable()

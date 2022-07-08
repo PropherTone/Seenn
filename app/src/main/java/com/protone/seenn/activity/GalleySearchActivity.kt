@@ -7,6 +7,8 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.SearchModel
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.linkInput
 import com.protone.api.context.root
@@ -36,18 +38,22 @@ class GalleySearchActivity :
     }
 
     override suspend fun GalleySearchViewModel.init() {
-        SearchModel(binding.inputSearch) {
+        val searchModel = SearchModel(binding.inputSearch) {
             query(getInput())
         }
         onQueryListener = this@GalleySearchActivity
         IntentDataHolder.get().let {
             if (!(it != null && it is List<*> && it.isNotEmpty() && it[0] is GalleyMedia)) {
-                toast(getString(R.string.none))
+                R.string.none.getString().toast()
             } else {
                 @Suppress("UNCHECKED_CAST")
                 data.addAll(it as List<GalleyMedia>)
                 initList(data[0].isVideo)
             }
+        }
+
+        onFinish = {
+            searchModel.destroy()
         }
     }
 
@@ -125,7 +131,7 @@ class GalleySearchActivity :
     }
 
     override fun popDelete() {
-        tryDelete(viewModel.selectList, this) {
+        tryDelete(viewModel.selectList) {
             binding.apply {
                 (resultGalleries.adapter as GalleyListAdapter).removeMedia(it)
                 (resultCato.adapter as GalleyListAdapter).removeMedia(it)
@@ -143,7 +149,7 @@ class GalleySearchActivity :
     }
 
     override fun popRename() {
-        tryRename(viewModel.selectList, this)
+        tryRename(viewModel.selectList)
     }
 
     override fun popSelectAll() {

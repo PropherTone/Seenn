@@ -2,8 +2,8 @@ package com.protone.seen.adapter
 
 import android.content.Context
 import android.view.ViewGroup
-import com.protone.api.context.layoutInflater
-import com.protone.api.getFileName
+import com.protone.api.context.newLayoutInflater
+import com.protone.api.baseType.getFileName
 import com.protone.seen.databinding.LogListLayoutBinding
 
 class LogListAdapter(context: Context) : BaseAdapter<LogListLayoutBinding>(context) {
@@ -15,7 +15,7 @@ class LogListAdapter(context: Context) : BaseAdapter<LogListLayoutBinding>(conte
         parent: ViewGroup,
         viewType: Int
     ): Holder<LogListLayoutBinding> {
-        return Holder(LogListLayoutBinding.inflate(context.layoutInflater, parent, false))
+        return Holder(LogListLayoutBinding.inflate(context.newLayoutInflater, parent, false))
     }
 
     override fun onBindViewHolder(holder: Holder<LogListLayoutBinding>, position: Int) {

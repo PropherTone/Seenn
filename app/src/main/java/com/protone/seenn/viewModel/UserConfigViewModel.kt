@@ -2,9 +2,9 @@ package com.protone.seenn.viewModel
 
 import androidx.lifecycle.ViewModel
 import com.bumptech.glide.Glide
-import com.protone.api.context.APP
-import com.protone.api.getString
-import com.protone.api.toast
+import com.protone.api.context.SApplication
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.seenn.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -35,13 +35,13 @@ class UserConfigViewModel : ViewModel() {
     suspend fun clearCache() {
         withContext(Dispatchers.IO) {
             try {
-                Glide.get(APP.app).apply {
+                Glide.get(SApplication.app).apply {
                     clearDiskCache()
                     withContext(Dispatchers.Main) {
                         clearMemory()
                     }
                 }
-                val file = File("${APP.app.externalCacheDir?.path}/CrashLog")
+                val file = File("${SApplication.app.externalCacheDir?.path}/CrashLog")
                 if (file.exists() && file.isDirectory) {
                     file.listFiles()?.forEach {
                         it.delete()

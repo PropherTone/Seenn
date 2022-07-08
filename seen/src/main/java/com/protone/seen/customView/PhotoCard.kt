@@ -2,13 +2,10 @@ package com.protone.seen.customView
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.AttrRes
-import androidx.annotation.StyleRes
 import androidx.cardview.widget.CardView
-import com.protone.api.context.layoutInflater
+import com.protone.api.context.newLayoutInflater
 import com.protone.seen.databinding.PhotoCardLayoutBinding
 
 class PhotoCard @JvmOverloads constructor(
@@ -17,7 +14,7 @@ class PhotoCard @JvmOverloads constructor(
     @AttrRes defStyleAttr: Int = 0
 ) : CardView(context, attrs, defStyleAttr) {
 
-    private val binding = PhotoCardLayoutBinding.inflate(context.layoutInflater, this, true)
+    private val binding = PhotoCardLayoutBinding.inflate(context.newLayoutInflater, this, true)
 
     var title = ""
         set(value) {

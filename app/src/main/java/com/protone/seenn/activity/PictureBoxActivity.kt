@@ -3,8 +3,8 @@ package com.protone.seenn.activity
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.root
-import com.protone.api.getString
-import com.protone.api.toast
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.adapter.PictureBoxAdapter
 import com.protone.seenn.R

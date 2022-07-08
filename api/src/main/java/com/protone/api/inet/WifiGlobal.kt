@@ -2,8 +2,8 @@ package com.protone.api.inet
 
 import android.content.Context
 import android.net.wifi.WifiManager
-import com.protone.api.context.APP
+import com.protone.api.context.SApplication
 
 fun Context.isWifiEnable(): Boolean {
-    return (APP.app.getSystemService(Context.WIFI_SERVICE) as WifiManager).isWifiEnabled
+    return (SApplication.app.getSystemService(Context.WIFI_SERVICE) as WifiManager).isWifiEnabled
 }

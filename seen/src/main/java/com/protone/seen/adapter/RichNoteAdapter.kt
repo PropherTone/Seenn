@@ -23,14 +23,12 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.protone.api.TAG
-import com.protone.api.context.layoutInflater
-import com.protone.api.json.jsonToList
+import com.protone.api.context.newLayoutInflater
 import com.protone.api.json.listToJson
 import com.protone.api.json.toJson
-import com.protone.api.toMediaBitmapByteArray
+import com.protone.api.baseType.toMediaBitmapByteArray
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ColorSpan
-import com.protone.mediamodle.note.spans.ISpan
 import com.protone.mediamodle.note.spans.ISpanForEditor
 import com.protone.seen.customView.InRecyclerView
 import com.protone.seen.databinding.*
@@ -109,34 +107,34 @@ class RichNoteAdapter(
         when (viewType) {
             PHOTO -> RichPhotoHolder(
                 RichPhotoLayoutBinding.inflate(
-                    context.layoutInflater,
+                    context.newLayoutInflater,
                     parent,
                     false
                 )
             )
             MUSIC -> RichMusicHolder(
                 RichMusicLayoutBinding.inflate(
-                    (context.layoutInflater),
+                    (context.newLayoutInflater),
                     parent,
                     false
                 )
             )
             VIDEO -> RichVideoHolder(
                 RichVideoLayoutBinding.inflate(
-                    context.layoutInflater,
+                    context.newLayoutInflater,
                     parent,
                     false
                 )
             )
             else -> if (isEditable) RichEditTextHolder(
                 RichEditTextLayoutBinding.inflate(
-                    context.layoutInflater,
+                    context.newLayoutInflater,
                     parent,
                     false
                 )
             ) else RichTextHolder(
                 RichTextLayoutBinding.inflate(
-                    context.layoutInflater,
+                    context.newLayoutInflater,
                     parent,
                     false
                 )

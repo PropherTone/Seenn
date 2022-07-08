@@ -9,8 +9,8 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.appbar.AppBarLayout
-import com.protone.api.*
 import com.protone.api.animation.AnimationHelper
+import com.protone.api.baseType.*
 import com.protone.api.context.*
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
@@ -183,7 +183,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
 
     private suspend fun confirm() = viewModel.apply {
         if (title.isEmpty()) {
-            toast(getString(R.string.enter_title))
+            R.string.enter_title.getString().toast()
             return@apply
         }
         val indexedRichNote = indexRichNote()
@@ -340,7 +340,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             colorPopWindow = it
             it.setOnDismissListener { colorPopWindow = null }
         }.startColorPickerPopup(binding.noteEditTool) {
-            binding.noteEditRichNote.setColor(it.toStringColor())
+            binding.noteEditRichNote.setColor(it.toHexColor())
         }
     }
 }

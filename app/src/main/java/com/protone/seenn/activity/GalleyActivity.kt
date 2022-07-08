@@ -135,7 +135,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
 
     override fun popDelete() {
         viewModel.chooseData()?.let {
-            tryDelete(it, this) { re ->
+            tryDelete(it) { re ->
                 viewModel.deleteMedia(re)
             }
         }
@@ -153,7 +153,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
 
     override fun popRename() {
         viewModel.chooseData()?.let {
-            tryRename(it, this)
+            tryRename(it)
         }
     }
 

@@ -5,9 +5,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.view.ViewTreeObserver
 import androidx.activity.viewModels
-import com.protone.api.checkNeededPermission
+import com.protone.api.context.checkNeededPermission
 import com.protone.api.context.*
-import com.protone.api.requestContentPermission
+import com.protone.api.context.requestContentPermission
 import com.protone.mediamodle.GalleyHelper
 import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.databinding.SplashActivityBinding
@@ -76,7 +76,7 @@ class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true
 
     override fun onGlobalLayout() {
         binding.root.let {
-            APP.apply {
+            SApplication.apply {
                 screenHeight = it.measuredHeight
                 screenWidth = it.measuredWidth
             }

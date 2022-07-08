@@ -2,10 +2,9 @@ package com.protone.seen.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import com.protone.api.context.layoutInflater
+import com.protone.api.context.newLayoutInflater
 import com.protone.seen.databinding.CheckListAdapterLayoutBinding
 
 class CheckListAdapter(
@@ -41,7 +40,7 @@ class CheckListAdapter(
         parent: ViewGroup,
         viewType: Int
     ): Holder<CheckListAdapterLayoutBinding> =
-        Holder(CheckListAdapterLayoutBinding.inflate(context.layoutInflater, parent, false))
+        Holder(CheckListAdapterLayoutBinding.inflate(context.newLayoutInflater, parent, false))
 
     override fun onBindViewHolder(holder: Holder<CheckListAdapterLayoutBinding>, position: Int) {
         setSelect(holder, selectList.contains(dataList[position]))

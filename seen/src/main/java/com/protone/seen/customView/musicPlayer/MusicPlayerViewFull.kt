@@ -6,8 +6,8 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import android.widget.ViewSwitcher
-import com.protone.api.context.layoutInflater
-import com.protone.api.toBitmapByteArray
+import com.protone.api.baseType.toBitmapByteArray
+import com.protone.api.context.newLayoutInflater
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.databinding.AutoMusicPlayerLayoutFullBinding
@@ -17,7 +17,7 @@ class MusicPlayerViewFull @JvmOverloads constructor(
 ) : BaseMusicPlayer(context, attrs) {
 
     private val binding =
-        AutoMusicPlayerLayoutFullBinding.inflate(context.layoutInflater, this, true)
+        AutoMusicPlayerLayoutFullBinding.inflate(context.newLayoutInflater, this, true)
 
     override val next: ImageView = binding.musicNext
     override val control: ImageView = binding.musicControl
@@ -30,7 +30,7 @@ class MusicPlayerViewFull @JvmOverloads constructor(
     override var cover2: ImageView = binding.musicCover2
     override var coverSwitcher: ViewSwitcher = binding.musicCover
     override var looper: ImageView? = binding.loopMode
-    override val root: View = binding.musicBack
+    override val root: View = binding.controller
 
     override var cover: Uri = Uri.EMPTY
         set(value) {

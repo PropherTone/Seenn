@@ -9,8 +9,8 @@ import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.setPadding
-import com.protone.api.context.layoutInflater
-import com.protone.api.getColor
+import com.protone.api.baseType.getColor
+import com.protone.api.context.newLayoutInflater
 import com.protone.seen.R
 import com.protone.seen.databinding.ColorfulBarChildLayoutBinding
 import kotlinx.coroutines.*
@@ -25,7 +25,7 @@ class ColorfulProgressBar @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
     private val binding = ColorfulBarChildLayoutBinding
-        .inflate(context.layoutInflater, this, true)
+        .inflate(context.newLayoutInflater, this, true)
     private var scope: CoroutineScope? = null
     private var childX: Float
         get() = binding.root.x

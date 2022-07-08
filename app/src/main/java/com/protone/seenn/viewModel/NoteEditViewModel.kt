@@ -2,10 +2,10 @@ package com.protone.seenn.viewModel
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
-import com.protone.api.getString
+import com.protone.api.baseType.getString
 import com.protone.api.json.toUriJson
-import com.protone.api.toMediaBitmapByteArray
-import com.protone.api.toast
+import com.protone.api.baseType.toMediaBitmapByteArray
+import com.protone.api.baseType.toast
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Note
 import com.protone.mediamodle.GalleyHelper

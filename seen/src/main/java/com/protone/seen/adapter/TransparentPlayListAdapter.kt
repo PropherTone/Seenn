@@ -2,7 +2,7 @@ package com.protone.seen.adapter
 
 import android.content.Context
 import android.view.ViewGroup
-import com.protone.api.context.layoutInflater
+import com.protone.api.context.newLayoutInflater
 import com.protone.database.room.entity.Music
 import com.protone.seen.R
 import com.protone.seen.databinding.TpPlaylistAdapterLayoutBinding
@@ -32,7 +32,7 @@ class TransparentPlayListAdapter(
         parent: ViewGroup,
         viewType: Int
     ): Holder<TpPlaylistAdapterLayoutBinding> {
-        val binding = TpPlaylistAdapterLayoutBinding.inflate(context.layoutInflater, parent, false)
+        val binding = TpPlaylistAdapterLayoutBinding.inflate(context.newLayoutInflater, parent, false)
         return Holder(binding)
     }
 

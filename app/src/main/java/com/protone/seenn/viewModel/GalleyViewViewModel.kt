@@ -1,7 +1,7 @@
 package com.protone.seenn.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.protone.api.getString
+import com.protone.api.baseType.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seenn.R

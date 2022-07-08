@@ -4,8 +4,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layoutDescription="@xml/music_player_layout_scene">
+        android:layout_height="match_parent">
 
         <ViewSwitcher
             android:id="@+id/music_back"
@@ -32,160 +31,169 @@
                 android:scaleType="centerCrop" />
         </ViewSwitcher>
 
-        <ImageView
-            android:id="@+id/music_cover_back"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/music_cover_back_round"
-            android:contentDescription="@string/icon"
-            android:scaleType="centerCrop"
-            app:layout_constraintBottom_toBottomOf="@id/music_back"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toEndOf="@id/music_back"
-            app:layout_constraintStart_toStartOf="@id/music_back"
-            app:layout_constraintTop_toTopOf="@id/music_back"
-            app:layout_constraintVertical_bias="0.25"
-            app:layout_constraintWidth_percent="0.6" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/controller"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <ViewSwitcher
-            android:id="@+id/music_cover"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/music_cover_back_round"
-            android:inAnimation="@anim/image_switch_in"
-            android:outAnimation="@anim/image_switch_out"
-            app:layout_constraintBottom_toBottomOf="@id/music_cover_back"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toEndOf="@id/music_cover_back"
-            app:layout_constraintStart_toStartOf="@id/music_cover_back"
-            app:layout_constraintTop_toTopOf="@id/music_cover_back"
-            app:layout_constraintWidth_percent="0.56">
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/music_cover1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+            <ImageView
+                android:id="@+id/music_cover_back"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/music_cover_back_round"
                 android:contentDescription="@string/icon"
                 android:scaleType="centerCrop"
-                app:shapeAppearance="@style/ovalImage" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/controller"
+                app:layout_constraintTop_toTopOf="@+id/controller"
+                app:layout_constraintVertical_bias="0.25"
+                app:layout_constraintWidth_percent="0.6" />
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/music_cover2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/icon"
-                android:scaleType="centerCrop"
-                app:shapeAppearance="@style/ovalImage" />
-        </ViewSwitcher>
+            <ViewSwitcher
+                android:id="@+id/music_cover"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/music_cover_back_round"
+                android:inAnimation="@anim/image_switch_in"
+                android:outAnimation="@anim/image_switch_out"
+                app:layout_constraintBottom_toBottomOf="@id/music_cover_back"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="@id/music_cover_back"
+                app:layout_constraintStart_toStartOf="@id/music_cover_back"
+                app:layout_constraintTop_toTopOf="@id/music_cover_back"
+                app:layout_constraintWidth_percent="0.56">
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/round_background_fore_dark"
-            app:layout_constraintBottom_toBottomOf="@id/music_detail"
-            app:layout_constraintEnd_toEndOf="@id/music_detail"
-            app:layout_constraintStart_toStartOf="@id/music_detail"
-            app:layout_constraintTop_toTopOf="@id/music_name" />
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/music_cover1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/icon"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearance="@style/ovalImage" />
 
-        <TextView
-            android:id="@+id/music_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:ellipsize="marquee"
-            android:gravity="center"
-            android:letterSpacing="0.06"
-            android:lines="1"
-            android:text="@string/model_music"
-            android:textColor="@color/white"
-            android:textSize="@dimen/title_text"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/music_progress"
-            app:layout_constraintEnd_toEndOf="@id/music_back"
-            app:layout_constraintStart_toStartOf="@id/music_back"
-            app:layout_constraintTop_toBottomOf="@id/music_cover_back"
-            app:layout_constraintVertical_bias="0.04"
-            app:layout_constraintWidth_percent="0.46" />
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/music_cover2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/icon"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearance="@style/ovalImage" />
+            </ViewSwitcher>
 
-        <TextView
-            android:id="@+id/music_detail"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:lines="1"
-            android:text="@string/music_bucket_name"
-            android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="@id/music_name"
-            app:layout_constraintStart_toStartOf="@id/music_name"
-            app:layout_constraintTop_toBottomOf="@id/music_name"
-            app:layout_constraintWidth_percent="0.5" />
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/round_background_fore_dark"
+                app:layout_constraintBottom_toBottomOf="@id/music_detail"
+                app:layout_constraintEnd_toEndOf="@id/music_detail"
+                app:layout_constraintStart_toStartOf="@id/music_detail"
+                app:layout_constraintTop_toTopOf="@id/music_name" />
 
-        <com.protone.seen.customView.ColorfulProgressBar
-            android:id="@+id/music_progress"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@id/music_back"
-            app:layout_constraintEnd_toEndOf="@id/music_back"
-            app:layout_constraintHeight_percent="0.01"
-            app:layout_constraintStart_toStartOf="@id/music_back"
-            app:layout_constraintTop_toTopOf="@id/music_back"
-            app:layout_constraintVertical_bias="0.8"
-            app:layout_constraintWidth_percent="0.88" />
+            <TextView
+                android:id="@+id/music_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:gravity="center"
+                android:letterSpacing="0.06"
+                android:lines="1"
+                android:text="@string/model_music"
+                android:textColor="@color/white"
+                android:textSize="@dimen/title_text"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@id/music_progress"
+                app:layout_constraintEnd_toEndOf="@+id/controller"
+                app:layout_constraintStart_toStartOf="@+id/controller"
+                app:layout_constraintTop_toBottomOf="@id/music_cover_back"
+                app:layout_constraintVertical_bias="0.04"
+                app:layout_constraintWidth_percent="0.46" />
 
-        <ImageView
-            android:id="@+id/loop_mode"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:contentDescription="@string/action"
-            app:layout_constraintBottom_toBottomOf="@id/music_control"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toStartOf="@id/music_previous"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/music_control"
-            app:layout_constraintWidth_percent="0.06" />
+            <TextView
+                android:id="@+id/music_detail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:lines="1"
+                android:text="@string/music_bucket_name"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="@id/music_name"
+                app:layout_constraintStart_toStartOf="@id/music_name"
+                app:layout_constraintTop_toBottomOf="@id/music_name"
+                app:layout_constraintWidth_percent="0.5" />
 
-        <ImageView
-            android:id="@+id/music_previous"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/oval_fore_dark"
-            android:contentDescription="@string/action"
-            android:src="@drawable/ic_round_arrow_left__white_24"
-            app:layout_constraintBottom_toBottomOf="@id/music_control"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toStartOf="@id/music_control"
-            app:layout_constraintHorizontal_bias="0.96"
-            app:layout_constraintStart_toStartOf="@id/music_back"
-            app:layout_constraintTop_toTopOf="@id/music_control"
-            app:layout_constraintWidth_percent="0.14" />
+            <com.protone.seen.customView.ColorfulProgressBar
+                android:id="@+id/music_progress"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="@+id/controller"
+                app:layout_constraintEnd_toEndOf="@+id/controller"
+                app:layout_constraintHeight_percent="0.01"
+                app:layout_constraintStart_toStartOf="@+id/controller"
+                app:layout_constraintTop_toTopOf="@+id/controller"
+                app:layout_constraintVertical_bias="0.8"
+                app:layout_constraintWidth_percent="0.88" />
 
-        <ImageView
-            android:id="@+id/music_control"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/oval_fore_dark"
-            android:contentDescription="@string/action"
-            android:src="@drawable/ic_round_on_white_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toEndOf="@id/music_back"
-            app:layout_constraintStart_toStartOf="@id/music_back"
-            app:layout_constraintTop_toBottomOf="@id/music_progress"
-            app:layout_constraintWidth_percent="0.2" />
+            <ImageView
+                android:id="@+id/loop_mode"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:contentDescription="@string/action"
+                app:layout_constraintBottom_toBottomOf="@id/music_control"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toStartOf="@id/music_previous"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/music_control"
+                app:layout_constraintWidth_percent="0.06" />
 
-        <ImageView
-            android:id="@+id/music_next"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/oval_fore_dark"
-            android:contentDescription="@string/action"
-            android:src="@drawable/ic_round_arrow_right_white_24"
-            app:layout_constraintBottom_toBottomOf="@id/music_control"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintEnd_toEndOf="@id/music_back"
-            app:layout_constraintHorizontal_bias="0.04"
-            app:layout_constraintStart_toEndOf="@id/music_control"
-            app:layout_constraintTop_toTopOf="@id/music_control"
-            app:layout_constraintWidth_percent="0.14" />
+            <ImageView
+                android:id="@+id/music_previous"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/oval_fore_dark"
+                android:contentDescription="@string/action"
+                android:src="@drawable/ic_round_arrow_left__white_24"
+                app:layout_constraintBottom_toBottomOf="@id/music_control"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toStartOf="@id/music_control"
+                app:layout_constraintHorizontal_bias="0.96"
+                app:layout_constraintStart_toStartOf="@+id/controller"
+                app:layout_constraintTop_toTopOf="@id/music_control"
+                app:layout_constraintWidth_percent="0.14" />
+
+            <ImageView
+                android:id="@+id/music_control"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/oval_fore_dark"
+                android:contentDescription="@string/action"
+                android:src="@drawable/ic_round_on_white_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="@+id/controller"
+                app:layout_constraintStart_toStartOf="@+id/controller"
+                app:layout_constraintTop_toBottomOf="@id/music_progress"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <ImageView
+                android:id="@+id/music_next"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/oval_fore_dark"
+                android:contentDescription="@string/action"
+                android:src="@drawable/ic_round_arrow_right_white_24"
+                app:layout_constraintBottom_toBottomOf="@id/music_control"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintEnd_toEndOf="@+id/controller"
+                app:layout_constraintHorizontal_bias="0.04"
+                app:layout_constraintStart_toEndOf="@id/music_control"
+                app:layout_constraintTop_toTopOf="@id/music_control"
+                app:layout_constraintWidth_percent="0.14" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

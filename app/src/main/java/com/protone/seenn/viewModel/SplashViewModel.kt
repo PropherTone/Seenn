@@ -1,8 +1,8 @@
 package com.protone.seenn.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.protone.api.getString
-import com.protone.api.saveToFile
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.saveToFile
 import com.protone.api.todayDate
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.MusicBucket

@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
-import com.protone.api.context.APP
-import com.protone.api.context.layoutInflater
+import com.protone.api.context.SApplication
+import com.protone.api.context.newLayoutInflater
 import com.protone.api.context.onUiThread
-import com.protone.api.getString
+import com.protone.api.baseType.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.seen.R
 import com.protone.seen.databinding.GalleyBucketListLayoutBinding
@@ -38,9 +38,9 @@ class GalleyBucketAdapter(
         viewType: Int
     ): Holder<GalleyBucketListLayoutBinding> {
         return Holder(
-            GalleyBucketListLayoutBinding.inflate(context.layoutInflater, parent, false).apply {
+            GalleyBucketListLayoutBinding.inflate(context.newLayoutInflater, parent, false).apply {
                 root.updateLayoutParams {
-                    height = APP.screenHeight / 10
+                    height = SApplication.screenHeight / 10
                 }
                 bucketThumb.scaleType = ImageView.ScaleType.CENTER_CROP
             })

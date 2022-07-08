@@ -5,20 +5,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.protone.api.context.APP
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toMediaBitmapByteArray
+import com.protone.api.baseType.toast
+import com.protone.api.context.SApplication
 import com.protone.api.context.intent
 import com.protone.api.context.root
-import com.protone.api.getString
 import com.protone.api.json.toEntity
-import com.protone.api.toMediaBitmapByteArray
-import com.protone.api.toast
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.sp.config.userConfig
 import com.protone.mediamodle.GalleyHelper
 import com.protone.seen.databinding.UserConfigItemLayoutBinding
-import com.protone.seen.dialog.CheckListDialog
-import com.protone.seen.dialog.TitleDialog
-import com.protone.seen.popWindows.UserPops
+import com.protone.seen.dialog.checkListDialog
+import com.protone.seen.dialog.loginDialog
+import com.protone.seen.dialog.regDialog
+import com.protone.seen.dialog.titleDialog
 import com.protone.seenn.R
 import com.protone.seenn.databinding.UserConfigActivityBinding
 import com.protone.seenn.viewModel.GalleyViewModel
@@ -77,7 +78,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
                 }.root.run {
                     layoutParams = ConstraintLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
-                        APP.screenHeight - resources.getDimensionPixelSize(R.dimen.user_icon)
+                        SApplication.screenHeight - resources.getDimensionPixelSize(R.dimen.user_icon)
                     )
                     binding.userRoot.addView(this)
                 }
@@ -148,10 +149,10 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
     }
 
     private fun startLoginDialog() {
-        UserPops(this@UserConfigActivity).startLoginPopUp(
+        loginDialog(
             userConfig.userName != "",
             { name, password ->
-                return@startLoginPopUp when {
+                return@loginDialog when {
                     userConfig.userName == "" -> false
                     name != userConfig.userName -> false
                     password != userConfig.userPassword -> false
@@ -164,7 +165,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
             },
             {
                 var result = false
-                UserPops(this@UserConfigActivity).startRegPopUp { s, s2 ->
+                regDialog { s, s2 ->
                     userConfig.userName = s
                     userConfig.userPassword = s2
                     userConfig.isLogin = true
@@ -176,7 +177,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
     }
 
     private fun startNameDialog() {
-        TitleDialog(this, R.string.user_name.getString(), "") {
+        titleDialog(R.string.user_name.getString(), "") {
             if (it.isNotEmpty()) {
                 userConfig.userName = it
             }
@@ -184,7 +185,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
     }
 
     private fun startPasswordDialog() {
-        TitleDialog(this, R.string.password.getString(), "") {
+        titleDialog(R.string.password.getString(), "") {
             if (it == userConfig.userPassword) {
                 userConfig.userPassword = it
                 R.string.success.getString().toast()
@@ -204,8 +205,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
     }
 
     private fun startLockListPop() {
-        CheckListDialog(
-            this@UserConfigActivity,
+        checkListDialog(
             mutableListOf(
                 R.string.model_noteBook.getString(),
                 R.string.model_music.getString(),
@@ -213,10 +213,10 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
             )
         ) {
             if (!it.isNullOrEmpty()) {
-                TitleDialog(this@UserConfigActivity, "选择", "") { lock ->
+                titleDialog("选择", "") { lock ->
                     if (lock.isEmpty()) {
                         R.string.none.getString().toast()
-                        return@TitleDialog
+                        return@titleDialog
                     }
                     when (it) {
                         R.string.model_noteBook.getString() -> userConfig.lockNote = lock
@@ -231,8 +231,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
     }
 
     private fun startUnlockListPop() {
-        CheckListDialog(
-            this@UserConfigActivity,
+        checkListDialog(
             mutableListOf(
                 R.string.model_noteBook.getString(),
                 R.string.model_music.getString(),
@@ -240,10 +239,10 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
             )
         ) {
             if (!it.isNullOrEmpty()) {
-                TitleDialog(this@UserConfigActivity, R.string.password.getString(), "") { lock ->
+                titleDialog(R.string.password.getString(), "") { lock ->
                     if (lock.isEmpty()) {
                         R.string.none.getString().toast()
-                        return@TitleDialog
+                        return@titleDialog
                     }
                     if (when (it) {
                             R.string.model_noteBook.getString() -> {

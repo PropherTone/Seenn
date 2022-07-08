@@ -27,7 +27,7 @@ import com.protone.seen.adapter.GalleyBucketAdapter
 import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seen.customView.StateImageView
 import com.protone.seen.databinding.GalleyFragmentLayoutBinding
-import com.protone.seen.dialog.TitleDialog
+import com.protone.seen.dialog.titleDialog
 import com.protone.seen.itemDecoration.GalleyItemDecoration
 import com.protone.seenn.R
 import com.protone.seenn.activity.GalleySearchActivity
@@ -139,8 +139,7 @@ class GalleyFragment(
                         onSelectMod = false
                     }
                 } else {
-                    TitleDialog(
-                        requireContext(),
+                    activity?.titleDialog(
                         requireContext().getString(R.string.user_name),
                         ""
                     ) {

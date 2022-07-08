@@ -3,15 +3,14 @@ package com.protone.seenn.viewModel
 import android.content.Intent
 import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
+import com.protone.api.baseType.getString
 import com.protone.api.context.*
-import com.protone.api.getString
 import com.protone.database.room.entity.Music
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.customView.musicPlayer.BaseMusicPlayer
 import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.seenn.service.MusicService
-import kotlinx.coroutines.cancel
 
 class MusicControllerIMP(private val controller: BaseMusicPlayer) {
     var binder: MusicService.MusicBinder? = null
@@ -148,8 +147,6 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
     }
 
     fun getPlayingMusic() = binder?.onMusicPlaying()?.value
-
-    fun finish() = controller.cancel()
 
     fun getProgress() = controller.progress?.barDuration
 

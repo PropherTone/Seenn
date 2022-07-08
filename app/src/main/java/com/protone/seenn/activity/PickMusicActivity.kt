@@ -8,8 +8,8 @@ import com.protone.api.SearchModel
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.linkInput
 import com.protone.api.context.root
-import com.protone.api.getString
-import com.protone.api.toast
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Medias
 import com.protone.seen.adapter.AddMusicListAdapter

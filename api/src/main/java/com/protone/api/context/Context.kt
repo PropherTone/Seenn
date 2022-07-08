@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-val Context.layoutInflater: LayoutInflater
+val Context.newLayoutInflater: LayoutInflater
     get() = LayoutInflater.from(this)
 
 val Context.root: ViewGroup?

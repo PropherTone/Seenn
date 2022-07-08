@@ -10,9 +10,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.protone.api.animation.AnimationHelper
-import com.protone.api.context.layoutInflater
-import com.protone.api.getDrawable
-import com.protone.api.getString
+import com.protone.api.context.newLayoutInflater
+import com.protone.api.baseType.getDrawable
+import com.protone.api.baseType.getString
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicBucketAdapterLayoutBinding
@@ -56,7 +56,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
     ): Holder<MusicBucketAdapterLayoutBinding> {
         return Holder(
             MusicBucketAdapterLayoutBinding.inflate(
-                context.layoutInflater,
+                context.newLayoutInflater,
                 parent,
                 false
             )

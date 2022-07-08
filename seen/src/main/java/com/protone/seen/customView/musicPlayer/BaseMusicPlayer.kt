@@ -13,10 +13,7 @@ import com.protone.api.img.Blur
 import com.protone.api.isInDebug
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 abstract class BaseMusicPlayer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -95,5 +92,10 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
             (switcher.nextView as ImageView).setImageResource(R.drawable.main_background)
             switcher.showNext()
         }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        cancel()
     }
 }

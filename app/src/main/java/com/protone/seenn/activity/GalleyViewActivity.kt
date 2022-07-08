@@ -1,9 +1,6 @@
 package com.protone.seenn.activity
 
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
@@ -13,22 +10,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
+import com.protone.api.baseType.getStorageSize
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toDateString
 import com.protone.api.context.intent
 import com.protone.api.context.root
-import com.protone.api.getStorageSize
-import com.protone.api.getString
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.json.toUri
-import com.protone.api.toDateString
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.adapter.CheckListAdapter
 import com.protone.seen.adapter.GalleyViewPager2Adapter
 import com.protone.seen.databinding.ImageCateLayoutBinding
-import com.protone.seen.databinding.RichVideoLayoutBinding
 import com.protone.seen.databinding.TextCateLayoutBinding
 import com.protone.seenn.R
 import com.protone.seenn.databinding.GalleyViewActivityBinding
+import com.protone.seenn.fragment.GalleyViewFragment
 import com.protone.seenn.viewModel.GalleyViewViewModel
 import com.protone.seenn.viewModel.NoteViewViewModel
 import kotlinx.coroutines.Dispatchers
@@ -220,7 +217,7 @@ class GalleyViewActivity :
     }
 
     override fun popDelete() {
-        tryDelete(mutableListOf(viewModel.getCurrentMedia()), this) {
+        tryDelete(mutableListOf(viewModel.getCurrentMedia())) {
 //            binding.galleyVView.setCurrentItem(viewModel.curPosition + 1, true)
             val indexOf = viewModel.galleyMedias.indexOf(it)
             if (indexOf != -1) {
@@ -241,7 +238,7 @@ class GalleyViewActivity :
     }
 
     override fun popRename() {
-        tryRename(mutableListOf(viewModel.getCurrentMedia()), this)
+        tryRename(mutableListOf(viewModel.getCurrentMedia()))
     }
 
     override fun popSelectAll() = Unit
@@ -251,34 +248,4 @@ class GalleyViewActivity :
     }
 
     override fun popIntoBox() = Unit
-
-    class GalleyViewFragment(private val galleyMedia: GalleyMedia) : Fragment() {
-
-        private lateinit var binding: RichVideoLayoutBinding
-
-        override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-        ): View {
-            binding = RichVideoLayoutBinding.inflate(inflater, container, false)
-            binding.richVideo.setVideoPath(galleyMedia.uri)
-            return binding.root
-        }
-
-        override fun onDestroy() {
-            super.onDestroy()
-            binding.richVideo.release()
-        }
-
-        override fun onResume() {
-            super.onResume()
-            binding.richVideo.play()
-        }
-
-        override fun onPause() {
-            super.onPause()
-            binding.richVideo.pause()
-        }
-    }
 }

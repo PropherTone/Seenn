@@ -5,9 +5,8 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
-import com.protone.api.context.layoutInflater
+import com.protone.api.context.newLayoutInflater
 import com.protone.seen.databinding.RichMusicLayoutBinding
-import com.protone.seen.databinding.RichVideoLayoutBinding
 
 class RichMusicView @JvmOverloads constructor(
     context: Context,
@@ -15,6 +14,6 @@ class RichMusicView @JvmOverloads constructor(
     @AttrRes defStyleAttr: Int = 0,
     @StyleRes defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes){
-    val binding = RichMusicLayoutBinding.inflate(context.layoutInflater,this,true)
+    val binding = RichMusicLayoutBinding.inflate(context.newLayoutInflater,this,true)
 
 }

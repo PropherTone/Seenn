@@ -6,8 +6,8 @@ import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.isVisible
-import com.protone.api.context.layoutInflater
-import com.protone.api.getDrawable
+import com.protone.api.context.newLayoutInflater
+import com.protone.api.baseType.getDrawable
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.databinding.VideoControllerBinding
@@ -19,7 +19,7 @@ class MyVideoController @JvmOverloads constructor(
     @StyleRes defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val binding = VideoControllerBinding.inflate(context.layoutInflater, this, true)
+    private val binding = VideoControllerBinding.inflate(context.newLayoutInflater, this, true)
 
     var playVideo: () -> Unit = {}
     var pauseVideo: () -> Unit = {}

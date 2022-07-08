@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isGone
 import com.protone.api.animation.AnimationHelper
-import com.protone.api.context.layoutInflater
+import com.protone.api.context.newLayoutInflater
 import com.protone.api.context.onUiThread
-import com.protone.api.getDrawable
-import com.protone.api.toStringMinuteTime
+import com.protone.api.baseType.getDrawable
+import com.protone.api.baseType.toStringMinuteTime
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Medias
@@ -61,7 +61,7 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
         parent: ViewGroup,
         viewType: Int
     ): Holder<MusicListLayoutBinding> {
-        return Holder(MusicListLayoutBinding.inflate(context.layoutInflater, parent, false)).apply {
+        return Holder(MusicListLayoutBinding.inflate(context.newLayoutInflater, parent, false)).apply {
             binding.isLoad = true
         }
     }

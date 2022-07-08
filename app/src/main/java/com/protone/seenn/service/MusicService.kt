@@ -12,8 +12,8 @@ import android.os.IBinder
 import android.widget.RemoteViews
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.protone.api.baseType.toBitmapByteArray
 import com.protone.api.context.*
-import com.protone.api.toBitmapByteArray
 import com.protone.database.room.entity.Music
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.ApplicationBroadCast
@@ -51,7 +51,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
             if (playList.isEmpty()) return null
             if (field == null) {
                 field = MediaPlayer.create(
-                    APP.app,
+                    SApplication.app,
                     playList[playPosition].uri
                 ).also {
                     it.setOnCompletionListener(this)
@@ -74,8 +74,8 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
             activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
             stopSelf()
             val activityManager =
-                APP.app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.killBackgroundProcesses(APP.app.packageName)
+                SApplication.app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            activityManager.killBackgroundProcesses(SApplication.app.packageName)
         }
 
         override fun music() {

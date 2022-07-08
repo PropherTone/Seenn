@@ -1,9 +1,9 @@
 package com.protone.seenn.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.protone.api.context.APP
+import com.protone.api.context.SApplication
 
 class MainViewModel : ViewModel() {
     var btnY = 0f
-    val btnH = APP.app.resources.getDimensionPixelSize(com.protone.seen.R.dimen.action_icon_p)
+    val btnH = SApplication.app.resources.getDimensionPixelSize(com.protone.seen.R.dimen.action_icon_p)
 }

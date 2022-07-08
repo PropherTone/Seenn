@@ -6,8 +6,8 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import android.widget.ViewSwitcher
-import com.protone.api.context.layoutInflater
-import com.protone.api.toBitmapByteArray
+import com.protone.api.baseType.toBitmapByteArray
+import com.protone.api.context.newLayoutInflater
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.databinding.AutoMusicPlayerLayoutMidBinding
@@ -17,7 +17,7 @@ class MusicPlayerViewMid @JvmOverloads constructor(
 ) : BaseMusicPlayer(context, attrs) {
 
     private val binding =
-        AutoMusicPlayerLayoutMidBinding.inflate(context.layoutInflater, this, true)
+        AutoMusicPlayerLayoutMidBinding.inflate(context.newLayoutInflater, this, true)
 
     override val next: ImageView = binding.musicNext
     override val control: ImageView = binding.musicControl

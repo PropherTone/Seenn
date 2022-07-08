@@ -8,16 +8,16 @@ import android.net.Uri
 import android.provider.MediaStore
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.protone.api.R
-import com.protone.api.getString
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.api.isInDebug
-import com.protone.api.toast
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
-val activityOperationBroadcast: LocalBroadcastManager = LocalBroadcastManager.getInstance(APP.app)
+val activityOperationBroadcast: LocalBroadcastManager = LocalBroadcastManager.getInstance(SApplication.app)
 
 fun Activity.observeChange(uri: Uri, targetName: String): Boolean {
     var name = ""
@@ -91,41 +91,39 @@ fun Activity.renameMedia(
 inline fun Activity.funcForMultiRename(
     name: String,
     uri: Uri,
-    callBack: (String?) -> Unit
+    crossinline callBack: (String?) -> Unit
 ) {
-    try {
-        if (observeChange(uri, name)) {
+        try {
+            if (observeChange(uri, name)) {
+                callBack.invoke(name)
+                return
+            }
+            grantUriPermission(
+                packageName,
+                uri,
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            contentResolver.update(
+                uri,
+                ContentValues().apply {
+                    put(
+                        MediaStore.MediaColumns.DISPLAY_NAME,
+                        name
+                    )
+                },
+                null,
+                null
+            )
             callBack.invoke(name)
-            return
+        } catch (e: Exception) {
+            callBack.invoke(null)
         }
-        grantUriPermission(
-            packageName,
-            uri,
-            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        )
-        contentResolver.update(
-            uri,
-            ContentValues().apply {
-                put(
-                    MediaStore.MediaColumns.DISPLAY_NAME,
-                    name
-                )
-            },
-            null,
-            null
-        )
-        callBack.invoke(name)
-    } catch (e: Exception) {
-        callBack.invoke(null)
-    }
 }
 
-fun Activity.deleteMedia(
+suspend fun Activity.deleteMedia(
     uri: Uri,
-    scope: CoroutineScope,
     callBack: (Boolean) -> Unit
 ) {
-    scope.launch(Dispatchers.IO) {
         flow {
             try {
                 grantUriPermission(
@@ -146,13 +144,10 @@ fun Activity.deleteMedia(
             withContext(Dispatchers.Main) {
                 callBack.invoke(it)
             }
-            cancel()
         }
-    }
 }
 
-fun Activity.multiDeleteMedia(uris: List<Uri>, scope: CoroutineScope, callBack: (Boolean) -> Unit) {
-    scope.launch(Dispatchers.IO) {
+suspend fun Activity.multiDeleteMedia(uris: List<Uri>, callBack: (Boolean) -> Unit) {
         uris.asFlow().map {
             try {
                 grantUriPermission(
@@ -173,9 +168,7 @@ fun Activity.multiDeleteMedia(uris: List<Uri>, scope: CoroutineScope, callBack: 
             withContext(Dispatchers.Main) {
                 callBack.invoke(it)
             }
-            cancel()
         }
-    }
 }
 
 fun Activity.showFailedToast() = runOnUiThread {

@@ -4,8 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import com.protone.api.context.layoutInflater
-import com.protone.api.toStringMinuteTime
+import com.protone.api.context.newLayoutInflater
+import com.protone.api.baseType.toStringMinuteTime
 import com.protone.database.room.entity.Music
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
@@ -50,7 +50,7 @@ class MusicListAdapter(context: Context) :
     ): Holder<MusicListLayoutBinding> {
         return Holder(
             MusicListLayoutBinding.inflate(
-                context.layoutInflater,
+                context.newLayoutInflater,
                 parent,
                 false
             )
