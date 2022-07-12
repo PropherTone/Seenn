@@ -272,7 +272,9 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun deleteNote(note: Note) {
-        noteDAO?.deleteNote(note)
+        execute {
+            noteDAO?.deleteNote(note)
+        }
     }
 
     override fun insertNote(note: Note) {

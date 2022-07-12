@@ -34,10 +34,9 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
         initPop()
     }
 
-
     override suspend fun onViewEvent(event: String) = Unit
 
-    override suspend fun GalleyViewModel.init() = viewModel.run {
+    override suspend fun GalleyViewModel.init() {
         chooseType = intent.getStringExtra(GalleyViewModel.CHOOSE_MODE) ?: ""
 
         if (chooseType.isNotEmpty()) showActionBtn()
@@ -66,9 +65,10 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
         initPager()
 
         Medias.mediaLive.observe(this@GalleyActivity) {
-            if (it == Medias.GALLEY_UPDATED) {
+            if (it == Medias.GALLEY_UPDATED && !onChangeName) {
                 initPager()
             }
+            onChangeName = false
         }
 
         chooseData.observe(this@GalleyActivity) {
@@ -142,17 +142,16 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
     }
 
     override fun popMoveTo() {
-        launch {
-            viewModel.chooseData()?.let {
-                moveTo(binding.galleyBar, viewModel.rightMailer != 0, it) { target, list ->
-                    viewModel.addBucket(target, list)
-                }
+        viewModel.chooseData()?.let {
+            moveTo(binding.galleyBar, viewModel.rightMailer != 0, it) { target, list ->
+                viewModel.addBucket(target, list)
             }
         }
     }
 
     override fun popRename() {
         viewModel.chooseData()?.let {
+            viewModel.onChangeName = true
             tryRename(it)
         }
     }

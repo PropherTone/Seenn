@@ -10,9 +10,9 @@ import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
 import android.widget.Toast
+import com.protone.api.baseType.getString
 import com.protone.api.context.onUiThread
 import com.protone.api.context.workIntentFilter
-import com.protone.api.baseType.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMulti
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusic
@@ -101,7 +101,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         )
     }
 
-    private fun updateMusicBucket() = launch {
+    private fun updateMusicBucket() = launch(Dispatchers.IO) {
         val cacheList = arrayListOf<Music>().apply { addAll(music) }
         val cacheAllMusic = arrayListOf<Music>()
         val allMusic = (getAllMusic() as ArrayList?)?.also { cacheAllMusic.addAll(it) }
@@ -159,7 +159,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                     if (list.size > 0) allMusic.remove(list[0])
                 }
         }
-        launch {
+        launch(Dispatchers.IO) {
             val allMusic = getAllMusic() as MutableList
             flow {
                 scanAudio { _, music ->
@@ -176,7 +176,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         }
     }
 
-    private fun updateGalley(uri: Uri) = launch {
+    private fun updateGalley(uri: Uri) = launch(Dispatchers.IO) {
         scanGalleyWithUri(uri) {
             DataBaseDAOHelper.insertSignedMedia(it)
             mediaLive.postValue(GALLEY_UPDATED)
@@ -192,7 +192,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                     if (list.size > 0) allSignedMedia.remove(list[0])
                 }
         }
-        launch {
+        launch(Dispatchers.IO) {
             val allSignedMedia = getAllSignedMedia() as MutableList
             val scanPicture = async {
                 flow {
@@ -227,7 +227,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         }
     }
 
-    private inner class WorkBinder : Binder(),IWorkService {
+    private inner class WorkBinder : Binder(), IWorkService {
         override fun updateMusicBucket() {
             this@WorkService.updateMusicBucket()
         }

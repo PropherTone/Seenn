@@ -12,7 +12,7 @@ import java.io.InputStream
 
 fun Uri.saveToFile(
     fileName: String,
-    dir: String,
+    dir: String? = null,
     w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
     h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
 ) = toBitmap(w, h)?.saveToFile(fileName, dir)

@@ -5,8 +5,8 @@ import android.content.Context
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.protone.api.context.newLayoutInflater
 import com.protone.api.baseType.toDateString
+import com.protone.api.context.newLayoutInflater
 import com.protone.database.room.entity.Note
 import com.protone.seen.databinding.NoteListAdapterLayoutBinding
 
@@ -50,6 +50,14 @@ class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBindi
         noteList.clear()
         noteList.addAll(list)
         notifyDataSetChanged()
+    }
+
+    fun deleteNote(note: Note) {
+        val indexOf = noteList.indexOf(note)
+        if (indexOf != -1) {
+            noteList.removeAt(indexOf)
+            notifyItemRemoved(indexOf)
+        }
     }
 
     var noteListEventListener: NoteListEvent? = null

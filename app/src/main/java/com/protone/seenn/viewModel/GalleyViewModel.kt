@@ -34,6 +34,8 @@ class GalleyViewModel : ViewModel(), TabLayout.OnTabSelectedListener {
 
     var rightMailer = 0
 
+    var onChangeName = false
+
     private val mailers = arrayOfNulls<FragMailer>(2)
 
     val chooseData: MutableLiveData<MutableList<GalleyMedia>> =

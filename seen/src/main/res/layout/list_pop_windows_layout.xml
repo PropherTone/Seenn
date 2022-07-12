@@ -24,7 +24,7 @@
             android:background="@drawable/background_ripple_blue"
             android:contentDescription="@string/action"
             android:padding="@dimen/icon_padding_lite"
-            android:src="@drawable/ic_baseline_check_24"
+            android:src="@drawable/ic_baseline_check_24_white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

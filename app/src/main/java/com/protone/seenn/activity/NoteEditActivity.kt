@@ -20,6 +20,7 @@ import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
 import com.protone.mediamodle.note.entity.*
 import com.protone.mediamodle.note.spans.ISpanForUse
+import com.protone.seen.dialog.imageListDialog
 import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seenn.R
 import com.protone.seenn.databinding.NoteEditActivityBinding
@@ -134,11 +135,9 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             setNoteIconCache(re.uri)
             showProgress(true)
             savedIconPath = if (iconUri != null) {
-                val saveIcon = saveIcon(title) {
-                    setNoteIcon(savedIconPath)
-                }
+                saveIcon(title) { b -> if (b) setNoteIcon(savedIconPath) }
                 showProgress(false)
-                saveIcon
+                savedIconPath
             } else ""
         }
     }
@@ -186,8 +185,11 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             R.string.enter_title.getString().toast()
             return@apply
         }
-        val indexedRichNote = indexRichNote()
         showProgress(true)
+        val indexedRichNote = binding.noteEditRichNote.indexRichNote(title) {
+            if (it.size <= 0) return@indexRichNote true
+            return@indexRichNote imageListDialog(it)
+        }
         val note = Note(
             title,
             indexedRichNote.second,
@@ -230,7 +232,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         }
     }
 
-    private suspend fun startGalleyPick(isPhoto: Boolean) = withContext(Dispatchers.IO) {
+    private suspend fun startGalleyPick(isPhoto: Boolean) =
         startActivityForResult(GalleyActivity::class.intent.apply {
             putExtra(
                 GalleyViewModel.CHOOSE_MODE,
@@ -239,7 +241,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         })?.let { re ->
             re.data?.getStringExtra(GalleyViewModel.GALLEY_DATA)?.toEntity(GalleyMedia::class.java)
         }
-    }
+
 
     private suspend fun initEditor(richCode: Int, text: String) = withContext(Dispatchers.Main) {
         binding.noteEditRichNote.setRichList(richCode, text)
@@ -287,9 +289,6 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             binding.noteEditRichNote.insertMusic(RichMusicStates(uri, it, title))
         }
     }
-
-    private suspend fun indexRichNote(): Pair<Int, String> =
-        binding.noteEditRichNote.indexRichNote(title)
 
     private fun setNoteIcon(path: String) {
         Glide.with(this)

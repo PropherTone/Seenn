@@ -53,7 +53,10 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
                 }
 
                 override fun onDelete(note: Note) {
-                    //TODO Delete note not IMP yet
+                    titleDialog(R.string.delete.getString(), R.string.delete.getString()) {
+                        this@init.deleteNote(note)
+                        deleteNote(note)
+                    }
                 }
             }
         }
@@ -70,7 +73,7 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     }
 
     fun addBucket() {
-        titleDialog( getString(R.string.add_dir), "") { re ->
+        titleDialog(getString(R.string.add_dir), "") { re ->
             if (re.isNotEmpty()) {
                 launch(Dispatchers.IO) {
                     viewModel.insertNoteType(re, "").let { pair ->

@@ -13,6 +13,7 @@ import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.seen.databinding.GalleyOptionPopBinding
 import com.protone.seen.dialog.cateDialog
+import com.protone.seen.dialog.checkListDialog
 import com.protone.seen.dialog.titleDialog
 import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seen.popWindows.GalleyOptionPop
@@ -109,6 +110,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
     }
 
     private fun renameMulti(gm: List<GalleyMedia>) {
+        val reList = arrayListOf<String>()
         titleDialog(
             getString(R.string.rename),
             ""
@@ -122,8 +124,14 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
                         if (result != null) {
                             it.name = result
                             R.string.success.getString().toast()
-                        } else R.string.not_supported.getString().toast()
+                        } else {
+                            reList.add(it.name)
+                            R.string.not_supported.getString().toast()
+                        }
                     }
+                }
+                withContext(Dispatchers.Main) {
+                    checkListDialog(reList) {}
                 }
             }
         }
@@ -165,7 +173,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
     }
 
     fun addCate(gms: MutableList<GalleyMedia>) {
-        cateDialog( {
+        cateDialog({
             titleDialog(R.string.addCate.getString(), "") { re ->
                 if (re.isEmpty()) {
                     "请输入内容".toast()
@@ -204,12 +212,12 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
         }
     }
 
-    suspend fun moveTo(
+    fun moveTo(
         anchor: View,
         isVideo: Boolean,
         gms: MutableList<GalleyMedia>,
         callback: (String, MutableList<GalleyMedia>) -> Unit
-    ) = withContext(Dispatchers.Main) {
+    ) = launch(Dispatchers.Main) {
         val pop = ColorfulPopWindow(this@BaseMediaActivity)
         pop.startListPopup(
             anchor,

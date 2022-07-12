@@ -3,9 +3,9 @@ package com.protone.seenn.viewModel
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.protone.api.baseType.getString
-import com.protone.api.json.toUriJson
 import com.protone.api.baseType.toMediaBitmapByteArray
 import com.protone.api.baseType.toast
+import com.protone.api.json.toUriJson
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Note
 import com.protone.mediamodle.GalleyHelper
@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 
 class NoteEditViewModel : ViewModel() {
 
-    enum class ViewEvent{
+    enum class ViewEvent {
         Confirm,
         PickImage,
         PickVideo,
@@ -37,21 +37,22 @@ class NoteEditViewModel : ViewModel() {
     var allNote: MutableList<String>? = null
     var onEdit = false
 
-    suspend fun saveIcon(name: String, onSuccess: () -> Unit) = withContext(Dispatchers.IO) {
-        suspendCancellableCoroutine<String> { co ->
+    suspend fun saveIcon(name: String, onResult: (Boolean) -> Unit): Unit =
+        withContext(Dispatchers.IO) {
             GalleyHelper.saveIconToLocal(
                 name,
                 iconUri?.toMediaBitmapByteArray()
             ) { s ->
-                if (!s.isNullOrEmpty()) {
-                    co.resumeWith(Result.success(savedIconPath))
+                savedIconPath = if (!s.isNullOrEmpty()) {
+                    onResult.invoke(true)
+                    s
                 } else {
                     R.string.failed_upload_image.getString().toast()
-                    co.resumeWith(Result.success(iconUri!!.toUriJson()))
+                    onResult.invoke(false)
+                    iconUri!!.toUriJson()
                 }
             }
         }
-    }
 
     suspend fun getAllNote() = withContext(Dispatchers.IO) {
         suspendCancellableCoroutine<MutableList<String>> {
@@ -73,7 +74,7 @@ class NoteEditViewModel : ViewModel() {
         }
     }
 
-    suspend fun copyNote(inNote:Note,note: Note) = withContext(Dispatchers.IO) {
+    suspend fun copyNote(inNote: Note, note: Note) = withContext(Dispatchers.IO) {
         inNote.title = note.title
         inNote.type = note.type
         inNote.text = note.text

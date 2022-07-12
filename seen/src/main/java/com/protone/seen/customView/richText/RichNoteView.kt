@@ -379,11 +379,15 @@ class RichNoteView @JvmOverloads constructor(
      *
      * [String] : Json of [RichStates]>
      */
-    suspend fun indexRichNote(title: String): Pair<Int, String> {
+    suspend fun indexRichNote(
+        title: String,
+        onSaveResult:suspend (ArrayList<Uri>) -> Boolean
+    ): Pair<Int, String> {
         val richArray = arrayOfNulls<String>(childCount)
         val richSer = arrayListOf<String>()
-        var richStates = 0
+        val reList = arrayListOf<Uri>()
         val taskChannel = Channel<Pair<String, Int>>(Channel.UNLIMITED)
+        var richStates = 0
         var count = 0
         return withContext(Dispatchers.IO) {
             suspendCancellableCoroutine {
@@ -398,14 +402,18 @@ class RichNoteView @JvmOverloads constructor(
                                 taskChannel.close()
                             }
                         }
-                        richArray.onEach {
-                            it?.let { state ->
-                                richSer.add(state)
+                        if (withContext(Dispatchers.Main) {
+                                onSaveResult.invoke(reList)
+                            }) {
+                            richArray.onEach {
+                                it?.let { state ->
+                                    richSer.add(state)
+                                }
                             }
+                            it.resumeWith(
+                                Result.success(Pair(richStates, richSer.listToJson(String::class.java)))
+                            )
                         }
-                        it.resumeWith(
-                            Result.success(Pair(richStates, richSer.listToJson(String::class.java)))
-                        )
                         break
                     }
                 }.start()
@@ -429,14 +437,21 @@ class RichNoteView @JvmOverloads constructor(
                         is RichPhotoStates -> {
                             richStates = richStates * 10 + PHOTO
                             val child = getChildAt(i)
-                            async(Dispatchers.IO) {
-                                tag.uri.toBitmap(child.measuredWidth, child.measuredHeight)
-                                    ?.saveToFile(title + "_${System.currentTimeMillis()}")
-                                    ?.let {
-                                        if (tag.path == null) {
-                                            tag.path = it
-                                        }
+                            if (tag.path != null) {
+                                taskChannel.trySend(Pair(tag.toJson(), i))
+                            } else async(Dispatchers.IO) {
+                                tag.uri.saveToFile(
+                                    title + "_${System.currentTimeMillis()}",
+                                    dir = "NoteCache",
+                                    w = child.measuredWidth,
+                                    h = child.measuredHeight
+                                )?.let {
+                                    if (tag.path == null) {
+                                        tag.path = it
+                                    } else {
+                                        reList.add(tag.uri)
                                     }
+                                }
                                 taskChannel.trySend(Pair(tag.toJson(), i))
                             }.start()
                         }

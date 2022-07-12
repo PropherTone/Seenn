@@ -11,10 +11,10 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.animation.AnimationHelper
-import com.protone.api.context.*
 import com.protone.api.baseType.getDrawable
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
+import com.protone.api.context.*
 import com.protone.database.room.entity.Music
 import com.protone.database.room.entity.MusicBucket
 import com.protone.database.sp.config.userConfig
@@ -58,7 +58,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
     }
 
     @Suppress("ObjectLiteralToLambda")
-    override suspend fun MusicModel.init() = viewModel.run {
+    override suspend fun MusicModel.init()  {
         bucket = userConfig.lastMusicBucket
         val musicController = MusicControllerIMP(binding.mySmallMusicPlayer)
         musicController.onClick {

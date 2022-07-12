@@ -4,12 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
+import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.marginBottom
 import com.protone.api.context.root
 import com.protone.api.context.setSoftInputStatuesListener
 import com.protone.api.json.toUri
-import com.protone.api.baseType.toast
 import com.protone.database.room.entity.MusicBucket
 import com.protone.seenn.R
 import com.protone.seenn.databinding.AddBucketActivityBinding
@@ -58,7 +58,7 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
         }
     }
 
-    override suspend fun AddBucketViewModel.init(): Unit = viewModel.run {
+    override suspend fun AddBucketViewModel.init() {
         editName = intent.getStringExtra(AddBucketViewModel.BUCKET_NAME)
         editName?.let { eName ->
             musicBucket = getMusicBucketByName(eName)
