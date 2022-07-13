@@ -5,20 +5,11 @@ import com.protone.database.room.*
 import com.protone.database.room.entity.*
 
 object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGalleyDAO, NoteDAO,
-    NoteTypeDAO, GalleyBucketDAO {
+    NoteTypeDAO, GalleyBucketDAO, GalleriesWithNotesDAO, NoteDirWithNoteDAO,
+    MusicWithMusicBucketDAO {
 
     //MusicBucket
-    private var musicBucketDAO: MusicBucketDAO? = null
-
-    init {
-        musicBucketDAO()
-    }
-
-    private fun musicBucketDAO() {
-        if (musicBucketDAO == null) {
-            musicBucketDAO = getMusicBucketDAO()
-        }
-    }
+    private val musicBucketDAO by lazy { getMusicBucketDAO() }
 
     suspend fun getAllMusicBucketRs() = onResult<List<MusicBucket>?> {
         execute {
@@ -27,20 +18,20 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun getAllMusicBucket(): List<MusicBucket>? {
-        return musicBucketDAO?.getAllMusicBucket()
+        return musicBucketDAO.getAllMusicBucket()
     }
 
     override fun getMusicBucketByName(name: String): MusicBucket? {
-        return musicBucketDAO?.getMusicBucketByName(name)
+        return musicBucketDAO.getMusicBucketByName(name)
     }
 
     override fun addMusicBucket(musicBucket: MusicBucket) {
-        musicBucketDAO?.addMusicBucket(musicBucket)
+        musicBucketDAO.addMusicBucket(musicBucket)
     }
 
     fun addMusicBucketThread(musicBucket: MusicBucket) {
         execute {
-            musicBucketDAO?.addMusicBucket(musicBucket)
+            musicBucketDAO.addMusicBucket(musicBucket)
         }
     }
 
@@ -68,7 +59,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun updateMusicBucket(bucket: MusicBucket): Int {
-        return musicBucketDAO?.updateMusicBucket(bucket) ?: -1
+        return musicBucketDAO.updateMusicBucket(bucket)
     }
 
     fun updateMusicBucketBack(bucket: MusicBucket) {
@@ -85,31 +76,24 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     suspend fun deleteMusicBucketRs(bucket: MusicBucket) = onResult<Boolean> {
         execute {
-            musicBucketDAO?.deleteMusicBucket(bucket)
-            it.resumeWith(Result.success(musicBucketDAO?.getMusicBucketByName(bucket.name) == null))
+            musicBucketDAO.deleteMusicBucket(bucket)
+            it.resumeWith(Result.success(musicBucketDAO.getMusicBucketByName(bucket.name) == null))
         }
     }
 
     override fun deleteMusicBucket(bucket: MusicBucket) {
         execute {
-            musicBucketDAO?.deleteMusicBucket(bucket)
+            musicBucketDAO.deleteMusicBucket(bucket)
         }
     }
-
 
     //Music
-    private var musicDAO: MusicDAO? = null
-
-    init {
-        if (musicDAO == null) {
-            musicDAO = getMusicDAO()
-        }
-    }
+    private val musicDAO by lazy { getMusicDAO() }
 
     fun insertMusicMulti(music: List<Music>) {
         execute {
             music.forEach {
-                musicDAO?.insertMusic(it)
+                musicDAO.insertMusic(it)
             }
         }
     }
@@ -117,7 +101,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     fun deleteMusicMulti(music: List<Music>) {
         execute {
             music.forEach {
-                musicDAO?.deleteMusic(it)
+                musicDAO.deleteMusic(it)
             }
         }
     }
@@ -130,29 +114,29 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     fun insertMusicCheck(music: Music) {
-        musicDAO?.getMusicByUri(music.uri).let {
+        musicDAO.getMusicByUri(music.uri).let {
             if (it == null) insertMusic(music)
         }
     }
 
     override fun insertMusic(music: Music) {
-        musicDAO?.insertMusic(music)
+        musicDAO.insertMusic(music)
     }
 
-    override fun getAllMusic(): List<Music>? = musicDAO?.getAllMusic()
+    override fun getAllMusic(): List<Music>? = musicDAO.getAllMusic()
 
     override fun deleteMusic(music: Music) {
         execute {
-            musicDAO?.deleteMusic(music)
+            musicDAO.deleteMusic(music)
         }
     }
 
-    override fun updateMusic(music: Music): Int = musicDAO?.updateMusic(music) ?: -1
+    override fun updateMusic(music: Music): Int = musicDAO.updateMusic(music)
 
     override fun updateMusicMyBucket(name: String, bucket: List<String>): Int =
-        musicDAO?.updateMusicMyBucket(name, bucket) ?: -1
+        musicDAO.updateMusicMyBucket(name, bucket)
 
-    override fun getMusicByUri(uri: Uri): Music? = musicDAO?.getMusicByUri(uri)
+    override fun getMusicByUri(uri: Uri): Music? = musicDAO.getMusicByUri(uri)
 
     suspend fun updateMusicRs(music: Music) = onResult<Int> {
         execute {
@@ -167,13 +151,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     //Galley
-    private var signedGalleyDAO: SignedGalleyDAO? = null
-
-    init {
-        if (signedGalleyDAO == null) {
-            signedGalleyDAO = getGalleyDAO()
-        }
-    }
+    private val signedGalleyDAO by lazy { getGalleyDAO() }
 
     suspend fun getAllSignedMediaRs() = onResult<List<GalleyMedia>?> {
         execute {
@@ -182,17 +160,17 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun getAllSignedMedia(): List<GalleyMedia>? =
-        signedGalleyDAO?.getAllSignedMedia()
+        signedGalleyDAO.getAllSignedMedia()
 
     override fun getAllMediaByType(isVideo: Boolean): List<GalleyMedia>? =
-        signedGalleyDAO?.getAllMediaByType(isVideo)
+        signedGalleyDAO.getAllMediaByType(isVideo)
 
     override fun getAllGalley(isVideo: Boolean): List<String>? {
-        return signedGalleyDAO?.getAllGalley(isVideo)
+        return signedGalleyDAO.getAllGalley(isVideo)
     }
 
     override fun getAllMediaByGalley(name: String, isVideo: Boolean): List<GalleyMedia>? {
-        return signedGalleyDAO?.getAllMediaByGalley(name, isVideo)
+        return signedGalleyDAO.getAllMediaByGalley(name, isVideo)
     }
 
     fun deleteSignedMedias(list: MutableList<GalleyMedia>) {
@@ -204,12 +182,12 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun deleteSignedMediaByUri(uri: Uri) {
-        signedGalleyDAO?.deleteSignedMediaByUri(uri)
+        signedGalleyDAO.deleteSignedMediaByUri(uri)
     }
 
     override fun deleteSignedMedia(media: GalleyMedia) {
         execute {
-            signedGalleyDAO?.deleteSignedMedia(media)
+            signedGalleyDAO.deleteSignedMedia(media)
         }
     }
 
@@ -230,15 +208,15 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
                 it.type = media.type
                 it.date = media.date
                 updateSignedMedia(it)
-            } else signedGalleyDAO?.insertSignedMedia(media)
+            } else signedGalleyDAO.insertSignedMedia(media)
         }
     }
 
     override fun getSignedMedia(uri: Uri): GalleyMedia? =
-        signedGalleyDAO?.getSignedMedia(uri)
+        signedGalleyDAO.getSignedMedia(uri)
 
     override fun getSignedMedia(path: String): GalleyMedia? =
-        signedGalleyDAO?.getSignedMedia(path)
+        signedGalleyDAO.getSignedMedia(path)
 
     suspend fun getSignedMediaRs(uri: Uri) = onResult<GalleyMedia?> {
         execute {
@@ -247,42 +225,36 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun updateSignedMedia(galleyMedia: GalleyMedia) {
-        signedGalleyDAO?.updateSignedMedia(galleyMedia)
+        signedGalleyDAO.updateSignedMedia(galleyMedia)
     }
 
     //Note
-    private var noteDAO: NoteDAO? = null
-
-    init {
-        if (noteDAO == null) {
-            noteDAO = getNoteDAO()
-        }
-    }
+    private val noteDAO by lazy { getNoteDAO() }
 
     override fun getAllNote(): List<Note>? {
-        return noteDAO?.getAllNote()
+        return noteDAO.getAllNote()
     }
 
     override fun getNoteByName(name: String): Note? {
-        return noteDAO?.getNoteByName(name)
+        return noteDAO.getNoteByName(name)
     }
 
     override fun updateNote(note: Note): Int? {
-        return noteDAO?.updateNote(note)
+        return noteDAO.updateNote(note)
     }
 
     override fun deleteNote(note: Note) {
         execute {
-            noteDAO?.deleteNote(note)
+            noteDAO.deleteNote(note)
         }
     }
 
-    override fun insertNote(note: Note) {
-        noteDAO?.insertNote(note)
+    override fun insertNote(note: Note): Long {
+        return noteDAO.insertNote(note)
     }
 
     suspend fun insertNoteRs(note: Note) =
-        onResult<Pair<Boolean, String>> {
+        onResult<Pair<Boolean, Long>> {
             execute {
                 var count = 0
                 val tempName = note.title
@@ -296,69 +268,57 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
                 while (names[note.title] != null) {
                     note.title = "${tempName}(${++count})"
                 }
-                insertNote(note)
-                it.resumeWith(Result.success(Pair(getNoteByName(note.title) != null, note.title)))
+                val id = insertNote(note)
+                it.resumeWith(Result.success(Pair(getNoteByName(note.title) != null, id)))
             }
         }
 
     //NoteType
-    private var noteTypeDAO: NoteTypeDAO? = null
+    private val noteTypeDAO by lazy { getNoteTypeDAO() }
 
-    init {
-        if (noteTypeDAO == null) {
-            noteTypeDAO = getNoteTypeDAO()
-        }
-    }
-
-    suspend fun insertNoteTypeRs(
-        noteType: NoteType,
+    suspend fun insertNoteDirRs(
+        noteDir: NoteDir,
     ) = onResult<Pair<Boolean, String>> {
         execute {
             var count = 0
-            val tempName = noteType.type
+            val tempName = noteDir.name
             val names = mutableMapOf<String, Int>()
-            getALLNoteType()?.forEach {
-                names[it.type] = 1
-                if (it.type == noteType.type) {
-                    noteType.type = "${tempName}(${++count})"
+            getALLNoteDir()?.forEach {
+                names[it.name] = 1
+                if (it.name == noteDir.name) {
+                    noteDir.name = "${tempName}(${++count})"
                 }
             }
-            while (names[noteType.type] != null) {
-                noteType.type = "${tempName}(${++count})"
+            while (names[noteDir.name] != null) {
+                noteDir.name = "${tempName}(${++count})"
             }
-            insertNoteType(noteType)
-            it.resumeWith(Result.success(Pair(getNoteType(noteType.type) != null, noteType.type)))
+            insertNoteDir(noteDir)
+            it.resumeWith(Result.success(Pair(getNoteDir(noteDir.name) != null, noteDir.name)))
         }
     }
 
-    override fun insertNoteType(noteType: NoteType) {
-        noteTypeDAO?.insertNoteType(noteType)
+    override fun insertNoteDir(noteDir: NoteDir) {
+        noteTypeDAO.insertNoteDir(noteDir)
     }
 
-    override fun getNoteType(name: String): NoteType? = noteTypeDAO?.getNoteType(name)
+    override fun getNoteDir(name: String): NoteDir? = noteTypeDAO.getNoteDir(name)
 
 
-    override fun deleteNoteType(noteType: NoteType) {
-        noteTypeDAO?.deleteNoteType(noteType)
+    override fun deleteNoteDir(noteDir: NoteDir) {
+        noteTypeDAO.deleteNoteDir(noteDir)
     }
 
-    suspend fun doDeleteNoteTypeRs(noteType: NoteType) = onResult<Boolean> {
+    suspend fun doDeleteNoteDirRs(noteDir: NoteDir) = onResult<Boolean> {
         execute {
-            deleteNoteType(noteType)
-            it.resumeWith(Result.success(getNoteType(noteType.type) != null))
+            deleteNoteDir(noteDir)
+            it.resumeWith(Result.success(getNoteDir(noteDir.name) != null))
         }
     }
 
-    override fun getALLNoteType(): List<NoteType>? = noteTypeDAO?.getALLNoteType()
+    override fun getALLNoteDir(): List<NoteDir>? = noteTypeDAO.getALLNoteDir()
 
     //GalleyBucket
-    private var galleyBucketDAO: GalleyBucketDAO? = null
-
-    init {
-        if (galleyBucketDAO == null) {
-            galleyBucketDAO = getGalleyBucketDAO()
-        }
-    }
+    private val galleyBucketDAO by lazy { getGalleyBucketDAO() }
 
     inline fun insertGalleyBucketCB(
         galleyBucket: GalleyBucket,
@@ -383,15 +343,15 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun insertGalleyBucket(galleyBucket: GalleyBucket) {
-        galleyBucketDAO?.insertGalleyBucket(galleyBucket)
+        galleyBucketDAO.insertGalleyBucket(galleyBucket)
     }
 
     override fun getGalleyBucket(name: String): GalleyBucket? =
-        galleyBucketDAO?.getGalleyBucket(name)
+        galleyBucketDAO.getGalleyBucket(name)
 
     override fun deleteGalleyBucket(galleyBucket: GalleyBucket) {
         execute {
-            galleyBucketDAO?.deleteGalleyBucket(galleyBucket)
+            galleyBucketDAO.deleteGalleyBucket(galleyBucket)
         }
     }
 
@@ -402,7 +362,68 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     }
 
     override fun getALLGalleyBucket(isVideo: Boolean): List<GalleyBucket>? =
-        galleyBucketDAO?.getALLGalleyBucket(isVideo)
+        galleyBucketDAO.getALLGalleyBucket(isVideo)
+
+    private val galleriesWithNotesDAO by lazy { getGalleriesWithNotesDAO() }
+
+    override fun insertGalleriesWithNotes(galleriesWithNotes: GalleriesWithNotes) {
+        galleriesWithNotesDAO.insertGalleriesWithNotes(galleriesWithNotes)
+    }
+
+    override fun getNotesWithGalley(mediaId: Long): List<Note> {
+        return galleriesWithNotesDAO.getNotesWithGalley(mediaId) ?: mutableListOf()
+    }
+
+    override fun getGalleriesWithNote(noteId: Long): List<GalleyMedia> {
+        return galleriesWithNotesDAO.getGalleriesWithNote(noteId) ?: mutableListOf()
+    }
+
+    private val noteDirWithNoteDAO by lazy { getNoteDirWithNoteDAO() }
+
+    override fun insertNoteDirWithNote(noteDirWithNotes: NoteDirWithNotes) {
+        noteDirWithNoteDAO.insertNoteDirWithNote(noteDirWithNotes)
+    }
+
+    override fun getNotesWithNoteDir(noteDirId: Long): List<Note> {
+        return noteDirWithNoteDAO.getNotesWithNoteDir(noteDirId) ?: mutableListOf()
+    }
+
+    override fun getNoteDirWithNote(noteId: Long): List<NoteDir> {
+        return noteDirWithNoteDAO.getNoteDirWithNote(noteId) ?: mutableListOf()
+    }
+
+    private val musicWithMusicBucketDAO by lazy { getMusicWithMusicBucketDAO() }
+
+    suspend fun insertMusicWithMusicBucket(musicID: Long, bucket: String) = onResult<Long> { co ->
+        val musicBucket = getMusicBucketByName(bucket)
+        if (musicBucket == null) {
+            co.resumeWith(Result.success(-1L))
+            return@onResult
+        }
+        val entity = MusicWithMusicBucket(
+            null,
+            musicBucket.musicBucketId,
+            musicID
+        )
+        val success = Result.success(insertMusicWithMusicBucket(entity) ?: -1)
+        co.resumeWith(success)
+    }
+
+    override fun insertMusicWithMusicBucket(musicWithMusicBucket: MusicWithMusicBucket): Long? {
+        return musicWithMusicBucketDAO.insertMusicWithMusicBucket(musicWithMusicBucket)
+    }
+
+    override fun deleteMusicWithMusicBucket(musicID: Long) {
+        musicWithMusicBucketDAO.deleteMusicWithMusicBucket(musicID)
+    }
+
+    override fun getMusicWithMusicBucket(musicBucketId: Long): List<Music> {
+        return musicWithMusicBucketDAO.getMusicWithMusicBucket(musicBucketId) ?: mutableListOf()
+    }
+
+    override fun getMusicBucketWithMusic(musicID: Long): List<MusicBucket> {
+        return musicWithMusicBucketDAO.getMusicBucketWithMusic(musicID) ?: mutableListOf()
+    }
 
 }
 

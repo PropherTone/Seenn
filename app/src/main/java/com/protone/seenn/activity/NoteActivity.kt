@@ -10,7 +10,7 @@ import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.root
 import com.protone.database.room.entity.Note
-import com.protone.database.room.entity.NoteType
+import com.protone.database.room.entity.NoteDir
 import com.protone.seen.R
 import com.protone.seen.adapter.NoteListAdapter
 import com.protone.seen.adapter.NoteTypeListAdapter
@@ -61,7 +61,7 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
             }
         }
         addNoteType {
-            startActivity(NoteEditActivity::class.intent.putExtra(NoteEditViewModel.NOTE_TYPE, it))
+            startActivity(NoteEditActivity::class.intent.putExtra(NoteEditViewModel.NOTE_DIR, it))
         }
         onTypeSelected { type ->
             refreshNoteList(viewModel.getNoteList(type))
@@ -76,11 +76,10 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
         titleDialog(getString(R.string.add_dir), "") { re ->
             if (re.isNotEmpty()) {
                 launch(Dispatchers.IO) {
-                    viewModel.insertNoteType(re, "").let { pair ->
+                    viewModel.insertNoteDir(re, "").let { pair ->
                         if (pair.first) {
-                            if (binding.noteBucketList.adapter is NoteTypeListAdapter)
-                                (binding.noteBucketList.adapter as NoteTypeListAdapter)
-                                    .insertNoteType(NoteType(pair.second, ""))
+                            (binding.noteBucketList.adapter as NoteTypeListAdapter)
+                                .insertNoteDir(NoteDir(pair.second, ""))
                         } else {
                             withContext(Dispatchers.Main) {
                                 R.string.failed_msg.getString().toast()
@@ -133,7 +132,7 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
         (binding.noteList.adapter as NoteListAdapter?)?.setNoteList(list)
     }
 
-    private fun refreshNoteType(list: List<NoteType>) {
+    private fun refreshNoteType(list: List<NoteDir>) {
         if (binding.noteBucketList.adapter is NoteTypeListAdapter)
             (binding.noteBucketList.adapter as NoteTypeListAdapter).setNoteTypeList(list)
     }

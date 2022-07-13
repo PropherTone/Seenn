@@ -2,6 +2,7 @@ package com.protone.seenn.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.streams.toList
 
 class GalleySearchViewModel : ViewModel() {
 
@@ -47,11 +49,15 @@ class GalleySearchViewModel : ViewModel() {
             }
             launch(Dispatchers.IO) {
                 data.asFlow().filter {
-                    it.notes?.contains(input) == true
-                            || it.notes?.contains(lowercase) == true
-                            || it.notes?.contains(uppercase) == true
-                            || it.notes?.stream()
-                        ?.anyMatch { name -> name.contains(input, true) } == true
+                    val notesWithGalley =
+                        DataBaseDAOHelper.getNotesWithGalley(it.mediaId ?: 0).stream().map { note ->
+                            note.title
+                        }.toList()
+                    notesWithGalley.contains(input)
+                            || notesWithGalley.contains(lowercase)
+                            || notesWithGalley.contains(uppercase)
+                            || notesWithGalley.stream()
+                        .anyMatch { name -> name.contains(input, true) }
                 }.buffer().toList().let { noteFilterList ->
                     onQueryListener?.onNoteResult(noteFilterList as MutableList<GalleyMedia>)
                     cancel()

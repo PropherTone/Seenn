@@ -12,7 +12,7 @@ import com.protone.database.room.converters.UriTypeConverter
 @TypeConverters(UriTypeConverter::class, ListTypeConverter::class)
 data class GalleyMedia(
     @PrimaryKey(autoGenerate = true)
-    val id: Long?,
+    val mediaId: Long?,
     var name: String,
     var path : String?,
     var bucket: String,
@@ -23,11 +23,11 @@ data class GalleyMedia(
     var date: Long,
     val thumbnailUri: Uri?,
     val duration: Long,
-    val isVideo: Boolean,
-    var notes : List<String>?
+    val isVideo: Boolean
 ) {
+
     override fun toString(): String {
-        return "GalleyMedia(id=$id, name='$name', bucket='$bucket', size=$size, type='$type', cate='$cate', uri=$uri, date=$date, thumbnailUri=$thumbnailUri, duration=$duration, isVideo=$isVideo)"
+        return "GalleyMedia(id=$mediaId, name='$name', bucket='$bucket', size=$size, type='$type', cate='$cate', uri=$uri, date=$date, thumbnailUri=$thumbnailUri, duration=$duration, isVideo=$isVideo)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -59,7 +59,6 @@ data class GalleyMedia(
         result = 31 * result + (thumbnailUri?.hashCode() ?: 0)
         result = 31 * result + duration.hashCode()
         result = 31 * result + isVideo.hashCode()
-        result = 31 * result + (notes?.hashCode() ?: 0)
         return result
     }
 

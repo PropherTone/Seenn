@@ -25,3 +25,15 @@ fun getMusicDAO(): MusicDAO {
 fun getGalleyBucketDAO(): GalleyBucketDAO {
     return SeennDataBase.database.getGalleyBucketDAO()
 }
+
+fun getGalleriesWithNotesDAO(): GalleriesWithNotesDAO {
+    return SeennDataBase.database.getGalleriesWithNotesDAO()
+}
+
+fun getNoteDirWithNoteDAO(): NoteDirWithNoteDAO {
+    return SeennDataBase.database.getNoteDirWithNoteDAO()
+}
+
+fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO {
+    return SeennDataBase.database.getMusicWithMusicBucket()
+}

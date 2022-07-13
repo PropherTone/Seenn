@@ -114,7 +114,7 @@ class GalleyViewActivity :
                 )
             }
         }
-        setNotes(((galleyMedia?.notes ?: mutableListOf()) as MutableList<String>))
+        setNotes(getNotesWithGalley(galleyMedia?.mediaId))
     }
 
     private fun GalleyViewViewModel.setMediaInfo(position: Int) = galleyMedias[position].let { m ->

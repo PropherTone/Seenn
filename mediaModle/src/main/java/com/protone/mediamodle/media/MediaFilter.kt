@@ -54,8 +54,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
                         uri,
                         dateTime,
                         thumbnailUri, 0,
-                        false,
-                        null
+                        false
                     )
                 )
                 return
@@ -108,8 +107,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
                         uri,
                         dateTime,
                         thumbnailUri, duration,
-                        true,
-                        null
+                        true
                     )
                 )
                 return
@@ -234,8 +232,7 @@ inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)): MutableMap<Strin
                 uri,
                 dateTime,
                 thumbnailUri, 0,
-                false,
-                null
+                false
             ).let { gm ->
                 function.invoke(gm.uri, gm)
                 galley[bucketName]?.add(gm)
@@ -295,8 +292,7 @@ inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)): MutableMap<String,
                 uri,
                 dateTime,
                 thumbnailUri, duration,
-                true,
-                null
+                true
             ).let { gm ->
                 function.invoke(gm.uri, gm)
                 galley[bucketName]?.add(gm)

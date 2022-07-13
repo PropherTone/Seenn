@@ -9,9 +9,8 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
-import android.widget.Toast
 import com.protone.api.baseType.getString
-import com.protone.api.context.onUiThread
+import com.protone.api.baseType.toast
 import com.protone.api.context.workIntentFilter
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMulti
@@ -36,8 +35,9 @@ import com.protone.seenn.broadcast.MediaContentObserver
 import com.protone.seenn.broadcast.WorkReceiver
 import com.protone.seenn.broadcast.workLocalBroadCast
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import java.util.function.Consumer
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import java.util.stream.Collectors
 
 class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) {
@@ -105,28 +105,25 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         val cacheList = arrayListOf<Music>().apply { addAll(music) }
         val cacheAllMusic = arrayListOf<Music>()
         val allMusic = (getAllMusic() as ArrayList?)?.also { cacheAllMusic.addAll(it) }
-        val allMusicBucket = getAllMusicBucket().let { l ->
-            (l as ArrayList).filter {
-                it.name != R.string.all_music.getString()
-            }
-        }
-        allMusicBucket.forEach { (name) -> musicBucket[name] = ArrayList() }
-        allMusic?.also {
-            it.asFlow().onEach { music ->
-                music.myBucket.forEach(Consumer {
-                    musicBucket[it]?.add(music)
-                })
-            }.buffer().collect { music ->
-                if (cacheList.contains(music)) {
-                    cacheList.remove(music)
-                    cacheAllMusic.remove(music)
-                }
+        allMusic?.forEach { music ->
+            if (cacheList.contains(music)) {
+                cacheList.remove(music)
+                cacheAllMusic.remove(music)
             }
         }
         if (cacheList.size > 0) {
             insertMusicMulti(cacheList)
         } else if (cacheAllMusic.size > 0) {
             deleteMusicMulti(cacheAllMusic)
+        }
+        val allMusicBucket = getAllMusicBucket().let { l ->
+            (l as ArrayList).filter {
+                it.name != R.string.all_music.getString()
+            }
+        }
+        allMusicBucket.forEach {
+            musicBucket[it.name] =
+                DataBaseDAOHelper.getMusicWithMusicBucket(it.musicBucketId) as MutableList<Music>
         }
         getAllMusicRs()?.let {
             music = it as MutableList<Music>
@@ -242,8 +239,6 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
     }
 
     private fun makeToast(msg: String) {
-        this.onUiThread {
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-        }
+        msg.toast()
     }
 }

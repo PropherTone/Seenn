@@ -5,9 +5,9 @@ import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
+import com.protone.api.baseType.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
-import com.protone.database.room.entity.NoteType
+import com.protone.database.room.entity.NoteDir
 import com.protone.seen.R
 import com.protone.seen.databinding.NoteTpyeListAdapterBinding
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +17,7 @@ class NoteTypeListAdapter(
     context: Context,
 ) : BaseAdapter<NoteTpyeListAdapterBinding>(context) {
 
-    private val noteTypeList = arrayListOf<NoteType>()
+    private val noteDirList = arrayListOf<NoteDir>()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -44,48 +44,46 @@ class NoteTypeListAdapter(
                 AlertDialog.Builder(context).setPositiveButton(
                     context.getString(R.string.confirm)
                 ) { dialog, _ ->
-                    val noteType = noteTypeList[position]
+                    val noteType = noteDirList[position]
                     DataBaseDAOHelper.execute {
-                        val re = DataBaseDAOHelper.doDeleteNoteTypeRs(noteType)
-                        if (re) {
-                            val index = noteTypeList.indexOf(noteType)
-                            noteTypeList.removeAt(index)
-                            withContext(Dispatchers.Main) {
-                                notifyItemRemoved(index)
-                            }
-                        } else withContext(Dispatchers.Main) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.failed_msg),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        DataBaseDAOHelper.doDeleteNoteDirRs(noteType)
+                        val index = noteDirList.indexOf(noteType)
+                        noteDirList.removeAt(index)
+                        withContext(Dispatchers.Main) {
+                            notifyItemRemoved(index)
                         }
                     }
                     dialog.dismiss()
-                }.setNegativeButton(context.getString(R.string.cancel)) { dialog, _ ->
+                }.setNegativeButton(R.string.cancel.getString()) { dialog, _ ->
                     dialog.dismiss()
-                }.setTitle(context.getString(R.string.delete)).create().show()
+                }.setTitle(R.string.delete.getString()).create().show()
                 return@setOnLongClickListener false
             }
-            noteTypeName.text = noteTypeList[holder.layoutPosition].type
+            noteTypeName.text = noteDirList[holder.layoutPosition].name
             noteTypeAddNote.setOnClickListener {
                 addNote?.invoke(noteTypeName.text.toString())
             }
         }
     }
 
-    override fun getItemCount(): Int = noteTypeList.size
+    override fun getItemCount(): Int = noteDirList.size
 
-    fun insertNoteType(noteType: NoteType) {
-        noteTypeList.add(noteType)
-        notifyItemInserted(noteTypeList.size)
+    fun insertNoteDir(noteDir: NoteDir) {
+        noteDirList.add(noteDir)
+        notifyItemInserted(noteDirList.size)
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setNoteTypeList(list: List<NoteType>) {
-        noteTypeList.clear()
-        noteTypeList.add(NoteType(context.getString(R.string.all), ""))
-        noteTypeList.addAll(list)
+    fun setNoteTypeList(list: List<NoteDir>) {
+        noteDirList.clear()
+        noteDirList.add(
+            NoteDir(
+                context.getString(
+                    R.string.all
+                ), ""
+            )
+        )
+        noteDirList.addAll(list)
         notifyDataSetChanged()
     }
 

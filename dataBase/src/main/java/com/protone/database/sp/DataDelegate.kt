@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class DataProvider(private val dataStore: DataStore<Preferences>) : Sp,
+class DataDelegate(private val dataStore: DataStore<Preferences>) : ISp,
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
     override fun setInt(key: String, value: Int) {
         launch {
@@ -85,8 +85,4 @@ class DataProvider(private val dataStore: DataStore<Preferences>) : Sp,
         }
     }
 
-}
-
-fun DataStore<Preferences>.toDataProvider(): DataProvider {
-    return DataProvider(this)
 }

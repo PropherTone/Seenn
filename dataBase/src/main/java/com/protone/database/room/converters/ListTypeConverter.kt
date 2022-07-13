@@ -14,7 +14,7 @@ class ListTypeConverter {
     @TypeConverter
     fun objectToString(list: List<String>?): String {
         val sb = StringBuilder()
-        list?.stream()?.forEach { sb.append("$it|") }
+        list?.forEach { sb.append("$it|") }
         return sb.toString()
     }
 }

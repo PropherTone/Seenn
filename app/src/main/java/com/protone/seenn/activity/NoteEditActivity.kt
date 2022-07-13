@@ -15,7 +15,6 @@ import com.protone.api.context.*
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
-import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
 import com.protone.mediamodle.note.entity.*
@@ -170,13 +169,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
                     re.date.toDateString().toString()
                 )
             )
-            re.apply {
-                if (notes == null) notes = mutableListOf()
-                (notes as MutableList<String>).add(title)
-            }
-            withContext(Dispatchers.IO) {
-                DataBaseDAOHelper.updateSignedMedia(re)
-            }
+            medias.add(re)
         }
     }
 
@@ -195,7 +188,6 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             indexedRichNote.second,
             savedIconPath,
             System.currentTimeMillis(),
-            mutableListOf(intent.getStringExtra(NoteEditViewModel.NOTE_TYPE)),
             indexedRichNote.first
         )
         if (onEdit) {
@@ -213,7 +205,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             copyNote(inNote, note)
             val re = updateNote(inNote)
             if (re == null && re == -1) {
-                insertNote(inNote).let { result ->
+                insertNote(inNote,intent.getStringExtra(NoteEditViewModel.NOTE_DIR)).let { result ->
                     if (result) {
                         setResult(
                             RESULT_OK,
@@ -227,7 +219,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
                 finish()
             }
         } else {
-            if (insertNote(note)) finish()
+            if (insertNote(note,intent.getStringExtra(NoteEditViewModel.NOTE_DIR))) finish()
             else R.string.failed_msg.getString().toast()
         }
     }

@@ -10,9 +10,9 @@ interface NoteDAO {
     fun getAllNote(): List<Note>?
 
     @Insert
-    fun insertNote(note: Note)
+    fun insertNote(note: Note): Long
 
-    @Query("SELECT * FROM Note WHERE Title LIKE :name")
+    @Query("SELECT * FROM Note WHERE Note_Title LIKE :name")
     fun getNoteByName(name: String): Note?
 
     @Update

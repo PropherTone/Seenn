@@ -25,7 +25,7 @@ data class Music(
     var myBucket: List<String>
 ) {
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
+    var musicID: Long = 0
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import com.protone.api.context.SApplication
 import com.protone.database.R
+import com.protone.database.sp.DataDelegate
 import com.protone.database.sp.DataTool
-import com.protone.database.sp.toDataProvider
 
 val userConfig = UserConfig(SApplication.app)
 
@@ -13,8 +13,7 @@ class UserConfig(context: Context) {
 
     private val Context.dataProvider by preferencesDataStore(name = "USER_CONFIG")
 
-    private val config =
-        DataTool(context.dataProvider.toDataProvider())
+    private val config = DataTool(DataDelegate(context.dataProvider))
 
     var isFirstBoot by config.boolean("FIRST_BOOT", true)
 

@@ -8,6 +8,7 @@ import com.protone.seenn.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.stream.Collectors
+import kotlin.streams.toList
 
 class GalleyViewViewModel : ViewModel() {
 
@@ -37,4 +38,15 @@ class GalleyViewViewModel : ViewModel() {
     suspend fun getSignedMedia() = DataBaseDAOHelper.getSignedMediaRs(galleyMedias[curPosition].uri)
 
     fun getCurrentMedia() = galleyMedias[curPosition]
+
+    suspend fun getNotesWithGalley(mediaId: Long?): MutableList<String> =
+        withContext(Dispatchers.IO) {
+            mediaId?.let {
+                DataBaseDAOHelper.getNotesWithGalley(it).stream().map { note ->
+                    note.title
+                }.toList() as MutableList<String>
+            } ?: mutableListOf()
+        }
+
+
 }

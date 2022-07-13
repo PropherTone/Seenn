@@ -16,7 +16,7 @@ data class MusicBucket(
     var date: String?
 ) {
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
+    var musicBucketId: Long = 0
 
     @Ignore
     constructor() : this("", null, 0, null, null)
@@ -44,7 +44,7 @@ data class MusicBucket(
     }
 
     override fun toString(): String {
-        return "MusicBucket(name='$name', icon=$icon, size=$size, detail=$detail, date=$date, id=$id)"
+        return "MusicBucket(name='$name', icon=$icon, size=$size, detail=$detail, date=$date, id=$musicBucketId)"
     }
 
 

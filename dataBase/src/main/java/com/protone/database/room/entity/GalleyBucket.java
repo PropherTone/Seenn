@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 public class GalleyBucket {
 
     @PrimaryKey(autoGenerate = true)
-    Integer _ID;
+    Long galleyBucketId;
 
     String type;
 
@@ -18,12 +18,12 @@ public class GalleyBucket {
         this.image = image;
     }
 
-    public Integer get_ID() {
-        return _ID;
+    public Long getGalleyBucketId() {
+        return galleyBucketId;
     }
 
-    public void set_ID(Integer _ID) {
-        this._ID = _ID;
+    public void setGalleyBucketId(Long galleyBucketId) {
+        this.galleyBucketId = galleyBucketId;
     }
 
     public String getType() {

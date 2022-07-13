@@ -1,14 +1,12 @@
 package com.protone.seenn.viewModel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.protone.api.context.SApplication
+import com.protone.api.baseType.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Note
-import com.protone.database.room.entity.NoteType
+import com.protone.database.room.entity.NoteDir
 import com.protone.seen.R
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.suspendCoroutine
 
@@ -25,38 +23,20 @@ class NoteViewModel : ViewModel() {
 
     fun getNoteList(type: String?) = noteList[type.also { selected = it }] ?: mutableListOf()
 
-    fun deleteNote(note: Note) = DataBaseDAOHelper.run {
-        deleteNote(note)
-        viewModelScope.launch(Dispatchers.IO) {
-            getAllSignedMedia()?.forEach {
-                it.notes?.let { notes ->
-                    val index = notes.indexOf(note.title)
-                    if (index != -1) {
-                        notes as MutableList<String>
-                        notes.removeAt(index)
-                        updateSignedMedia(it)
-                    }
-                }
-            }
-        }
-    }
+    fun deleteNote(note: Note) = DataBaseDAOHelper.deleteNote(note)
+
 
     suspend fun queryAllNote() = withContext(Dispatchers.IO) {
         suspendCoroutine<MutableList<Note>> { co ->
-            DataBaseDAOHelper.getAllNote()?.let {
-                noteList[SApplication.app.getString(R.string.all).also { s ->
+            DataBaseDAOHelper.getALLNoteDir()?.let {
+                noteList[R.string.all.getString().also { s ->
                     selected = s
-                }] = mutableListOf<Note>().apply { addAll(it) }
-                it.forEach { note ->
-                    note.type.forEach { type ->
-                        if (noteList[type] == null) {
-                            noteList[type] = mutableListOf()
-                        }
-                        if (type != SApplication.app.getString(R.string.all) && noteList[type]?.contains(
-                                note
-                            ) == false
-                        ) noteList[type]?.add(note)
-                    }
+                }] = mutableListOf<Note>().apply {
+                    addAll(DataBaseDAOHelper.getAllNote() ?: mutableListOf())
+                }
+                it.forEach { noteDir ->
+                    noteList[noteDir.name] =
+                        DataBaseDAOHelper.getNotesWithNoteDir(noteDir.noteDirId) as MutableList<Note>
                 }
                 co.resumeWith(Result.success(noteList[selected] ?: mutableListOf()))
             }
@@ -64,15 +44,20 @@ class NoteViewModel : ViewModel() {
     }
 
     suspend fun queryAllNoteType() = withContext(Dispatchers.IO) {
-        suspendCoroutine<MutableList<NoteType>> { co ->
+        suspendCoroutine<MutableList<NoteDir>> { co ->
             co.resumeWith(
                 Result.success(
-                    (DataBaseDAOHelper.getALLNoteType() ?: mutableListOf()) as MutableList<NoteType>
+                    (DataBaseDAOHelper.getALLNoteDir() ?: mutableListOf()) as MutableList<NoteDir>
                 )
             )
         }
     }
 
-    suspend fun insertNoteType(type: String?, image: String?) =
-        DataBaseDAOHelper.insertNoteTypeRs(NoteType(type, image))
+    suspend fun insertNoteDir(type: String?, image: String?) =
+        DataBaseDAOHelper.insertNoteDirRs(
+            NoteDir(
+                type,
+                image
+            )
+        )
 }

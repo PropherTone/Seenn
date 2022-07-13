@@ -4,20 +4,20 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.protone.database.room.entity.NoteType
+import com.protone.database.room.entity.NoteDir
 
 @Dao
 interface NoteTypeDAO {
 
     @Insert
-    fun insertNoteType(noteType: NoteType)
+    fun insertNoteDir(noteDir: NoteDir)
 
-    @Query("SELECT * FROM NoteType WHERE type LIKE :name")
-    fun getNoteType(name: String): NoteType?
+    @Query("SELECT * FROM NoteDir WHERE name LIKE :name")
+    fun getNoteDir(name: String): NoteDir?
 
     @Delete
-    fun deleteNoteType(noteType: NoteType)
+    fun deleteNoteDir(noteDir: NoteDir)
 
-    @Query("SELECT * FROM NoteType")
-    fun getALLNoteType(): List<NoteType>?
+    @Query("SELECT * FROM NoteDir")
+    fun getALLNoteDir(): List<NoteDir>?
 }

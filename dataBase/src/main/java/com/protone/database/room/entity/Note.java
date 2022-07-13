@@ -1,5 +1,6 @@
 package com.protone.database.room.entity;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -15,52 +16,41 @@ import java.util.List;
 public class Note {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "ID")
-    public int id;
+    public int noteId;
 
-    @ColumnInfo(name = "Title")
+    @ColumnInfo(name = "Note_Title")
     public String title;
 
-    @ColumnInfo(name = "Text")
+    @ColumnInfo(name = "Note_Text")
     public String text;
 
-    @ColumnInfo(name = "TitleImage")
+    @ColumnInfo(name = "Note_TitleImage")
     public String imagePath;
 
-    @ColumnInfo(name = "Time")
+    @ColumnInfo(name = "Note_Time")
     public Long time;
 
-    public List<String> type;
-
+    @ColumnInfo(name = "Note_RichCode")
     public int richCode;
 
     @Ignore
     public Note() {
     }
 
-    public Note(String title, String text, String imagePath, Long time, List<String> type, int richCode) {
+    public Note(String title, String text, String imagePath, Long time, int richCode) {
         this.title = title;
         this.text = text;
         this.imagePath = imagePath;
         this.time = time;
-        this.type = type;
         this.richCode = richCode;
     }
 
-    public List<String> getType() {
-        return type;
+    public int getNoteId() {
+        return noteId;
     }
 
-    public void setType(List<String> type) {
-        this.type = type;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public void setNoteId(int noteId) {
+        this.noteId = noteId;
     }
 
     public String getTitle() {
@@ -110,36 +100,34 @@ public class Note {
 
         Note note = (Note) o;
 
-        if (id != note.id) return false;
+        if (noteId != note.noteId) return false;
         if (richCode != note.richCode) return false;
         if (!title.equals(note.title)) return false;
         if (!text.equals(note.text)) return false;
         if (!imagePath.equals(note.imagePath)) return false;
-        if (!time.equals(note.time)) return false;
-        return type.equals(note.type);
+        return time.equals(note.time);
     }
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = noteId;
         result = 31 * result + title.hashCode();
         result = 31 * result + text.hashCode();
         result = 31 * result + imagePath.hashCode();
         result = 31 * result + time.hashCode();
-        result = 31 * result + type.hashCode();
         result = 31 * result + richCode;
         return result;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Note{" +
-                "id=" + id +
+                "id=" + noteId +
                 ", title='" + title + '\'' +
                 ", text='" + text + '\'' +
                 ", imagePath='" + imagePath + '\'' +
                 ", time='" + time + '\'' +
-                ", type='" + type + '\'' +
                 ", richCode=" + richCode +
                 '}';
     }

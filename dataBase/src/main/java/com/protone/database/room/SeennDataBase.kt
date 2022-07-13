@@ -6,10 +6,20 @@ import androidx.room.RoomDatabase
 import com.protone.api.context.SApplication
 import com.protone.database.room.dao.*
 import com.protone.database.room.entity.*
-import java.lang.ref.SoftReference
+import java.lang.ref.WeakReference
 
 @Database(
-    entities = [GalleyMedia::class, Note::class, NoteType::class, MusicBucket::class, Music::class, GalleyBucket::class],
+    entities = [
+        GalleyMedia::class,
+        Note::class,
+        NoteDir::class,
+        MusicBucket::class,
+        Music::class,
+        GalleyBucket::class,
+        GalleriesWithNotes::class,
+        NoteDirWithNotes::class,
+        MusicWithMusicBucket::class
+    ],
     version = 1,
     exportSchema = false
 )
@@ -20,17 +30,20 @@ abstract class SeennDataBase : RoomDatabase() {
     abstract fun getMusicBucketDAO(): MusicBucketDAO
     abstract fun getMusicDAO(): MusicDAO
     abstract fun getGalleyBucketDAO(): GalleyBucketDAO
+    abstract fun getGalleriesWithNotesDAO(): GalleriesWithNotesDAO
+    abstract fun getNoteDirWithNoteDAO(): NoteDirWithNoteDAO
+    abstract fun getMusicWithMusicBucket(): MusicWithMusicBucketDAO
 
     companion object {
         @JvmStatic
         val database: SeennDataBase
             @Synchronized get() {
                 return databaseImpl?.get() ?: init().apply {
-                    databaseImpl = SoftReference(this)
+                    databaseImpl = WeakReference(this)
                 }
             }
 
-        private var databaseImpl: SoftReference<SeennDataBase>? = null
+        private var databaseImpl: WeakReference<SeennDataBase>? = null
 
         private fun init(): SeennDataBase {
             return Room.databaseBuilder(

@@ -7,7 +7,10 @@ import com.protone.api.baseType.toMediaBitmapByteArray
 import com.protone.api.baseType.toast
 import com.protone.api.json.toUriJson
 import com.protone.database.room.dao.DataBaseDAOHelper
+import com.protone.database.room.entity.GalleriesWithNotes
+import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Note
+import com.protone.database.room.entity.NoteDirWithNotes
 import com.protone.mediamodle.GalleyHelper
 import com.protone.seenn.R
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +28,7 @@ class NoteEditViewModel : ViewModel() {
     }
 
     companion object {
-        const val NOTE_TYPE = "NoteType"
+        const val NOTE_DIR = "NoteType"
         const val NOTE = "Note"
         const val CONTENT_TITLE = "NoteContentTitle"
     }
@@ -36,6 +39,7 @@ class NoteEditViewModel : ViewModel() {
     var noteName: String? = null
     var allNote: MutableList<String>? = null
     var onEdit = false
+    var medias = arrayListOf<GalleyMedia>()
 
     suspend fun saveIcon(name: String, onResult: (Boolean) -> Unit): Unit =
         withContext(Dispatchers.IO) {
@@ -76,7 +80,6 @@ class NoteEditViewModel : ViewModel() {
 
     suspend fun copyNote(inNote: Note, note: Note) = withContext(Dispatchers.IO) {
         inNote.title = note.title
-        inNote.type = note.type
         inNote.text = note.text
         inNote.imagePath = note.imagePath
         inNote.richCode = note.richCode
@@ -87,10 +90,33 @@ class NoteEditViewModel : ViewModel() {
         DataBaseDAOHelper.updateNote(note)
     }
 
-    suspend fun insertNote(note: Note) = withContext(Dispatchers.IO) {
+    suspend fun insertNote(note: Note, dir: String?) = withContext(Dispatchers.IO) {
         DataBaseDAOHelper.insertNoteRs(note).let { result ->
             if (result.first) {
                 DataBaseDAOHelper.deleteNote(note)
+                dir?.let {
+                    val noteDir = DataBaseDAOHelper.getNoteDir(it)
+                    if (noteDir != null) {
+                        DataBaseDAOHelper.insertNoteDirWithNote(
+                            NoteDirWithNotes(
+                                null,
+                                noteDir.noteDirId,
+                                result.second
+                            )
+                        )
+                    }
+                }
+                medias.forEach {
+                    if (it.mediaId != null) {
+                        DataBaseDAOHelper.insertGalleriesWithNotes(
+                            GalleriesWithNotes(
+                                null,
+                                it.mediaId!!,
+                                result.second
+                            )
+                        )
+                    }
+                }
                 true
             } else {
                 R.string.failed_msg.getString().toast()

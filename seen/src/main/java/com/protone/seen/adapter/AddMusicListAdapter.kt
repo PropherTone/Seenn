@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.isGone
 import com.protone.api.animation.AnimationHelper
-import com.protone.api.context.newLayoutInflater
-import com.protone.api.context.onUiThread
 import com.protone.api.baseType.getDrawable
 import com.protone.api.baseType.toStringMinuteTime
+import com.protone.api.context.newLayoutInflater
+import com.protone.api.context.onUiThread
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Medias
@@ -20,7 +20,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
-class AddMusicListAdapter(context: Context, private val bucket: String, private val multiSelect: Boolean) :
+class AddMusicListAdapter(
+    context: Context,
+    private val bucket: String,
+    private val multiSelect: Boolean
+) :
     SelectListAdapter<MusicListLayoutBinding, Music>(context) {
 
     init {
@@ -61,7 +65,13 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
         parent: ViewGroup,
         viewType: Int
     ): Holder<MusicListLayoutBinding> {
-        return Holder(MusicListLayoutBinding.inflate(context.newLayoutInflater, parent, false)).apply {
+        return Holder(
+            MusicListLayoutBinding.inflate(
+                context.newLayoutInflater,
+                parent,
+                false
+            )
+        ).apply {
             binding.isLoad = true
         }
     }
@@ -76,7 +86,6 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                     viewQueue.add(position)
                     if (selectList.contains(music)) {
                         if (!multiSelect) return@setOnClickListener
-                        (music.myBucket as ArrayList).remove(bucket)
                         DataBaseDAOHelper.execute {
                             val re = DataBaseDAOHelper.updateMusicRs(music)
                             if (re != -1 && re != 0) {
@@ -91,17 +100,12 @@ class AddMusicListAdapter(context: Context, private val bucket: String, private 
                             is Animatable -> {
                                 d.start()
                                 if (multiSelect) {
-                                    music.myBucket.apply {
-                                        (this as ArrayList).add(bucket)
-                                    }
                                     DataBaseDAOHelper.execute {
-                                        val re = DataBaseDAOHelper.updateMusicRs(music)
-                                        if (re != -1 && re != 0) {
+                                        val re = DataBaseDAOHelper
+                                            .insertMusicWithMusicBucket(music.musicID, bucket)
+                                        if (re != -1L) {
                                             changeIconAni(musicListPlayState)
                                         } else {
-                                            music.myBucket.apply {
-                                                (this as ArrayList).remove(bucket)
-                                            }
                                             selectList.remove(music)
                                             notifyItemChanged()
                                         }
