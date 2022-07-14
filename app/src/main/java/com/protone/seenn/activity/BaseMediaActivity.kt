@@ -208,7 +208,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
                     (g.cate as MutableList).add(cate)
                 }
             }
-            DataBaseDAOHelper.updateMediaMulti(list)
+            DataBaseDAOHelper.updateMediaMultiAsync(list)
         }
     }
 
@@ -237,7 +237,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
                             (it.type as MutableList<String>).add(re)
                         else "${it.name}已存在${it.type}中".toast()
                     }
-                    DataBaseDAOHelper.updateMediaMulti(list)
+                    DataBaseDAOHelper.updateMediaMultiAsync(list)
                     callback.invoke(re, list)
                 }
             } else R.string.none.getString().toast()

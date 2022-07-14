@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
@@ -16,7 +17,8 @@ import java.util.List;
 public class Note {
 
     @PrimaryKey(autoGenerate = true)
-    public int noteId;
+    @ColumnInfo(name = "noteId")
+    public Long noteId;
 
     @ColumnInfo(name = "Note_Title")
     public String title;
@@ -45,11 +47,11 @@ public class Note {
         this.richCode = richCode;
     }
 
-    public int getNoteId() {
+    public Long getNoteId() {
         return noteId;
     }
 
-    public void setNoteId(int noteId) {
+    public void setNoteId(Long noteId) {
         this.noteId = noteId;
     }
 
@@ -100,7 +102,7 @@ public class Note {
 
         Note note = (Note) o;
 
-        if (noteId != note.noteId) return false;
+        if (!noteId.equals(note.noteId)) return false;
         if (richCode != note.richCode) return false;
         if (!title.equals(note.title)) return false;
         if (!text.equals(note.text)) return false;
@@ -110,7 +112,7 @@ public class Note {
 
     @Override
     public int hashCode() {
-        int result = noteId;
+        int result = noteId != null ? noteId.hashCode() : 0;
         result = 31 * result + title.hashCode();
         result = 31 * result + text.hashCode();
         result = 31 * result + imagePath.hashCode();

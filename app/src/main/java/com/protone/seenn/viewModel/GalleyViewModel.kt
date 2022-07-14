@@ -34,7 +34,7 @@ class GalleyViewModel : ViewModel(), TabLayout.OnTabSelectedListener {
 
     var rightMailer = 0
 
-    var onChangeName = false
+    var onTransaction = false
 
     private val mailers = arrayOfNulls<FragMailer>(2)
 
@@ -73,6 +73,10 @@ class GalleyViewModel : ViewModel(), TabLayout.OnTabSelectedListener {
 
     fun deleteMedia(media: GalleyMedia) {
         mailers[rightMailer]?.deleteMedia(media)
+    }
+
+    fun onUpdate(updateList: ArrayList<GalleyMedia>) {
+        mailers[rightMailer]?.onGalleyUpdate(updateList)
     }
 
     fun addBucket(name: String, list: MutableList<GalleyMedia>) {

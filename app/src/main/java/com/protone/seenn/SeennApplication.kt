@@ -23,4 +23,5 @@ class SeennApplication : Application() {
             else "${base?.externalCacheDir?.path}/s_crash_log_${todayDate}.txt"
 
     }
+
 }

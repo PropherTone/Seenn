@@ -64,11 +64,11 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
 
         initPager()
 
-        Medias.mediaLive.observe(this@GalleyActivity) {
-            if (it == Medias.GALLEY_UPDATED && !onChangeName) {
-                initPager()
+        Medias.galleyLive.observe(this@GalleyActivity) {
+            if (!onTransaction) {
+                onUpdate(it)
             }
-            onChangeName = false
+            onTransaction = false
         }
 
         chooseData.observe(this@GalleyActivity) {
@@ -135,6 +135,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
 
     override fun popDelete() {
         viewModel.chooseData()?.let {
+            viewModel.onTransaction = true
             tryDelete(it) { re ->
                 viewModel.deleteMedia(re)
             }
@@ -151,7 +152,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
 
     override fun popRename() {
         viewModel.chooseData()?.let {
-            viewModel.onChangeName = true
+            viewModel.onTransaction = true
             tryRename(it)
         }
     }

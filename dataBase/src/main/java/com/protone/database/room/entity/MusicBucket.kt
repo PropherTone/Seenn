@@ -1,9 +1,6 @@
 package com.protone.database.room.entity
 
-import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.protone.database.room.converters.UriTypeConverter
 
 @Entity
@@ -16,6 +13,7 @@ data class MusicBucket(
     var date: String?
 ) {
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "musicBucketId")
     var musicBucketId: Long = 0
 
     @Ignore

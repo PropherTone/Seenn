@@ -165,12 +165,12 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         finishMusic()
         unregisterReceiver(receiver)
         unregisterReceiver(appReceiver)
         musicBroadCastManager.unregisterReceiver(receiver)
         cancel()
+        super.onDestroy()
     }
 
     @Suppress("DEPRECATION")
@@ -292,7 +292,6 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
             if (++playPosition > playList.size - 1) playPosition = 0
             finishMusic()
             play()
-//            currentMusic.postValue(playList[playPosition])
         }
     }
 
@@ -302,7 +301,6 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
             if (--playPosition <= 0) playPosition = playList.size - 1
             finishMusic()
             play()
-//            currentMusic.postValue(playList[playPosition])
         }
     }
 
@@ -413,8 +411,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         null,
         0L,
         0L,
-        Uri.EMPTY,
-        mutableListOf()
+        Uri.EMPTY
     )
 }
 

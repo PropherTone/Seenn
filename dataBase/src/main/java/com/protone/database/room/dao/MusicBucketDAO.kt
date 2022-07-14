@@ -6,7 +6,7 @@ import com.protone.database.room.entity.MusicBucket
 @Dao
 interface MusicBucketDAO {
 
-    @Query("SELECT * FROM MusicBucket")
+    @Query("SELECT * FROM MusicBucket ORDER BY date ASC")
     fun getAllMusicBucket(): List<MusicBucket>?
 
     @Query("SELECT * FROM MusicBucket WHERE name LIKE :name")

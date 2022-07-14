@@ -176,8 +176,7 @@ inline fun scanAudioWithUri(mediaUri: Uri, callBack: (Music) -> Unit) {
                     audioName,
                     audioDuration,
                     audioYear,
-                    uri,
-                    arrayListOf()
+                    uri
                 )
             )
             return
@@ -363,10 +362,9 @@ inline fun scanAudio(function: ((Uri, Music) -> Unit)): MutableList<Music> {
                     audioName,
                     audioDuration,
                     audioYear,
-                    uri,
-                    arrayListOf()
-                ).also {
-                    function.invoke(uri, it)
+                    uri
+                ).also { music->
+                    function.invoke(uri, music)
                 }
             )
         }

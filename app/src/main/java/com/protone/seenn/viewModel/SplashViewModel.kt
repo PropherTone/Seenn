@@ -19,7 +19,7 @@ class SplashViewModel : ViewModel() {
 
     fun firstBootWork(){
         if (userConfig.isFirstBoot) {
-            DataBaseDAOHelper.addMusicBucketThread(
+            DataBaseDAOHelper.addMusicBucketAsync(
                 MusicBucket(
                     R.string.all_music.getString(),
                     if (Medias.music.size > 0) Medias.music[0].uri.saveToFile(
@@ -31,7 +31,7 @@ class SplashViewModel : ViewModel() {
                     todayDate("yyyy/MM/dd")
                 )
             )
-            DataBaseDAOHelper.insertMusicMulti(Medias.music)
+            DataBaseDAOHelper.insertMusicMultiAsync(Medias.music)
             userConfig.apply {
                 isFirstBoot = false
                 lastMusicBucket = R.string.all_music.getString()

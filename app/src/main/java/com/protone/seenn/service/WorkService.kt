@@ -13,18 +13,16 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.workIntentFilter
 import com.protone.database.room.dao.DataBaseDAOHelper
-import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMulti
+import com.protone.database.room.dao.DataBaseDAOHelper.deleteMusicMultiAsync
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusic
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusicBucket
 import com.protone.database.room.dao.DataBaseDAOHelper.getAllMusicRs
 import com.protone.database.room.dao.DataBaseDAOHelper.getMusicBucketByName
-import com.protone.database.room.dao.DataBaseDAOHelper.insertMusicMulti
-import com.protone.database.room.dao.DataBaseDAOHelper.updateMusicBucketBack
+import com.protone.database.room.dao.DataBaseDAOHelper.updateMusicBucketAsync
 import com.protone.database.room.entity.GalleyMedia
 import com.protone.database.room.entity.Music
-import com.protone.mediamodle.Medias.AUDIO_UPDATED
-import com.protone.mediamodle.Medias.GALLEY_UPDATED
-import com.protone.mediamodle.Medias.mediaLive
+import com.protone.mediamodle.Medias.audioLive
+import com.protone.mediamodle.Medias.galleyLive
 import com.protone.mediamodle.Medias.music
 import com.protone.mediamodle.Medias.musicBucket
 import com.protone.mediamodle.Medias.musicBucketLive
@@ -102,20 +100,6 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
     }
 
     private fun updateMusicBucket() = launch(Dispatchers.IO) {
-        val cacheList = arrayListOf<Music>().apply { addAll(music) }
-        val cacheAllMusic = arrayListOf<Music>()
-        val allMusic = (getAllMusic() as ArrayList?)?.also { cacheAllMusic.addAll(it) }
-        allMusic?.forEach { music ->
-            if (cacheList.contains(music)) {
-                cacheList.remove(music)
-                cacheAllMusic.remove(music)
-            }
-        }
-        if (cacheList.size > 0) {
-            insertMusicMulti(cacheList)
-        } else if (cacheAllMusic.size > 0) {
-            deleteMusicMulti(cacheAllMusic)
-        }
         val allMusicBucket = getAllMusicBucket().let { l ->
             (l as ArrayList).filter {
                 it.name != R.string.all_music.getString()
@@ -132,7 +116,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             getMusicBucketByName(it)?.let { mb ->
                 musicBucket[it]?.size?.let { size ->
                     mb.size = size
-                    updateMusicBucketBack(mb)
+                    updateMusicBucketAsync(mb)
                 }
             }
         }
@@ -144,41 +128,50 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
     private fun updateMusic(uri: Uri) {
         scanAudioWithUri(uri) {
             DataBaseDAOHelper.insertMusic(it)
-            mediaLive.postValue(AUDIO_UPDATED)
+            audioLive.postValue(arrayListOf(it))
         }
+        updateMusicBucket()
         makeToast("音乐更新完毕")
     }
 
     private fun updateMusic() {
-        fun sortMusic(allMusic: MutableList<Music>, music: Music) {
-            allMusic.stream().filter { it.uri == music.uri }
-                .collect(Collectors.toList()).let { list ->
-                    if (list.size > 0) allMusic.remove(list[0])
-                }
+        fun sortMusic(allMusic: MutableList<Music>, music: Music): Boolean {
+            val index = allMusic.indexOf(music)
+            if (index != -1) {
+                allMusic.removeAt(index)
+                return true
+            }
+            return false
         }
         launch(Dispatchers.IO) {
             val allMusic = getAllMusic() as MutableList
             flow {
                 scanAudio { _, music ->
-                    emit(music)
-                    DataBaseDAOHelper.insertMusicCheck(music)
+                    if (sortMusic(allMusic, music)) {
+                        emit(music)
+                    }
                 }
             }.buffer().collect {
-                synchronized(allMusic) { sortMusic(allMusic, it) }
+                DataBaseDAOHelper.insertMusic(it)
             }
-            deleteMusicMulti(allMusic)
-            mediaLive.postValue(AUDIO_UPDATED)
-            makeToast("音乐更新完毕")
+            deleteMusicMultiAsync(allMusic)
+            if (allMusic.size != 0) {
+                updateMusicBucket()
+                audioLive.postValue(allMusic as ArrayList<Music>)
+                makeToast("音乐更新完毕")
+            }
             cancel()
         }
     }
 
     private fun updateGalley(uri: Uri) = launch(Dispatchers.IO) {
         scanGalleyWithUri(uri) {
-            DataBaseDAOHelper.insertSignedMedia(it)
-            mediaLive.postValue(GALLEY_UPDATED)
+            val checkedMedia = DataBaseDAOHelper.insertSignedMediaChecked(it)
+            if (checkedMedia != null) {
+                galleyLive.postValue(arrayListOf(checkedMedia))
+                makeToast("相册更新完毕")
+            }
         }
-        makeToast("相册更新完毕")
         cancel()
     }
 
@@ -189,6 +182,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                     if (list.size > 0) allSignedMedia.remove(list[0])
                 }
         }
+        val updatedMedia = arrayListOf<GalleyMedia>()
         launch(Dispatchers.IO) {
             val allSignedMedia = getAllSignedMedia() as MutableList
             val scanPicture = async {
@@ -197,9 +191,12 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                         emit(galleyMedia)
                     }
                 }.buffer().collect {
-                    sortSignedMedia(it)
+                    val checkedMedia = insertSignedMediaChecked(it)
                     synchronized(allSignedMedia) {
                         sortMedia(allSignedMedia, it)
+                    }
+                    if (checkedMedia != null && !updatedMedia.contains(checkedMedia)) {
+                        updatedMedia.add(checkedMedia)
                     }
                 }
             }
@@ -209,17 +206,24 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                         emit(galleyMedia)
                     }
                 }.buffer().collect {
-                    sortSignedMedia(it)
+                    val checkedMedia = insertSignedMediaChecked(it)
                     synchronized(allSignedMedia) {
                         sortMedia(allSignedMedia, it)
                     }
+                    if (checkedMedia != null && !updatedMedia.contains(checkedMedia)) {
+                        updatedMedia.add(checkedMedia)
+                    }
                 }
+
             }
             scanPicture.await()
             scanVideo.await()
-            deleteSignedMedias(allSignedMedia)
-            mediaLive.postValue(GALLEY_UPDATED)
-            makeToast("相册更新完毕")
+            updatedMedia.addAll(allSignedMedia)
+            deleteSignedMediaMultiAsync(allSignedMedia)
+            if (updatedMedia.size != 0) {
+                galleyLive.postValue(updatedMedia)
+                makeToast("相册更新完毕")
+            }
             cancel()
         }
     }

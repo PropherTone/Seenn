@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.animation.AnimationHelper
+import com.protone.api.baseType.getString
 import com.protone.api.context.intent
 import com.protone.api.context.onUiThread
 import com.protone.database.room.dao.DataBaseDAOHelper
@@ -34,6 +35,7 @@ import com.protone.seenn.activity.GalleySearchActivity
 import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import kotlin.streams.toList
 
 class GalleyFragment(
     private val isVideo: Boolean,
@@ -95,7 +97,33 @@ class GalleyFragment(
         }
 
         override fun getChooseGalley(): MutableList<GalleyMedia>? {
-            return galleyMap[rightGalley] ?: galleyMap[context?.getString(R.string.all_galley)]
+            return galleyMap[rightGalley] ?: galleyMap[R.string.all_galley.getString()]
+        }
+
+        override fun onGalleyUpdate(updateList: ArrayList<GalleyMedia>) {
+            launch(Dispatchers.IO) {
+                var isNew = false
+                DataBaseDAOHelper.getAllMediaByType(isVideo)?.let {
+                    galleyMap[R.string.all_galley.getString()] = it as MutableList<GalleyMedia>
+                }
+                updateList.stream().map { it.bucket }.toList().forEach {
+                    if (galleyMap[it] == null) {
+                        isNew = true
+                    }
+                    galleyMap[it] = (DataBaseDAOHelper.getAllMediaByGalley(
+                        it,
+                        isVideo
+                    ) as MutableList<GalleyMedia>)
+                    galleyMap[it]?.let { list ->
+                        val pair = Pair(
+                            if (list.size > 0) list[0].uri else Uri.EMPTY,
+                            arrayOf(it, list.size.toString())
+                        )
+                        if (isNew) insertBucket(pair) else refreshBucket(pair)
+                    }
+                }
+                noticeListUpdate(galleyMap[rightGalley])
+            }
         }
 
     }
@@ -165,6 +193,7 @@ class GalleyFragment(
                                 onViewCreated = true
                                 initList()
                                 sortData()
+                                channel.close()
                                 if (!isLock) sortPrivateData()
                             }
                         }
@@ -288,7 +317,6 @@ class GalleyFragment(
                         }
                     }
             }
-
         }
     }
 
@@ -311,6 +339,10 @@ class GalleyFragment(
         getBucketAdapter()?.insertBucket(pairs)
     }
 
+    private fun refreshBucket(pairs: Pair<Uri, Array<String>>) {
+        getBucketAdapter()?.refreshBucket(pairs)
+    }
+
     private fun noticeListUpdate(data: MutableList<GalleyMedia>?) {
         getListAdapter()?.noticeDataUpdate(data)
     }
@@ -323,7 +355,7 @@ class GalleyFragment(
         if (binding.galleyList.adapter is GalleyListAdapter)
             binding.galleyList.adapter as GalleyListAdapter else null
 
-    override fun select(galleyMedia: GalleyMedia)  = Unit
+    override fun select(galleyMedia: GalleyMedia) = Unit
 
     override fun select(galleyMedia: MutableList<GalleyMedia>) {
         iGalleyFragment?.select(galleyMedia)

@@ -13,7 +13,7 @@ interface MusicDAO {
     @Insert
     fun insertMusic(music: Music)
 
-    @Query("SELECT * FROM Music")
+    @Query("SELECT * FROM Music ORDER BY year ASC")
     fun getAllMusic(): List<Music>?
 
     @Delete
@@ -21,9 +21,6 @@ interface MusicDAO {
 
     @Update(entity = Music::class)
     fun updateMusic(music: Music): Int
-
-    @Query("UPDATE Music SET myBucket = :bucket WHERE title == :name")
-    fun updateMusicMyBucket(name: String, bucket: List<String>): Int
 
     @Query("SELECT * FROM Music WHERE uri LIKE :uri")
     fun getMusicByUri(uri: Uri): Music?

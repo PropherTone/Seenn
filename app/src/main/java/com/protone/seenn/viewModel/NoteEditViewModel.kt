@@ -99,7 +99,6 @@ class NoteEditViewModel : ViewModel() {
                     if (noteDir != null) {
                         DataBaseDAOHelper.insertNoteDirWithNote(
                             NoteDirWithNotes(
-                                null,
                                 noteDir.noteDirId,
                                 result.second
                             )
@@ -110,7 +109,6 @@ class NoteEditViewModel : ViewModel() {
                     if (it.mediaId != null) {
                         DataBaseDAOHelper.insertGalleriesWithNotes(
                             GalleriesWithNotes(
-                                null,
                                 it.mediaId!!,
                                 result.second
                             )

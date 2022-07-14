@@ -1,6 +1,7 @@
 package com.protone.database.room.entity
 
 import android.net.Uri
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
@@ -21,11 +22,11 @@ data class Music(
     val displayName: String?,
     val duration: Long,
     val year: Long,
-    val uri: Uri,
-    var myBucket: List<String>
+    val uri: Uri
 ) {
     @PrimaryKey(autoGenerate = true)
-    var musicID: Long = 0
+    @ColumnInfo(name = "musicBaseId")
+    var musicBaseId: Long = 0
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

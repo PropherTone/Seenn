@@ -29,7 +29,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         musicBucketDAO.addMusicBucket(musicBucket)
     }
 
-    fun addMusicBucketThread(musicBucket: MusicBucket) {
+    fun addMusicBucketAsync(musicBucket: MusicBucket) {
         execute {
             musicBucketDAO.addMusicBucket(musicBucket)
         }
@@ -62,7 +62,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         return musicBucketDAO.updateMusicBucket(bucket)
     }
 
-    fun updateMusicBucketBack(bucket: MusicBucket) {
+    fun updateMusicBucketAsync(bucket: MusicBucket) {
         execute {
             updateMusicBucket(bucket)
         }
@@ -76,21 +76,25 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     suspend fun deleteMusicBucketRs(bucket: MusicBucket) = onResult<Boolean> {
         execute {
-            musicBucketDAO.deleteMusicBucket(bucket)
+            deleteMusicBucket(bucket)
             it.resumeWith(Result.success(musicBucketDAO.getMusicBucketByName(bucket.name) == null))
         }
     }
 
-    override fun deleteMusicBucket(bucket: MusicBucket) {
+    fun deleteMusicBucketAsync(bucket: MusicBucket) {
         execute {
-            musicBucketDAO.deleteMusicBucket(bucket)
+            deleteMusicBucket(bucket)
         }
+    }
+
+    override fun deleteMusicBucket(bucket: MusicBucket) {
+        musicBucketDAO.deleteMusicBucket(bucket)
     }
 
     //Music
     private val musicDAO by lazy { getMusicDAO() }
 
-    fun insertMusicMulti(music: List<Music>) {
+    fun insertMusicMultiAsync(music: List<Music>) {
         execute {
             music.forEach {
                 musicDAO.insertMusic(it)
@@ -98,10 +102,10 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         }
     }
 
-    fun deleteMusicMulti(music: List<Music>) {
+    fun deleteMusicMultiAsync(music: List<Music>) {
         execute {
             music.forEach {
-                musicDAO.deleteMusic(it)
+                deleteMusic(it)
             }
         }
     }
@@ -125,28 +129,23 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     override fun getAllMusic(): List<Music>? = musicDAO.getAllMusic()
 
-    override fun deleteMusic(music: Music) {
+    fun deleteMusicAsync(music: Music) {
         execute {
-            musicDAO.deleteMusic(music)
+            deleteMusic(music)
         }
     }
 
-    override fun updateMusic(music: Music): Int = musicDAO.updateMusic(music)
+    override fun deleteMusic(music: Music) {
+        musicDAO.deleteMusic(music)
+    }
 
-    override fun updateMusicMyBucket(name: String, bucket: List<String>): Int =
-        musicDAO.updateMusicMyBucket(name, bucket)
+    override fun updateMusic(music: Music): Int = musicDAO.updateMusic(music)
 
     override fun getMusicByUri(uri: Uri): Music? = musicDAO.getMusicByUri(uri)
 
     suspend fun updateMusicRs(music: Music) = onResult<Int> {
         execute {
             it.resumeWith(Result.success(updateMusic(music)))
-        }
-    }
-
-    suspend fun updateMusicMyBucketRs(name: String, bucket: List<String>) = onResult<Int> {
-        execute {
-            it.resumeWith(Result.success(updateMusicMyBucket(name, bucket)))
         }
     }
 
@@ -173,7 +172,7 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         return signedGalleyDAO.getAllMediaByGalley(name, isVideo)
     }
 
-    fun deleteSignedMedias(list: MutableList<GalleyMedia>) {
+    fun deleteSignedMediaMultiAsync(list: MutableList<GalleyMedia>) {
         execute {
             list.forEach {
                 deleteSignedMediaByUri(it.uri)
@@ -185,30 +184,38 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         signedGalleyDAO.deleteSignedMediaByUri(uri)
     }
 
-    override fun deleteSignedMedia(media: GalleyMedia) {
+    fun deleteSignedMediaAsync(media: GalleyMedia) {
         execute {
-            signedGalleyDAO.deleteSignedMedia(media)
+            deleteSignedMedia(media)
         }
     }
 
-    fun updateMediaMulti(list: MutableList<GalleyMedia>) {
+    override fun deleteSignedMedia(media: GalleyMedia) {
+        signedGalleyDAO.deleteSignedMedia(media)
+    }
+
+    fun updateMediaMultiAsync(list: MutableList<GalleyMedia>) {
         execute { list.forEach { updateSignedMedia(it) } }
     }
 
     override fun insertSignedMedia(media: GalleyMedia) {
-        execute { sortSignedMedia(media) }
+        signedGalleyDAO.insertSignedMedia(media)
     }
 
-    fun sortSignedMedia(media: GalleyMedia) {
-        getSignedMedia(media.uri).let {
-            if (it != null) {
-                it.name = media.name
-                it.path = media.path
-                it.bucket = media.bucket
-                it.type = media.type
-                it.date = media.date
-                updateSignedMedia(it)
-            } else signedGalleyDAO.insertSignedMedia(media)
+    fun insertSignedMediaChecked(media: GalleyMedia): GalleyMedia? {
+        val it = getSignedMedia(media.uri)
+        return if (it != null) {
+            if (it == media) return null
+            it.name = media.name
+            it.path = media.path
+            it.bucket = media.bucket
+            it.type = media.type
+            it.date = media.date
+            updateSignedMedia(it)
+            it
+        } else {
+            insertSignedMedia(media)
+            media
         }
     }
 
@@ -243,10 +250,14 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
         return noteDAO.updateNote(note)
     }
 
-    override fun deleteNote(note: Note) {
+    fun deleteNoteAsync(note: Note) {
         execute {
             noteDAO.deleteNote(note)
         }
+    }
+
+    override fun deleteNote(note: Note) {
+        noteDAO.deleteNote(note)
     }
 
     override fun insertNote(note: Note): Long {
@@ -349,10 +360,14 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
     override fun getGalleyBucket(name: String): GalleyBucket? =
         galleyBucketDAO.getGalleyBucket(name)
 
-    override fun deleteGalleyBucket(galleyBucket: GalleyBucket) {
+    fun deleteGalleyBucketAsync(galleyBucket: GalleyBucket) {
         execute {
-            galleyBucketDAO.deleteGalleyBucket(galleyBucket)
+            deleteGalleyBucket(galleyBucket)
         }
+    }
+
+    override fun deleteGalleyBucket(galleyBucket: GalleyBucket) {
+        galleyBucketDAO.deleteGalleyBucket(galleyBucket)
     }
 
     suspend fun getGalleyBucketRs(name: String) = onResult<GalleyBucket?> {
@@ -401,7 +416,6 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
             return@onResult
         }
         val entity = MusicWithMusicBucket(
-            null,
             musicBucket.musicBucketId,
             musicID
         )
@@ -411,6 +425,12 @@ object DataBaseDAOHelper : BaseDAOHelper(), MusicBucketDAO, MusicDAO, SignedGall
 
     override fun insertMusicWithMusicBucket(musicWithMusicBucket: MusicWithMusicBucket): Long? {
         return musicWithMusicBucketDAO.insertMusicWithMusicBucket(musicWithMusicBucket)
+    }
+
+    fun deleteMusicWithMusicBucketAsync(musicID: Long) {
+        execute {
+            deleteMusicWithMusicBucket(musicID)
+        }
     }
 
     override fun deleteMusicWithMusicBucket(musicID: Long) {

@@ -6,7 +6,7 @@ import com.protone.database.room.entity.Note
 @Dao
 interface NoteDAO {
 
-    @Query("SELECT * FROM Note")
+    @Query("SELECT * FROM Note ORDER BY Note_Time ASC")
     fun getAllNote(): List<Note>?
 
     @Insert

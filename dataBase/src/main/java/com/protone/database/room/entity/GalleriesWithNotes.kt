@@ -1,10 +1,14 @@
 package com.protone.database.room.entity
 
-import androidx.room.*
+import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.ForeignKey.CASCADE
+import androidx.room.Index
+import androidx.room.TypeConverters
 import com.protone.database.room.converters.ListTypeConverter
 
 @Entity(
+    primaryKeys = ["mediaId", "noteId"],
     foreignKeys = [
         ForeignKey(
             entity = GalleyMedia::class,
@@ -20,15 +24,13 @@ import com.protone.database.room.converters.ListTypeConverter
         )
     ], indices = [
         Index(
-            value = ["mediaId", "noteId"],
+            value = ["noteId", "mediaId"],
             unique = true
         )
     ]
 )
 @TypeConverters(ListTypeConverter::class)
 data class GalleriesWithNotes(
-    @PrimaryKey(autoGenerate = true)
-    val galleriesWithNotes_id: Long?,
     val mediaId: Long,
     val noteId: Long
 )

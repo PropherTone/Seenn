@@ -7,10 +7,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
+import com.protone.api.baseType.getString
 import com.protone.api.context.SApplication
 import com.protone.api.context.newLayoutInflater
 import com.protone.api.context.onUiThread
-import com.protone.api.baseType.getString
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.seen.R
 import com.protone.seen.databinding.GalleyBucketListLayoutBinding
@@ -60,7 +60,7 @@ class GalleyBucketAdapter(
                                 .setPositiveButton(
                                     R.string.confirm
                                 ) { dialog, _ ->
-                                    DataBaseDAOHelper.deleteGalleyBucket(galley)
+                                    DataBaseDAOHelper.deleteGalleyBucketAsync(galley)
                                     deleteBucket(galleries[position])
                                     dialog.dismiss()
                                 }.setNegativeButton(R.string.cancel) { dialog, _ ->
@@ -84,7 +84,6 @@ class GalleyBucketAdapter(
                 }
             }
         }
-
     }
 
     private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
@@ -93,6 +92,21 @@ class GalleyBucketAdapter(
             galleries.removeAt(index)
             selectList.remove(bucket)
             notifyItemRemoved(index)
+        }
+    }
+
+    fun refreshBucket(item: Pair<Uri, Array<String>>) {
+        val iterator = galleries.iterator()
+        var index = 0
+        while (iterator.hasNext()) {
+            if (iterator.next().second[0] == item.second[0]) {
+                galleries[index] = item
+                context.onUiThread {
+                    notifyItemChanged(index)
+                }
+                break
+            }
+            index++
         }
     }
 

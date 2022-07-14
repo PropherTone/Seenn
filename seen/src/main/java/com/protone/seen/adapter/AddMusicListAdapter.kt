@@ -16,8 +16,6 @@ import com.protone.database.room.entity.Music
 import com.protone.mediamodle.Medias
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.util.*
 
 class AddMusicListAdapter(
@@ -86,12 +84,8 @@ class AddMusicListAdapter(
                     viewQueue.add(position)
                     if (selectList.contains(music)) {
                         if (!multiSelect) return@setOnClickListener
-                        DataBaseDAOHelper.execute {
-                            val re = DataBaseDAOHelper.updateMusicRs(music)
-                            if (re != -1 && re != 0) {
-                                withContext(Dispatchers.Main) { checkSelect(holder, music) }
-                            }
-                        }
+                        DataBaseDAOHelper.deleteMusicWithMusicBucketAsync(music.musicBaseId)
+                        checkSelect(holder, music)
                         return@setOnClickListener
                     }
                     checkSelect(holder, music)
@@ -102,7 +96,7 @@ class AddMusicListAdapter(
                                 if (multiSelect) {
                                     DataBaseDAOHelper.execute {
                                         val re = DataBaseDAOHelper
-                                            .insertMusicWithMusicBucket(music.musicID, bucket)
+                                            .insertMusicWithMusicBucket(music.musicBaseId, bucket)
                                         if (re != -1L) {
                                             changeIconAni(musicListPlayState)
                                         } else {

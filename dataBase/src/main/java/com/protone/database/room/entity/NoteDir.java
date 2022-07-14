@@ -1,5 +1,6 @@
 package com.protone.database.room.entity;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -7,6 +8,7 @@ import androidx.room.PrimaryKey;
 public class NoteDir {
 
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "noteDirId")
     Long noteDirId;
 
     String name;

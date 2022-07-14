@@ -1,6 +1,5 @@
 package com.protone.seenn.activity
 
-import android.content.Intent
 import android.view.ViewTreeObserver
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
@@ -10,7 +9,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
-import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.intent
 import com.protone.api.context.root
 import com.protone.api.json.toEntity
@@ -23,7 +21,6 @@ import com.protone.mediamodle.Medias
 import com.protone.seen.adapter.MainModelListAdapter
 import com.protone.seen.itemDecoration.ModelListItemDecoration
 import com.protone.seenn.R
-import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.databinding.MainActivityBinding
 import com.protone.seenn.service.WorkService
 import com.protone.seenn.viewModel.MainViewModel
@@ -93,20 +90,18 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
             Medias.musicBucket[userConfig.lastMusicBucket]?.let {
                 musicController.setMusicList(it)
                 musicController.refresh(
-                    if (userConfig.lastMusic.isNotEmpty()) userConfig.lastMusic.toEntity(
-                        Music::class.java
-                    ) else binder.getPlayList()[0], userConfig.lastMusicProgress
+                    if (userConfig.lastMusic.isNotEmpty())
+                        userConfig.lastMusic.toEntity(Music::class.java)
+                    else binder.getPlayList()[0], userConfig.lastMusicProgress
                 )
             }
         }
 
-        Medias.mediaLive.observe(this@MainActivity) { code ->
-            if (code == Medias.AUDIO_UPDATED) {
-                musicController.refresh()
-                workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
-            } else {
-                refreshModelList()
-            }
+        Medias.galleyLive.observe(this@MainActivity) {
+            refreshModelList()
+        }
+        Medias.audioLive.observe(this@MainActivity) {
+            musicController.refresh()
         }
 
         onFinish = {
@@ -115,6 +110,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
             userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
             userConfig.lastMusic = binder.onMusicPlaying().value?.toJson() ?: ""
         }
+
     }
 
     override suspend fun doStart() {

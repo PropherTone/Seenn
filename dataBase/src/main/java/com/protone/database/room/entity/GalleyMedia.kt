@@ -1,17 +1,16 @@
 package com.protone.database.room.entity
 
 import android.net.Uri
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.protone.database.room.converters.ListTypeConverter
 import com.protone.database.room.converters.UriTypeConverter
 
 
-@Entity
+@Entity(indices = [Index(value = ["mediaId"], unique = true)])
 @TypeConverters(UriTypeConverter::class, ListTypeConverter::class)
 data class GalleyMedia(
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "mediaId")
     val mediaId: Long?,
     var name: String,
     var path : String?,
@@ -52,8 +51,6 @@ data class GalleyMedia(
         var result = name.hashCode()
         result = 31 * result + bucket.hashCode()
         result = 31 * result + size.hashCode()
-        result = 31 * result + (type?.hashCode() ?: 0)
-        result = 31 * result + (cate?.hashCode() ?: 0)
         result = 31 * result + uri.hashCode()
         result = 31 * result + date.hashCode()
         result = 31 * result + (thumbnailUri?.hashCode() ?: 0)

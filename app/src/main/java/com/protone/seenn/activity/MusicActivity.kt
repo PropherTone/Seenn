@@ -4,7 +4,6 @@ import android.content.Intent
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -97,13 +96,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
             musicController.setMusicList(Medias.musicBucket[bucket] ?: Medias.music)
         }
 
-        Medias.mediaLive.observe(this@MusicActivity, object : Observer<Int> {
-            override fun onChanged(t: Int?) {
-                if (t == Medias.AUDIO_UPDATED) {
-                    workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
-                }
-            }
-        })
+        workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
     }
 
     private fun MusicModel.updateBucket() {

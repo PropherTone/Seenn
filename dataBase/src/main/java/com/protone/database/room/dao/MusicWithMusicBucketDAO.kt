@@ -11,14 +11,14 @@ import com.protone.database.room.entity.MusicWithMusicBucket
 interface MusicWithMusicBucketDAO {
 
     @Insert
-    fun insertMusicWithMusicBucket(musicWithMusicBucket: MusicWithMusicBucket):Long?
+    fun insertMusicWithMusicBucket(musicWithMusicBucket: MusicWithMusicBucket): Long?
 
-    @Query("DELETE FROM MusicWithMusicBucket WHERE musicID LIKE :musicID")
+    @Query("DELETE FROM MusicWithMusicBucket WHERE musicBaseId LIKE :musicID")
     fun deleteMusicWithMusicBucket(musicID: Long)
 
-    @Query("SELECT * FROM Music INNER JOIN MusicWithMusicBucket ON Music.musicId = MusicWithMusicBucket.musicId WHERE MusicWithMusicBucket.musicBucketId LIKE:musicBucketId")
+    @Query("SELECT * FROM Music INNER JOIN MusicWithMusicBucket ON Music.musicBaseId = MusicWithMusicBucket.musicBaseId WHERE MusicWithMusicBucket.musicBucketId LIKE:musicBucketId")
     fun getMusicWithMusicBucket(musicBucketId: Long): List<Music>?
 
-    @Query("SELECT * FROM MusicBucket INNER JOIN MusicWithMusicBucket ON MusicBucket.musicBucketId = MusicWithMusicBucket.musicBucketId WHERE MusicWithMusicBucket.musicID LIKE:musicID")
+    @Query("SELECT * FROM MusicBucket INNER JOIN MusicWithMusicBucket ON MusicBucket.musicBucketId = MusicWithMusicBucket.musicBucketId WHERE MusicWithMusicBucket.musicBaseId LIKE:musicID")
     fun getMusicBucketWithMusic(musicID: Long): List<MusicBucket>?
 }
