@@ -27,7 +27,7 @@ import kotlin.math.abs
 class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     override val viewModel: NoteViewModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         binding = NoteActivityBinding.inflate(layoutInflater, root, false)
         fitStatuesBar(binding.root)
         fitNavigationBar(binding.root)

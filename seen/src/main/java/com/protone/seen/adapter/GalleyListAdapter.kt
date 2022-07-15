@@ -101,7 +101,9 @@ class GalleyListAdapter(
         val indexOf = media.indexOf(item)
         if (indexOf != -1) {
             onSelectMod = true
-            notifyItemChanged(indexOf)
+            context.onUiThread {
+                notifyItemChanged(indexOf)
+            }
         }
     }
 
@@ -132,7 +134,9 @@ class GalleyListAdapter(
         if (index != -1) {
             media.removeAt(index)
             if (selectList.contains(galleyMedia)) selectList.remove(galleyMedia)
-            notifyItemRemoved(index)
+            context.onUiThread {
+                notifyItemRemoved(index)
+            }
         }
     }
 

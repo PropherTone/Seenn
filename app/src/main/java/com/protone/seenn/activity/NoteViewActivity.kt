@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel>(true) {
     override val viewModel: NoteViewViewModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         binding = NoteViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitNavigationBarUsePadding(binding.root)

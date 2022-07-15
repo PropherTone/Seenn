@@ -117,14 +117,12 @@ fun Activity.titleDialog(title: String, name: String, callBack: (String) -> Unit
         create = it
     }.show()
     val attributes = create?.window?.attributes
-    setSoftInputStatuesListener { i, b ->
+    setSoftInputStatuesListener { _, b ->
         if (b) {
             attributes?.y = attributes?.y?.minus(binding.root.measuredHeight / 2)
-//                    create?.window?.attributes = attributes
             create?.onWindowAttributesChanged(attributes)
         } else {
             attributes?.y = 0
-//                    create?.window?.attributes = attributes
             create?.onWindowAttributesChanged(attributes)
         }
     }
@@ -158,16 +156,18 @@ fun Activity.cateDialog(
 }
 
 fun Activity.checkListDialog(
+    title: String,
     dataList: MutableList<String>,
-    callBack: (String?) -> Unit
+    callBack: ((String?) -> Unit)? = null
 ) {
     val binding = ListPopWindowsLayoutBinding.inflate(
         newLayoutInflater,
         root,
         false
     )
-    val create = android.app.AlertDialog.Builder(this).setView(binding.root).create()
+    val create = AlertDialog.Builder(this).setView(binding.root).create()
     binding.apply {
+        listTitle.text = title
         listList.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = CheckListAdapter(context, dataList)
@@ -175,7 +175,7 @@ fun Activity.checkListDialog(
         listConfirm.setOnClickListener {
             listList.adapter.let {
                 if (it is CheckListAdapter)
-                    callBack.invoke(if (it.selectList.size > 0) it.selectList[0] else null)
+                    callBack?.invoke(if (it.selectList.size > 0) it.selectList[0] else null)
             }
             create.dismiss()
         }
@@ -192,8 +192,7 @@ suspend fun Activity.imageListDialog(
             root,
             false
         )
-        val create =
-            android.app.AlertDialog.Builder(this@imageListDialog).setView(binding.root).create()
+        val create = AlertDialog.Builder(this@imageListDialog).setView(binding.root).create()
         binding.apply {
             listList.apply {
                 layoutManager = LinearLayoutManager(context)

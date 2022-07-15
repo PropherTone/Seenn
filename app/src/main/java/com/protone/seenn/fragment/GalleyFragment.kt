@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -17,8 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.api.context.intent
-import com.protone.api.context.onUiThread
 import com.protone.database.room.dao.DataBaseDAOHelper
 import com.protone.database.room.entity.GalleyBucket
 import com.protone.database.room.entity.GalleyMedia
@@ -144,7 +143,7 @@ class GalleyFragment(
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        rightGalley = context.getString(R.string.all_galley)
+        rightGalley = R.string.all_galley.getString()
     }
 
     override fun onCreateView(
@@ -168,12 +167,12 @@ class GalleyFragment(
                     }
                 } else {
                     activity?.titleDialog(
-                        requireContext().getString(R.string.user_name),
+                        R.string.user_name.getString(),
                         ""
                     ) {
                         if (it.isNotEmpty()) {
                             addBucket(it)
-                        } else toast(requireContext().getString(R.string.enter))
+                        } else R.string.enter.getString().toast()
                     }
                 }
             }
@@ -277,7 +276,7 @@ class GalleyFragment(
         DataBaseDAOHelper.run {
             val signedMedias = getAllMediaByType(isVideo) as MutableList<GalleyMedia>?
             if (signedMedias == null) {
-                toast(requireContext().getString(R.string.none))
+                R.string.none.getString().toast()
                 return@launch
             }
             signedMedias.let {
@@ -327,10 +326,10 @@ class GalleyFragment(
                     insertBucket(Pair(Uri.EMPTY, arrayOf(reName, "PRIVATE")))
                     galleyMap[reName] = mutableListOf()
                 } else {
-                    toast(requireContext().getString(R.string.locked))
+                    R.string.locked.getString().toast()
                 }
             } else {
-                toast(requireContext().getString(R.string.failed_msg))
+                R.string.failed_msg.getString().toast()
             }
         }
     }
@@ -348,12 +347,10 @@ class GalleyFragment(
     }
 
     private fun getBucketAdapter() =
-        if (binding.galleyBucket.adapter is GalleyBucketAdapter)
-            (binding.galleyBucket.adapter as GalleyBucketAdapter) else null
+        if (onViewCreated) binding.galleyBucket.adapter as GalleyBucketAdapter else null
 
     private fun getListAdapter() =
-        if (binding.galleyList.adapter is GalleyListAdapter)
-            binding.galleyList.adapter as GalleyListAdapter else null
+        if (onViewCreated) binding.galleyList.adapter as GalleyListAdapter else null
 
     override fun select(galleyMedia: GalleyMedia) = Unit
 
@@ -363,9 +360,5 @@ class GalleyFragment(
 
     override fun openView(galleyMedia: GalleyMedia) {
         iGalleyFragment?.openView(galleyMedia, rightGalley)
-    }
-
-    private fun toast(text: String) = requireContext().run {
-        onUiThread { Toast.makeText(this, text, Toast.LENGTH_SHORT).show() }
     }
 }

@@ -29,7 +29,7 @@ class GalleySearchActivity :
     GalleyListAdapter.OnSelect, GalleySearchViewModel.OnQuery {
     override val viewModel: GalleySearchViewModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         binding = GalleySearchActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitNavigationBar(binding.root)

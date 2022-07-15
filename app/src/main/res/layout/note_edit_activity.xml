@@ -66,6 +66,7 @@
                         android:layout_width="@dimen/small_Icon"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
+                        android:background="@drawable/background_ripple_transparent_white"
                         android:contentDescription="@string/action"
                         android:onClick="@{()->activity.finish()}"
                         android:paddingTop="@dimen/main_margin"

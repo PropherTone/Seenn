@@ -8,6 +8,18 @@
         android:background="@color/white"
         android:padding="@dimen/icon_padding">
 
+        <TextView
+            android:id="@+id/list_title"
+            android:text=""
+            android:textColor="@color/white"
+            android:padding="@dimen/texts_padding"
+            android:background="@drawable/background_ripple_blue"
+            android:gravity="center"
+            android:textSize="@dimen/title_text"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/list_list"
             android:layout_width="match_parent"
@@ -15,6 +27,7 @@
             android:background="@color/white"
             android:overScrollMode="never"
             android:padding="@dimen/small_elevation"
+            app:layout_constraintTop_toBottomOf="@id/list_title"
             app:layout_constraintBottom_toTopOf="@id/list_confirm" />
 
         <ImageView

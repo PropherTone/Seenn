@@ -36,7 +36,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
     ViewTreeObserver.OnGlobalLayoutListener {
     override val viewModel: MusicModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         binding = MusicActivtiyBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MusicActivity
             root.viewTreeObserver.addOnGlobalLayoutListener(this@MusicActivity)

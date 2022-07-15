@@ -21,9 +21,11 @@ import java.io.File
 class LogActivity : BaseActivity<LogActivityBinding, LogViewModel>(false) {
     override val viewModel: LogViewModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         binding = LogActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
+        fitStatuesBar(binding.root)
+        fitNavigationBar(binding.root)
     }
 
     override suspend fun LogViewModel.init() {

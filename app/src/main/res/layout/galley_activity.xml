@@ -33,6 +33,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="@dimen/back_margin"
                 android:layout_marginTop="@dimen/back_margin"
+                android:background="@drawable/background_ripple_transparent_white"
                 android:contentDescription="@string/back"
                 android:onClick="@{()->activity.finish()}"
                 android:src="@drawable/ic_round_arrow_left__white_24" />

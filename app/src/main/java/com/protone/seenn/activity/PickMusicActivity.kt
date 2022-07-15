@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
 class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewModel>(true) {
     override val viewModel: PickMusicViewModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         binding = PickMusicActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBar(binding.root)

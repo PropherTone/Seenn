@@ -14,7 +14,7 @@ import com.protone.seenn.viewModel.PictureBoxViewModel
 class PictureBoxActivity:BaseActivity<PictureBoxActivityBinding,PictureBoxViewModel>(false) {
     override val viewModel: PictureBoxViewModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         setTranslucentStatues()
         binding = PictureBoxActivityBinding.inflate(layoutInflater, root, false)
     }

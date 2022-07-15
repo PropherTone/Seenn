@@ -21,7 +21,7 @@ class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true
 
     override val viewModel: SplashViewModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         binding = SplashActivityBinding.inflate(layoutInflater, root, false)
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(this)
     }

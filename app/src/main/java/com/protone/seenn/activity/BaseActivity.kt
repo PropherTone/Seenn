@@ -28,7 +28,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     protected abstract val viewModel: VM
     protected lateinit var binding: VB
 
-    abstract fun initView()
+    abstract fun createView()
     abstract suspend fun VM.init()
     abstract suspend fun onViewEvent(event: String)
     private var viewEvent: Channel<String>? = null
@@ -83,7 +83,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
             activityOperationReceiver,
             IntentFilter(ACTIVITY_FINISH)
         )
-        initView()
+        createView()
         setContentView(binding.root)
         launch {
             viewEventTask?.start()

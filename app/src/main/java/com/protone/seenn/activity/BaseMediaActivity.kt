@@ -1,6 +1,5 @@
 package com.protone.seenn.activity
 
-import android.net.Uri
 import android.view.View
 import androidx.core.view.isGone
 import androidx.databinding.ViewDataBinding
@@ -22,7 +21,6 @@ import com.protone.seenn.viewModel.GalleyViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.stream.Collectors
 
 abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEvent: Boolean) :
     BaseActivity<VB, VM>(handleEvent),
@@ -90,7 +88,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
     ) {
         when {
             gm.size == 1 -> delete(gm[0], callBack)
-            gm.size > 1 -> deleteMulti(gm, callBack)
+            gm.size > 1 -> deleteMulti(gm)
         }
     }
 
@@ -100,12 +98,11 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
             getString(R.string.rename),
             gm.name.replace(mimeType, "")
         ) { name ->
-            renameMedia(name + mimeType, gm.uri, this) { result ->
-                if (result) {
-                    gm.name = name + mimeType
-                    R.string.success.getString().toast()
-                } else R.string.not_supported.getString().toast()
-            }
+            val result = renameMedia(name + mimeType, gm.uri)
+            if (result) {
+                gm.name = name + mimeType
+                R.string.success.getString().toast()
+            } else R.string.not_supported.getString().toast()
         }
     }
 
@@ -117,21 +114,18 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
         ) { name ->
             launch(Dispatchers.IO) {
                 gm.forEach {
-                    funcForMultiRename(
+                    val result = funcForMultiRename(
                         "$name(${gm.indexOf(it)}).${it.name.getFileMimeType()}",
                         it.uri,
-                    ) { result ->
-                        if (result != null) {
-                            it.name = result
-                            R.string.success.getString().toast()
-                        } else {
-                            reList.add(it.name)
-                            R.string.not_supported.getString().toast()
-                        }
+                    )
+                    if (result != null) {
+                        it.name = result
+                    } else {
+                        reList.add(it.name)
                     }
                 }
                 withContext(Dispatchers.Main) {
-                    checkListDialog(reList) {}
+                    checkListDialog(R.string.this_file_op_failed.getString(), reList)
                 }
             }
         }
@@ -142,32 +136,29 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
         callBack: (GalleyMedia) -> Unit
     ) {
         launch(Dispatchers.IO) {
-            deleteMedia(gm.uri) { result ->
-                if (result) {
-                    DataBaseDAOHelper.deleteSignedMedia(gm)
-                    callBack.invoke(gm)
-                    R.string.success.getString().toast()
-                } else R.string.not_supported.getString().toast()
-            }
+            val result = deleteMedia(gm.uri)
+            if (result) {
+                DataBaseDAOHelper.deleteSignedMedia(gm)
+                callBack.invoke(gm)
+                R.string.success.getString().toast()
+            } else R.string.not_supported.getString().toast()
+
         }
     }
 
-    private fun deleteMulti(
-        gm: List<GalleyMedia>,
-        callBack: (GalleyMedia) -> Unit
-    ) {
+    private fun deleteMulti(gm: List<GalleyMedia>) {
         launch(Dispatchers.IO) {
-            val list = gm.stream().map {
-                it.uri
-            }.collect(Collectors.toList()) as List<Uri>
-            var count = 0
-            multiDeleteMedia(list) { result ->
+            val reList = arrayListOf<String>()
+            gm.forEach {
+                val result = multiDeleteMedia(it.uri)
                 if (result) {
-                    DataBaseDAOHelper.deleteSignedMedia(gm[count])
-                    callBack.invoke(gm[count])
-                    R.string.success.getString().toast()
-                } else R.string.not_supported.getString().toast()
-                count++
+                    DataBaseDAOHelper.deleteSignedMedia(it)
+                } else {
+                    reList.add(it.name)
+                }
+            }
+            withContext(Dispatchers.Main) {
+                checkListDialog(R.string.this_file_op_failed.getString(), reList)
             }
         }
     }

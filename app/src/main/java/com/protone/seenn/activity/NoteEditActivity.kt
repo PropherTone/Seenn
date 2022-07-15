@@ -44,7 +44,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         }
         get() = binding.noteEditTitle.text.toString()
 
-    override fun initView() {
+    override fun createView() {
         binding = NoteEditActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitNavigationBarUsePadding(binding.root)

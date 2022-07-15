@@ -18,7 +18,7 @@ import com.protone.seenn.viewModel.MusicViewModel
 class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>(false) {
     override val viewModel: MusicViewModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         binding = MusicViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitNavigationBar(binding.musicPlayer.root)

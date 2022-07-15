@@ -37,7 +37,7 @@ class GalleyViewActivity :
     BaseMediaActivity<GalleyViewActivityBinding, GalleyViewViewModel>(true) {
     override val viewModel: GalleyViewViewModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         binding = GalleyViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBarUsePadding(binding.galleyVTitle)

@@ -53,7 +53,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
             field = value
         }
 
-    override fun initView() {
+    override fun createView() {
         binding = MainActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MainActivity
             fitNavigationBar(root)

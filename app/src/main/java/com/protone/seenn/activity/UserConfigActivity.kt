@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigViewModel>(true) {
     override val viewModel: UserConfigViewModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         binding = UserConfigActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitNavigationBar(binding.root)
@@ -206,6 +206,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
 
     private fun startLockListPop() {
         checkListDialog(
+            R.string.choose.getString(),
             mutableListOf(
                 R.string.model_noteBook.getString(),
                 R.string.model_music.getString(),
@@ -213,7 +214,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
             )
         ) {
             if (!it.isNullOrEmpty()) {
-                titleDialog("选择", "") { lock ->
+                titleDialog(R.string.choose.getString(), "") { lock ->
                     if (lock.isEmpty()) {
                         R.string.none.getString().toast()
                         return@titleDialog
@@ -232,6 +233,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
 
     private fun startUnlockListPop() {
         checkListDialog(
+            R.string.choose.getString(),
             mutableListOf(
                 R.string.model_noteBook.getString(),
                 R.string.model_music.getString(),

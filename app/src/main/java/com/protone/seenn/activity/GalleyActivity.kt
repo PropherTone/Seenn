@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>(false) {
     override val viewModel: GalleyViewModel by viewModels()
 
-    override fun initView() {
+    override fun createView() {
         binding = GalleyActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBar(binding.root)
