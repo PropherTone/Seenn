@@ -170,7 +170,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
     override fun popIntoBox() {
         launch(Dispatchers.IO) {
             viewModel.apply {
-                IntentDataHolder.put((chooseData() ?: getChooseGalley()))
+                putGainIntentData((chooseData() ?: getChooseGalley()))
                 startActivity(PictureBoxActivity::class.intent)
             }
         }

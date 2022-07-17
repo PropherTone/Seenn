@@ -42,14 +42,12 @@ class GalleySearchActivity :
             query(getInput())
         }
         onQueryListener = this@GalleySearchActivity
-        IntentDataHolder.get().let {
-            if (!(it != null && it is List<*> && it.isNotEmpty() && it[0] is GalleyMedia)) {
-                R.string.none.getString().toast()
-            } else {
-                @Suppress("UNCHECKED_CAST")
-                data.addAll(it as List<GalleyMedia>)
-                initList(data[0].isVideo)
-            }
+        val gainListData = getGainListData<GalleyMedia>()
+        if (gainListData == null) {
+            R.string.none.getString().toast()
+        } else {
+            data.addAll(gainListData)
+            initList(data[0].isVideo)
         }
 
         onFinish = {
@@ -173,7 +171,7 @@ class GalleySearchActivity :
     override fun popIntoBox() {
         launch(Dispatchers.IO) {
             viewModel.apply {
-                IntentDataHolder.put(selectList)
+                putGainIntentData(selectList)
                 startActivity(PictureBoxActivity::class.intent)
             }
         }

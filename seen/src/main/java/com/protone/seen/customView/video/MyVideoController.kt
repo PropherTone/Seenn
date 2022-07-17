@@ -26,12 +26,10 @@ class MyVideoController @JvmOverloads constructor(
 
     private var isPlaying = false
         set(value) {
-            binding.vStart.background =
-                if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
-                else R.drawable.ic_baseline_pause_24_white.getDrawable()
-            binding.vControl.background =
-                if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
-                else R.drawable.ic_baseline_pause_24_white.getDrawable()
+            binding.vStart.setImageDrawable( if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
+            else R.drawable.ic_baseline_pause_24_white.getDrawable())
+            binding.vControl.setImageDrawable(if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
+            else R.drawable.ic_baseline_pause_24_white.getDrawable())
             field = value
         }
 

@@ -13,37 +13,45 @@ abstract class MusicReceiver : BroadcastReceiver() {
     private var isPlaying = false
 
     override fun onReceive(p0: Context?, p1: Intent?) {
-        when (p1?.action) {
-            MUSIC_PLAY -> {
-                isPlaying = if (!isPlaying) {
-                    play()
-                    true
-                } else {
-                    pause()
-                    false
+        try {
+            when (p1?.action) {
+                MUSIC_PLAY -> {
+                    isPlaying = if (!isPlaying) {
+                        play()
+                        true
+                    } else {
+                        pause()
+                        false
+                    }
+                    refresh(isPlaying)
                 }
-                refresh(isPlaying)
+                MUSIC_PAUSE -> {
+                    isPlaying = false
+                    pause()
+                }
+                MUSIC_FINISH -> {
+                    finish()
+                    isPlaying = false
+                }
+                MUSIC_PREVIOUS -> {
+                    previous()
+                    isPlaying = true
+                    refresh(isPlaying)
+                }
+                MUSIC_NEXT -> {
+                    next()
+                    isPlaying = true
+                    refresh(isPlaying)
+                }
+                MUSIC_REFRESH -> {
+                    refresh(isPlaying, ref = true)
+                }
+                MUSIC_PLAY_CUR -> {
+                    refresh(true)
+                }
             }
-            MUSIC_FINISH -> {
-                finish()
-                isPlaying = false
-            }
-            MUSIC_PREVIOUS -> {
-                previous()
-                isPlaying = true
-                refresh(isPlaying)
-            }
-            MUSIC_NEXT -> {
-                next()
-                isPlaying = true
-                refresh(isPlaying)
-            }
-            MUSIC_REFRESH ->{
-                refresh(isPlaying, ref = true)
-            }
-            MUSIC_PLAY_CUR->{
-                refresh(true)
-            }
+        } catch (e: Exception) {
+
         }
     }
 

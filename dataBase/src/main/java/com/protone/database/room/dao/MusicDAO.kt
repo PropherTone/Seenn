@@ -13,7 +13,7 @@ interface MusicDAO {
     @Insert
     fun insertMusic(music: Music)
 
-    @Query("SELECT * FROM Music ORDER BY year ASC")
+    @Query("SELECT * FROM Music ORDER BY year DESC")
     fun getAllMusic(): List<Music>?
 
     @Delete

@@ -384,17 +384,20 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
             LOOP_LIST -> next()
             LOOP_SINGLE -> {
                 --playPosition
-                next()
+                musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
             }
-            NO_LOOP -> pause()
+            NO_LOOP -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_PAUSE))
             RANDOM -> {
                 playPosition = (0 until playList.size - 1).random()
-                finishMusic()
-                play()
+                musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY))
             }
             PLAY_LIST -> {
-                if (playPosition <= playList.size - 1) next()
-                else pause()
+                if (playPosition <= playList.size - 1) musicBroadCastManager.sendBroadcast(
+                    Intent(
+                        MUSIC_NEXT
+                    )
+                )
+                else musicBroadCastManager.sendBroadcast(Intent(MUSIC_PAUSE))
             }
         }
     }

@@ -116,6 +116,10 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
         }
     }
 
+    fun <T> putGainIntentData(data: T) {
+        IntentDataHolder.put(data)
+    }
+
     suspend inline fun startActivityForResult(
         intent: Intent?,
     ) = withContext(Dispatchers.Main) {
@@ -161,7 +165,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     }
 
     protected fun fitNavigationBar(root: View) {
-        if (hasNavigationBar) root.marginBottom(navigationBarHeight)
+        if (isNavigationBar) root.marginBottom(navigationBarHeight)
     }
 
     protected fun fitStatuesBarUsePadding(view: View) {
@@ -169,7 +173,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     }
 
     protected fun fitNavigationBarUsePadding(view: View) {
-        if (hasNavigationBar) view.paddingBottom(navigationBarHeight)
+        if (isNavigationBar) view.paddingBottom(navigationBarHeight)
     }
 
     fun setTranslucentStatues() {
