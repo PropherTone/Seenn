@@ -8,7 +8,7 @@ import androidx.annotation.Nullable
 import com.protone.cloud.noteSync.CloudStates
 import com.protone.cloud.noteSync.NoteSyncClient
 import com.protone.cloud.noteSync.NoteSyncServer
-import com.protone.database.room.entity.Note
+import com.protone.api.entity.Note
 
 class NoteSyncService : Service() {
 

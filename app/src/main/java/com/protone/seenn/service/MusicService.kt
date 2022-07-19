@@ -14,7 +14,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.protone.api.baseType.toBitmapByteArray
 import com.protone.api.context.*
-import com.protone.database.room.entity.Music
+import com.protone.api.entity.Music
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.ApplicationBroadCast
 import com.protone.seenn.broadcast.MusicReceiver
@@ -30,6 +30,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.concurrent.timerTask
+import kotlin.system.exitProcess
 
 /**
  * MusicService by ProTone 2022/03/23
@@ -70,12 +71,8 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
 
     private val appReceiver = object : ApplicationBroadCast() {
         override fun finish() {
-            notificationManager?.cancelAll()
-            activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
             stopSelf()
-            val activityManager =
-                SApplication.app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            activityManager.killBackgroundProcesses(SApplication.app.packageName)
+            onDestroy()
         }
 
         override fun music() {
@@ -165,12 +162,19 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     }
 
     override fun onDestroy() {
+        cancel()
+        activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
         finishMusic()
         unregisterReceiver(receiver)
         unregisterReceiver(appReceiver)
         musicBroadCastManager.unregisterReceiver(receiver)
-        cancel()
+        notificationManager?.cancelAll()
         super.onDestroy()
+        val activityManager =
+            SApplication.app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        activityManager.killBackgroundProcesses(SApplication.app.packageName)
+        android.os.Process.killProcess(android.os.Process.myPid())
+        exitProcess(0)
     }
 
     @Suppress("DEPRECATION")
@@ -344,7 +348,12 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
                 currentMusic.postValue(
                     if (playList.isNotEmpty() && music.title != "NO MUSIC") {
                         playPosition = playList.indexOf(music)
-                        playList[playPosition]
+                        if (playPosition == -1) {
+                            playPosition = 0
+                            getEmptyMusic()
+                        } else {
+                            playList[playPosition]
+                        }
                     } else getEmptyMusic()
                 )
             }

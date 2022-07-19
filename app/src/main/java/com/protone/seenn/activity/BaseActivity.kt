@@ -4,6 +4,7 @@ import android.content.*
 import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.ActivityResult
@@ -13,13 +14,16 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
+import com.protone.api.TAG
 import com.protone.api.context.*
 import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seenn.service.MusicService
-import com.protone.seenn.viewModel.IntentDataHolder
+import com.protone.seenn.IntentDataHolder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
 import java.util.concurrent.atomic.AtomicInteger
 
 abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Boolean) :
@@ -43,12 +47,8 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
         if (handleEven) {
             viewEvent = Channel(Channel.UNLIMITED)
             viewEventTask = launch(Dispatchers.Main) {
-                while (isActive) {
-                    select<Unit> {
-                        viewEvent?.onReceive {
-                            onViewEvent(it)
-                        }
-                    }
+                viewEvent?.receiveAsFlow()?.collect {
+                    onViewEvent(it)
                 }
             }
         }
@@ -85,7 +85,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
         )
         createView()
         setContentView(binding.root)
-        launch {
+        lifecycleScope.launchWhenStarted {
             viewEventTask?.start()
             viewModel.init()
         }
@@ -193,6 +193,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     override fun onStart() {
         try {
             launch {
+                Log.d(TAG, "onStart: ${this@BaseActivity::class.simpleName}")
                 doStart()
             }
         } finally {
@@ -203,6 +204,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     override fun onResume() {
         try {
             launch {
+                Log.d(TAG, "onResume: ${this@BaseActivity::class.simpleName}")
                 onResume?.invoke()
                 doResume()
             }
@@ -214,6 +216,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     override fun onRestart() {
         try {
             launch {
+                Log.d(TAG, "onRestart: ${this@BaseActivity::class.simpleName}")
                 onRestart?.invoke()
                 doRestart()
             }
@@ -225,6 +228,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     override fun onPause() {
         try {
             launch {
+                Log.d(TAG, "onPause: ${this@BaseActivity::class.simpleName}")
                 onPause?.invoke()
                 doPause()
             }
@@ -236,6 +240,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     override fun onStop() {
         try {
             launch {
+                Log.d(TAG, "onStop: ${this@BaseActivity::class.simpleName}")
                 onStop?.invoke()
                 doStop()
             }
@@ -247,6 +252,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     override fun finish() {
         try {
             launch {
+                Log.d(TAG, "finish: ${this@BaseActivity::class.simpleName}")
                 onFinish?.invoke()
                 doFinish()
             }

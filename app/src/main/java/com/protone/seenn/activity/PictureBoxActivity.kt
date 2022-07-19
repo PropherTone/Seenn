@@ -5,13 +5,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.root
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
-import com.protone.database.room.entity.GalleyMedia
+import com.protone.api.entity.GalleyMedia
 import com.protone.seen.adapter.PictureBoxAdapter
 import com.protone.seenn.R
 import com.protone.seenn.databinding.PictureBoxActivityBinding
 import com.protone.seenn.viewModel.PictureBoxViewModel
 
-class PictureBoxActivity:BaseActivity<PictureBoxActivityBinding,PictureBoxViewModel>(false) {
+class PictureBoxActivity:BaseActivity<PictureBoxActivityBinding, PictureBoxViewModel>(false) {
     override val viewModel: PictureBoxViewModel by viewModels()
 
     override fun createView() {

@@ -10,8 +10,8 @@ import com.protone.api.context.linkInput
 import com.protone.api.context.root
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
-import com.protone.database.room.entity.Music
-import com.protone.mediamodle.Medias
+import com.protone.api.entity.Music
+import com.protone.seenn.Medias
 import com.protone.seen.adapter.AddMusicListAdapter
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.workLocalBroadCast

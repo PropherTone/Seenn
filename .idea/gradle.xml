@@ -11,13 +11,14 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/api" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/cloud" />
+            <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/dataBase" />
-            <option value="$PROJECT_DIR$/mediaModle" />
-            <option value="$PROJECT_DIR$/seen" />
+            <option value="$PROJECT_DIR$/media" />
+            <option value="$PROJECT_DIR$/ui" />
             <option value="$PROJECT_DIR$/values" />
+            <option value="$PROJECT_DIR$/worker" />
           </set>
         </option>
       </GradleProjectSettings>

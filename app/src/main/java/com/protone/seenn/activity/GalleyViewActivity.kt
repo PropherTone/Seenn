@@ -18,7 +18,7 @@ import com.protone.api.context.root
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.json.toUri
-import com.protone.database.room.entity.GalleyMedia
+import com.protone.api.entity.GalleyMedia
 import com.protone.seen.adapter.CheckListAdapter
 import com.protone.seen.adapter.GalleyViewPager2Adapter
 import com.protone.seen.databinding.ImageCateLayoutBinding

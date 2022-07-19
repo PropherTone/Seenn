@@ -5,10 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.view.ViewTreeObserver
 import androidx.activity.viewModels
-import com.protone.api.context.checkNeededPermission
 import com.protone.api.context.*
-import com.protone.api.context.requestContentPermission
-import com.protone.mediamodle.GalleyHelper
+import com.protone.seenn.GalleyHelper
 import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.databinding.SplashActivityBinding
 import com.protone.seenn.service.MusicService
@@ -67,7 +65,7 @@ class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true
     }
 
     private fun updateMedia() {
-        workLocalBroadCast.sendBroadcast(Intent().setAction(UPDATE_GALLEY))
+        workLocalBroadCast.sendBroadcast(Intent(UPDATE_GALLEY))
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC))
         GalleyHelper.updateAll {
             sendViewEvent(SplashViewModel.ViewEvent.InitConfig.name)

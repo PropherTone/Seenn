@@ -7,10 +7,11 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Seenn"
-include ':seen'
-include ':api'
+include ':ui'
+include ':common'
 include ':dataBase'
 include ':cloud'
-include ':mediaModle'
+include ':media'
 include ':app'
 include ':values'
+include ':worker'

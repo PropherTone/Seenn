@@ -1,7 +1,7 @@
 package com.protone.database.room.dao
 
 import androidx.room.*
-import com.protone.database.room.entity.Note
+import com.protone.api.entity.Note
 
 @Dao
 interface NoteDAO {

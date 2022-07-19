@@ -8,18 +8,17 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.api.context.intent
 import com.protone.api.context.root
+import com.protone.api.entity.GalleyMedia
 import com.protone.api.json.toJson
 import com.protone.api.json.toUriJson
-import com.protone.database.room.entity.GalleyMedia
-import com.protone.database.sp.config.userConfig
-import com.protone.mediamodle.Medias
 import com.protone.seen.R
 import com.protone.seen.adapter.MyFragmentStateAdapter
+import com.protone.seenn.Medias
+import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.GalleyActivityBinding
 import com.protone.seenn.fragment.GalleyFragment
 import com.protone.seenn.viewModel.GalleyViewModel
 import com.protone.seenn.viewModel.GalleyViewViewModel
-import com.protone.seenn.viewModel.IntentDataHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

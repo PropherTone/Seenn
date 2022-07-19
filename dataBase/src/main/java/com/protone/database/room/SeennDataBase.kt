@@ -4,8 +4,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.protone.api.context.SApplication
+import com.protone.api.entity.*
 import com.protone.database.room.dao.*
-import com.protone.database.room.entity.*
 import java.lang.ref.WeakReference
 
 @Database(
@@ -32,7 +32,7 @@ abstract class SeennDataBase : RoomDatabase() {
     abstract fun getGalleyBucketDAO(): GalleyBucketDAO
     abstract fun getGalleriesWithNotesDAO(): GalleriesWithNotesDAO
     abstract fun getNoteDirWithNoteDAO(): NoteDirWithNoteDAO
-    abstract fun getMusicWithMusicBucket(): MusicWithMusicBucketDAO
+    abstract fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO
 
     companion object {
         @JvmStatic

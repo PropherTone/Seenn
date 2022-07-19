@@ -35,5 +35,5 @@ fun getNoteDirWithNoteDAO(): NoteDirWithNoteDAO {
 }
 
 fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO {
-    return SeennDataBase.database.getMusicWithMusicBucket()
+    return SeennDataBase.database.getMusicWithMusicBucketDAO()
 }

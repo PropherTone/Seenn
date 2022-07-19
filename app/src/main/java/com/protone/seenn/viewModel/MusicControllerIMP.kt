@@ -5,7 +5,7 @@ import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import com.protone.api.baseType.getString
 import com.protone.api.context.*
-import com.protone.database.room.entity.Music
+import com.protone.api.entity.Music
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.customView.musicPlayer.BaseMusicPlayer

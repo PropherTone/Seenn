@@ -3,9 +3,9 @@ package com.protone.database.room.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.protone.database.room.entity.GalleriesWithNotes
-import com.protone.database.room.entity.GalleyMedia
-import com.protone.database.room.entity.Note
+import com.protone.api.entity.GalleriesWithNotes
+import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.Note
 
 @Dao
 interface GalleriesWithNotesDAO {

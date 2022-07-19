@@ -3,9 +3,9 @@ package com.protone.database.room.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.protone.database.room.entity.Music
-import com.protone.database.room.entity.MusicBucket
-import com.protone.database.room.entity.MusicWithMusicBucket
+import com.protone.api.entity.Music
+import com.protone.api.entity.MusicBucket
+import com.protone.api.entity.MusicWithMusicBucket
 
 @Dao
 interface MusicWithMusicBucketDAO {

@@ -1,8 +1,7 @@
 package com.protone.cloud.noteSync
 
-import android.net.wifi.WifiConfiguration
 import com.protone.api.json.toJson
-import com.protone.database.room.entity.Note
+import com.protone.api.entity.Note
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

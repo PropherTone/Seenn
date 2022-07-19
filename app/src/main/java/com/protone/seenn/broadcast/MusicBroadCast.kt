@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.protone.api.context.*
+import com.protone.api.tryWithRecording
 
 val musicBroadCastManager by lazy { LocalBroadcastManager.getInstance(SApplication.app) }
 
@@ -13,7 +14,7 @@ abstract class MusicReceiver : BroadcastReceiver() {
     private var isPlaying = false
 
     override fun onReceive(p0: Context?, p1: Intent?) {
-        try {
+        tryWithRecording {
             when (p1?.action) {
                 MUSIC_PLAY -> {
                     isPlaying = if (!isPlaying) {
@@ -50,8 +51,6 @@ abstract class MusicReceiver : BroadcastReceiver() {
                     refresh(true)
                 }
             }
-        } catch (e: Exception) {
-
         }
     }
 

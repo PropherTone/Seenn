@@ -10,16 +10,19 @@ import com.protone.api.context.UPDATE_GALLEY
 import com.protone.api.context.UPDATE_MUSIC
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.json.toUri
+import com.protone.api.tryWithRecording
 
 val workLocalBroadCast by lazy { LocalBroadcastManager.getInstance(SApplication.app) }
 
 abstract class WorkReceiver : BroadcastReceiver(), IWorkService {
 
     override fun onReceive(p0: Context?, p1: Intent?) {
-        when (p1?.action) {
-            UPDATE_MUSIC_BUCKET -> updateMusicBucket()
-            UPDATE_MUSIC -> updateMusic(p1.getStringExtra("uri")?.toUri())
-            UPDATE_GALLEY -> updateGalley(p1.getStringExtra("uri")?.toUri())
+        tryWithRecording {
+            when (p1?.action) {
+                UPDATE_MUSIC_BUCKET -> updateMusicBucket()
+                UPDATE_MUSIC -> updateMusic(p1.getStringExtra("uri")?.toUri())
+                UPDATE_GALLEY -> updateGalley(p1.getStringExtra("uri")?.toUri())
+            }
         }
     }
 }

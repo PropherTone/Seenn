@@ -3,9 +3,9 @@ package com.protone.database.room.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.protone.database.room.entity.Note
-import com.protone.database.room.entity.NoteDir
-import com.protone.database.room.entity.NoteDirWithNotes
+import com.protone.api.entity.Note
+import com.protone.api.entity.NoteDir
+import com.protone.api.entity.NoteDirWithNotes
 
 @Dao
 interface NoteDirWithNoteDAO {

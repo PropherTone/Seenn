@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.protone.database.room.entity.NoteDir
+import com.protone.api.entity.NoteDir
 
 @Dao
 interface NoteTypeDAO {

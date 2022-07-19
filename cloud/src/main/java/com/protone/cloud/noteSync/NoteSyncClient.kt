@@ -2,7 +2,7 @@ package com.protone.cloud.noteSync
 
 import android.util.Log
 import com.protone.api.json.toEntity
-import com.protone.database.room.entity.Note
+import com.protone.api.entity.Note
 import kotlinx.coroutines.*
 import java.io.DataInputStream
 import java.io.IOException

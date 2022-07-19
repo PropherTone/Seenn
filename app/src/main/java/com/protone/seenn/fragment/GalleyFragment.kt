@@ -18,20 +18,20 @@ import com.protone.api.animation.AnimationHelper
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
-import com.protone.database.room.dao.DataBaseDAOHelper
-import com.protone.database.room.entity.GalleyBucket
-import com.protone.database.room.entity.GalleyMedia
-import com.protone.mediamodle.media.FragMailer
-import com.protone.mediamodle.media.IGalleyFragment
+import com.protone.api.entity.GalleyBucket
+import com.protone.api.entity.GalleyMedia
 import com.protone.seen.adapter.GalleyBucketAdapter
 import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seen.customView.StateImageView
 import com.protone.seen.databinding.GalleyFragmentLayoutBinding
 import com.protone.seen.dialog.titleDialog
 import com.protone.seen.itemDecoration.GalleyItemDecoration
+import com.protone.seenn.IntentDataHolder
 import com.protone.seenn.R
 import com.protone.seenn.activity.GalleySearchActivity
-import com.protone.seenn.viewModel.IntentDataHolder
+import com.protone.seenn.database.DatabaseHelper
+import com.protone.seenn.media.FragMailer
+import com.protone.seenn.media.IGalleyFragment
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlin.streams.toList
@@ -102,17 +102,22 @@ class GalleyFragment(
         override fun onGalleyUpdate(updateList: ArrayList<GalleyMedia>) {
             launch(Dispatchers.IO) {
                 var isNew = false
-                DataBaseDAOHelper.getAllMediaByType(isVideo)?.let {
-                    galleyMap[R.string.all_galley.getString()] = it as MutableList<GalleyMedia>
-                }
+                DatabaseHelper
+                    .instance
+                    .signedGalleyDAOBridge
+                    .getAllMediaByType(isVideo)
+                    ?.let {
+                        galleyMap[R.string.all_galley.getString()] = it as MutableList<GalleyMedia>
+                    }
                 updateList.stream().map { it.bucket }.toList().forEach {
                     if (galleyMap[it] == null) {
                         isNew = true
                     }
-                    galleyMap[it] = (DataBaseDAOHelper.getAllMediaByGalley(
-                        it,
-                        isVideo
-                    ) as MutableList<GalleyMedia>)
+                    galleyMap[it] = (
+                            DatabaseHelper
+                                .instance
+                                .signedGalleyDAOBridge
+                                .getAllMediaByGalley(it, isVideo) as MutableList<GalleyMedia>)
                     galleyMap[it]?.let { list ->
                         val pair = Pair(
                             if (list.size > 0) list[0].uri else Uri.EMPTY,
@@ -187,14 +192,12 @@ class GalleyFragment(
             while (!onViewCreated) {
                 kotlinx.coroutines.selects.select<Unit> {
                     channel.onReceive {
-                        when (it) {
-                            "onCreateView" -> {
-                                onViewCreated = true
-                                initList()
-                                sortData()
-                                channel.close()
-                                if (!isLock) sortPrivateData()
-                            }
+                        if (it == "onCreateView") {
+                            onViewCreated = true
+                            initList()
+                            sortData()
+                            channel.close()
+                            if (!isLock) sortPrivateData()
                         }
                     }
                 }
@@ -263,64 +266,74 @@ class GalleyFragment(
     }
 
     private fun sortPrivateData() = launch(Dispatchers.IO) {
-        (DataBaseDAOHelper.getALLGalleyBucket(isVideo) as MutableList<GalleyBucket>?)?.forEach {
-            synchronized(binding) {
-                insertBucket(Pair(Uri.EMPTY, arrayOf(it.type, "PRIVATE")))
-                galleyMap[it.type] = mutableListOf()
+        (DatabaseHelper
+            .instance
+            .galleyBucketDAOBridge
+            .getALLGalleyBucket(isVideo) as MutableList<GalleyBucket>?)
+            ?.forEach {
+                synchronized(binding) {
+                    insertBucket(Pair(Uri.EMPTY, arrayOf(it.type, "PRIVATE")))
+                    galleyMap[it.type] = mutableListOf()
+                }
             }
-        }
     }
 
     private fun sortData() = launch(Dispatchers.IO) {
         galleyMap[context?.getString(R.string.all_galley)] = mutableListOf()
-        DataBaseDAOHelper.run {
-            val signedMedias = getAllMediaByType(isVideo) as MutableList<GalleyMedia>?
-            if (signedMedias == null) {
-                R.string.none.getString().toast()
-                return@launch
-            }
-            signedMedias.let {
-                galleyMap[context?.getString(R.string.all_galley)] = it
-                insertBucket(
-                    Pair(
-                        if (signedMedias.size > 0) signedMedias[0].uri else Uri.EMPTY,
-                        arrayOf(
-                            requireContext().getString(R.string.all_galley),
-                            signedMedias.size.toString()
+        DatabaseHelper
+            .instance
+            .signedGalleyDAOBridge
+            .run {
+                val signedMedias = getAllMediaByType(isVideo) as MutableList<GalleyMedia>?
+                if (signedMedias == null) {
+                    R.string.none.getString().toast()
+                    return@launch
+                }
+                signedMedias.let {
+                    galleyMap[context?.getString(R.string.all_galley)] = it
+                    insertBucket(
+                        Pair(
+                            if (signedMedias.size > 0) signedMedias[0].uri else Uri.EMPTY,
+                            arrayOf(
+                                requireContext().getString(R.string.all_galley),
+                                signedMedias.size.toString()
+                            )
                         )
                     )
-                )
-                getBucketAdapter()?.performSelect()
-                noticeListUpdate(it)
-            }
-            if (!isLock) launch(Dispatchers.IO) {
-                signedMedias.forEach {
-                    it.type?.forEach { type ->
-                        if (galleyMap[type] == null) {
-                            galleyMap[type] = mutableListOf()
+                    getBucketAdapter()?.performSelect()
+                    noticeListUpdate(it)
+                }
+                if (!isLock) launch(Dispatchers.IO) {
+                    signedMedias.forEach {
+                        it.type?.forEach { type ->
+                            if (galleyMap[type] == null) {
+                                galleyMap[type] = mutableListOf()
+                            }
+                            galleyMap[type]?.add(it)
                         }
-                        galleyMap[type]?.add(it)
                     }
                 }
-            }
-            getAllGalley(isVideo)?.forEach {
-                galleyMap[it] = (getAllMediaByGalley(it, isVideo) as MutableList<GalleyMedia>)
-                    .also { list ->
-                        synchronized(binding) {
-                            insertBucket(
-                                Pair(
-                                    if (list.size > 0) list[0].uri else Uri.EMPTY,
-                                    arrayOf(it, list.size.toString())
+                getAllGalley(isVideo)?.forEach {
+                    galleyMap[it] = (getAllMediaByGalley(it, isVideo) as MutableList<GalleyMedia>)
+                        .also { list ->
+                            synchronized(binding) {
+                                insertBucket(
+                                    Pair(
+                                        if (list.size > 0) list[0].uri else Uri.EMPTY,
+                                        arrayOf(it, list.size.toString())
+                                    )
                                 )
-                            )
+                            }
                         }
-                    }
+                }
             }
-        }
     }
 
     private fun addBucket(name: String) {
-        DataBaseDAOHelper.insertGalleyBucketCB(GalleyBucket(name, isVideo)) { re, reName ->
+        DatabaseHelper
+            .instance
+            .galleyBucketDAOBridge
+            .insertGalleyBucketCB(GalleyBucket(name, isVideo)) { re, reName ->
             if (re) {
                 if (!isLock) {
                     insertBucket(Pair(Uri.EMPTY, arrayOf(reName, "PRIVATE")))

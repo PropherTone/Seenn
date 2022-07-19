@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.protone.database.room.entity.GalleyMedia
+import com.protone.api.entity.GalleyMedia
 import com.protone.seen.databinding.RichVideoLayoutBinding
 
 class GalleyViewFragment(private val galleyMedia: GalleyMedia) : Fragment() {

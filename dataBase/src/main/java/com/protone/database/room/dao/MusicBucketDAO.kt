@@ -1,7 +1,7 @@
 package com.protone.database.room.dao
 
 import androidx.room.*
-import com.protone.database.room.entity.MusicBucket
+import com.protone.api.entity.MusicBucket
 
 @Dao
 interface MusicBucketDAO {

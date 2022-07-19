@@ -7,10 +7,10 @@ import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.root
 import com.protone.api.context.statuesBarHeight
-import com.protone.database.room.entity.Music
-import com.protone.database.sp.config.userConfig
+import com.protone.api.entity.Music
 import com.protone.seen.adapter.TransparentPlayListAdapter
 import com.protone.seen.itemDecoration.GalleyItemDecoration
+import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.MusicViewActivityBinding
 import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.seenn.viewModel.MusicViewModel

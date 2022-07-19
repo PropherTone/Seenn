@@ -8,21 +8,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.baseType.getDrawable
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.*
-import com.protone.database.room.entity.Music
-import com.protone.database.room.entity.MusicBucket
-import com.protone.database.sp.config.userConfig
-import com.protone.mediamodle.Medias
+import com.protone.api.entity.Music
+import com.protone.api.entity.MusicBucket
 import com.protone.seen.adapter.MusicBucketAdapter
 import com.protone.seen.adapter.MusicListAdapter
 import com.protone.seen.customView.StateImageView
+import com.protone.seenn.Medias
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.workLocalBroadCast
+import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.MusicActivtiyBinding
 import com.protone.seenn.viewModel.AddBucketViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
@@ -40,11 +39,10 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
         binding = MusicActivtiyBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MusicActivity
             root.viewTreeObserver.addOnGlobalLayoutListener(this@MusicActivity)
-            appToolbar.addOnOffsetChangedListener(
-                AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-                    binding.toolbar.progress =
-                        -verticalOffset / appBarLayout.totalScrollRange.toFloat()
-                })
+            appToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+                binding.toolbar.progress =
+                    -verticalOffset / appBarLayout.totalScrollRange.toFloat()
+            }
         }
         fitNavigationBar(binding.root)
     }
@@ -248,7 +246,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
         }
     }
 
-    fun addBucket(name: String) = launch(Dispatchers.IO) {
+    private fun addBucket(name: String) = launch(Dispatchers.IO) {
         viewModel.getMusicBucketByName(name)?.let {
             withContext(Dispatchers.Main) {
                 getMusicBucketAdapter().addBucket(it)

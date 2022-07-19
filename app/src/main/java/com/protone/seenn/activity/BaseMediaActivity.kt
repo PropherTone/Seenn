@@ -8,8 +8,7 @@ import com.protone.api.baseType.getFileMimeType
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.*
-import com.protone.database.room.dao.DataBaseDAOHelper
-import com.protone.database.room.entity.GalleyMedia
+import com.protone.api.entity.GalleyMedia
 import com.protone.seen.databinding.GalleyOptionPopBinding
 import com.protone.seen.dialog.cateDialog
 import com.protone.seen.dialog.checkListDialog
@@ -17,6 +16,7 @@ import com.protone.seen.dialog.titleDialog
 import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seen.popWindows.GalleyOptionPop
 import com.protone.seenn.R
+import com.protone.seenn.database.DatabaseHelper
 import com.protone.seenn.viewModel.GalleyViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -138,7 +138,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
         launch(Dispatchers.IO) {
             val result = deleteMedia(gm.uri)
             if (result) {
-                DataBaseDAOHelper.deleteSignedMedia(gm)
+                DatabaseHelper.instance.signedGalleyDAOBridge.deleteSignedMedia(gm)
                 callBack.invoke(gm)
                 R.string.success.getString().toast()
             } else R.string.not_supported.getString().toast()
@@ -152,7 +152,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
             gm.forEach {
                 val result = multiDeleteMedia(it.uri)
                 if (result) {
-                    DataBaseDAOHelper.deleteSignedMedia(it)
+                    DatabaseHelper.instance.signedGalleyDAOBridge.deleteSignedMedia(it)
                 } else {
                     reList.add(it.name)
                 }
@@ -199,7 +199,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
                     (g.cate as MutableList).add(cate)
                 }
             }
-            DataBaseDAOHelper.updateMediaMultiAsync(list)
+            DatabaseHelper.instance.signedGalleyDAOBridge.updateMediaMultiAsync(list)
         }
     }
 
@@ -214,7 +214,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
             anchor,
             withContext(Dispatchers.IO) {
                 val list = mutableListOf<String>()
-                DataBaseDAOHelper.getALLGalleyBucket(isVideo)
+                DatabaseHelper.instance.galleyBucketDAOBridge.getALLGalleyBucket(isVideo)
                     ?.forEach {
                         list.add(it.type)
                     }
@@ -228,7 +228,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEve
                             (it.type as MutableList<String>).add(re)
                         else "${it.name}已存在${it.type}中".toast()
                     }
-                    DataBaseDAOHelper.updateMediaMultiAsync(list)
+                    DatabaseHelper.instance.signedGalleyDAOBridge.updateMediaMultiAsync(list)
                     callback.invoke(re, list)
                 }
             } else R.string.none.getString().toast()

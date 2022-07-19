@@ -11,20 +11,23 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.root
+import com.protone.api.entity.Music
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.todayDate
-import com.protone.database.room.dao.DataBaseDAOHelper
-import com.protone.database.room.entity.Music
-import com.protone.database.sp.config.userConfig
-import com.protone.mediamodle.Medias
+import com.protone.seenn.Medias
 import com.protone.seen.adapter.MainModelListAdapter
 import com.protone.seen.itemDecoration.ModelListItemDecoration
 import com.protone.seenn.R
+import com.protone.seenn.database.DatabaseHelper
+import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.MainActivityBinding
 import com.protone.seenn.service.WorkService
 import com.protone.seenn.viewModel.MainViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
     ViewTreeObserver.OnGlobalLayoutListener {
@@ -87,25 +90,34 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
                 userConfig.musicLoopMode = it
             }
             musicController.setLoopMode(userConfig.musicLoopMode)
-            Medias.musicBucket[userConfig.lastMusicBucket]?.let {
-                musicController.setMusicList(it)
-                musicController.refresh(
-                    if (userConfig.lastMusic.isNotEmpty())
-                        userConfig.lastMusic.toEntity(Music::class.java)
-                    else binder.getPlayList()[0], userConfig.lastMusicProgress
-                )
+            launch(Dispatchers.IO) {
+                while (isActive) {
+                    if (Medias.musicBucketLive.value != null && Medias.musicBucketLive.value == 1) {
+                        break
+                    }
+                }
+                Medias.musicBucket[userConfig.lastMusicBucket]?.let {
+                    musicController.setMusicList(it)
+                    musicController.refresh(
+                        if (userConfig.lastMusic.isNotEmpty())
+                            userConfig.lastMusic.toEntity(Music::class.java)
+                        else binder.getPlayList()[0], userConfig.lastMusicProgress
+                    )
+                }
             }
         }
 
-        Medias.galleyLive.observe(this@MainActivity) {
-            refreshModelList()
-        }
-        Medias.audioLive.observe(this@MainActivity) {
-            musicController.refresh()
+        Medias.apply {
+            galleyLive.observe(this@MainActivity) {
+                refreshModelList()
+            }
+            audioLive.observe(this@MainActivity) {
+                musicController.refresh()
+            }
         }
 
         onFinish = {
-            DataBaseDAOHelper.shutdownNow()
+            DatabaseHelper.instance.shutdownNow()
             stopService(WorkService::class.intent)
             userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
             userConfig.lastMusic = binder.onMusicPlaying().value?.toJson() ?: ""

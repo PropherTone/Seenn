@@ -9,8 +9,8 @@ import com.protone.api.context.intent
 import com.protone.api.context.marginBottom
 import com.protone.api.context.root
 import com.protone.api.context.setSoftInputStatuesListener
+import com.protone.api.entity.MusicBucket
 import com.protone.api.json.toUri
-import com.protone.database.room.entity.MusicBucket
 import com.protone.seenn.R
 import com.protone.seenn.databinding.AddBucketActivityBinding
 import com.protone.seenn.viewModel.AddBucketViewModel

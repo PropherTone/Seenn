@@ -15,10 +15,10 @@ import com.protone.api.context.*
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
-import com.protone.database.room.entity.GalleyMedia
-import com.protone.database.room.entity.Note
-import com.protone.mediamodle.note.entity.*
-import com.protone.mediamodle.note.spans.ISpanForUse
+import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.Note
+import com.protone.api.entity.*
+import com.protone.seenn.note.spans.ISpanForUse
 import com.protone.seen.dialog.imageListDialog
 import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seenn.R

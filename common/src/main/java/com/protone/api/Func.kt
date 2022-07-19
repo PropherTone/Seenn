@@ -1,0 +1,32 @@
+package com.protone.api
+
+import android.content.pm.ApplicationInfo
+import com.protone.api.context.SApplication
+import java.text.SimpleDateFormat
+import java.util.*
+
+fun isInDebug(): Boolean {
+    return try {
+        val info: ApplicationInfo = SApplication.app.applicationInfo
+        (info.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+    } catch (e: java.lang.Exception) {
+        false
+    }
+}
+
+fun todayDate(format: String): String = SimpleDateFormat(
+    format,
+    Locale.getDefault()
+).format(Calendar.getInstance(Locale.getDefault()).apply {
+    timeInMillis = System.currentTimeMillis()
+}.time)
+
+fun tryWithRecording(func: () -> Unit) {
+    try {
+        func.invoke()
+    } catch (e: Exception) {
+        if (SCrashHandler.path != null) {
+            SCrashHandler.writeLog(e)
+        }
+    }
+}

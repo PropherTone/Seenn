@@ -9,8 +9,8 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.root
-import com.protone.database.room.entity.Note
-import com.protone.database.room.entity.NoteDir
+import com.protone.api.entity.Note
+import com.protone.api.entity.NoteDir
 import com.protone.seen.R
 import com.protone.seen.adapter.NoteListAdapter
 import com.protone.seen.adapter.NoteTypeListAdapter

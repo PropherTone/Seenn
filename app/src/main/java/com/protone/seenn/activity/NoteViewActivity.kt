@@ -9,7 +9,7 @@ import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.root
 import com.protone.api.json.toJson
-import com.protone.database.room.entity.Note
+import com.protone.api.entity.Note
 import com.protone.seen.customView.richText.RichNoteView
 import com.protone.seenn.R
 import com.protone.seenn.databinding.NoteViewActivityBinding
