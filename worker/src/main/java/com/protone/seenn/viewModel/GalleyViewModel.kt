@@ -1,15 +1,14 @@
 package com.protone.seenn.viewModel
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.google.android.material.tabs.TabLayout
 import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleyMedia
+import com.protone.seenn.R
 import com.protone.seenn.media.FragMailer
 import com.protone.seenn.media.IGalleyFragment
-import com.protone.seenn.R
 
-class GalleyViewModel : ViewModel(), TabLayout.OnTabSelectedListener {
+class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     companion object {
         @JvmStatic
         val CUSTOM = "CustomChoose"

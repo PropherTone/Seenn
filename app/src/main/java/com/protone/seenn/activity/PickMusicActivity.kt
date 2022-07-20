@@ -5,17 +5,18 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.SearchModel
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.linkInput
 import com.protone.api.context.root
-import com.protone.api.baseType.getString
-import com.protone.api.baseType.toast
 import com.protone.api.entity.Music
-import com.protone.seenn.Medias
 import com.protone.seen.adapter.AddMusicListAdapter
+import com.protone.seenn.Medias
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.databinding.PickMusicActivityBinding
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,7 +54,7 @@ class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewMo
         }
     }
 
-    override suspend fun onViewEvent(event: String) = Unit
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     override fun finish() {
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))

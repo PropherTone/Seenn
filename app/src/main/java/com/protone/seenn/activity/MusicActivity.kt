@@ -24,6 +24,7 @@ import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.MusicActivtiyBinding
 import com.protone.seenn.viewModel.AddBucketViewModel
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.seenn.viewModel.MusicModel
 import kotlinx.coroutines.Dispatchers
@@ -47,10 +48,10 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
         fitNavigationBar(binding.root)
     }
 
-    override suspend fun onViewEvent(event: String) {
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
         when (event) {
-            MusicModel.ViewEvent.Delete.name -> viewModel.delete()
-            MusicModel.ViewEvent.RefreshBucket.name -> viewModel.refreshBucket()
+            MusicModel.MusicEvent.Delete -> viewModel.delete()
+            MusicModel.MusicEvent.RefreshBucket -> viewModel.refreshBucket()
         }
     }
 
@@ -105,7 +106,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
     }
 
     fun sendDelete() {
-        sendViewEvent(MusicModel.ViewEvent.Delete.name)
+        sendViewEvent(MusicModel.MusicEvent.Delete)
     }
 
     fun edit() {
@@ -145,7 +146,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
     }
 
     private fun sendRefreshBucket() {
-        sendViewEvent(MusicModel.ViewEvent.RefreshBucket.name)
+        sendViewEvent(MusicModel.MusicEvent.RefreshBucket)
     }
 
     private suspend fun MusicModel.refreshBucket() {
@@ -205,7 +206,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                     override fun delete(bucket: String, position: Int) {
                         this@initList.bucket = bucket
                         actionPosition = position
-                        sendViewEvent(MusicModel.ViewEvent.Delete.name)
+                        sendViewEvent(MusicModel.MusicEvent.Delete)
                     }
 
                     override fun edit(bucket: String, position: Int) {

@@ -11,13 +11,12 @@ import com.bumptech.glide.Glide
 import com.protone.api.context.newLayoutInflater
 import com.protone.api.context.root
 import com.protone.api.context.setSoftInputStatuesListener
+import com.protone.api.onResult
 import com.protone.seen.R
 import com.protone.seen.adapter.BaseAdapter
 import com.protone.seen.adapter.CheckListAdapter
 import com.protone.seen.databinding.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 
 fun Activity.loginDialog(
     isReg: Boolean,
@@ -49,7 +48,7 @@ fun Activity.loginDialog(
     log.show()
     val attributes = log.window?.attributes
     val oldY = attributes?.y
-    setSoftInputStatuesListener { i, b ->
+    setSoftInputStatuesListener { _, b ->
         if (b) {
             attributes?.y = attributes?.y?.minus(binding.root.measuredHeight / 2)
             log.onWindowAttributesChanged(attributes)
@@ -74,7 +73,7 @@ fun Activity.regDialog(confirmCall: (String, String) -> Boolean) {
     log.show()
     val attributes = log.window?.attributes
     val oldY = attributes?.y
-    setSoftInputStatuesListener { i, b ->
+    setSoftInputStatuesListener { _, b ->
         if (b) {
             attributes?.y = attributes?.y?.minus(binding.root.measuredHeight / 2)
             log.onWindowAttributesChanged(attributes)
@@ -185,50 +184,47 @@ fun Activity.checkListDialog(
 
 suspend fun Activity.imageListDialog(
     dataList: MutableList<Uri>
-) = withContext(Dispatchers.Main) {
-    suspendCancellableCoroutine<Boolean> { co ->
-        val binding = ImageListDialogLayoutBinding.inflate(
-            newLayoutInflater,
-            root,
-            false
-        )
-        val create = AlertDialog.Builder(this@imageListDialog).setView(binding.root).create()
-        binding.apply {
-            listList.apply {
-                layoutManager = LinearLayoutManager(context)
-                adapter = object : BaseAdapter<PhotoCardLayoutBinding>(context) {
+) = onResult(Dispatchers.Main) { co ->
+    val binding = ImageListDialogLayoutBinding.inflate(
+        newLayoutInflater,
+        root,
+        false
+    )
+    val create = AlertDialog.Builder(this@imageListDialog).setView(binding.root).create()
+    binding.apply {
+        listList.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = object : BaseAdapter<PhotoCardLayoutBinding>(context) {
 
-                    override fun onCreateViewHolder(
-                        parent: ViewGroup,
-                        viewType: Int
-                    ): Holder<PhotoCardLayoutBinding> {
-                        return Holder(PhotoCardLayoutBinding.inflate(layoutInflater, parent, false))
-                    }
-
-                    override fun onBindViewHolder(
-                        holder: Holder<PhotoCardLayoutBinding>,
-                        position: Int
-                    ) {
-                        Glide.with(context).asDrawable().load(dataList[position])
-                            .into(holder.binding.photoCardPhoto)
-                        val i = position + 1
-                        holder.binding.photoCardTitle.text = i.toString()
-                    }
-
-                    override fun getItemCount(): Int = dataList.size
-
+                override fun onCreateViewHolder(
+                    parent: ViewGroup,
+                    viewType: Int
+                ): Holder<PhotoCardLayoutBinding> {
+                    return Holder(PhotoCardLayoutBinding.inflate(layoutInflater, parent, false))
                 }
-            }
-            listConfirm.setOnClickListener {
-                co.resumeWith(Result.success(true))
-                create.dismiss()
-            }
-            listDismiss.setOnClickListener {
-                co.resumeWith(Result.success(false))
-                create.dismiss()
+
+                override fun onBindViewHolder(
+                    holder: Holder<PhotoCardLayoutBinding>,
+                    position: Int
+                ) {
+                    Glide.with(context).asDrawable().load(dataList[position])
+                        .into(holder.binding.photoCardPhoto)
+                    val i = position + 1
+                    holder.binding.photoCardTitle.text = i.toString()
+                }
+
+                override fun getItemCount(): Int = dataList.size
+
             }
         }
-        create.show()
+        listConfirm.setOnClickListener {
+            co.resumeWith(Result.success(true))
+            create.dismiss()
+        }
+        listDismiss.setOnClickListener {
+            co.resumeWith(Result.success(false))
+            create.dismiss()
+        }
     }
-
+    create.show()
 }

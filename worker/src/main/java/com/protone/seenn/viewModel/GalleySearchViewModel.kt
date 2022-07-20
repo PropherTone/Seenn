@@ -1,6 +1,5 @@
 package com.protone.seenn.viewModel
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.protone.api.entity.GalleyMedia
 import com.protone.seenn.database.DatabaseHelper
@@ -14,7 +13,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.streams.toList
 
-class GalleySearchViewModel : ViewModel() {
+class GalleySearchViewModel : BaseViewModel() {
 
     val data = mutableListOf<GalleyMedia>()
 

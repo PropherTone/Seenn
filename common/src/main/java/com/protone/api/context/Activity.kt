@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
+import android.view.ViewGroup
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.protone.api.R
 import com.protone.api.baseType.getString
@@ -135,3 +136,22 @@ fun Activity.multiDeleteMedia(uri: Uri): Boolean {
 fun Activity.showFailedToast() = runOnUiThread {
     R.string.failed_msg.getString().toast()
 }
+
+val Activity.hasNavigationBar: Boolean
+    get() {
+        return this.baseContext.navigationBarHeight > 0
+    }
+
+val Activity.isNavigationBar: Boolean
+    get() {
+        val vp = window.decorView as? ViewGroup
+        if (vp != null) {
+            for (i in 0 until vp.childCount) {
+                vp.getChildAt(i).context.packageName
+                if (vp.getChildAt(i).id != -1 && "navigationBarBackground" ==
+                    resources.getResourceEntryName(vp.getChildAt(i).id)
+                ) return true
+            }
+        }
+        return false
+    }

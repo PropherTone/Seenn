@@ -1,6 +1,5 @@
 package com.protone.seenn.viewModel
 
-import androidx.lifecycle.ViewModel
 import com.protone.api.baseType.getString
 import com.protone.api.entity.Note
 import com.protone.api.entity.NoteDir
@@ -10,11 +9,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.suspendCoroutine
 
-class NoteViewModel : ViewModel() {
+class NoteViewModel : BaseViewModel() {
 
-    enum class ViewEvent {
-        Init,
-        RefreshList
+    sealed class NoteViewEvent {
+        object Init : ViewEvent
+        object RefreshList : ViewEvent
     }
 
     private val noteList = mutableMapOf<String, MutableList<Note>>()

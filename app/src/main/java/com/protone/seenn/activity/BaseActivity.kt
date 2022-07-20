@@ -13,20 +13,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import com.protone.api.TAG
 import com.protone.api.context.*
+import com.protone.api.onResult
+import com.protone.seenn.IntentDataHolder
 import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seenn.service.MusicService
-import com.protone.seenn.IntentDataHolder
+import com.protone.seenn.viewModel.BaseViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import java.util.concurrent.atomic.AtomicInteger
 
-abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Boolean) :
+abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven: Boolean) :
     AppCompatActivity(),
     CoroutineScope by MainScope() {
     protected abstract val viewModel: VM
@@ -34,8 +35,8 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
 
     abstract fun createView()
     abstract suspend fun VM.init()
-    abstract suspend fun onViewEvent(event: String)
-    private var viewEvent: Channel<String>? = null
+    abstract suspend fun onViewEvent(event: BaseViewModel.ViewEvent)
+    private var viewEvent: Channel<BaseViewModel.ViewEvent>? = null
     private var viewEventTask: Job? = null
     protected var onFinish: (suspend () -> Unit)? = null
     protected var onResume: (suspend () -> Unit)? = null
@@ -122,18 +123,16 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
 
     suspend inline fun startActivityForResult(
         intent: Intent?,
-    ) = withContext(Dispatchers.Main) {
-        suspendCancellableCoroutine<ActivityResult?> { co ->
-            activityResultRegistry.register(
-                code.incrementAndGet().toString(),
-                ActivityResultContracts.StartActivityForResult(),
-            ) {
-                co.resumeWith(Result.success(it))
-            }.launch(intent)
-        }
+    ): ActivityResult? = onResult(Dispatchers.Main) { co ->
+        activityResultRegistry.register(
+            code.incrementAndGet().toString(),
+            ActivityResultContracts.StartActivityForResult(),
+        ) {
+            co.resumeWith(Result.success(it))
+        }.launch(intent)
     }
 
-    fun sendViewEvent(event: String) {
+    fun sendViewEvent(event: BaseViewModel.ViewEvent) {
         viewEvent?.trySend(event)
     }
 
@@ -165,7 +164,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : ViewModel>(handleEven: Bo
     }
 
     protected fun fitNavigationBar(root: View) {
-        if (isNavigationBar) root.marginBottom(navigationBarHeight)
+        if (hasNavigationBar) root.marginBottom(navigationBarHeight)
     }
 
     protected fun fitStatuesBarUsePadding(view: View) {

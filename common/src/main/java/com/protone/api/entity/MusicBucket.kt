@@ -6,10 +6,15 @@ import com.protone.api.converters.UriTypeConverter
 @Entity
 @TypeConverters(UriTypeConverter::class)
 data class MusicBucket(
+    @ColumnInfo(name = "name")
     var name: String,
+    @ColumnInfo(name = "icon")
     var icon: String?,
+    @ColumnInfo(name = "size")
     var size: Int,
+    @ColumnInfo(name = "detail")
     var detail: String?,
+    @ColumnInfo(name = "date")
     var date: String?
 ) {
     @PrimaryKey(autoGenerate = true)

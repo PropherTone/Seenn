@@ -1,9 +1,6 @@
 package com.protone.api.entity
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.protone.api.converters.ListTypeConverter
 
 @Entity(
@@ -30,6 +27,8 @@ import com.protone.api.converters.ListTypeConverter
 )
 @TypeConverters(ListTypeConverter::class)
 data class MusicWithMusicBucket(
+    @ColumnInfo(name = "musicBucketId")
     val musicBucketId: Long,
+    @ColumnInfo(name = "musicBaseId")
     val musicBaseId: Long
 )

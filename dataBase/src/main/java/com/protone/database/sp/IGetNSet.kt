@@ -1,6 +1,6 @@
 package com.protone.database.sp
 
-interface ISp {
+interface IGetNSet {
     fun setInt(key:String,value:Int)
     fun getInt(key:String,defValue:Int): Int
     fun setLong(key:String,value:Long)

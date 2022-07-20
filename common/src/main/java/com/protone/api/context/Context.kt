@@ -109,25 +109,6 @@ fun View.marginBottom(margin: Int) {
     layoutParams = marginLayoutParams
 }
 
-val Activity.hasNavigationBar: Boolean
-    get() {
-        return this.baseContext.navigationBarHeight > 0
-    }
-
-val Activity.isNavigationBar: Boolean
-    get() {
-        val vp = window.decorView as? ViewGroup
-        if (vp != null) {
-            for (i in 0 until vp.childCount) {
-                vp.getChildAt(i).context.packageName
-                if (vp.getChildAt(i).id != -1 && "navigationBarBackground" ==
-                    resources.getResourceEntryName(vp.getChildAt(i).id)
-                ) return true
-            }
-        }
-        return false
-    }
-
 inline fun Context.onUiThread(crossinline function: () -> Unit) {
     if (Looper.getMainLooper() == Looper.myLooper()) {
         function.invoke()

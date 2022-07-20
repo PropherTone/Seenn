@@ -11,8 +11,10 @@ public class NoteDir {
     @ColumnInfo(name = "noteDirId")
     Long noteDirId;
 
+    @ColumnInfo(name = "name")
     String name;
 
+    @ColumnInfo(name = "image")
     String image;
 
     public NoteDir(String name, String image) {

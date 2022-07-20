@@ -1,6 +1,5 @@
 package com.protone.seenn.viewModel
 
-import androidx.lifecycle.ViewModel
 import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleyMedia
 import com.protone.seenn.R
@@ -10,7 +9,7 @@ import kotlinx.coroutines.withContext
 import java.util.stream.Collectors
 import kotlin.streams.toList
 
-class GalleyViewViewModel : ViewModel() {
+class GalleyViewViewModel : BaseViewModel() {
 
     companion object {
         const val MEDIA = "GalleyViewActivity:MediaData"
@@ -18,8 +17,8 @@ class GalleyViewViewModel : ViewModel() {
         const val GALLEY = "GalleyViewActivity:Galley"
     }
 
-    enum class ViewEvent {
-        SetNote
+    sealed class GalleyViewEvent {
+        object SetNote : ViewEvent
     }
 
     var curPosition: Int = 0

@@ -1,7 +1,6 @@
 package com.protone.seenn.viewModel
 
 import android.net.Uri
-import androidx.lifecycle.ViewModel
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.saveToFile
 import com.protone.api.entity.MusicBucket
@@ -12,15 +11,15 @@ import com.protone.seenn.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class AddBucketViewModel : ViewModel() {
+class AddBucketViewModel : BaseViewModel() {
 
     companion object {
         @JvmStatic
         val BUCKET_NAME = "BUCKET_NAME"
     }
 
-    enum class ViewEvent {
-        Confirm
+    sealed class AddBucketEvent{
+        object Confirm : ViewEvent
     }
 
     var editName: String? = null

@@ -16,6 +16,7 @@ import com.protone.seen.adapter.NoteListAdapter
 import com.protone.seen.adapter.NoteTypeListAdapter
 import com.protone.seen.dialog.titleDialog
 import com.protone.seenn.databinding.NoteActivityBinding
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.NoteEditViewModel
 import com.protone.seenn.viewModel.NoteViewModel
 import com.protone.seenn.viewModel.NoteViewViewModel
@@ -34,10 +35,10 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
         binding.activity = this
     }
 
-    override suspend fun onViewEvent(event: String) {
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
         when (event) {
-            NoteViewModel.ViewEvent.Init.name -> viewModel.init()
-            NoteViewModel.ViewEvent.RefreshList.name -> refreshList()
+            NoteViewModel.NoteViewEvent.Init -> viewModel.init()
+            NoteViewModel.NoteViewEvent.RefreshList -> refreshList()
         }
     }
 
@@ -69,7 +70,7 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     }
 
     override suspend fun doResume() {
-        sendViewEvent(NoteViewModel.ViewEvent.RefreshList.name)
+        sendViewEvent(NoteViewModel.NoteViewEvent.RefreshList)
     }
 
     fun addBucket() {
@@ -96,8 +97,8 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     fun refresh() {
         handleBucketEvent()
         TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
-        sendViewEvent(NoteViewModel.ViewEvent.Init.name)
-        sendViewEvent(NoteViewModel.ViewEvent.RefreshList.name)
+        sendViewEvent(NoteViewModel.NoteViewEvent.Init)
+        sendViewEvent(NoteViewModel.NoteViewEvent.RefreshList)
     }
 
     private suspend fun refreshList() {

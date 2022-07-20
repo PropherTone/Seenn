@@ -1,10 +1,7 @@
 package com.protone.api.entity
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
+import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
-import androidx.room.Index
-import androidx.room.TypeConverters
 import com.protone.api.converters.ListTypeConverter
 
 @Entity(
@@ -31,6 +28,8 @@ import com.protone.api.converters.ListTypeConverter
 )
 @TypeConverters(ListTypeConverter::class)
 data class GalleriesWithNotes(
+    @ColumnInfo(name = "mediaId")
     val mediaId: Long,
+    @ColumnInfo(name = "noteId")
     val noteId: Long
 )

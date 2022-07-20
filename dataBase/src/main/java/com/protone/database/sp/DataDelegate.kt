@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class DataDelegate(private val dataStore: DataStore<Preferences>) : ISp,
+class DataDelegate(private val dataStore: DataStore<Preferences>) : IGetNSet,
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
     override fun setInt(key: String, value: Int) {
         launch {

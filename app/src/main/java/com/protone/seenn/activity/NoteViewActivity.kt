@@ -8,11 +8,12 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.root
-import com.protone.api.json.toJson
 import com.protone.api.entity.Note
+import com.protone.api.json.toJson
 import com.protone.seen.customView.richText.RichNoteView
 import com.protone.seenn.R
 import com.protone.seenn.databinding.NoteViewActivityBinding
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleyViewViewModel
 import com.protone.seenn.viewModel.NoteEditViewModel
 import com.protone.seenn.viewModel.NoteViewViewModel
@@ -36,19 +37,19 @@ class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel
         }
     }
 
-    override suspend fun onViewEvent(event: String) {
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
         when (event) {
-            NoteViewViewModel.ViewEvent.Next.name -> viewModel.initSeen(viewModel.noteQueue.poll())
-            NoteViewViewModel.ViewEvent.Edit.name -> edit()
+            NoteViewViewModel.NoteViewEvent.Next -> viewModel.initSeen(viewModel.noteQueue.poll())
+            NoteViewViewModel.NoteViewEvent.Edit -> edit()
         }
     }
 
     fun sendNext() {
-        sendViewEvent(NoteViewViewModel.ViewEvent.Next.name)
+        sendViewEvent(NoteViewViewModel.NoteViewEvent.Next)
     }
 
     fun sendEdit() {
-        sendViewEvent(NoteViewViewModel.ViewEvent.Edit.name)
+        sendViewEvent(NoteViewViewModel.NoteViewEvent.Edit)
     }
 
     override fun finish() {

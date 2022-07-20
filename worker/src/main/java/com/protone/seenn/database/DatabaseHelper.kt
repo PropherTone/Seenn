@@ -5,6 +5,7 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.entity.*
 import com.protone.api.isInDebug
+import com.protone.api.onResult
 import com.protone.database.R
 import com.protone.database.room.*
 import kotlinx.coroutines.*
@@ -60,18 +61,6 @@ class DatabaseHelper {
             }
         }
     }
-
-    suspend inline fun <T> onResult(crossinline runnable: (CancellableContinuation<T>) -> Unit) =
-        withContext(Dispatchers.IO) {
-            suspendCancellableCoroutine<T> {
-                try {
-                    runnable.invoke(it)
-                } catch (e: Exception) {
-                    if (isInDebug()) e.printStackTrace()
-                    R.string.unknown_error.getString().toast()
-                }
-            }
-        }
 
     fun shutdownNow() {
         if (executorService.isActive) {
@@ -137,13 +126,13 @@ class DatabaseHelper {
             }
         }
 
-        suspend fun updateMusicBucketRs(bucket: MusicBucket) = onResult<Int> {
+        suspend fun updateMusicBucketRs(bucket: MusicBucket) = onResult {
             execute {
                 it.resumeWith(Result.success(updateMusicBucket(bucket)))
             }
         }
 
-        suspend fun deleteMusicBucketRs(bucket: MusicBucket) = onResult<Boolean> {
+        suspend fun deleteMusicBucketRs(bucket: MusicBucket) = onResult {
             execute {
                 deleteMusicBucket(bucket)
                 it.resumeWith(Result.success(musicBucketDAO.getMusicBucketByName(bucket.name) == null))
@@ -179,7 +168,7 @@ class DatabaseHelper {
         }
 
 
-        suspend fun getAllMusicRs() = onResult<List<Music>?> {
+        suspend fun getAllMusicRs() = onResult {
             execute {
                 it.resumeWith(Result.success(getAllMusic()))
             }
@@ -211,7 +200,7 @@ class DatabaseHelper {
 
         fun getMusicByUri(uri: Uri): Music? = musicDAO.getMusicByUri(uri)
 
-        suspend fun updateMusicRs(music: Music) = onResult<Int> {
+        suspend fun updateMusicRs(music: Music) = onResult {
             execute {
                 it.resumeWith(Result.success(updateMusic(music)))
             }
@@ -219,7 +208,7 @@ class DatabaseHelper {
     }
 
     inner class GalleyDAOBridge {
-        suspend fun getAllSignedMediaRs() = onResult<List<GalleyMedia>?> {
+        suspend fun getAllSignedMediaRs() = onResult {
             execute {
                 it.resumeWith(Result.success(getAllSignedMedia()))
             }
@@ -292,7 +281,7 @@ class DatabaseHelper {
         fun getSignedMedia(path: String): GalleyMedia? =
             signedGalleyDAO.getSignedMedia(path)
 
-        suspend fun getSignedMediaRs(uri: Uri) = onResult<GalleyMedia?> {
+        suspend fun getSignedMediaRs(uri: Uri) = onResult {
             execute {
                 it.resumeWith(Result.success(getSignedMedia(uri)))
             }
@@ -331,7 +320,7 @@ class DatabaseHelper {
         }
 
         suspend fun insertNoteRs(note: Note) =
-            onResult<Pair<Boolean, Long>> {
+            onResult {
                 execute {
                     var count = 0
                     val tempName = note.title
@@ -384,7 +373,7 @@ class DatabaseHelper {
             noteTypeDAO.deleteNoteDir(noteDir)
         }
 
-        suspend fun doDeleteNoteDirRs(noteDir: NoteDir) = onResult<Boolean> {
+        suspend fun doDeleteNoteDirRs(noteDir: NoteDir) = onResult {
             execute {
                 deleteNoteDir(noteDir)
                 it.resumeWith(Result.success(getNoteDir(noteDir.name) != null))
@@ -434,7 +423,7 @@ class DatabaseHelper {
             galleyBucketDAO.deleteGalleyBucket(galleyBucket)
         }
 
-        suspend fun getGalleyBucketRs(name: String) = onResult<GalleyBucket?> {
+        suspend fun getGalleyBucketRs(name: String) = onResult {
             execute {
                 it.resumeWith(Result.success(getGalleyBucket(name)))
             }
@@ -474,7 +463,7 @@ class DatabaseHelper {
 
     inner class MusicWithMusicBucketDAOBridge {
         suspend fun insertMusicWithMusicBucket(musicID: Long, bucket: String) =
-            onResult<Long> { co ->
+            onResult { co ->
                 val musicBucket = musicBucketDAOBridge.getMusicBucketByName(bucket)
                 if (musicBucket == null) {
                     co.resumeWith(Result.success(-1L))

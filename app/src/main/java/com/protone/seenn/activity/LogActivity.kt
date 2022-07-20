@@ -12,6 +12,7 @@ import com.protone.api.context.root
 import com.protone.seen.adapter.LogListAdapter
 import com.protone.seenn.R
 import com.protone.seenn.databinding.LogActivityBinding
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.LogViewModel
 import com.protone.seenn.viewModel.NoteEditViewModel
 import kotlinx.coroutines.Dispatchers
@@ -61,7 +62,7 @@ class LogActivity : BaseActivity<LogActivityBinding, LogViewModel>(false) {
         })
     }
 
-    override suspend fun onViewEvent(event: String) = Unit
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     override suspend fun doStart() {
         viewModel.initLogList()

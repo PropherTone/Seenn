@@ -17,6 +17,7 @@ import androidx.annotation.StyleRes
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.protone.api.context.SApplication
+import com.protone.api.onResult
 import kotlinx.coroutines.*
 import java.io.InputStream
 
@@ -104,7 +105,8 @@ class PictureListScrollView @JvmOverloads constructor(
                     withContext(Dispatchers.Main) {
                         it.imageView.visibility = if (localVisibleRect) {
                             Log.d(TAG, "checkState: ${it.position}")
-                            Glide.with(context).load(dataList?.get(it.position)!!).into(it.imageView)
+                            Glide.with(context).load(dataList?.get(it.position)!!)
+                                .into(it.imageView)
 //                            it.imageView.setImageBitmap(decodeBitmap(dataList?.get(it.position)!!))
 //                            visibleIndex = it.position
                             View.VISIBLE
@@ -117,7 +119,7 @@ class PictureListScrollView @JvmOverloads constructor(
 //                                }
                             it.imageView.setImageBitmap(null)
                             it.imageView.setImageDrawable(null)
-                                View.INVISIBLE
+                            View.INVISIBLE
 //                            }
 //                            View.VISIBLE
                         }
@@ -157,18 +159,17 @@ class PictureListScrollView @JvmOverloads constructor(
 
     private val contentResolver by lazy { SApplication.app.contentResolver }
 
-    private suspend fun onPreLoad(uri: Uri) = withContext(Dispatchers.IO) {
-        suspendCancellableCoroutine<Int> { c ->
-            val ois = contentResolver.openInputStream(uri)
-            val options = BitmapFactory.Options().apply {
-                inJustDecodeBounds = true
-            }
-            val bitmap = BitmapFactory.decodeStream(ois, null, options)
-            ois?.close()
-            bitmap?.recycle()
-            c.resumeWith(Result.success(options.outHeight))
+    private suspend fun onPreLoad(uri: Uri) = onResult { c ->
+        val ois = contentResolver.openInputStream(uri)
+        val options = BitmapFactory.Options().apply {
+            inJustDecodeBounds = true
         }
+        val bitmap = BitmapFactory.decodeStream(ois, null, options)
+        ois?.close()
+        bitmap?.recycle()
+        c.resumeWith(Result.success(options.outHeight))
     }
+
 
     private suspend fun decodeBitmap(uri: Uri) = withContext(Dispatchers.IO) {
         var ois: InputStream? = null

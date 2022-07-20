@@ -1,6 +1,5 @@
 package com.protone.seenn.viewModel
 
-import androidx.lifecycle.ViewModel
 import com.protone.api.entity.Music
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asFlow
@@ -9,7 +8,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 
-class PickMusicViewModel : ViewModel() {
+class PickMusicViewModel : BaseViewModel() {
 
     companion object {
         const val BUCKET_NAME = "BUCKET"

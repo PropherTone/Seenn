@@ -1,7 +1,6 @@
 package com.protone.seenn.viewModel
 
 import android.animation.ObjectAnimator
-import androidx.lifecycle.ViewModel
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.saveToFile
 import com.protone.api.baseType.toast
@@ -17,11 +16,11 @@ import java.io.File
 import java.util.stream.Collectors
 import kotlin.coroutines.suspendCoroutine
 
-class MusicModel : ViewModel() {
+class MusicModel : BaseViewModel() {
 
-    enum class ViewEvent {
-        Delete,
-        RefreshBucket
+    sealed class MusicEvent {
+        object Delete : ViewEvent
+        object RefreshBucket : ViewEvent
     }
 
     var bucket = R.string.all_music.getString()

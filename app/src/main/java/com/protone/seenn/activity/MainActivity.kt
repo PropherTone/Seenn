@@ -6,7 +6,6 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
@@ -15,14 +14,15 @@ import com.protone.api.entity.Music
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.todayDate
-import com.protone.seenn.Medias
 import com.protone.seen.adapter.MainModelListAdapter
 import com.protone.seen.itemDecoration.ModelListItemDecoration
+import com.protone.seenn.Medias
 import com.protone.seenn.R
 import com.protone.seenn.database.DatabaseHelper
 import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.MainActivityBinding
 import com.protone.seenn.service.WorkService
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.MainViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
 import kotlinx.coroutines.Dispatchers
@@ -77,7 +77,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
         refreshModelList()
     }
 
-    override suspend fun onViewEvent(event: String) = Unit
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     override suspend fun MainViewModel.init() {
         val musicController = MusicControllerIMP(binding.musicPlayer)
@@ -154,17 +154,16 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
                 it.y = it.y + viewModel.btnH * 2
                 viewModel.btnY = it.y
             }
-            toolbar.addOnOffsetChangedListener(
-                AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-                    binding.toolMotion.progress =
-                        -verticalOffset / appBarLayout.totalScrollRange.toFloat().also {
-                            binding.musicPlayer.isVisible = it > 0.7f
-                            binding.actionBtnContainer.also { btn ->
-                                btn.y =
-                                    viewModel.btnY - (viewModel.btnH * binding.toolMotion.progress) * 2
-                            }
+            toolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+                binding.toolMotion.progress =
+                    -verticalOffset / appBarLayout.totalScrollRange.toFloat().also {
+                        binding.musicPlayer.isVisible = it > 0.7f
+                        binding.actionBtnContainer.also { btn ->
+                            btn.y =
+                                viewModel.btnY - (viewModel.btnH * binding.toolMotion.progress) * 2
                         }
-                })
+                    }
+            }
             root.viewTreeObserver.removeOnGlobalLayoutListener(this@MainActivity)
         }
     }

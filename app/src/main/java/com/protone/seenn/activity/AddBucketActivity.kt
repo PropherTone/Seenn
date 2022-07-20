@@ -14,6 +14,7 @@ import com.protone.api.json.toUri
 import com.protone.seenn.R
 import com.protone.seenn.databinding.AddBucketActivityBinding
 import com.protone.seenn.viewModel.AddBucketViewModel
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleyViewModel
 import kotlinx.coroutines.launch
 
@@ -52,9 +53,9 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
         }
     }
 
-    override suspend fun onViewEvent(event: String) {
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
         when (event) {
-            AddBucketViewModel.ViewEvent.Confirm.name -> confirm()
+            AddBucketViewModel.AddBucketEvent.Confirm -> confirm()
         }
     }
 
@@ -93,7 +94,7 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
     }
 
     fun sendConfirm() {
-        sendViewEvent(AddBucketViewModel.ViewEvent.Confirm.name)
+        sendViewEvent(AddBucketViewModel.AddBucketEvent.Confirm)
     }
 
     private suspend fun confirm(): Unit = viewModel.run {

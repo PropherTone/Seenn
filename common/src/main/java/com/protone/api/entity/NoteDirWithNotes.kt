@@ -1,13 +1,10 @@
 package com.protone.api.entity
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.protone.api.converters.ListTypeConverter
 
 @Entity(
-    primaryKeys = ["noteDirId","noteId"],
+    primaryKeys = ["noteDirId", "noteId"],
     foreignKeys = [
         ForeignKey(
             entity = NoteDir::class,
@@ -30,6 +27,8 @@ import com.protone.api.converters.ListTypeConverter
 )
 @TypeConverters(ListTypeConverter::class)
 data class NoteDirWithNotes(
+    @ColumnInfo(name = "noteDirId")
     val noteDirId: Long,
+    @ColumnInfo(name = "noteId")
     val noteId: Long
 )

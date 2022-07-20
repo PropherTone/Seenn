@@ -15,10 +15,11 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toDateString
 import com.protone.api.context.intent
 import com.protone.api.context.root
+import com.protone.api.entity.GalleyMedia
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.json.toUri
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.onResult
 import com.protone.seen.adapter.CheckListAdapter
 import com.protone.seen.adapter.GalleyViewPager2Adapter
 import com.protone.seen.databinding.ImageCateLayoutBinding
@@ -26,11 +27,11 @@ import com.protone.seen.databinding.TextCateLayoutBinding
 import com.protone.seenn.R
 import com.protone.seenn.databinding.GalleyViewActivityBinding
 import com.protone.seenn.fragment.GalleyViewFragment
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleyViewViewModel
 import com.protone.seenn.viewModel.NoteViewViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 
 class GalleyViewActivity :
@@ -55,9 +56,10 @@ class GalleyViewActivity :
         init(isVideo)
     }
 
-    override suspend fun onViewEvent(event: String) {
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
         when (event) {
-            GalleyViewViewModel.ViewEvent.SetNote.name -> viewModel.setInfo()
+            GalleyViewViewModel.GalleyViewEvent.SetNote -> viewModel.setInfo()
+            else -> {}
         }
     }
 
@@ -77,7 +79,7 @@ class GalleyViewActivity :
     }
 
     fun sendSetInfo() {
-        sendViewEvent(GalleyViewViewModel.ViewEvent.SetNote.name)
+        sendViewEvent(GalleyViewViewModel.GalleyViewEvent.SetNote)
     }
 
     private suspend fun GalleyViewViewModel.setInfo() {
@@ -126,14 +128,13 @@ class GalleyViewActivity :
         )
     }
 
-    private suspend fun GalleyViewViewModel.getMediaIndex() = withContext(Dispatchers.IO) {
-        suspendCancellableCoroutine<Int> { co ->
-            val galleyMedia =
-                intent.getStringExtra(GalleyViewViewModel.MEDIA)?.toEntity(GalleyMedia::class.java)
-            val indexOf = galleyMedias.indexOf(galleyMedia)
-            curPosition = indexOf
-            co.resumeWith(Result.success(indexOf))
-        }
+    private suspend fun GalleyViewViewModel.getMediaIndex() = onResult { co ->
+        val galleyMedia =
+            intent.getStringExtra(GalleyViewViewModel.MEDIA)?.toEntity(GalleyMedia::class.java)
+        val indexOf = galleyMedias.indexOf(galleyMedia)
+        curPosition = indexOf
+        co.resumeWith(Result.success(indexOf))
+
     }
 
     private fun initViewPager(

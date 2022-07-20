@@ -1,7 +1,6 @@
 package com.protone.seenn.viewModel
 
 import android.net.Uri
-import androidx.lifecycle.ViewModel
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toMediaBitmapByteArray
 import com.protone.api.baseType.toast
@@ -10,21 +9,21 @@ import com.protone.api.entity.GalleyMedia
 import com.protone.api.entity.Note
 import com.protone.api.entity.NoteDirWithNotes
 import com.protone.api.json.toUriJson
+import com.protone.api.onResult
 import com.protone.seenn.GalleyHelper
 import com.protone.seenn.R
 import com.protone.seenn.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 
-class NoteEditViewModel : ViewModel() {
+class NoteEditViewModel : BaseViewModel() {
 
-    enum class ViewEvent {
-        Confirm,
-        PickImage,
-        PickVideo,
-        PickMusic,
-        PickIcon
+    sealed class NoteEvent {
+        object Confirm : ViewEvent
+        object PickImage : ViewEvent
+        object PickVideo : ViewEvent
+        object PickMusic : ViewEvent
+        object PickIcon : ViewEvent
     }
 
     companion object {
@@ -58,24 +57,20 @@ class NoteEditViewModel : ViewModel() {
             }
         }
 
-    suspend fun getAllNote() = withContext(Dispatchers.IO) {
-        suspendCancellableCoroutine {
-            val notes = DatabaseHelper.instance.noteDAOBridge.getAllNote()
-            val list = mutableListOf<String>()
-            notes?.forEach { note ->
-                list.add(note.title)
-            }
-            it.resumeWith(Result.success(list))
+    suspend fun getAllNote() = onResult {
+        val notes = DatabaseHelper.instance.noteDAOBridge.getAllNote()
+        val list = mutableListOf<String>()
+        notes?.forEach { note ->
+            list.add(note.title)
         }
+        it.resumeWith(Result.success(list))
     }
 
-    suspend fun getMusicTitle(uri: Uri) = withContext(Dispatchers.IO) {
-        suspendCancellableCoroutine { co ->
-            val musicByUri = DatabaseHelper.instance.musicDAOBridge.getMusicByUri(uri)
-            co.resumeWith(
-                Result.success(musicByUri?.title ?: "^ ^")
-            )
-        }
+    suspend fun getMusicTitle(uri: Uri) = onResult { co ->
+        val musicByUri = DatabaseHelper.instance.musicDAOBridge.getMusicByUri(uri)
+        co.resumeWith(
+            Result.success(musicByUri?.title ?: "^ ^")
+        )
     }
 
     suspend fun copyNote(inNote: Note, note: Note) = withContext(Dispatchers.IO) {

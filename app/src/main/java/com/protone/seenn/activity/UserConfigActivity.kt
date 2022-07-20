@@ -22,6 +22,7 @@ import com.protone.seenn.GalleyHelper
 import com.protone.seenn.R
 import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.UserConfigActivityBinding
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleyViewModel
 import com.protone.seenn.viewModel.UserConfigViewModel
 import kotlinx.coroutines.delay
@@ -48,19 +49,19 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
         )
     }
 
-    override suspend fun onViewEvent(event: String) {
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
         when (event) {
-            UserConfigViewModel.ViewEvent.Login.name -> startLoginDialog()
-            UserConfigViewModel.ViewEvent.Icon.name -> startIconPick()
-            UserConfigViewModel.ViewEvent.Name.name -> startNameDialog()
-            UserConfigViewModel.ViewEvent.PassWord.name -> startPasswordDialog()
-            UserConfigViewModel.ViewEvent.ShareNote.name -> {}
-            UserConfigViewModel.ViewEvent.ShareData.name -> {}
-            UserConfigViewModel.ViewEvent.Lock.name -> startLockListPop()
-            UserConfigViewModel.ViewEvent.Unlock.name -> startUnlockListPop()
-            UserConfigViewModel.ViewEvent.Refresh.name -> refreshLayout()
-            UserConfigViewModel.ViewEvent.ClearCache.name -> viewModel.clearCache()
-            UserConfigViewModel.ViewEvent.Log.name -> startActivity(LogActivity::class.intent)
+            UserConfigViewModel.UserConfigEvent.Login -> startLoginDialog()
+            UserConfigViewModel.UserConfigEvent.Icon -> startIconPick()
+            UserConfigViewModel.UserConfigEvent.Name -> startNameDialog()
+            UserConfigViewModel.UserConfigEvent.PassWord -> startPasswordDialog()
+            UserConfigViewModel.UserConfigEvent.ShareNote -> {}
+            UserConfigViewModel.UserConfigEvent.ShareData -> {}
+            UserConfigViewModel.UserConfigEvent.Lock -> startLockListPop()
+            UserConfigViewModel.UserConfigEvent.Unlock -> startUnlockListPop()
+            UserConfigViewModel.UserConfigEvent.Refresh -> refreshLayout()
+            UserConfigViewModel.UserConfigEvent.ClearCache -> viewModel.clearCache()
+            UserConfigViewModel.UserConfigEvent.Log -> startActivity(LogActivity::class.intent)
         }
     }
 
@@ -69,7 +70,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
     }
 
     private fun chooseMode(mode: UserConfigViewModel.DisplayMode) {
-        val logView = initModeView("日志", UserConfigViewModel.ViewEvent.Log.name)
+        val logView = initModeView("日志", UserConfigViewModel.UserConfigEvent.Log)
         if (mode == UserConfigViewModel.DisplayMode.UnRegis) {
             UserConfigItemLayoutBinding.inflate(layoutInflater, root, false)
                 .apply {
@@ -86,19 +87,19 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
             return
         }
         val views = mutableListOf<View>(
-            initModeView("修改头像", UserConfigViewModel.ViewEvent.Icon.name),
-            initModeView("修改名称", UserConfigViewModel.ViewEvent.Name.name),
-            initModeView("修改密码", UserConfigViewModel.ViewEvent.PassWord.name),
-            initModeView("笔记共享", UserConfigViewModel.ViewEvent.ShareNote.name),
-            initModeView("数据共享", UserConfigViewModel.ViewEvent.ShareData.name),
-            initModeView("模块加密", UserConfigViewModel.ViewEvent.Lock.name),
-            initModeView("清理缓存", UserConfigViewModel.ViewEvent.ClearCache.name),
+            initModeView("修改头像", UserConfigViewModel.UserConfigEvent.Icon),
+            initModeView("修改名称", UserConfigViewModel.UserConfigEvent.Name),
+            initModeView("修改密码", UserConfigViewModel.UserConfigEvent.PassWord),
+            initModeView("笔记共享", UserConfigViewModel.UserConfigEvent.ShareNote),
+            initModeView("数据共享", UserConfigViewModel.UserConfigEvent.ShareData),
+            initModeView("模块加密", UserConfigViewModel.UserConfigEvent.Lock),
+            initModeView("清理缓存", UserConfigViewModel.UserConfigEvent.ClearCache),
             logView
         )
         if (mode == UserConfigViewModel.DisplayMode.Locked) views.add(
             initModeView(
                 "模块解锁",
-                UserConfigViewModel.ViewEvent.Unlock.name
+                UserConfigViewModel.UserConfigEvent.Unlock
             )
         )
         launch {
@@ -110,7 +111,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
         }
     }
 
-    private fun initModeView(name: String, event: String) =
+    private fun initModeView(name: String, event: BaseViewModel.ViewEvent) =
         UserConfigItemLayoutBinding.inflate(layoutInflater, root, false)
             .apply {
                 itemName.text = name

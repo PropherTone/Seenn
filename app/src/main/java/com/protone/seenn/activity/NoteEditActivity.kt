@@ -8,25 +8,19 @@ import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.google.android.material.appbar.AppBarLayout
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.baseType.*
 import com.protone.api.context.*
+import com.protone.api.entity.*
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
-import com.protone.api.entity.GalleyMedia
-import com.protone.api.entity.Note
-import com.protone.api.entity.*
-import com.protone.seenn.note.spans.ISpanForUse
 import com.protone.seen.dialog.imageListDialog
 import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seenn.R
 import com.protone.seenn.databinding.NoteEditActivityBinding
-import com.protone.seenn.viewModel.GalleyViewModel
-import com.protone.seenn.viewModel.NoteEditViewModel
-import com.protone.seenn.viewModel.NoteViewViewModel
-import com.protone.seenn.viewModel.PickMusicViewModel
+import com.protone.seenn.note.spans.ISpanForUse
+import com.protone.seenn.viewModel.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -49,11 +43,10 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         binding.activity = this
         fitNavigationBarUsePadding(binding.root)
         binding.noteEditTitle.requestFocus()
-        binding.noteEditToolbar.addOnOffsetChangedListener(
-            AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-                binding.toolbar.progress =
-                    -verticalOffset / appBarLayout.totalScrollRange.toFloat()
-            })
+        binding.noteEditToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+            binding.toolbar.progress =
+                -verticalOffset / appBarLayout.totalScrollRange.toFloat()
+        }
         setSoftInputStatuesListener { height, isShow ->
             if (isShow) {
                 binding.root.marginBottom(height)
@@ -98,34 +91,34 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
 
     }
 
-    override suspend fun onViewEvent(event: String) {
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
         when (event) {
-            NoteEditViewModel.ViewEvent.Confirm.name -> confirm()
-            NoteEditViewModel.ViewEvent.PickIcon.name -> pickIcon()
-            NoteEditViewModel.ViewEvent.PickImage.name -> pickImage()
-            NoteEditViewModel.ViewEvent.PickVideo.name -> pickVideo()
-            NoteEditViewModel.ViewEvent.PickMusic.name -> pickMusic()
+            NoteEditViewModel.NoteEvent.Confirm -> confirm()
+            NoteEditViewModel.NoteEvent.PickIcon -> pickIcon()
+            NoteEditViewModel.NoteEvent.PickImage -> pickImage()
+            NoteEditViewModel.NoteEvent.PickVideo -> pickVideo()
+            NoteEditViewModel.NoteEvent.PickMusic -> pickMusic()
         }
     }
 
     fun sendConfirm() {
-        sendViewEvent(NoteEditViewModel.ViewEvent.Confirm.name)
+        sendViewEvent(NoteEditViewModel.NoteEvent.Confirm)
     }
 
     fun sendPickIcon() {
-        sendViewEvent(NoteEditViewModel.ViewEvent.PickIcon.name)
+        sendViewEvent(NoteEditViewModel.NoteEvent.PickIcon)
     }
 
     fun sendPickImage() {
-        sendViewEvent(NoteEditViewModel.ViewEvent.PickImage.name)
+        sendViewEvent(NoteEditViewModel.NoteEvent.PickImage)
     }
 
     fun sendPickVideo() {
-        sendViewEvent(NoteEditViewModel.ViewEvent.PickVideo.name)
+        sendViewEvent(NoteEditViewModel.NoteEvent.PickVideo)
     }
 
     fun sendPickMusic() {
-        sendViewEvent(NoteEditViewModel.ViewEvent.PickMusic.name)
+        sendViewEvent(NoteEditViewModel.NoteEvent.PickMusic)
     }
 
     private suspend fun pickIcon() = viewModel.apply {
@@ -205,7 +198,10 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             copyNote(inNote, note)
             val re = updateNote(inNote)
             if (re == null && re == -1) {
-                insertNote(inNote,intent.getStringExtra(NoteEditViewModel.NOTE_DIR)).let { result ->
+                insertNote(
+                    inNote,
+                    intent.getStringExtra(NoteEditViewModel.NOTE_DIR)
+                ).let { result ->
                     if (result) {
                         setResult(
                             RESULT_OK,
@@ -219,7 +215,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
                 finish()
             }
         } else {
-            if (insertNote(note,intent.getStringExtra(NoteEditViewModel.NOTE_DIR))) finish()
+            if (insertNote(note, intent.getStringExtra(NoteEditViewModel.NOTE_DIR))) finish()
             else R.string.failed_msg.getString().toast()
         }
     }

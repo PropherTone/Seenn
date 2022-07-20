@@ -18,6 +18,7 @@ import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seen.itemDecoration.GalleyItemDecoration
 import com.protone.seenn.R
 import com.protone.seenn.databinding.GalleySearchActivityBinding
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleySearchViewModel
 import com.protone.seenn.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +55,7 @@ class GalleySearchActivity :
         }
     }
 
-    override suspend fun onViewEvent(event: String) = Unit
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     private fun initList(isVideo: Boolean) {
         binding.apply {

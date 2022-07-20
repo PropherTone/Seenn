@@ -1,7 +1,10 @@
 package com.protone.api
 
 import android.content.pm.ApplicationInfo
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.api.context.SApplication
+import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,6 +30,20 @@ fun tryWithRecording(func: () -> Unit) {
     } catch (e: Exception) {
         if (SCrashHandler.path != null) {
             SCrashHandler.writeLog(e)
+        }
+    }
+}
+
+suspend inline fun <T> onResult(
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    crossinline runnable: CoroutineScope.(CancellableContinuation<T>) -> Unit
+) = withContext(dispatcher) {
+    suspendCancellableCoroutine {
+        try {
+            runnable.invoke(this, it)
+        } catch (e: Exception) {
+            if (isInDebug()) e.printStackTrace()
+            R.string.unknown_error.getString().toast()
         }
     }
 }

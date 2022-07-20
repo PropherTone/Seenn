@@ -11,6 +11,7 @@ import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.databinding.SplashActivityBinding
 import com.protone.seenn.service.MusicService
 import com.protone.seenn.service.WorkService
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.SplashViewModel
 
 @SuppressLint("CustomSplashScreen")
@@ -32,19 +33,19 @@ class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true
         checkNeededPermission({
             requestContentPermission()
         }, {
-            sendViewEvent(SplashViewModel.ViewEvent.UpdateMedia.name)
+            sendViewEvent(SplashViewModel.SplashEvent.UpdateMedia)
         })
     }
 
-    override suspend fun onViewEvent(event: String) {
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
         when (event) {
-            SplashViewModel.ViewEvent.InitConfig.name -> {
+            SplashViewModel.SplashEvent.InitConfig -> {
                 viewModel.firstBootWork()
                 startService(MusicService::class.intent)
                 startActivity(MainActivity::class.intent)
                 finish()
             }
-            SplashViewModel.ViewEvent.UpdateMedia.name -> updateMedia()
+            SplashViewModel.SplashEvent.UpdateMedia -> updateMedia()
         }
     }
 
@@ -57,7 +58,7 @@ class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true
             && grantResults[0] == PackageManager.PERMISSION_GRANTED
             && grantResults[1] == PackageManager.PERMISSION_GRANTED
         ) {
-            sendViewEvent(SplashViewModel.ViewEvent.UpdateMedia.name)
+            sendViewEvent(SplashViewModel.SplashEvent.UpdateMedia)
         } else {
             finish()
         }
@@ -68,7 +69,7 @@ class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_GALLEY))
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC))
         GalleyHelper.updateAll {
-            sendViewEvent(SplashViewModel.ViewEvent.InitConfig.name)
+            sendViewEvent(SplashViewModel.SplashEvent.InitConfig)
         }
     }
 

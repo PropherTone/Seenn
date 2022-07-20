@@ -11,8 +11,10 @@ public class GalleyBucket {
     @ColumnInfo(name = "galleyBucketId")
     Long galleyBucketId;
 
+    @ColumnInfo(name = "type")
     String type;
 
+    @ColumnInfo(name = "image")
     boolean image;
 
     public GalleyBucket(String type, boolean image) {

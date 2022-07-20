@@ -1,6 +1,5 @@
 package com.protone.seenn.viewModel
 
-import androidx.lifecycle.ViewModel
 import com.bumptech.glide.Glide
 import com.protone.api.SCrashHandler
 import com.protone.api.baseType.getParentPath
@@ -12,20 +11,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class UserConfigViewModel : ViewModel() {
+class UserConfigViewModel : BaseViewModel() {
 
-    enum class ViewEvent {
-        Login,
-        Icon,
-        Name,
-        PassWord,
-        ShareNote,
-        ShareData,
-        Lock,
-        Unlock,
-        Refresh,
-        ClearCache,
-        Log
+    sealed class UserConfigEvent {
+        object Login : ViewEvent
+        object Icon : ViewEvent
+        object Name : ViewEvent
+        object PassWord : ViewEvent
+        object ShareNote : ViewEvent
+        object ShareData : ViewEvent
+        object Lock : ViewEvent
+        object Unlock : ViewEvent
+        object Refresh : ViewEvent
+        object ClearCache : ViewEvent
+        object Log : ViewEvent
     }
 
     enum class DisplayMode {

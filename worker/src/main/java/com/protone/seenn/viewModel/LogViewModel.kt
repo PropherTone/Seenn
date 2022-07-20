@@ -1,6 +1,5 @@
 package com.protone.seenn.viewModel
 
-import androidx.lifecycle.ViewModel
 import com.protone.api.SCrashHandler
 import com.protone.api.baseType.getParentPath
 import kotlinx.coroutines.Dispatchers
@@ -8,7 +7,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileReader
 
-class LogViewModel : ViewModel() {
+class LogViewModel : BaseViewModel() {
 
     fun getLogContent(path:String): String {
         val file = File(path)

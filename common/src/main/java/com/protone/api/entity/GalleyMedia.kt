@@ -12,16 +12,27 @@ data class GalleyMedia(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "mediaId")
     val mediaId: Long?,
+    @ColumnInfo(name = "name")
     var name: String,
-    var path : String?,
+    @ColumnInfo(name = "path")
+    var path: String?,
+    @ColumnInfo(name = "bucket")
     var bucket: String,
+    @ColumnInfo(name = "size")
     var size: Long,
+    @ColumnInfo(name = "type")
     var type: List<String>?,
+    @ColumnInfo(name = "cate")
     var cate: List<String>?,
+    @ColumnInfo(name = "uri")
     val uri: Uri,
+    @ColumnInfo(name = "date")
     var date: Long,
+    @ColumnInfo(name = "thumbnailUri")
     val thumbnailUri: Uri?,
+    @ColumnInfo(name = "duration")
     val duration: Long,
+    @ColumnInfo(name = "isVideo")
     val isVideo: Boolean
 ) {
 

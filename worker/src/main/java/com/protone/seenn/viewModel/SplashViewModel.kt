@@ -1,6 +1,5 @@
 package com.protone.seenn.viewModel
 
-import androidx.lifecycle.ViewModel
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.saveToFile
 import com.protone.api.entity.MusicBucket
@@ -10,14 +9,14 @@ import com.protone.seenn.R
 import com.protone.seenn.database.DatabaseHelper
 import com.protone.seenn.database.userConfig
 
-class SplashViewModel : ViewModel() {
+class SplashViewModel : BaseViewModel() {
 
-    enum class ViewEvent{
-        InitConfig,
-        UpdateMedia
+    sealed class SplashEvent {
+        object InitConfig : ViewEvent
+        object UpdateMedia : ViewEvent
     }
 
-    fun firstBootWork(){
+    fun firstBootWork() {
         if (userConfig.isFirstBoot) {
             DatabaseHelper.instance.musicBucketDAOBridge.addMusicBucketAsync(
                 MusicBucket(

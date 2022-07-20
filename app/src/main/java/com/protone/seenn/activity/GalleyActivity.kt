@@ -17,6 +17,7 @@ import com.protone.seenn.Medias
 import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.GalleyActivityBinding
 import com.protone.seenn.fragment.GalleyFragment
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleyViewModel
 import com.protone.seenn.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +34,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
         initPop()
     }
 
-    override suspend fun onViewEvent(event: String) = Unit
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     override suspend fun GalleyViewModel.init() {
         chooseType = intent.getStringExtra(GalleyViewModel.CHOOSE_MODE) ?: ""

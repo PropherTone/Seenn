@@ -1,20 +1,18 @@
 package com.protone.seenn.viewModel
 
 import android.net.Uri
-import androidx.lifecycle.ViewModel
 import com.protone.api.entity.GalleyMedia
 import com.protone.seenn.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.stream.Collectors
 
-class NoteViewViewModel : ViewModel() {
+class NoteViewViewModel : BaseViewModel() {
 
-    enum class ViewEvent{
-        Next,
-        Edit
+    sealed class NoteViewEvent {
+        object Next : BaseViewModel.ViewEvent
+        object Edit : BaseViewModel.ViewEvent
     }
 
     companion object {
@@ -24,9 +22,7 @@ class NoteViewViewModel : ViewModel() {
     val noteQueue = ArrayDeque<String>()
 
     suspend fun getNoteByName(name: String) = withContext(Dispatchers.IO) {
-        suspendCancellableCoroutine { co ->
-            co.resumeWith(Result.success(DatabaseHelper.instance.noteDAOBridge.getNoteByName(name)))
-        }
+        DatabaseHelper.instance.noteDAOBridge.getNoteByName(name)
     }
 
     suspend fun getMusicByUri(uri: Uri) = withContext(Dispatchers.IO) {

@@ -11,17 +11,29 @@ import com.protone.api.converters.UriTypeConverter
 @Entity
 @TypeConverters(UriTypeConverter::class, ListTypeConverter::class)
 data class Music(
+    @ColumnInfo(name = "musicId")
     val musicId: Long,
+    @ColumnInfo(name = "title")
     val title: String,
+    @ColumnInfo(name = "size")
     val size: Long,
+    @ColumnInfo(name = "album")
     val album: String?,
+    @ColumnInfo(name = "albumID")
     val albumID: Uri?,
+    @ColumnInfo(name = "artist")
     val artist: String?,
+    @ColumnInfo(name = "mimeType")
     val mimeType: String,
+    @ColumnInfo(name = "bucketDisplayName")
     val bucketDisplayName: String?,
+    @ColumnInfo(name = "displayName")
     val displayName: String?,
+    @ColumnInfo(name = "duration")
     val duration: Long,
+    @ColumnInfo(name = "year")
     val year: Long,
+    @ColumnInfo(name = "uri")
     val uri: Uri
 ) {
     @PrimaryKey(autoGenerate = true)

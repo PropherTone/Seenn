@@ -34,6 +34,7 @@ import com.protone.api.json.jsonToList
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
+import com.protone.api.onResult
 import com.protone.seen.R
 import com.protone.seen.customView.musicPlayer.BaseMusicPlayer
 import com.protone.seen.databinding.RichMusicLayoutBinding
@@ -41,10 +42,13 @@ import com.protone.seen.databinding.RichPhotoLayoutBinding
 import com.protone.seen.databinding.VideoCardBinding
 import com.protone.seenn.note.MyTextWatcher
 import com.protone.seenn.note.spans.ISpanForEditor
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 
 /**
  * RichText editor by ProTone 2022/4/15
@@ -380,7 +384,7 @@ class RichNoteView @JvmOverloads constructor(
      */
     suspend fun indexRichNote(
         title: String,
-        onSaveResult:suspend (ArrayList<Uri>) -> Boolean
+        onSaveResult: suspend (ArrayList<Uri>) -> Boolean
     ): Pair<Int, String> {
         val richArray = arrayOfNulls<String>(childCount)
         val richSer = arrayListOf<String>()
@@ -388,76 +392,74 @@ class RichNoteView @JvmOverloads constructor(
         val taskChannel = Channel<Pair<String, Int>>(Channel.UNLIMITED)
         var richStates = 0
         var count = 0
-        return withContext(Dispatchers.IO) {
-            suspendCancellableCoroutine {
-                async(Dispatchers.IO) {
-                    while (isActive) {
-                        taskChannel.receiveAsFlow().collect {
-                            if (it.second < childCount) {
-                                richArray[it.second] = it.first
-                                count++
-                            }
-                            if (count >= childCount) {
-                                taskChannel.close()
-                            }
+        return onResult {
+            async(Dispatchers.IO) {
+                while (isActive) {
+                    taskChannel.receiveAsFlow().collect {
+                        if (it.second < childCount) {
+                            richArray[it.second] = it.first
+                            count++
                         }
-                        if (withContext(Dispatchers.Main) {
-                                onSaveResult.invoke(reList)
-                            }) {
-                            richArray.onEach {
-                                it?.let { state ->
-                                    richSer.add(state)
-                                }
-                            }
-                            it.resumeWith(
-                                Result.success(Pair(richStates, richSer.listToJson(String::class.java)))
-                            )
+                        if (count >= childCount) {
+                            taskChannel.close()
                         }
-                        break
                     }
-                }.start()
-                for (i in 0 until childCount) {
-                    when (val tag = getChildAt(i).tag) {
-                        is RichNoteStates -> {
-                            richStates = richStates * 10 + TEXT
-                            taskChannel.trySend(
-                                Pair(
-                                    RichNoteSer(
-                                        getEdittext(i)?.text.toString(),
-                                        tag.spanStates.listToJson(SpanStates::class.java)
-                                    ).toJson(), i
-                                )
+                    if (withContext(Dispatchers.Main) {
+                            onSaveResult.invoke(reList)
+                        }) {
+                        richArray.onEach {
+                            it?.let { state ->
+                                richSer.add(state)
+                            }
+                        }
+                        it.resumeWith(
+                            Result.success(Pair(richStates, richSer.listToJson(String::class.java)))
+                        )
+                    }
+                    break
+                }
+            }.start()
+            for (i in 0 until childCount) {
+                when (val tag = getChildAt(i).tag) {
+                    is RichNoteStates -> {
+                        richStates = richStates * 10 + TEXT
+                        taskChannel.trySend(
+                            Pair(
+                                RichNoteSer(
+                                    getEdittext(i)?.text.toString(),
+                                    tag.spanStates.listToJson(SpanStates::class.java)
+                                ).toJson(), i
                             )
-                        }
-                        is RichVideoStates -> {
-                            richStates = richStates * 10 + VIDEO
+                        )
+                    }
+                    is RichVideoStates -> {
+                        richStates = richStates * 10 + VIDEO
+                        taskChannel.trySend(Pair(tag.toJson(), i))
+                    }
+                    is RichPhotoStates -> {
+                        richStates = richStates * 10 + PHOTO
+                        val child = getChildAt(i)
+                        if (tag.path != null) {
                             taskChannel.trySend(Pair(tag.toJson(), i))
-                        }
-                        is RichPhotoStates -> {
-                            richStates = richStates * 10 + PHOTO
-                            val child = getChildAt(i)
-                            if (tag.path != null) {
-                                taskChannel.trySend(Pair(tag.toJson(), i))
-                            } else async(Dispatchers.IO) {
-                                tag.uri.saveToFile(
-                                    title + "_${System.currentTimeMillis()}",
-                                    dir = "NoteCache",
-                                    w = child.measuredWidth,
-                                    h = child.measuredHeight
-                                )?.let {
-                                    if (tag.path == null) {
-                                        tag.path = it
-                                    } else {
-                                        reList.add(tag.uri)
-                                    }
+                        } else async(Dispatchers.IO) {
+                            tag.uri.saveToFile(
+                                title + "_${System.currentTimeMillis()}",
+                                dir = "NoteCache",
+                                w = child.measuredWidth,
+                                h = child.measuredHeight
+                            )?.let {
+                                if (tag.path == null) {
+                                    tag.path = it
+                                } else {
+                                    reList.add(tag.uri)
                                 }
-                                taskChannel.trySend(Pair(tag.toJson(), i))
-                            }.start()
-                        }
-                        is RichMusicStates -> {
-                            richStates = richStates * 10 + MUSIC
+                            }
                             taskChannel.trySend(Pair(tag.toJson(), i))
-                        }
+                        }.start()
+                    }
+                    is RichMusicStates -> {
+                        richStates = richStates * 10 + MUSIC
+                        taskChannel.trySend(Pair(tag.toJson(), i))
                     }
                 }
             }

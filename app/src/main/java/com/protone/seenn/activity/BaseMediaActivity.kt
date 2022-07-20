@@ -3,7 +3,6 @@ package com.protone.seenn.activity
 import android.view.View
 import androidx.core.view.isGone
 import androidx.databinding.ViewDataBinding
-import androidx.lifecycle.ViewModel
 import com.protone.api.baseType.getFileMimeType
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
@@ -17,12 +16,13 @@ import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seen.popWindows.GalleyOptionPop
 import com.protone.seenn.R
 import com.protone.seenn.database.DatabaseHelper
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleyViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-abstract class BaseMediaActivity<VB : ViewDataBinding, VM : ViewModel>(handleEvent: Boolean) :
+abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEvent: Boolean) :
     BaseActivity<VB, VM>(handleEvent),
     View.OnClickListener {
 

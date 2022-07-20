@@ -12,6 +12,7 @@ import com.protone.seen.adapter.TransparentPlayListAdapter
 import com.protone.seen.itemDecoration.GalleyItemDecoration
 import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.MusicViewActivityBinding
+import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.seenn.viewModel.MusicViewModel
 
@@ -44,7 +45,7 @@ class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>
         }
     }
 
-    override suspend fun onViewEvent(event: String) = Unit
+    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     private fun initPlayList(
         playList: MutableList<Music>, onPlay: Music?,

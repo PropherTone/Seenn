@@ -23,16 +23,16 @@ import java.lang.ref.WeakReference
     version = 1,
     exportSchema = false
 )
-abstract class SeennDataBase : RoomDatabase() {
-    abstract fun getGalleyDAO(): SignedGalleyDAO
-    abstract fun getNoteDAO(): NoteDAO
-    abstract fun getNoteTypeDAO(): NoteTypeDAO
-    abstract fun getMusicBucketDAO(): MusicBucketDAO
-    abstract fun getMusicDAO(): MusicDAO
-    abstract fun getGalleyBucketDAO(): GalleyBucketDAO
-    abstract fun getGalleriesWithNotesDAO(): GalleriesWithNotesDAO
-    abstract fun getNoteDirWithNoteDAO(): NoteDirWithNoteDAO
-    abstract fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO
+internal abstract class SeennDataBase : RoomDatabase() {
+    internal abstract fun getGalleyDAO(): SignedGalleyDAO
+    internal abstract fun getNoteDAO(): NoteDAO
+    internal abstract fun getNoteTypeDAO(): NoteTypeDAO
+    internal abstract fun getMusicBucketDAO(): MusicBucketDAO
+    internal abstract fun getMusicDAO(): MusicDAO
+    internal abstract fun getGalleyBucketDAO(): GalleyBucketDAO
+    internal abstract fun getGalleriesWithNotesDAO(): GalleriesWithNotesDAO
+    internal abstract fun getNoteDirWithNoteDAO(): NoteDirWithNoteDAO
+    internal abstract fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO
 
     companion object {
         @JvmStatic
