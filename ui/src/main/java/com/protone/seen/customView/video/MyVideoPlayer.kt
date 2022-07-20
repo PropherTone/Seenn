@@ -2,6 +2,7 @@ package com.protone.seen.customView.video
 
 import android.content.Context
 import android.graphics.SurfaceTexture
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
@@ -33,7 +34,7 @@ class MyVideoPlayer @JvmOverloads constructor(
     private val videoController: MyVideoController by lazy { MyVideoController(context) }
 
     fun setFullScreen(listener: () -> Unit) {
-        videoController.fullScreen = listener
+        videoController.fullScreen(listener)
     }
 
     private var mediaPlayer: MediaPlayer? = null
@@ -62,8 +63,8 @@ class MyVideoPlayer @JvmOverloads constructor(
 
     init {
         videoController.apply {
-            playVideo = { play() }
-            pauseVideo = { pause() }
+            playVideo { play() }
+            pauseVideo { pause() }
             setProgressListener(object : ColorfulProgressBar.Progress {
                 override fun getProgress(position: Long) {
                     videoSeekTo(position)
@@ -119,6 +120,7 @@ class MyVideoPlayer @JvmOverloads constructor(
         try {
             if (mediaPlayer?.isPlaying == false && isPrepared) {
                 mediaPlayer?.start()
+                videoController.onStart()
                 startProgress()
             }
         } catch (e: IllegalStateException) {
@@ -142,6 +144,7 @@ class MyVideoPlayer @JvmOverloads constructor(
         mediaPlayer?.apply {
             stop()
             release()
+            isPrepared = false
         }
         mediaPlayer = null
         progressHandler.removeCallbacksAndMessages(null)
@@ -164,6 +167,13 @@ class MyVideoPlayer @JvmOverloads constructor(
         if (surfaceTexture == null) {
             surfaceTexture = p0
             mediaPlayer?.apply {
+                setAudioAttributes(
+                    AudioAttributes
+                        .Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
+                        .build()
+                )
                 setDataSource(context, path)
                 setSurface(surface)
                 prepareAsync()
@@ -189,17 +199,11 @@ class MyVideoPlayer @JvmOverloads constructor(
     override fun onVideoSizeChanged(p0: MediaPlayer?, p1: Int, p2: Int) {
         textureView?.adaptVideoSize(p1, p2)
         textureView?.measuredHeight?.let {
-            textureView?.measuredWidth?.let { it1 ->
-                measure(
-                    it1,
-                    it
-                )
-            }
+            textureView?.measuredWidth?.let { it1 -> measure(it1, it) }
         }
     }
 
     override fun onCompletion(p0: MediaPlayer?) {
-        isPrepared = false
         videoController.complete()
     }
 

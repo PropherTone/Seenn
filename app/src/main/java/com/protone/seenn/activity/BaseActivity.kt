@@ -231,6 +231,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
                 onPause?.invoke()
                 doPause()
             }
+            hideSoftInput()
         } finally {
             super.onPause()
         }

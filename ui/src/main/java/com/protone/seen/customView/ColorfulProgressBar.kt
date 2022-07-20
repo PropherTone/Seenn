@@ -24,13 +24,13 @@ class ColorfulProgressBar @JvmOverloads constructor(
     @StyleRes defStyleRes: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes) {
 
-    private val binding = ColorfulBarChildLayoutBinding
+    private val button = ColorfulBarChildLayoutBinding
         .inflate(context.newLayoutInflater, this, true)
     private var scope: CoroutineScope? = null
     private var childX: Float
-        get() = binding.root.x
+        get() = button.root.x
         set(value) {
-            binding.root.x = value
+            button.root.x = value
         }
     private var halfHeight = 0f
     private var halfChildW = 0
@@ -123,7 +123,7 @@ class ColorfulProgressBar @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        halfChildW = binding.root.measuredWidth / 2
+        halfChildW = button.root.measuredWidth / 2
         backBarPath.moveTo(halfChildW.toFloat(), halfHeight)
         backBarPath.lineTo((width - halfChildW).toFloat(), halfHeight)
         linearGradient = LinearGradient(

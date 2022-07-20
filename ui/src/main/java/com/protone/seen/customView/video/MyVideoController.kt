@@ -6,8 +6,8 @@ import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.isVisible
-import com.protone.api.context.newLayoutInflater
 import com.protone.api.baseType.getDrawable
+import com.protone.api.context.newLayoutInflater
 import com.protone.seen.R
 import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.databinding.VideoControllerBinding
@@ -21,19 +21,34 @@ class MyVideoController @JvmOverloads constructor(
 
     private val binding = VideoControllerBinding.inflate(context.newLayoutInflater, this, true)
 
-    var playVideo: () -> Unit = {}
-    var pauseVideo: () -> Unit = {}
+    private var playVideo: (() -> Unit)? = null
+    private var pauseVideo: (() -> Unit)? = null
+    private var fullScreen: (() -> Unit)? = null
+
+    fun playVideo(func: () -> Unit) {
+        playVideo = func
+    }
+
+    fun pauseVideo(func: () -> Unit) {
+        pauseVideo = func
+    }
+
+    fun fullScreen(func: () -> Unit) {
+        fullScreen = func
+    }
 
     private var isPlaying = false
         set(value) {
-            binding.vStart.setImageDrawable( if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
-            else R.drawable.ic_baseline_pause_24_white.getDrawable())
-            binding.vControl.setImageDrawable(if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
-            else R.drawable.ic_baseline_pause_24_white.getDrawable())
+            binding.vStart.setImageDrawable(
+                if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
+                else R.drawable.ic_baseline_pause_24_white.getDrawable()
+            )
+            binding.vControl.setImageDrawable(
+                if (!value) R.drawable.ic_baseline_play_arrow_24_white.getDrawable()
+                else R.drawable.ic_baseline_pause_24_white.getDrawable()
+            )
             field = value
         }
-
-    var fullScreen: (() -> Unit)? = null
 
     init {
         binding.vFull.setOnClickListener {
@@ -41,7 +56,7 @@ class MyVideoController @JvmOverloads constructor(
         }
         binding.vStart.setOnClickListener {
             if (!isPlaying) {
-                playVideo()
+                playVideo?.invoke()
                 binding.vSeekBar.start()
             }
             it.isVisible = false
@@ -50,14 +65,21 @@ class MyVideoController @JvmOverloads constructor(
         }
         binding.vControl.setOnClickListener {
             if (!isPlaying) {
-                playVideo()
+                playVideo?.invoke()
                 binding.vSeekBar.start()
             } else {
-                pauseVideo()
+                pauseVideo?.invoke()
                 binding.vSeekBar.stop()
             }
             isPlaying = !isPlaying
         }
+    }
+
+    fun onStart() {
+        if (isPlaying) return
+        binding.vStart.isVisible = false
+        binding.vContainer.isVisible = true
+        isPlaying = true
     }
 
     fun complete() {

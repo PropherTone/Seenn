@@ -35,7 +35,6 @@ class MyTextureView @JvmOverloads constructor(
         val viewRotation = rotation
         var widthMS = widthMeasureSpec
         var heightMS = heightMeasureSpec
-        // 如果判断成立，则说明显示的TextureView和本身的位置是有90度的旋转的，所以需要交换宽高参数。
         if (viewRotation == 90f || viewRotation == 270f) {
             val tempMeasureSpec = widthMS
             widthMS = heightMS
@@ -91,8 +90,6 @@ class MyTextureView @JvmOverloads constructor(
                     height = width * videoHeight / videoWidth
                 }
             }
-        } else {
-            // no size yet, just adopt the given spec sizes
         }
         setMeasuredDimension(width, height)
     }

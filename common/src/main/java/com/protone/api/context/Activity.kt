@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.protone.api.R
 import com.protone.api.baseType.getString
@@ -135,6 +137,10 @@ fun Activity.multiDeleteMedia(uri: Uri): Boolean {
 
 fun Activity.showFailedToast() = runOnUiThread {
     R.string.failed_msg.getString().toast()
+}
+
+fun Activity.hideSoftInput(){
+    ViewCompat.getWindowInsetsController(window.decorView)?.hide(WindowInsetsCompat.Type.ime())
 }
 
 val Activity.hasNavigationBar: Boolean

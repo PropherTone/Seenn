@@ -17,7 +17,7 @@ import com.protone.api.entity.Music
 import com.protone.api.entity.MusicBucket
 import com.protone.seen.adapter.MusicBucketAdapter
 import com.protone.seen.adapter.MusicListAdapter
-import com.protone.seen.customView.StateImageView
+import com.protone.seen.customView.StatusImageView
 import com.protone.seenn.Medias
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.workLocalBroadCast
@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
-    StateImageView.StateListener,
+    StatusImageView.StateListener,
     ViewTreeObserver.OnGlobalLayoutListener {
     override val viewModel: MusicModel by viewModels()
 

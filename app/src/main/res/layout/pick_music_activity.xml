@@ -59,7 +59,7 @@
             android:contentDescription="@string/action"
             android:onClick="@{()-> activity.finish()}"
             android:padding="@dimen/icon_padding_lite"
-            android:src="@drawable/ic_baseline_keyboard_backspace_24"
+            android:src="@drawable/ic_round_keyboard_backspace_24_white"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -7,7 +7,7 @@ import androidx.annotation.StyleRes
 import com.protone.api.baseType.getDrawable
 import com.protone.seen.R
 
-class StateImageView @JvmOverloads constructor(
+class StatusImageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     @AttrRes defStyleAttr: Int = 0,

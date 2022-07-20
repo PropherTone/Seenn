@@ -47,21 +47,30 @@ val Context.navigationBarHeight: Int
     }
 
 var isKeyBroadShow = false
+var onLayoutChangeListener: View.OnLayoutChangeListener? = null
 
-inline fun Activity.setSoftInputStatuesListener(crossinline onSoftInput: (Int, Boolean) -> Unit={ _, _->}) {
+inline fun Activity.setSoftInputStatusListener(crossinline onSoftInput: (Int, Boolean) -> Unit = { _, _ -> }) {
     isKeyBroadShow = false
-    window.decorView.addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+    removeSoftInputStatusListener()
+    onLayoutChangeListener = View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
         val rect = Rect()
         v.getWindowVisibleDisplayFrame(rect)
         val i = v.height - rect.bottom - navigationBarHeight
         if (i > 0 && !isKeyBroadShow) {
             isKeyBroadShow = true
-            onSoftInput.invoke(i, i > 0)
+            onSoftInput.invoke(i, isKeyBroadShow)
         } else if (i <= 0 && isKeyBroadShow) {
             isKeyBroadShow = false
-            onSoftInput.invoke(i, false)
+            onSoftInput.invoke(i, isKeyBroadShow)
         }
     }
+    window.decorView.addOnLayoutChangeListener(onLayoutChangeListener)
+}
+
+fun Activity.removeSoftInputStatusListener() {
+    if (onLayoutChangeListener == null) return
+    window.decorView.removeOnLayoutChangeListener(onLayoutChangeListener)
+    onLayoutChangeListener = null
 }
 
 @SuppressLint("ClickableViewAccessibility")
@@ -70,7 +79,10 @@ fun Context.linkInput(target: View, input: View) {
         val inputManager: InputMethodManager =
             getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         if (inputManager.isActive) {
-            inputManager.hideSoftInputFromWindow(input.windowToken, 0)
+            inputManager.hideSoftInputFromWindow(
+                input.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
             isKeyBroadShow = false
         }
         false

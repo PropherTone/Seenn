@@ -24,7 +24,7 @@ import com.protone.api.entity.GalleyBucket
 import com.protone.api.entity.GalleyMedia
 import com.protone.seen.adapter.GalleyBucketAdapter
 import com.protone.seen.adapter.GalleyListAdapter
-import com.protone.seen.customView.StateImageView
+import com.protone.seen.customView.StatusImageView
 import com.protone.seen.databinding.GalleyFragmentLayoutBinding
 import com.protone.seen.dialog.titleDialog
 import com.protone.seen.itemDecoration.GalleyItemDecoration
@@ -256,7 +256,7 @@ class GalleyFragment(
             binding.galleyToolButton,
             45f
         )
-        binding.galleyShowBucket.setOnStateListener(object : StateImageView.StateListener {
+        binding.galleyShowBucket.setOnStateListener(object : StatusImageView.StateListener {
             override fun onActive() {
                 reverse()
             }

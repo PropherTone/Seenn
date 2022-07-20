@@ -4,6 +4,7 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Binder
@@ -51,10 +52,18 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         get() {
             if (playList.isEmpty()) return null
             if (field == null) {
+
                 field = MediaPlayer.create(
                     SApplication.app,
                     playList[playPosition].uri
                 ).also {
+                    it.setAudioAttributes(
+                        AudioAttributes
+                            .Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .build()
+                    )
                     it.setOnCompletionListener(this)
                 }
             }

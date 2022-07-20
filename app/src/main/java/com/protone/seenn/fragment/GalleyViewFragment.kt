@@ -18,8 +18,12 @@ class GalleyViewFragment(private val galleyMedia: GalleyMedia) : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = RichVideoLayoutBinding.inflate(inflater, container, false)
-        binding.richVideo.setVideoPath(galleyMedia.uri)
         return binding.root
+    }
+
+    override fun onStart() {
+        super.onStart()
+        binding.richVideo.setVideoPath(galleyMedia.uri)
     }
 
     override fun onDestroy() {

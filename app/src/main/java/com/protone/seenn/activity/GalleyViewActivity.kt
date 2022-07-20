@@ -51,7 +51,7 @@ class GalleyViewActivity :
     override suspend fun GalleyViewViewModel.init() {
         val isVideo = intent.getBooleanExtra(GalleyViewViewModel.TYPE, false)
         val galley =
-            intent.getStringExtra(GalleyViewViewModel.GALLEY) ?: getString(R.string.all_galley)
+            intent.getStringExtra(GalleyViewViewModel.GALLEY) ?: R.string.all_galley.getString()
         initGalleyData(galley, isVideo)
         init(isVideo)
     }

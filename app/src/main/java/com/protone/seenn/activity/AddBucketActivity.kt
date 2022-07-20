@@ -8,7 +8,7 @@ import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.marginBottom
 import com.protone.api.context.root
-import com.protone.api.context.setSoftInputStatuesListener
+import com.protone.api.context.setSoftInputStatusListener
 import com.protone.api.entity.MusicBucket
 import com.protone.api.json.toUri
 import com.protone.seenn.R
@@ -44,7 +44,7 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
         fitStatuesBarUsePadding(binding.root)
         fitNavigationBarUsePadding(binding.root)
         binding.activity = this
-        setSoftInputStatuesListener { i, b ->
+        setSoftInputStatusListener { i, b ->
             if (b) {
                 binding.root.marginBottom(i)
             } else {

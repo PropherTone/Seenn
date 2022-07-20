@@ -8,15 +8,39 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.protone.api.context.newLayoutInflater
-import com.protone.api.context.root
-import com.protone.api.context.setSoftInputStatuesListener
+import com.protone.api.context.*
 import com.protone.api.onResult
 import com.protone.seen.R
 import com.protone.seen.adapter.BaseAdapter
 import com.protone.seen.adapter.CheckListAdapter
 import com.protone.seen.databinding.*
 import kotlinx.coroutines.Dispatchers
+
+private var create: AlertDialog? = null
+    set(value) {
+        field = value
+        if (value?.ownerActivity != null) {
+            value.setOnShowListener {
+                val attributes = value.window?.attributes
+                val height =
+                    SApplication.screenHeight / 2 - ((value.window?.decorView?.height ?: 0) / 2)
+                (value.ownerActivity as Activity).setSoftInputStatusListener { h, b ->
+                    if (b && h + value.context.navigationBarHeight > height) {
+                        attributes?.y = attributes?.y?.minus(h - height)
+                            ?.minus(value.context.navigationBarHeight)
+                        value.onWindowAttributesChanged(attributes)
+                    } else {
+                        attributes?.y = 0
+                        value.onWindowAttributesChanged(attributes)
+                    }
+                }
+            }
+            value.setOnDismissListener {
+                (value.ownerActivity as Activity).removeSoftInputStatusListener()
+                create = null
+            }
+        }
+    }
 
 fun Activity.loginDialog(
     isReg: Boolean,
@@ -25,7 +49,9 @@ fun Activity.loginDialog(
 ) {
     val binding = LoginPopLayoutBinding.inflate(layoutInflater, root, false)
     if (isReg) binding.btnReg.isGone = true
-    val log = AlertDialog.Builder(this).setView(binding.root).create()
+    create = AlertDialog.Builder(this).setView(binding.root).create().also {
+        it.setOwnerActivity(this)
+    }
     binding.btnLogin.setOnClickListener {
         loginCall.invoke(
             binding.userName.text.toString(),
@@ -37,51 +63,31 @@ fun Activity.loginDialog(
                 binding.userNameLayout.error = " "
                 binding.userPasswordLayout.error = " "
             } else {
-                log.dismiss()
+                create?.dismiss()
             }
         }
     }
     binding.btnReg.setOnClickListener {
-        log.dismiss()
+        create?.dismiss()
         regClk.invoke()
     }
-    log.show()
-    val attributes = log.window?.attributes
-    val oldY = attributes?.y
-    setSoftInputStatuesListener { _, b ->
-        if (b) {
-            attributes?.y = attributes?.y?.minus(binding.root.measuredHeight / 2)
-            log.onWindowAttributesChanged(attributes)
-        } else {
-            attributes?.y = oldY
-            log.onWindowAttributesChanged(attributes)
-        }
-    }
+    create?.show()
 }
 
 fun Activity.regDialog(confirmCall: (String, String) -> Boolean) {
     val binding = RegPopLayoutBinding.inflate(layoutInflater, root, false)
-    val log = AlertDialog.Builder(this).setView(binding.root).create()
+    create = AlertDialog.Builder(this).setView(binding.root).create().also {
+        it.setOwnerActivity(this)
+    }
     binding.btnLogin.setOnClickListener {
         confirmCall.invoke(
             binding.userName.text.toString(),
             binding.userPassword.text.toString()
         ).let { re ->
-            if (re) log.dismiss()
+            if (re) create?.dismiss()
         }
     }
-    log.show()
-    val attributes = log.window?.attributes
-    val oldY = attributes?.y
-    setSoftInputStatuesListener { _, b ->
-        if (b) {
-            attributes?.y = attributes?.y?.minus(binding.root.measuredHeight / 2)
-            log.onWindowAttributesChanged(attributes)
-        } else {
-            attributes?.y = oldY
-            log.onWindowAttributesChanged(attributes)
-        }
-    }
+    create?.show()
 
 }
 
@@ -98,7 +104,6 @@ fun Activity.titleDialog(title: String, name: String, callBack: (String) -> Unit
         }
     }
 
-    var create: AlertDialog?
     AlertDialog.Builder(this).also {
         it.setView(binding.root)
         it.setPositiveButton(
@@ -106,26 +111,14 @@ fun Activity.titleDialog(title: String, name: String, callBack: (String) -> Unit
         ) { p0, _ ->
             callBack(binding.renameInput.text.toString())
             p0?.dismiss()
-            create = null
         }
         it.setNegativeButton(R.string.cancel) { p0, _ ->
             p0?.dismiss()
-            create = null
         }
     }.create().also {
+        it.setOwnerActivity(this)
         create = it
     }.show()
-    val attributes = create?.window?.attributes
-    setSoftInputStatuesListener { _, b ->
-        if (b) {
-            attributes?.y = attributes?.y?.minus(binding.root.measuredHeight / 2)
-            create?.onWindowAttributesChanged(attributes)
-        } else {
-            attributes?.y = 0
-            create?.onWindowAttributesChanged(attributes)
-        }
-    }
-
 }
 
 fun Activity.cateDialog(

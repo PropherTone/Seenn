@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/white">
 
-                <com.protone.seen.customView.StateImageView
+                <com.protone.seen.customView.StatusImageView
                     android:id="@+id/galley_showBucket"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/small_Icon"

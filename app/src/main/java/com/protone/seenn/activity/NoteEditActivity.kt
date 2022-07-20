@@ -47,7 +47,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             binding.toolbar.progress =
                 -verticalOffset / appBarLayout.totalScrollRange.toFloat()
         }
-        setSoftInputStatuesListener { height, isShow ->
+        setSoftInputStatusListener { height, isShow ->
             if (isShow) {
                 binding.root.marginBottom(height)
             } else {
