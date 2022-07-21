@@ -101,7 +101,7 @@ class GalleyFragment(
             return galleyMap[rightGalley] ?: galleyMap[R.string.all_galley.getString()]
         }
 
-        override fun onGalleyUpdate(updateList: ArrayList<GalleyMedia>) {
+        override fun onGalleyUpdate(updateList: MutableList<GalleyMedia>) {
             launch(Dispatchers.IO) {
                 var isNew = false
                 DatabaseHelper
@@ -192,7 +192,7 @@ class GalleyFragment(
         super.onCreate(savedInstanceState)
         launch {
             while (!onViewCreated) {
-                kotlinx.coroutines.selects.select<Unit> {
+                kotlinx.coroutines.selects.select {
                     channel.onReceive {
                         if (it == "onCreateView") {
                             onViewCreated = true
@@ -225,9 +225,9 @@ class GalleyFragment(
         galleyBucket.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = GalleyBucketAdapter(context, mutableListOf()) {
+                noticeListUpdate(galleyMap[it])
                 binding.galleyShowBucket.negative()
                 rightGalley = it
-                noticeListUpdate(galleyMap[it])
             }
             addItemDecoration(object : RecyclerView.ItemDecoration() {
                 override fun getItemOffsets(

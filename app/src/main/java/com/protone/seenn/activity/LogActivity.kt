@@ -11,6 +11,7 @@ import com.protone.api.context.intent
 import com.protone.api.context.root
 import com.protone.seen.adapter.LogListAdapter
 import com.protone.seenn.R
+import com.protone.seenn.database.DatabaseHelper
 import com.protone.seenn.databinding.LogActivityBinding
 import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.LogViewModel
@@ -66,6 +67,10 @@ class LogActivity : BaseActivity<LogActivityBinding, LogViewModel>(false) {
 
     override suspend fun doStart() {
         viewModel.initLogList()
+    }
+
+    fun action(){
+        DatabaseHelper.instance.showDataBase(this)
     }
 
     private suspend fun LogViewModel.initLogList() {

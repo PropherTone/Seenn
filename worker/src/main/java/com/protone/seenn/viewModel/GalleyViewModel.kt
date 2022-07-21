@@ -74,7 +74,7 @@ class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
         mailers[rightMailer]?.deleteMedia(media)
     }
 
-    fun onUpdate(updateList: ArrayList<GalleyMedia>) {
+    fun onUpdate(updateList: MutableList<GalleyMedia>) {
         mailers[rightMailer]?.onGalleyUpdate(updateList)
     }
 

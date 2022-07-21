@@ -9,22 +9,21 @@ import com.protone.api.entity.Note
 import com.protone.mediamodle.R
 import com.protone.seenn.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
 object Medias {
 
-    val galleyLive = MutableLiveData<ArrayList<GalleyMedia>>()
-    val audioLive = MutableLiveData<ArrayList<Music>>()
+    val galleyNotifier = MutableSharedFlow<MutableList<GalleyMedia>>()
+    val audioNotifier = MutableSharedFlow<MutableList<Music>>()
+    val musicBucketNotifier = MutableLiveData<Int>()
 
-    var music: MutableList<Music> = mutableListOf()
+    var music: MutableList<Music>
         set(value) {
             musicBucket[R.string.all_music.getString()] = value
-            field = value
         }
         get() = musicBucket[R.string.all_music.getString()] ?: mutableListOf()
-
-    val musicBucketLive = MutableLiveData<Int>()
 
     val musicBucket = mutableMapOf<String, MutableList<Music>>()
 

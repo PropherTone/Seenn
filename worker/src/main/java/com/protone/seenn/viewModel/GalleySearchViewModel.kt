@@ -5,10 +5,6 @@ import com.protone.api.entity.GalleyMedia
 import com.protone.seenn.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.streams.toList
@@ -27,27 +23,27 @@ class GalleySearchViewModel : BaseViewModel() {
             val lowercase = input.lowercase(Locale.getDefault())
             val uppercase = input.uppercase(Locale.getDefault())
             launch(Dispatchers.IO) {
-                data.asFlow().filter {
+                data.stream().filter {
                     it.name.contains(input, true)
-                }.buffer().toList().let { nameFilterList ->
+                }.toList().let { nameFilterList ->
                     onQueryListener?.onGalleyResult(nameFilterList as MutableList<GalleyMedia>)
                     cancel()
                 }
             }
             launch(Dispatchers.IO) {
-                data.asFlow().filter {
+                data.stream().filter {
                     it.cate?.contains(input) == true
                             || it.cate?.contains(lowercase) == true
                             || it.cate?.contains(uppercase) == true
                             || it.cate?.stream()
                         ?.anyMatch { name -> name.contains(input, true) } == true
-                }.buffer().toList().let { catoFilterList ->
+                }.toList().let { catoFilterList ->
                     onQueryListener?.onCatoResult(catoFilterList as MutableList<GalleyMedia>)
                     cancel()
                 }
             }
             launch(Dispatchers.IO) {
-                data.asFlow().filter {
+                data.stream().filter {
                     val notesWithGalley =
                         DatabaseHelper.instance
                             .galleriesWithNotesDAOBridge.getNotesWithGalley(it.mediaId ?: 0)
@@ -59,7 +55,7 @@ class GalleySearchViewModel : BaseViewModel() {
                             || notesWithGalley.contains(uppercase)
                             || notesWithGalley.stream()
                         .anyMatch { name -> name.contains(input, true) }
-                }.buffer().toList().let { noteFilterList ->
+                }.toList().let { noteFilterList ->
                     onQueryListener?.onNoteResult(noteFilterList as MutableList<GalleyMedia>)
                     cancel()
                 }

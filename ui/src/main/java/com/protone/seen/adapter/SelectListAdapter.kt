@@ -31,7 +31,7 @@ abstract class SelectListAdapter<V : ViewDataBinding, T>(context: Context) :
 
     fun setSelect(holder: Holder<V>, state: Boolean) = select(holder, state)
 
-    private fun clearSelected() {
+    fun clearSelected() {
         if (selectList.size > 0) {
             val itemIndex = itemIndex(selectList[0])
             selectList.clear()

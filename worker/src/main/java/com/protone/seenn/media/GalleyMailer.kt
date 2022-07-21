@@ -13,5 +13,5 @@ interface FragMailer {
     fun selectAll()
     fun onActionBtn()
     fun getChooseGalley(): MutableList<GalleyMedia>?
-    fun onGalleyUpdate(updateList: ArrayList<GalleyMedia>)
+    fun onGalleyUpdate(updateList: MutableList<GalleyMedia>)
 }

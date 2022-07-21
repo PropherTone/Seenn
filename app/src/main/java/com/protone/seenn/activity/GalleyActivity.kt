@@ -21,6 +21,7 @@ import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleyViewModel
 import com.protone.seenn.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>(false) {
@@ -64,7 +65,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
 
         initPager()
 
-        Medias.galleyLive.observe(this@GalleyActivity) {
+        Medias.galleyNotifier.collect {
             if (!onTransaction) {
                 onUpdate(it)
             }

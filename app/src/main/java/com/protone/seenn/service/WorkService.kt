@@ -14,11 +14,11 @@ import com.protone.api.baseType.toast
 import com.protone.api.context.workIntentFilter
 import com.protone.api.entity.GalleyMedia
 import com.protone.api.entity.Music
-import com.protone.seenn.Medias.audioLive
-import com.protone.seenn.Medias.galleyLive
+import com.protone.seenn.Medias.audioNotifier
+import com.protone.seenn.Medias.galleyNotifier
 import com.protone.seenn.Medias.music
 import com.protone.seenn.Medias.musicBucket
-import com.protone.seenn.Medias.musicBucketLive
+import com.protone.seenn.Medias.musicBucketNotifier
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.IWorkService
 import com.protone.seenn.broadcast.MediaContentObserver
@@ -117,15 +117,16 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                 }
             }
         }
-        musicBucketLive.postValue(1)
+        musicBucketNotifier.postValue(1)
         makeToast("歌单更新完毕")
-        cancel()
     }
 
     private fun updateMusic(uri: Uri) {
-        scanAudioWithUri(uri) {
-            DatabaseHelper.instance.musicDAOBridge.insertMusic(it)
-            audioLive.postValue(arrayListOf(it))
+        launch(Dispatchers.IO) {
+            scanAudioWithUri(uri) {
+                DatabaseHelper.instance.musicDAOBridge.insertMusicCheck(it)
+                audioNotifier.emit(arrayListOf(it))
+            }
         }
         updateMusicBucket()
         makeToast("音乐更新完毕")
@@ -139,26 +140,30 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                 true
             } else false
         }
-        launch(Dispatchers.IO) {
-            DatabaseHelper.instance.musicDAOBridge.run {
-                val allMusic = getAllMusic() as MutableList
+
+        DatabaseHelper.instance.musicDAOBridge.run {
+            val allMusic = mutableListOf<Music>()
+            launch(Dispatchers.IO) {
+                getAllMusic()?.let { allMusic.addAll(it) }
                 flow {
                     scanAudio { _, music ->
-                        if (sortMusic(allMusic, music)) {
+                        if (!sortMusic(allMusic, music)) {
                             emit(music)
                         }
                     }
                 }.buffer().collect {
                     insertMusic(it)
                 }
-                deleteMusicMultiAsync(allMusic)
-                updateMusicBucket()
-                if (allMusic.size != 0) {
-                    audioLive.postValue(allMusic as ArrayList<Music>)
-                    makeToast("音乐更新完毕")
-                }
             }
-            cancel()
+            deleteMusicMultiAsync(allMusic)
+            updateMusicBucket()
+            if (allMusic.size != 0) {
+                launch {
+                    audioNotifier.emit(allMusic as ArrayList<Music>)
+                }
+                makeToast("音乐更新完毕")
+            }
+
         }
     }
 
@@ -166,15 +171,14 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
         scanGalleyWithUri(uri) {
             val checkedMedia =
                 DatabaseHelper
-                .instance
-                .signedGalleyDAOBridge
-                .insertSignedMediaChecked(it)
+                    .instance
+                    .signedGalleyDAOBridge
+                    .insertSignedMediaChecked(it)
             if (checkedMedia != null) {
-                galleyLive.postValue(arrayListOf(checkedMedia))
+                galleyNotifier.emit(arrayListOf(checkedMedia))
                 makeToast("相册更新完毕")
             }
         }
-        cancel()
     }
 
     private fun updateGalley() = DatabaseHelper.instance.signedGalleyDAOBridge.run {
@@ -224,10 +228,9 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             updatedMedia.addAll(allSignedMedia)
             deleteSignedMediaMultiAsync(allSignedMedia)
             if (updatedMedia.size != 0) {
-                galleyLive.postValue(updatedMedia)
+                galleyNotifier.emit(updatedMedia)
                 makeToast("相册更新完毕")
             }
-            cancel()
         }
     }
 

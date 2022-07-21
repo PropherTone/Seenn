@@ -183,6 +183,7 @@ class GalleySearchActivity :
                 listGone(binding.resultGalleries)
             }
             if (binding.resultGalleries.adapter is GalleyListAdapter) {
+//                binding.resultGalleries.swapAdapter()
                 (binding.resultGalleries.adapter as GalleyListAdapter).noticeDataUpdate(list)
             }
         }

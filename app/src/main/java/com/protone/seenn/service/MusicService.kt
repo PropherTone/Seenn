@@ -114,35 +114,33 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
             notificationPlayState(b, ref)
         }
 
-        private fun notificationPlayState(state: Boolean, ref: Boolean = false) {
+        private fun notificationPlayState(state: Boolean, ref: Boolean) {
             synchronized(playList) {
                 if (playList.isEmpty()) return
-                launch {
-                    playState.postValue(state)
-                    initMusicNotification()
-                    remoteViews?.setImageViewResource(
-                        R.id.notify_music_control,
-                        if (state) R.drawable.ic_baseline_pause_24
-                        else R.drawable.ic_baseline_play_arrow_24
+                playState.postValue(state)
+                initMusicNotification()
+                remoteViews?.setImageViewResource(
+                    R.id.notify_music_control,
+                    if (state) R.drawable.ic_baseline_pause_24
+                    else R.drawable.ic_baseline_play_arrow_24
+                )
+                if (state || ref) {
+                    remoteViews?.setTextViewText(
+                        R.id.notify_music_name,
+                        playList[playPosition].title
                     )
-                    if (state || ref) {
-                        remoteViews?.setTextViewText(
-                            R.id.notify_music_name,
-                            playList[playPosition].title
-                        )
-                        playList[playPosition].uri.toBitmapByteArray()?.let { ba ->
-                            remoteViews?.setImageViewBitmap(
-                                R.id.notify_music_icon,
-                                BitmapFactory.decodeByteArray(
-                                    ba,
-                                    0,
-                                    ba.size
-                                )
+                    playList[playPosition].uri.toBitmapByteArray()?.let { ba ->
+                        remoteViews?.setImageViewBitmap(
+                            R.id.notify_music_icon,
+                            BitmapFactory.decodeByteArray(
+                                ba,
+                                0,
+                                ba.size
                             )
-                        }
+                        )
                     }
-                    notificationManager?.notify(NOTIFICATION_ID, notification)
                 }
+                notificationManager?.notify(NOTIFICATION_ID, notification)
             }
         }
     }
@@ -399,7 +397,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     override fun onCompletion(mp: MediaPlayer?) {
         playState.postValue(false)
         when (loopModeLive.value) {
-            LOOP_LIST -> next()
+            LOOP_LIST -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
             LOOP_SINGLE -> {
                 --playPosition
                 musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
@@ -419,23 +417,22 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
             }
         }
     }
-
-    private fun getEmptyMusic() = Music(
-        0,
-        "NO MUSIC",
-        0,
-        null,
-        null,
-        null,
-        "",
-        null,
-        null,
-        0L,
-        0L,
-        Uri.EMPTY
-    )
 }
 
+fun getEmptyMusic() = Music(
+    0,
+    "NO MUSIC",
+    0,
+    null,
+    null,
+    null,
+    "",
+    null,
+    null,
+    0L,
+    0L,
+    Uri.EMPTY
+)
 
 interface IMusicService {
     fun setLoopMode(mode: Int)

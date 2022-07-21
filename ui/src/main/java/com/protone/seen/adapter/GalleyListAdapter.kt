@@ -1,6 +1,5 @@
 package com.protone.seen.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -91,9 +90,7 @@ class GalleyListAdapter(
     fun quitSelectMod() {
         if (!onSelectMod) return
         onSelectMod = false
-        context.onUiThread {
-            clearAllSelected()
-        }
+        context.onUiThread { clearAllSelected() }
         onSelectListener?.select(selectList)
     }
 
@@ -101,30 +98,24 @@ class GalleyListAdapter(
         val indexOf = media.indexOf(item)
         if (indexOf != -1) {
             onSelectMod = true
-            context.onUiThread {
-                notifyItemChanged(indexOf)
-            }
+            context.onUiThread { notifyItemChanged(indexOf) }
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun noticeDataUpdate(item: MutableList<GalleyMedia>?) {
         if (item == null) return
+        val size = media.size
         media.clear()
+        context.onUiThread { notifyItemRangeRemoved(0, size) }
         media.addAll(item)
-        context.onUiThread {
-            notifyDataSetChanged()
-        }
+        context.onUiThread { notifyItemRangeInserted(0, media.size) }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun selectAll() {
         media.onEach {
             if (!selectList.contains(it)) {
                 selectList.add(it)
-                context.onUiThread {
-                    notifyItemChanged(media.indexOf(it))
-                }
+                context.onUiThread { notifyItemChanged(media.indexOf(it)) }
             }
         }
     }

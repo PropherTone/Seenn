@@ -19,6 +19,7 @@ object SCrashHandler : Thread.UncaughtExceptionHandler {
     override fun uncaughtException(t: Thread, e: Throwable) {
         if (path != null) {
             writeLog(e, t)
+            defaultUncaughtExceptionHandler?.uncaughtException(t, e)
             android.os.Process.killProcess(android.os.Process.myPid())
             exitProcess(0)
         } else {

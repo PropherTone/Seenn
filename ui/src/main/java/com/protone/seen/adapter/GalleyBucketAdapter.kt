@@ -53,9 +53,9 @@ class GalleyBucketAdapter(
                 root.setOnLongClickListener {
                     DatabaseHelper.instance.execute {
                         val galley = DatabaseHelper
-                                .instance
-                                .galleyBucketDAOBridge
-                                .getGalleyBucketRs(galleries[position].second[0])
+                            .instance
+                            .galleyBucketDAOBridge
+                            .getGalleyBucketRs(galleries[position].second[0])
                         if (galley != null) withContext(Dispatchers.Main) {
                             AlertDialog.Builder(context)
                                 .setTitle(R.string.delete.getString())
@@ -83,12 +83,21 @@ class GalleyBucketAdapter(
                     bucketName.text = sec[0]
                     bucketItemNumber.text = sec[1]
                     bucket.setOnClickListener {
+                        checkSelect(holder, data)
                         selectBucket(sec[0])
-                        if (!selectList.contains(data)) checkSelect(holder, data)
                     }
                 }
             }
         }
+    }
+
+    override fun checkSelect(
+        holder: Holder<GalleyBucketListLayoutBinding>,
+        item: Pair<Uri, Array<String>>
+    ) {
+        if (!multiChoose) clearSelected()
+        selectList.add(item)
+        setSelect(holder, true)
     }
 
     private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {

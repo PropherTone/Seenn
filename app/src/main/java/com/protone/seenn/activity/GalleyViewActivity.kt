@@ -41,8 +41,8 @@ class GalleyViewActivity :
     override fun createView() {
         binding = GalleyViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
-        fitStatuesBarUsePadding(binding.galleyVTitle)
-        fitNavigationBarUsePadding(binding.galleyVTitle)
+        fitStatuesBarUsePadding(binding.galleyVCover)
+        fitNavigationBarUsePadding(binding.galleyVCover)
         initPop()
         popLayout?.galleyIntoBox?.isGone = true
         popLayout?.galleySelectAll?.isGone = true

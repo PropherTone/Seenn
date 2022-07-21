@@ -82,7 +82,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
             userConfig.lastMusicBucket = bucket
         }
 
-        Medias.musicBucketLive.observe(this@MusicActivity) {
+        Medias.musicBucketNotifier.observe(this@MusicActivity) {
             sendRefreshBucket()
         }
         setBucket()

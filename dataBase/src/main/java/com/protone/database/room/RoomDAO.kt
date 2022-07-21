@@ -1,6 +1,8 @@
 package com.protone.database.room
 
+import android.content.Context
 import com.protone.database.room.dao.*
+import com.wajahatkarim3.roomexplorer.RoomExplorer
 
 fun getGalleyDAO(): SignedGalleyDAO {
     return SeennDataBase.database.getGalleyDAO()
@@ -36,4 +38,8 @@ fun getNoteDirWithNoteDAO(): NoteDirWithNoteDAO {
 
 fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO {
     return SeennDataBase.database.getMusicWithMusicBucketDAO()
+}
+
+fun showRoomDB(context: Context){
+    RoomExplorer.show(context,SeennDataBase::class.java,"SeennDB")
 }

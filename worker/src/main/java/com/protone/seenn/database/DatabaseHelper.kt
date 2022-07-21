@@ -1,5 +1,6 @@
 package com.protone.seenn.database
 
+import android.content.Context
 import android.net.Uri
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
@@ -48,6 +49,10 @@ class DatabaseHelper {
     val galleriesWithNotesDAOBridge by lazy { GalleriesWithNotesDAOBridge() }
     val noteDirWithNoteDAOBridge by lazy { NoteDirWithNoteDAOBridge() }
     val musicWithMusicBucketDAOBridge by lazy { MusicWithMusicBucketDAOBridge() }
+
+    fun showDataBase(context: Context) {
+        showRoomDB(context)
+    }
 
     inline fun execute(crossinline runnable: suspend () -> Unit) {
         executorService.launch(Dispatchers.IO) {
@@ -174,11 +179,16 @@ class DatabaseHelper {
             }
         }
 
-        fun insertMusicCheck(music: Music) {
+        fun insertMusicCheck(music: Music) = execute {
             musicDAO.getMusicByUri(music.uri).let {
-                if (it == null) insertMusic(music)
+                if (it == null) {
+                    insertMusic(music)
+                } else {
+                    updateMusic(music)
+                }
             }
         }
+
 
         fun insertMusic(music: Music) {
             musicDAO.insertMusic(music)
@@ -186,10 +196,8 @@ class DatabaseHelper {
 
         fun getAllMusic(): List<Music>? = musicDAO.getAllMusic()
 
-        fun deleteMusicAsync(music: Music) {
-            execute {
-                deleteMusic(music)
-            }
+        fun deleteMusicAsync(music: Music) = execute {
+            deleteMusic(music)
         }
 
         fun deleteMusic(music: Music) {

@@ -22,10 +22,12 @@ import com.protone.seenn.database.DatabaseHelper
 import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.MainActivityBinding
 import com.protone.seenn.service.WorkService
+import com.protone.seenn.service.getEmptyMusic
 import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.MainViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -92,7 +94,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
             musicController.setLoopMode(userConfig.musicLoopMode)
             launch(Dispatchers.IO) {
                 while (isActive) {
-                    if (Medias.musicBucketLive.value != null && Medias.musicBucketLive.value == 1) {
+                    if (Medias.musicBucketNotifier.value != null && Medias.musicBucketNotifier.value == 1) {
                         break
                     }
                 }
@@ -101,17 +103,17 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
                     musicController.refresh(
                         if (userConfig.lastMusic.isNotEmpty())
                             userConfig.lastMusic.toEntity(Music::class.java)
-                        else binder.getPlayList()[0], userConfig.lastMusicProgress
+                        else if (it.size > 0)it[0] else getEmptyMusic(), userConfig.lastMusicProgress
                     )
                 }
             }
         }
 
         Medias.apply {
-            galleyLive.observe(this@MainActivity) {
+            galleyNotifier.collect {
                 refreshModelList()
             }
-            audioLive.observe(this@MainActivity) {
+            audioNotifier.collect {
                 musicController.refresh()
             }
         }
