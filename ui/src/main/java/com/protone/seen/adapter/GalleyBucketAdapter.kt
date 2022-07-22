@@ -20,9 +20,10 @@ import kotlin.streams.toList
 
 class GalleyBucketAdapter(
     context: Context,
-    private var galleries: MutableList<Pair<Uri, Array<String>>>,
     val selectBucket: (String) -> Unit
 ) : SelectListAdapter<GalleyBucketListLayoutBinding, Pair<Uri, Array<String>>>(context) {
+
+    private var galleries: MutableList<Pair<Uri, Array<String>>> = mutableListOf()
 
     override val select: (holder: Holder<GalleyBucketListLayoutBinding>, isSelect: Boolean) -> Unit =
         { holder, isSelect ->

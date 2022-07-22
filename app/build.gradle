@@ -51,7 +51,6 @@ dependencies {
     implementation project(path: ':ui')
     implementation project(path: ':common')
     implementation project(path: ':cloud')
-    implementation project(path: ':media')
     implementation project(path: ':values')
     implementation project(path: ':worker')
 

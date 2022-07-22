@@ -32,7 +32,6 @@ class GalleySearchActivity :
     override fun createView() {
         binding = GalleySearchActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
-        fitNavigationBar(binding.root)
         fitStatuesBar(binding.root)
         initPop()
     }
@@ -47,7 +46,7 @@ class GalleySearchActivity :
             R.string.none.getString().toast()
         } else {
             data.addAll(gainListData)
-            initList(data[0].isVideo)
+            initList(isVideo())
         }
 
         onFinish = {
@@ -57,20 +56,22 @@ class GalleySearchActivity :
 
     override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
+    private fun newAdapter(list: MutableList<GalleyMedia>) = GalleyListAdapter(
+        this@GalleySearchActivity, viewModel.isVideo(), true
+    ).also {
+        it.setMedias(list)
+        it.multiChoose = true
+        it.setNewSelectList(viewModel.selectList)
+        it.setOnSelectListener(this@GalleySearchActivity)
+    }
+
     private fun initList(isVideo: Boolean) {
         binding.apply {
             linkInput(scroll, inputSearch)
             fun RecyclerView.initRecyclerView() {
                 apply {
                     layoutManager = GridLayoutManager(context, 4)
-                    adapter = GalleyListAdapter(
-                        this@GalleySearchActivity,
-                        mutableListOf(), isVideo, true
-                    ).also {
-                        it.multiChoose = true
-                        it.setNewSelectList(viewModel.selectList)
-                        it.setOnSelectListener(this@GalleySearchActivity)
-                    }
+                    adapter = newAdapter(mutableListOf())
                     addItemDecoration(GalleyItemDecoration(paddingEnd))
                     linkInput(this, inputSearch)
                 }
@@ -183,8 +184,7 @@ class GalleySearchActivity :
                 listGone(binding.resultGalleries)
             }
             if (binding.resultGalleries.adapter is GalleyListAdapter) {
-//                binding.resultGalleries.swapAdapter()
-                (binding.resultGalleries.adapter as GalleyListAdapter).noticeDataUpdate(list)
+                binding.resultGalleries.swapAdapter(newAdapter(list), true)
             }
         }
     }
@@ -195,7 +195,7 @@ class GalleySearchActivity :
                 listGone(binding.resultCato)
             }
             if (binding.resultCato.adapter is GalleyListAdapter) {
-                (binding.resultCato.adapter as GalleyListAdapter).noticeDataUpdate(list)
+                binding.resultCato.swapAdapter(newAdapter(list), true)
             }
         }
     }
@@ -206,7 +206,7 @@ class GalleySearchActivity :
                 listGone(binding.resultNotes)
             }
             if (binding.resultNotes.adapter is GalleyListAdapter) {
-                (binding.resultNotes.adapter as GalleyListAdapter).noticeDataUpdate(list)
+                binding.resultNotes.swapAdapter(newAdapter(list), true)
             }
         }
     }

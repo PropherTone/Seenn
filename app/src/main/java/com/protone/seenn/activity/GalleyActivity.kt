@@ -31,7 +31,6 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
         binding = GalleyActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBar(binding.root)
-        fitNavigationBar(binding.root)
         initPop()
     }
 

@@ -216,7 +216,7 @@ class GalleyFragment(
     private fun initList() = binding.run {
         galleyList.apply {
             layoutManager = GridLayoutManager(context, 4)
-            adapter = GalleyListAdapter(context, mutableListOf(), isVideo).also {
+            adapter = GalleyListAdapter(context, isVideo).also {
                 it.multiChoose = true
                 it.setOnSelectListener(this@GalleyFragment)
             }
@@ -224,7 +224,7 @@ class GalleyFragment(
         }
         galleyBucket.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = GalleyBucketAdapter(context, mutableListOf()) {
+            adapter = GalleyBucketAdapter(context) {
                 noticeListUpdate(galleyMap[it])
                 binding.galleyShowBucket.negative()
                 rightGalley = it
@@ -337,17 +337,17 @@ class GalleyFragment(
             .instance
             .galleyBucketDAOBridge
             .insertGalleyBucketCB(GalleyBucket(name, isVideo)) { re, reName ->
-            if (re) {
-                if (!isLock) {
-                    insertBucket(Pair(Uri.EMPTY, arrayOf(reName, "PRIVATE")))
-                    galleyMap[reName] = mutableListOf()
+                if (re) {
+                    if (!isLock) {
+                        insertBucket(Pair(Uri.EMPTY, arrayOf(reName, "PRIVATE")))
+                        galleyMap[reName] = mutableListOf()
+                    } else {
+                        R.string.locked.getString().toast()
+                    }
                 } else {
-                    R.string.locked.getString().toast()
+                    R.string.failed_msg.getString().toast()
                 }
-            } else {
-                R.string.failed_msg.getString().toast()
             }
-        }
     }
 
     private fun insertBucket(pairs: Pair<Uri, Array<String>>) {

@@ -12,15 +12,12 @@
 
         <item name="android:windowBackground">@drawable/main_background</item>
 
-        <!-- Status bar color. -->
-
-        <item name="android:windowTranslucentNavigation">true</item>
-        <item name="android:windowTranslucentStatus">false</item>
+        <!--设置全屏-->
+<!--        <item name="android:windowTranslucentNavigation">true</item>-->
+<!--        <item name="android:windowTranslucentStatus">true</item>-->
         <!-- 设置statusBarColor 为透明-->
-        <item name="android:statusBarColor">@color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <!-- Customize your theme here. -->
-        <!--        <item name="android:windowBackground">@drawable/splash_them</item>-->
+        <item name="android:statusBarColor">@color/blue_5</item>
+        <item name="android:navigationBarColor">@color/blue_5</item>
         <item name="android:windowDisablePreview">false</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>

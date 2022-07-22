@@ -3,7 +3,6 @@ package com.protone.seenn
 import com.protone.api.context.SApplication
 import com.protone.api.baseType.getFileName
 import com.protone.api.isInDebug
-import com.protone.mediamodle.R
 import com.protone.seenn.media.scanAudio
 import kotlinx.coroutines.*
 import java.io.File

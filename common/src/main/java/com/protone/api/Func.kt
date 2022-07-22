@@ -1,6 +1,7 @@
 package com.protone.api
 
 import android.content.pm.ApplicationInfo
+import android.os.Looper
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.SApplication
@@ -46,4 +47,12 @@ suspend inline fun <T> onResult(
             R.string.unknown_error.getString().toast()
         }
     }
+}
+
+inline fun onBackground(crossinline function: () -> Unit) {
+    if (Looper.getMainLooper() == Looper.myLooper()) {
+        Thread {
+            function.invoke()
+        }.start()
+    } else function.invoke()
 }

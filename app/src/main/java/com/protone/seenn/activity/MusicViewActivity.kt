@@ -22,7 +22,6 @@ class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>
     override fun createView() {
         binding = MusicViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
-        fitNavigationBar(binding.musicPlayer.root)
         binding.toolBar.layoutParams =
             binding.toolBar.layoutParams.apply { height = statuesBarHeight }
     }

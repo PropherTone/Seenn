@@ -27,13 +27,13 @@ import com.protone.api.baseType.saveToFile
 import com.protone.api.baseType.toBitmap
 import com.protone.api.context.SApplication
 import com.protone.api.context.newLayoutInflater
-import com.protone.api.context.onBackground
 import com.protone.api.context.onUiThread
 import com.protone.api.entity.*
 import com.protone.api.json.jsonToList
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
+import com.protone.api.onBackground
 import com.protone.api.onResult
 import com.protone.seen.R
 import com.protone.seen.customView.musicPlayer.BaseMusicPlayer

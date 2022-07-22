@@ -2,6 +2,7 @@ package com.protone.seen.adapter
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.baseType.getFileName
 import com.protone.api.context.newLayoutInflater
 import com.protone.seen.databinding.LogListLayoutBinding
@@ -10,6 +11,11 @@ class LogListAdapter(context: Context) : BaseAdapter<LogListLayoutBinding>(conte
 
     private val logs = mutableListOf<String>()
     var logEvent: LogEvent? = null
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        recyclerView.setHasFixedSize(true)
+        super.onAttachedToRecyclerView(recyclerView)
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

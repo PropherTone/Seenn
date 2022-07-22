@@ -3,9 +3,13 @@ package com.protone.api.context
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Rect
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
-import android.view.ViewGroup
+import android.view.View
+import android.view.WindowManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -139,25 +143,68 @@ fun Activity.showFailedToast() = runOnUiThread {
     R.string.failed_msg.getString().toast()
 }
 
-fun Activity.hideSoftInput(){
+fun Activity.hideSoftInput() {
     ViewCompat.getWindowInsetsController(window.decorView)?.hide(WindowInsetsCompat.Type.ime())
 }
 
+@Suppress("unused")
 val Activity.hasNavigationBar: Boolean
     get() {
-        return this.baseContext.navigationBarHeight > 0
+        return false
+//        return this.baseContext.navigationBarHeight > 0
     }
 
+@Suppress("unused")
 val Activity.isNavigationBar: Boolean
     get() {
-        val vp = window.decorView as? ViewGroup
-        if (vp != null) {
-            for (i in 0 until vp.childCount) {
-                vp.getChildAt(i).context.packageName
-                if (vp.getChildAt(i).id != -1 && "navigationBarBackground" ==
-                    resources.getResourceEntryName(vp.getChildAt(i).id)
-                ) return true
-            }
-        }
         return false
+//        val vp = window.decorView as? ViewGroup
+//        if (vp != null) {
+//            for (i in 0 until vp.childCount) {
+//                vp.getChildAt(i).context.packageName
+//                if (vp.getChildAt(i).id != -1 && "navigationBarBackground" ==
+//                    resources.getResourceEntryName(vp.getChildAt(i).id)
+//                ) return true
+//            }
+//        }
+//        return false
     }
+
+var isKeyBroadShow = false
+var onLayoutChangeListener: View.OnLayoutChangeListener? = null
+
+inline fun Activity.setSoftInputStatusListener(crossinline onSoftInput: (Int, Boolean) -> Unit = { _, _ -> }) {
+    isKeyBroadShow = false
+    removeSoftInputStatusListener()
+    val nvH = if (hasNavigationBar) navigationBarHeight else 0
+    onLayoutChangeListener = View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+        val rect = Rect()
+        v.getWindowVisibleDisplayFrame(rect)
+        val i = v.height - rect.bottom - nvH
+        if (i > 0 && !isKeyBroadShow) {
+            isKeyBroadShow = true
+            onSoftInput.invoke(i + nvH, isKeyBroadShow)
+        } else if (i <= 0 && isKeyBroadShow) {
+            isKeyBroadShow = false
+            onSoftInput.invoke(i + nvH, isKeyBroadShow)
+        }
+    }
+    window.decorView.addOnLayoutChangeListener(onLayoutChangeListener)
+}
+
+fun Activity.removeSoftInputStatusListener() {
+    if (onLayoutChangeListener == null) return
+    window.decorView.removeOnLayoutChangeListener(onLayoutChangeListener)
+    onLayoutChangeListener = null
+}
+
+fun Activity.setTransparentClipStatusBar() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        window.isStatusBarContrastEnforced = false
+    }
+    window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+    window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+    window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+    window.statusBarColor = Color.TRANSPARENT
+}

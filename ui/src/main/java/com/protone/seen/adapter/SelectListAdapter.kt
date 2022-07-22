@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.databinding.ViewDataBinding
+import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.animation.AnimationHelper
 import com.protone.seen.R
 
@@ -14,6 +15,13 @@ abstract class SelectListAdapter<V : ViewDataBinding, T>(context: Context) :
 
     var selectList = mutableListOf<T>()
     var multiChoose = false
+
+    var hasFixedSize = true
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        recyclerView.setHasFixedSize(hasFixedSize)
+        super.onAttachedToRecyclerView(recyclerView)
+    }
 
     open fun checkSelect(holder: Holder<V>, item: T) {
         if (selectList.contains(item)) {

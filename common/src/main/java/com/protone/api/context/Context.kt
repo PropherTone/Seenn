@@ -3,7 +3,6 @@ package com.protone.api.context
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.graphics.Rect
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
@@ -46,33 +45,6 @@ val Context.navigationBarHeight: Int
         return height
     }
 
-var isKeyBroadShow = false
-var onLayoutChangeListener: View.OnLayoutChangeListener? = null
-
-inline fun Activity.setSoftInputStatusListener(crossinline onSoftInput: (Int, Boolean) -> Unit = { _, _ -> }) {
-    isKeyBroadShow = false
-    removeSoftInputStatusListener()
-    onLayoutChangeListener = View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
-        val rect = Rect()
-        v.getWindowVisibleDisplayFrame(rect)
-        val i = v.height - rect.bottom - navigationBarHeight
-        if (i > 0 && !isKeyBroadShow) {
-            isKeyBroadShow = true
-            onSoftInput.invoke(i, isKeyBroadShow)
-        } else if (i <= 0 && isKeyBroadShow) {
-            isKeyBroadShow = false
-            onSoftInput.invoke(i, isKeyBroadShow)
-        }
-    }
-    window.decorView.addOnLayoutChangeListener(onLayoutChangeListener)
-}
-
-fun Activity.removeSoftInputStatusListener() {
-    if (onLayoutChangeListener == null) return
-    window.decorView.removeOnLayoutChangeListener(onLayoutChangeListener)
-    onLayoutChangeListener = null
-}
-
 @SuppressLint("ClickableViewAccessibility")
 fun Context.linkInput(target: View, input: View) {
     target.setOnTouchListener { _, _ ->
@@ -86,6 +58,17 @@ fun Context.linkInput(target: View, input: View) {
             isKeyBroadShow = false
         }
         false
+    }
+}
+
+inline fun Context.onUiThread(crossinline function: () -> Unit) {
+    if (Looper.getMainLooper() == Looper.myLooper()) {
+        function.invoke()
+        return
+    }
+    when (this) {
+        is Activity -> runOnUiThread { function.invoke() }
+        else -> CoroutineScope(Dispatchers.Main).launch { function.invoke() }
     }
 }
 
@@ -119,23 +102,4 @@ fun View.marginBottom(margin: Int) {
     val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams
     marginLayoutParams.bottomMargin = margin
     layoutParams = marginLayoutParams
-}
-
-inline fun Context.onUiThread(crossinline function: () -> Unit) {
-    if (Looper.getMainLooper() == Looper.myLooper()) {
-        function.invoke()
-        return
-    }
-    when (this) {
-        is Activity -> runOnUiThread { function.invoke() }
-        else -> CoroutineScope(Dispatchers.Main).launch { function.invoke() }
-    }
-}
-
-inline fun onBackground(crossinline function: () -> Unit) {
-    if (Looper.getMainLooper() == Looper.myLooper()) {
-        Thread {
-            function.invoke()
-        }.start()
-    } else function.invoke()
 }

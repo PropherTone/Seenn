@@ -34,7 +34,6 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
     override fun createView() {
         binding = UserConfigActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
-        fitNavigationBar(binding.root)
     }
 
     override suspend fun UserConfigViewModel.init() {

@@ -17,6 +17,14 @@ class GalleySearchViewModel : BaseViewModel() {
 
     var selectList: MutableList<GalleyMedia> = mutableListOf()
 
+    fun isVideo(): Boolean {
+        return if (data.size > 0) {
+            data[0].isVideo
+        } else {
+            false
+        }
+    }
+
     fun query(input: String) {
         if (input.isEmpty()) return
         viewModelScope.launch(Dispatchers.IO) {

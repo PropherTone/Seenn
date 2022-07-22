@@ -45,7 +45,6 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                     -verticalOffset / appBarLayout.totalScrollRange.toFloat()
             }
         }
-        fitNavigationBar(binding.root)
     }
 
     override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {

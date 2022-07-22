@@ -41,8 +41,6 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
     override fun createView() {
         binding = NoteEditActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
-        fitNavigationBarUsePadding(binding.root)
-        binding.noteEditTitle.requestFocus()
         binding.noteEditToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             binding.toolbar.progress =
                 -verticalOffset / appBarLayout.totalScrollRange.toFloat()

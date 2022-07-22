@@ -31,7 +31,6 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     override fun createView() {
         binding = NoteActivityBinding.inflate(layoutInflater, root, false)
         fitStatuesBar(binding.root)
-        fitNavigationBar(binding.root)
         binding.activity = this
     }
 

@@ -29,7 +29,6 @@ class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewMo
         binding = PickMusicActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBar(binding.root)
-        fitNavigationBar(binding.root)
         linkInput(binding.addMBList, binding.addMBSearch)
     }
 

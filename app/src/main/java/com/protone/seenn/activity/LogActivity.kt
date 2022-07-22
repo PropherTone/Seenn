@@ -27,7 +27,6 @@ class LogActivity : BaseActivity<LogActivityBinding, LogViewModel>(false) {
         binding = LogActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBar(binding.root)
-        fitNavigationBar(binding.root)
     }
 
     override suspend fun LogViewModel.init() {

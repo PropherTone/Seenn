@@ -16,13 +16,22 @@ import com.protone.seen.databinding.PictureBoxAdapterLayoutBinding
 
 class GalleyListAdapter(
     context: Context,
-    private val media: MutableList<GalleyMedia>,
     private val isVideo: Boolean = false,
     private val useSelect: Boolean = true
 ) : SelectListAdapter<PictureBoxAdapterLayoutBinding, GalleyMedia>(context) {
 
+    private val media: MutableList<GalleyMedia> = mutableListOf()
+
+    fun setMedias(list: MutableList<GalleyMedia>) {
+        media.addAll(list)
+    }
+
     private var itemLength = 0
     private var onSelectMod = false
+
+    init {
+        hasFixedSize = false
+    }
 
     override val select: (Holder<PictureBoxAdapterLayoutBinding>, Boolean) -> Unit =
         { holder, select ->

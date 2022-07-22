@@ -3,6 +3,7 @@ package com.protone.seen.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.protone.api.baseType.toDateString
@@ -13,6 +14,11 @@ import com.protone.seen.databinding.NoteListAdapterLayoutBinding
 class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBinding>(context) {
 
     private val noteList = arrayListOf<Note>()
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        recyclerView.setHasFixedSize(true)
+        super.onAttachedToRecyclerView(recyclerView)
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

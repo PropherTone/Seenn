@@ -79,6 +79,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
     lateinit var binder: MusicService.MusicBinder
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTransparentClipStatusBar()
         super.onCreate(savedInstanceState)
         activityOperationBroadcast.registerReceiver(
             activityOperationReceiver,

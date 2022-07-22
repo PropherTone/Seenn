@@ -61,7 +61,6 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
     override fun createView() {
         binding = MainActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MainActivity
-            fitNavigationBar(root)
             root.viewTreeObserver.addOnGlobalLayoutListener(this@MainActivity)
             musicPlayer.apply {
                 duration

@@ -42,7 +42,6 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
     override fun createView() {
         binding = AddBucketActivityBinding.inflate(layoutInflater, root, false)
         fitStatuesBarUsePadding(binding.root)
-        fitNavigationBarUsePadding(binding.root)
         binding.activity = this
         setSoftInputStatusListener { i, b ->
             if (b) {

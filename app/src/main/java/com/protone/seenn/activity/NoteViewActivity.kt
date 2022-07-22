@@ -25,7 +25,6 @@ class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel
     override fun createView() {
         binding = NoteViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
-        fitNavigationBarUsePadding(binding.root)
     }
 
     override suspend fun NoteViewViewModel.init() {
