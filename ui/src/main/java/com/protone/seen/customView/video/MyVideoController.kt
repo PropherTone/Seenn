@@ -59,8 +59,7 @@ class MyVideoController @JvmOverloads constructor(
                 playVideo?.invoke()
                 binding.vSeekBar.start()
             }
-            it.isVisible = false
-            binding.vContainer.isVisible = true
+            onPlay()
             isPlaying = true
         }
         binding.vControl.setOnClickListener {
@@ -77,9 +76,14 @@ class MyVideoController @JvmOverloads constructor(
 
     fun onStart() {
         if (isPlaying) return
+        onPlay()
+        isPlaying = true
+    }
+
+    private fun onPlay(){
         binding.vStart.isVisible = false
         binding.vContainer.isVisible = true
-        isPlaying = true
+        isVisible = false
     }
 
     fun complete() {

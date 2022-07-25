@@ -129,7 +129,7 @@
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="@+id/controller"
                 app:layout_constraintEnd_toEndOf="@+id/controller"
-                app:layout_constraintHeight_percent="0.01"
+                app:layout_constraintHeight_percent="0.03"
                 app:layout_constraintStart_toStartOf="@+id/controller"
                 app:layout_constraintTop_toTopOf="@+id/controller"
                 app:layout_constraintVertical_bias="0.8"

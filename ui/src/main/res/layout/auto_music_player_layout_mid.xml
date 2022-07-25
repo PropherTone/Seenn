@@ -107,7 +107,7 @@
         <com.protone.seen.customView.ColorfulProgressBar
             android:id="@+id/music_progress"
             android:layout_width="0dp"
-            android:layout_height="6dp"
+            android:layout_height="16dp"
             app:layout_constraintBottom_toTopOf="@id/music_control"
             app:layout_constraintEnd_toEndOf="@id/music_back"
             app:layout_constraintStart_toEndOf="@id/music_cover_back"
