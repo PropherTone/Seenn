@@ -3,6 +3,7 @@ package com.protone.seenn.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.view.View
 import android.view.ViewTreeObserver
 import androidx.activity.viewModels
 import com.protone.api.context.*
@@ -11,7 +12,6 @@ import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.databinding.SplashActivityBinding
 import com.protone.seenn.service.MusicService
 import com.protone.seenn.service.WorkService
-import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.SplashViewModel
 
 @SuppressLint("CustomSplashScreen")
@@ -20,13 +20,26 @@ class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true
 
     override val viewModel: SplashViewModel by viewModels()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = SplashActivityBinding.inflate(layoutInflater, root, false)
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(this)
+        return binding.root
     }
 
     override suspend fun SplashViewModel.init() {
         startService(WorkService::class.intent)
+
+        onViewEvent {
+            when (it) {
+                SplashViewModel.SplashEvent.InitConfig -> {
+                    viewModel.firstBootWork()
+                    startService(MusicService::class.intent)
+                    startActivity(MainActivity::class.intent)
+                    finish()
+                }
+                SplashViewModel.SplashEvent.UpdateMedia -> updateMedia()
+            }
+        }
     }
 
     override suspend fun doStart() {
@@ -35,18 +48,6 @@ class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true
         }, {
             sendViewEvent(SplashViewModel.SplashEvent.UpdateMedia)
         })
-    }
-
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
-        when (event) {
-            SplashViewModel.SplashEvent.InitConfig -> {
-                viewModel.firstBootWork()
-                startService(MusicService::class.intent)
-                startActivity(MainActivity::class.intent)
-                finish()
-            }
-            SplashViewModel.SplashEvent.UpdateMedia -> updateMedia()
-        }
     }
 
     override fun onRequestPermissionsResult(

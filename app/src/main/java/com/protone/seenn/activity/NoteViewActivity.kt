@@ -1,6 +1,7 @@
 package com.protone.seenn.activity
 
 import android.net.Uri
+import android.view.View
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -13,7 +14,6 @@ import com.protone.api.json.toJson
 import com.protone.seen.customView.richText.RichNoteView
 import com.protone.seenn.R
 import com.protone.seenn.databinding.NoteViewActivityBinding
-import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleyViewViewModel
 import com.protone.seenn.viewModel.NoteEditViewModel
 import com.protone.seenn.viewModel.NoteViewViewModel
@@ -22,9 +22,10 @@ import kotlinx.coroutines.launch
 class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel>(true) {
     override val viewModel: NoteViewViewModel by viewModels()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = NoteViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
+        return binding.root
     }
 
     override suspend fun NoteViewViewModel.init() {
@@ -34,12 +35,12 @@ class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel
             noteQueue.offer(it)
             initSeen(noteQueue.poll())
         }
-    }
 
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
-        when (event) {
-            NoteViewViewModel.NoteViewEvent.Next -> viewModel.initSeen(viewModel.noteQueue.poll())
-            NoteViewViewModel.NoteViewEvent.Edit -> edit()
+        onViewEvent {
+            when (it) {
+                NoteViewViewModel.NoteViewEvent.Next -> initSeen(viewModel.noteQueue.poll())
+                NoteViewViewModel.NoteViewEvent.Edit -> edit()
+            }
         }
     }
 

@@ -1,12 +1,12 @@
 package com.protone.seenn.viewModel
 
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.android.material.tabs.TabLayout
 import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleyMedia
 import com.protone.seenn.R
-import com.protone.seenn.media.FragMailer
-import com.protone.seenn.media.IGalleyFragment
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     companion object {
@@ -35,55 +35,57 @@ class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
 
     var onTransaction = false
 
-    private val mailers = arrayOfNulls<FragMailer>(2)
+    private val mailers = arrayOfNulls<MutableSharedFlow<GalleyFragmentViewModel.FragEvent>>(2)
 
-    val chooseData: MutableLiveData<MutableList<GalleyMedia>> =
-        MutableLiveData<MutableList<GalleyMedia>>()
+    var chooseData: MutableList<GalleyMedia>? = null
 
-    var startActivity: ((GalleyMedia, String) -> Unit)? = null
-
-    val iGalleyFragment = object : IGalleyFragment {
-        override fun select(galleyMedia: MutableList<GalleyMedia>) {
-            chooseData.postValue(galleyMedia)
-        }
-
-        override fun openView(galleyMedia: GalleyMedia, galley: String) {
-            startActivity?.invoke(galleyMedia, galley)
-        }
-    }
-
-    fun chooseData() = chooseData.value
-
-    fun setMailer(frag1: FragMailer? = null, frag2: FragMailer? = null) {
-        if (frag1 != null) {
-            mailers[0] = frag1
-        } else if (frag2 != null) {
-            mailers[1] = frag2
+    fun setMailer(
+        frag1: MutableSharedFlow<GalleyFragmentViewModel.FragEvent>? = null,
+        frag2: MutableSharedFlow<GalleyFragmentViewModel.FragEvent>? = null
+    ) {
+        viewModelScope.launch {
+            if (frag1 != null) {
+                mailers[0] = frag1
+            } else if (frag2 != null) {
+                mailers[1] = frag2
+            }
         }
     }
 
     fun onAction() {
-        mailers[rightMailer]?.onActionBtn()
+        viewModelScope.launch {
+            mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.OnActionBtn)
+        }
     }
 
-    fun getChooseGalley(): MutableList<GalleyMedia>? {
-        return mailers[rightMailer]?.getChooseGalley()
+    fun intoBox() {
+        viewModelScope.launch {
+            mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.IntoBox)
+        }
     }
 
     fun deleteMedia(media: GalleyMedia) {
-        mailers[rightMailer]?.deleteMedia(media)
+        viewModelScope.launch {
+            mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.DeleteMedia(media))
+        }
     }
 
     fun onUpdate(updateList: MutableList<GalleyMedia>) {
-        mailers[rightMailer]?.onGalleyUpdate(updateList)
+        viewModelScope.launch {
+            mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.OnGalleyUpdate(updateList))
+        }
     }
 
     fun addBucket(name: String, list: MutableList<GalleyMedia>) {
-        mailers[rightMailer]?.addBucket(name, list)
+        viewModelScope.launch {
+            mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.AddBucket(name, list))
+        }
     }
 
     fun selectAll() {
-        mailers[rightMailer]?.selectAll()
+        viewModelScope.launch {
+            mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.SelectAll)
+        }
     }
 
     override fun onTabSelected(tab: TabLayout.Tab?) {

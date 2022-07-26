@@ -8,8 +8,6 @@ import com.protone.api.todayDate
 import com.protone.seenn.Medias
 import com.protone.seenn.R
 import com.protone.seenn.database.DatabaseHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class AddBucketViewModel : BaseViewModel() {
 
@@ -18,8 +16,9 @@ class AddBucketViewModel : BaseViewModel() {
         val BUCKET_NAME = "BUCKET_NAME"
     }
 
-    sealed class AddBucketEvent{
+    sealed class AddBucketEvent {
         object Confirm : ViewEvent
+        object ChooseIcon : ViewEvent
     }
 
     var editName: String? = null
@@ -66,8 +65,6 @@ class AddBucketViewModel : BaseViewModel() {
     )
 
     suspend fun getMusicBucketByName(name: String) =
-        withContext(Dispatchers.IO) {
-            DatabaseHelper.instance
-                .musicBucketDAOBridge.getMusicBucketByName(name)
-        }
+        DatabaseHelper.instance.musicBucketDAOBridge.getMusicBucketByNameRs(name)
+
 }

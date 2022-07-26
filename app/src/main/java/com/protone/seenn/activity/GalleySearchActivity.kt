@@ -18,7 +18,6 @@ import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seen.itemDecoration.GalleyItemDecoration
 import com.protone.seenn.R
 import com.protone.seenn.databinding.GalleySearchActivityBinding
-import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleySearchViewModel
 import com.protone.seenn.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,11 +28,12 @@ class GalleySearchActivity :
     GalleyListAdapter.OnSelect, GalleySearchViewModel.OnQuery {
     override val viewModel: GalleySearchViewModel by viewModels()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = GalleySearchActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBar(binding.root)
         initPop()
+        return binding.root
     }
 
     override suspend fun GalleySearchViewModel.init() {
@@ -53,8 +53,6 @@ class GalleySearchActivity :
             searchModel.destroy()
         }
     }
-
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     private fun newAdapter(list: MutableList<GalleyMedia>) = GalleyListAdapter(
         this@GalleySearchActivity, viewModel.isVideo(), true

@@ -10,9 +10,11 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.protone.api.context.SApplication
-import com.protone.api.context.onUiThread
 import com.protone.api.entity.GalleyMedia
 import com.protone.seen.databinding.PictureBoxAdapterLayoutBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GalleyListAdapter(
     context: Context,
@@ -71,8 +73,7 @@ class GalleyListAdapter(
             videoIcon.isGone = !isVideo
         })
     }
-
-
+    
     override fun onBindViewHolder(holder: Holder<PictureBoxAdapterLayoutBinding>, position: Int) {
         setSelect(holder, selectList.contains(media[position]))
         holder.binding.imageView.let { image ->
@@ -99,43 +100,51 @@ class GalleyListAdapter(
     fun quitSelectMod() {
         if (!onSelectMod) return
         onSelectMod = false
-        context.onUiThread { clearAllSelected() }
+        launch { clearAllSelected() }
         onSelectListener?.select(selectList)
     }
 
     fun noticeSelectChange(item: GalleyMedia) {
-        val indexOf = media.indexOf(item)
-        if (indexOf != -1) {
-            onSelectMod = true
-            context.onUiThread { notifyItemChanged(indexOf) }
+        launch(Dispatchers.IO) {
+            val indexOf = media.indexOf(item)
+            if (indexOf != -1) {
+                onSelectMod = true
+                withContext(Dispatchers.Main) { notifyItemChanged(indexOf) }
+            }
         }
     }
 
     fun noticeDataUpdate(item: MutableList<GalleyMedia>?) {
-        if (item == null) return
-        val size = media.size
-        media.clear()
-        context.onUiThread { notifyItemRangeRemoved(0, size) }
-        media.addAll(item)
-        context.onUiThread { notifyItemRangeInserted(0, media.size) }
+        launch(Dispatchers.IO) {
+            if (item == null) return@launch
+            val size = media.size
+            media.clear()
+            withContext(Dispatchers.Main) { notifyItemRangeRemoved(0, size) }
+            media.addAll(item)
+            withContext(Dispatchers.Main) { notifyItemRangeInserted(0, media.size) }
+        }
     }
 
     fun selectAll() {
-        media.onEach {
-            if (!selectList.contains(it)) {
-                selectList.add(it)
-                context.onUiThread { notifyItemChanged(media.indexOf(it)) }
+        launch(Dispatchers.IO) {
+            media.onEach {
+                if (!selectList.contains(it)) {
+                    selectList.add(it)
+                    withContext(Dispatchers.Main) { notifyItemChanged(media.indexOf(it)) }
+                }
             }
         }
     }
 
     fun removeMedia(galleyMedia: GalleyMedia) {
-        val index = media.indexOf(galleyMedia)
-        if (index != -1) {
-            media.removeAt(index)
-            if (selectList.contains(galleyMedia)) selectList.remove(galleyMedia)
-            context.onUiThread {
-                notifyItemRemoved(index)
+        launch(Dispatchers.IO) {
+            val index = media.indexOf(galleyMedia)
+            if (index != -1) {
+                media.removeAt(index)
+                if (selectList.contains(galleyMedia)) selectList.remove(galleyMedia)
+                withContext(Dispatchers.Main) {
+                    notifyItemRemoved(index)
+                }
             }
         }
     }

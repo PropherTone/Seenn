@@ -31,9 +31,10 @@ import kotlinx.coroutines.launch
 class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigViewModel>(true) {
     override val viewModel: UserConfigViewModel by viewModels()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = UserConfigActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
+        return binding.root
     }
 
     override suspend fun UserConfigViewModel.init() {
@@ -46,21 +47,21 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
                 UserConfigViewModel.DisplayMode.Normal
             }
         )
-    }
 
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
-        when (event) {
-            UserConfigViewModel.UserConfigEvent.Login -> startLoginDialog()
-            UserConfigViewModel.UserConfigEvent.Icon -> startIconPick()
-            UserConfigViewModel.UserConfigEvent.Name -> startNameDialog()
-            UserConfigViewModel.UserConfigEvent.PassWord -> startPasswordDialog()
-            UserConfigViewModel.UserConfigEvent.ShareNote -> {}
-            UserConfigViewModel.UserConfigEvent.ShareData -> {}
-            UserConfigViewModel.UserConfigEvent.Lock -> startLockListPop()
-            UserConfigViewModel.UserConfigEvent.Unlock -> startUnlockListPop()
-            UserConfigViewModel.UserConfigEvent.Refresh -> refreshLayout()
-            UserConfigViewModel.UserConfigEvent.ClearCache -> viewModel.clearCache()
-            UserConfigViewModel.UserConfigEvent.Log -> startActivity(LogActivity::class.intent)
+        onViewEvent {
+            when (it) {
+                UserConfigViewModel.UserConfigEvent.Login -> startLoginDialog()
+                UserConfigViewModel.UserConfigEvent.Icon -> startIconPick()
+                UserConfigViewModel.UserConfigEvent.Name -> startNameDialog()
+                UserConfigViewModel.UserConfigEvent.PassWord -> startPasswordDialog()
+                UserConfigViewModel.UserConfigEvent.ShareNote -> {}
+                UserConfigViewModel.UserConfigEvent.ShareData -> {}
+                UserConfigViewModel.UserConfigEvent.Lock -> startLockListPop()
+                UserConfigViewModel.UserConfigEvent.Unlock -> startUnlockListPop()
+                UserConfigViewModel.UserConfigEvent.Refresh -> refreshLayout()
+                UserConfigViewModel.UserConfigEvent.ClearCache -> viewModel.clearCache()
+                UserConfigViewModel.UserConfigEvent.Log -> startActivity(LogActivity::class.intent)
+            }
         }
     }
 

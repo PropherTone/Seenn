@@ -2,6 +2,7 @@ package com.protone.seenn.activity
 
 import android.animation.ValueAnimator
 import android.transition.TransitionManager
+import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,7 +17,6 @@ import com.protone.seen.adapter.NoteListAdapter
 import com.protone.seen.adapter.NoteTypeListAdapter
 import com.protone.seen.dialog.titleDialog
 import com.protone.seenn.databinding.NoteActivityBinding
-import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.NoteEditViewModel
 import com.protone.seenn.viewModel.NoteViewModel
 import com.protone.seenn.viewModel.NoteViewViewModel
@@ -28,17 +28,11 @@ import kotlin.math.abs
 class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     override val viewModel: NoteViewModel by viewModels()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = NoteActivityBinding.inflate(layoutInflater, root, false)
         fitStatuesBar(binding.root)
         binding.activity = this
-    }
-
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
-        when (event) {
-            NoteViewModel.NoteViewEvent.Init -> viewModel.init()
-            NoteViewModel.NoteViewEvent.RefreshList -> refreshList()
-        }
+        return binding.root
     }
 
     override suspend fun NoteViewModel.init() {
@@ -65,6 +59,13 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
         }
         onTypeSelected { type ->
             refreshNoteList(viewModel.getNoteList(type))
+        }
+
+        onViewEvent {
+            when (it) {
+                NoteViewModel.NoteViewEvent.Init -> viewModel.init()
+                NoteViewModel.NoteViewEvent.RefreshList -> refreshList()
+            }
         }
     }
 

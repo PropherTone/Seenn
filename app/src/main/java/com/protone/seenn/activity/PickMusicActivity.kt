@@ -1,6 +1,7 @@
 package com.protone.seenn.activity
 
 import android.content.Intent
+import android.view.View
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,7 +17,6 @@ import com.protone.seenn.Medias
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.databinding.PickMusicActivityBinding
-import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,11 +25,12 @@ import kotlinx.coroutines.withContext
 class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewModel>(true) {
     override val viewModel: PickMusicViewModel by viewModels()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = PickMusicActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBar(binding.root)
         linkInput(binding.addMBList, binding.addMBSearch)
+        return binding.root
     }
 
     override suspend fun PickMusicViewModel.init() {
@@ -52,8 +53,6 @@ class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewMo
             viewModel.query(getInput())
         }
     }
-
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     override fun finish() {
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))

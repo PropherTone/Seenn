@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,8 +21,8 @@ import com.protone.api.animation.AnimationHelper
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
-import com.protone.api.entity.GalleyBucket
 import com.protone.api.entity.GalleyMedia
+import com.protone.api.json.toJson
 import com.protone.seen.adapter.GalleyBucketAdapter
 import com.protone.seen.adapter.GalleyListAdapter
 import com.protone.seen.customView.StatusImageView
@@ -31,126 +32,108 @@ import com.protone.seen.itemDecoration.GalleyItemDecoration
 import com.protone.seenn.IntentDataHolder
 import com.protone.seenn.R
 import com.protone.seenn.activity.GalleySearchActivity
-import com.protone.seenn.database.DatabaseHelper
-import com.protone.seenn.media.FragMailer
-import com.protone.seenn.media.IGalleyFragment
+import com.protone.seenn.activity.GalleyViewActivity
+import com.protone.seenn.activity.PictureBoxActivity
+import com.protone.seenn.viewModel.GalleyFragmentViewModel
+import com.protone.seenn.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import kotlin.streams.toList
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
 
 class GalleyFragment(
     private val isVideo: Boolean,
-    private val isLock: Boolean
+    private val isLock: Boolean,
+    private val onAttach: (MutableSharedFlow<GalleyFragmentViewModel.FragEvent>) -> Unit
 ) : Fragment(), CoroutineScope by MainScope(),
     ViewTreeObserver.OnGlobalLayoutListener,
     GalleyListAdapter.OnSelect {
 
-    private lateinit var rightGalley: String
+    private lateinit var viewModel: GalleyFragmentViewModel
+
     private lateinit var binding: GalleyFragmentLayoutBinding
 
     private var onSelectMod = false
         set(value) {
-            binding.galleyToolButton.isVisible = value
+            launch {
+                binding.galleyToolButton.isVisible = value
+            }
             field = value
         }
-
-    private var isBucketShowUp = true
 
     private lateinit var containerAnimator: ValueAnimator
     private lateinit var toolButtonAnimator: ValueAnimator
 
-    private val galleyMap = mutableMapOf<String?, MutableList<GalleyMedia>>()
-
-    var iGalleyFragment: IGalleyFragment? = null
-    private val channel = Channel<String>(Channel.BUFFERED)
-    private var onViewCreated = false
-    var fragMailer: FragMailer = object : FragMailer {
-
-        override fun deleteMedia(galleyMedia: GalleyMedia) {
-            if (!isLock) {
-                galleyMedia.type?.onEach {
-                    if (galleyMap[it]?.remove(galleyMedia) == true) {
-                        getListAdapter()?.removeMedia(galleyMedia)
-                    }
-                }
-            }
-            if (galleyMap[galleyMedia.bucket]?.remove(galleyMedia) == true) {
-                getListAdapter()?.removeMedia(galleyMedia)
-            }
-        }
-
-        override fun addBucket(name: String, list: MutableList<GalleyMedia>) {
-            if (!isLock) {
-                if (galleyMap[name] == null) {
-                    galleyMap[name] = mutableListOf()
-                }
-                galleyMap[name]?.addAll(list)
-            }
-        }
-
-        override fun selectAll() {
-            getListAdapter()?.selectAll()
-            onSelectMod = true
-        }
-
-        override fun onActionBtn() {
-            onSelectMod = true
-        }
-
-        override fun getChooseGalley(): MutableList<GalleyMedia>? {
-            return galleyMap[rightGalley] ?: galleyMap[R.string.all_galley.getString()]
-        }
-
-        override fun onGalleyUpdate(updateList: MutableList<GalleyMedia>) {
-            launch(Dispatchers.IO) {
-                var isNew = false
-                DatabaseHelper
-                    .instance
-                    .signedGalleyDAOBridge
-                    .getAllMediaByType(isVideo)
-                    ?.let {
-                        galleyMap[R.string.all_galley.getString()] = it as MutableList<GalleyMedia>
-                    }
-                updateList.stream().map { it.bucket }.toList().forEach {
-                    if (galleyMap[it] == null) {
-                        isNew = true
-                    }
-                    galleyMap[it] = (
-                            DatabaseHelper
-                                .instance
-                                .signedGalleyDAOBridge
-                                .getAllMediaByGalley(it, isVideo) as MutableList<GalleyMedia>)
-                    galleyMap[it]?.let { list ->
-                        val pair = Pair(
-                            if (list.size > 0) list[0].uri else Uri.EMPTY,
-                            arrayOf(it, list.size.toString())
-                        )
-                        if (isNew) insertBucket(pair) else refreshBucket(pair)
-                    }
-                }
-                noticeListUpdate(galleyMap[rightGalley])
-            }
-        }
-
-    }
-
-    private fun start() {
-        isBucketShowUp = false
-        binding.galleyToolButton.isVisible = onSelectMod
-        containerAnimator.start()
-        toolButtonAnimator.start()
-    }
-
-    private fun reverse() {
-        isBucketShowUp = true
-        binding.galleyToolButton.isVisible = true
-        containerAnimator.reverse()
-        toolButtonAnimator.reverse()
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        rightGalley = R.string.all_galley.getString()
+        val model: GalleyFragmentViewModel by viewModels()
+        viewModel = model
+        viewModel.apply {
+            onAttach.invoke(fragFlow)
+            launch(Dispatchers.IO) {
+                fragFlow.collect {
+                    when (it) {
+                        is GalleyFragmentViewModel.FragEvent.DeleteMedia -> {
+                            if (!isLock) {
+                                it.galleyMedia.type?.onEach { type ->
+                                    if (galleyMap[type]?.remove(it.galleyMedia) == true) {
+                                        getListAdapter().removeMedia(it.galleyMedia)
+                                    }
+                                }
+                            }
+                            if (galleyMap[it.galleyMedia.bucket]?.remove(it.galleyMedia) == true) {
+                                getListAdapter().removeMedia(it.galleyMedia)
+                            }
+                        }
+                        is GalleyFragmentViewModel.FragEvent.AddBucket -> {
+                            if (!isLock) {
+                                if (galleyMap[it.name] == null) {
+                                    galleyMap[it.name] = mutableListOf()
+                                }
+                                galleyMap[it.name]?.addAll(it.list)
+                            }
+                        }
+                        is GalleyFragmentViewModel.FragEvent.SelectAll -> {
+                            getListAdapter().selectAll()
+                            onSelectMod = true
+                        }
+                        is GalleyFragmentViewModel.FragEvent.OnActionBtn -> {
+                            onSelectMod = true
+                        }
+                        is GalleyFragmentViewModel.FragEvent.IntoBox -> {
+                            IntentDataHolder.put(
+                                (if (getListAdapter().selectList.size > 0) {
+                                    getListAdapter().selectList
+                                } else {
+                                    galleyMap[rightGalley]
+                                        ?: galleyMap[R.string.all_galley.getString()]
+                                })
+                            )
+                            startActivity(PictureBoxActivity::class.intent)
+                        }
+                        is GalleyFragmentViewModel.FragEvent.OnGalleyUpdate -> {
+                            updateGalley(it.updateList) { isNew, pair ->
+                                if (isNew) insertBucket(pair) else refreshBucket(pair)
+                            }
+                            noticeListUpdate(galleyMap[rightGalley])
+                        }
+                        is GalleyFragmentViewModel.FragEvent.OnNewBucket -> {
+                            insertBucket(it.pairs)
+                        }
+                        is GalleyFragmentViewModel.FragEvent.OnListUpdate -> {
+                            getBucketAdapter().performSelect()
+                            noticeListUpdate(it.data)
+                        }
+                        is GalleyFragmentViewModel.FragEvent.OnGetAllGalley ->{
+                            getBucketAdapter().performSelect()
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+        viewModel.rightGalley = R.string.all_galley.getString()
+        viewModel.isVideo = isVideo
+        viewModel.isLock = isLock
     }
 
     override fun onCreateView(
@@ -161,50 +144,30 @@ class GalleyFragment(
         binding = GalleyFragmentLayoutBinding.inflate(inflater, container, false).apply {
             root.viewTreeObserver.addOnGlobalLayoutListener(this@GalleyFragment)
             galleySearch.setOnClickListener {
-                IntentDataHolder.put(galleyMap[rightGalley])
-                context?.startActivity(GalleySearchActivity::class.intent.also { intent ->
-                    intent.putExtra("GALLEY", rightGalley)
+                IntentDataHolder.put(viewModel.galleyMap[viewModel.rightGalley])
+                startActivity(GalleySearchActivity::class.intent.also { intent ->
+                    intent.putExtra("GALLEY", viewModel.rightGalley)
                 })
             }
             galleyToolButton.setOnClickListener {
-                if (!isBucketShowUp) {
-                    if (onSelectMod && binding.galleyList.adapter is GalleyListAdapter) {
-                        (binding.galleyList.adapter as GalleyListAdapter).quitSelectMod()
-                        onSelectMod = false
-                    }
+                if (!viewModel.isBucketShowUp) {
+                    (binding.galleyList.adapter as GalleyListAdapter).quitSelectMod()
+                    onSelectMod = false
                 } else {
-                    activity?.titleDialog(
-                        R.string.user_name.getString(),
-                        ""
-                    ) {
+                    activity?.titleDialog(R.string.user_name.getString(), "") {
                         if (it.isNotEmpty()) {
-                            addBucket(it)
+                            viewModel.addBucket(it)
                         } else R.string.enter.getString().toast()
                     }
                 }
             }
         }
-        channel.trySend("onCreateView")
-        return binding.root
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        launch {
-            while (!onViewCreated) {
-                kotlinx.coroutines.selects.select {
-                    channel.onReceive {
-                        if (it == "onCreateView") {
-                            onViewCreated = true
-                            initList()
-                            sortData()
-                            channel.close()
-                            if (!isLock) sortPrivateData()
-                        }
-                    }
-                }
-            }
+        initList()
+        viewModel.apply {
+            sortData()
+            if (!isLock) sortPrivateData()
         }
+        return binding.root
     }
 
     override fun onDestroy() {
@@ -213,10 +176,24 @@ class GalleyFragment(
         super.onDestroy()
     }
 
+    private fun start() {
+        viewModel.isBucketShowUp = false
+        binding.galleyToolButton.isVisible = onSelectMod
+        containerAnimator.start()
+        toolButtonAnimator.start()
+    }
+
+    private fun reverse() {
+        viewModel.isBucketShowUp = true
+        binding.galleyToolButton.isVisible = true
+        containerAnimator.reverse()
+        toolButtonAnimator.reverse()
+    }
+
     private fun initList() = binding.run {
         galleyList.apply {
             layoutManager = GridLayoutManager(context, 4)
-            adapter = GalleyListAdapter(context, isVideo).also {
+            adapter = GalleyListAdapter(context, viewModel.isVideo).also {
                 it.multiChoose = true
                 it.setOnSelectListener(this@GalleyFragment)
             }
@@ -225,9 +202,9 @@ class GalleyFragment(
         galleyBucket.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = GalleyBucketAdapter(context) {
-                noticeListUpdate(galleyMap[it])
+                noticeListUpdate(viewModel.galleyMap[it])
                 binding.galleyShowBucket.negative()
-                rightGalley = it
+                viewModel.rightGalley = it
             }
             addItemDecoration(object : RecyclerView.ItemDecoration() {
                 override fun getItemOffsets(
@@ -268,113 +245,35 @@ class GalleyFragment(
         binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
     }
 
-    private fun sortPrivateData() = launch(Dispatchers.IO) {
-        (DatabaseHelper
-            .instance
-            .galleyBucketDAOBridge
-            .getALLGalleyBucket(isVideo) as MutableList<GalleyBucket>?)
-            ?.forEach {
-                synchronized(binding) {
-                    insertBucket(Pair(Uri.EMPTY, arrayOf(it.type, "PRIVATE")))
-                    galleyMap[it.type] = mutableListOf()
-                }
-            }
-    }
-
-    private fun sortData() = launch(Dispatchers.IO) {
-        galleyMap[context?.getString(R.string.all_galley)] = mutableListOf()
-        DatabaseHelper
-            .instance
-            .signedGalleyDAOBridge
-            .run {
-                val signedMedias = getAllMediaByType(isVideo) as MutableList<GalleyMedia>?
-                if (signedMedias == null) {
-                    R.string.none.getString().toast()
-                    return@launch
-                }
-                signedMedias.let {
-                    galleyMap[context?.getString(R.string.all_galley)] = it
-                    insertBucket(
-                        Pair(
-                            if (signedMedias.size > 0) signedMedias[0].uri else Uri.EMPTY,
-                            arrayOf(
-                                requireContext().getString(R.string.all_galley),
-                                signedMedias.size.toString()
-                            )
-                        )
-                    )
-                    getBucketAdapter()?.performSelect()
-                    noticeListUpdate(it)
-                }
-                if (!isLock) launch(Dispatchers.IO) {
-                    signedMedias.forEach {
-                        it.type?.forEach { type ->
-                            if (galleyMap[type] == null) {
-                                galleyMap[type] = mutableListOf()
-                            }
-                            galleyMap[type]?.add(it)
-                        }
-                    }
-                }
-                getAllGalley(isVideo)?.forEach {
-                    galleyMap[it] = (getAllMediaByGalley(it, isVideo) as MutableList<GalleyMedia>)
-                        .also { list ->
-                            synchronized(binding) {
-                                insertBucket(
-                                    Pair(
-                                        if (list.size > 0) list[0].uri else Uri.EMPTY,
-                                        arrayOf(it, list.size.toString())
-                                    )
-                                )
-                            }
-                        }
-                }
-            }
-    }
-
-    private fun addBucket(name: String) {
-        DatabaseHelper
-            .instance
-            .galleyBucketDAOBridge
-            .insertGalleyBucketCB(GalleyBucket(name, isVideo)) { re, reName ->
-                if (re) {
-                    if (!isLock) {
-                        insertBucket(Pair(Uri.EMPTY, arrayOf(reName, "PRIVATE")))
-                        galleyMap[reName] = mutableListOf()
-                    } else {
-                        R.string.locked.getString().toast()
-                    }
-                } else {
-                    R.string.failed_msg.getString().toast()
-                }
-            }
-    }
-
     private fun insertBucket(pairs: Pair<Uri, Array<String>>) {
-        getBucketAdapter()?.insertBucket(pairs)
+        getBucketAdapter().insertBucket(pairs)
     }
 
     private fun refreshBucket(pairs: Pair<Uri, Array<String>>) {
-        getBucketAdapter()?.refreshBucket(pairs)
+        getBucketAdapter().refreshBucket(pairs)
     }
 
     private fun noticeListUpdate(data: MutableList<GalleyMedia>?) {
-        getListAdapter()?.noticeDataUpdate(data)
+        getListAdapter().noticeDataUpdate(data)
     }
 
     private fun getBucketAdapter() =
-        if (onViewCreated) binding.galleyBucket.adapter as GalleyBucketAdapter else null
+        binding.galleyBucket.adapter as GalleyBucketAdapter
 
     private fun getListAdapter() =
-        if (onViewCreated) binding.galleyList.adapter as GalleyListAdapter else null
+        binding.galleyList.adapter as GalleyListAdapter
 
     override fun select(galleyMedia: GalleyMedia) = Unit
 
     override fun select(galleyMedia: MutableList<GalleyMedia>) {
-        iGalleyFragment?.select(galleyMedia)
+        viewModel.sendEvent(GalleyFragmentViewModel.FragEvent.OnSelect(galleyMedia))
     }
 
     override fun openView(galleyMedia: GalleyMedia) {
-        iGalleyFragment?.openView(galleyMedia, rightGalley)
+        startActivity(GalleyViewActivity::class.intent.apply {
+            putExtra(GalleyViewViewModel.MEDIA, galleyMedia.toJson())
+            putExtra(GalleyViewViewModel.TYPE, galleyMedia.isVideo)
+            putExtra(GalleyViewViewModel.GALLEY, viewModel.rightGalley)
+        })
     }
 }

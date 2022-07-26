@@ -1,17 +1,13 @@
 package com.protone.seenn.activity
 
 import android.content.*
-import android.graphics.Color
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.View
-import android.view.WindowManager
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.lifecycleScope
 import com.protone.api.TAG
@@ -33,9 +29,18 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
     protected abstract val viewModel: VM
     protected lateinit var binding: VB
 
-    abstract fun createView()
+    abstract fun createView(): View
     abstract suspend fun VM.init()
-    abstract suspend fun onViewEvent(event: BaseViewModel.ViewEvent)
+    private var onViewEvent: (suspend (BaseViewModel.ViewEvent) -> Unit)? = null
+        set(value) {
+            viewEventTask?.start()
+            field = value
+        }
+
+    fun onViewEvent(block: suspend (BaseViewModel.ViewEvent) -> Unit) {
+        onViewEvent = block
+    }
+
     private var viewEvent: Channel<BaseViewModel.ViewEvent>? = null
     private var viewEventTask: Job? = null
     protected var onFinish: (suspend () -> Unit)? = null
@@ -49,7 +54,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
             viewEvent = Channel(Channel.UNLIMITED)
             viewEventTask = launch(Dispatchers.Main) {
                 viewEvent?.receiveAsFlow()?.collect {
-                    onViewEvent(it)
+                    onViewEvent?.invoke(it)
                 }
             }
         }
@@ -85,10 +90,8 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
             activityOperationReceiver,
             IntentFilter(ACTIVITY_FINISH)
         )
-        createView()
-        setContentView(binding.root)
+        setContentView(createView())
         lifecycleScope.launchWhenStarted {
-            viewEventTask?.start()
             viewModel.init()
         }
     }
@@ -174,13 +177,6 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
 
     protected fun fitNavigationBarUsePadding(view: View) {
         if (isNavigationBar) view.paddingBottom(navigationBarHeight)
-    }
-
-    fun setTranslucentStatues() {
-        val controller = ViewCompat.getWindowInsetsController(window.decorView)
-        controller?.hide(WindowInsetsCompat.Type.statusBars())
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = Color.TRANSPARENT
     }
 
     open suspend fun doStart() = Unit

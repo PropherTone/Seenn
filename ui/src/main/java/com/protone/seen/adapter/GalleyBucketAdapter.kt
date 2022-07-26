@@ -10,11 +10,11 @@ import com.bumptech.glide.Glide
 import com.protone.api.baseType.getString
 import com.protone.api.context.SApplication
 import com.protone.api.context.newLayoutInflater
-import com.protone.api.context.onUiThread
 import com.protone.seen.R
 import com.protone.seen.databinding.GalleyBucketListLayoutBinding
 import com.protone.seenn.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
@@ -52,7 +52,7 @@ class GalleyBucketAdapter(
             setSelect(holder, selectList.contains(data))
             holder.binding.apply {
                 root.setOnLongClickListener {
-                    DatabaseHelper.instance.execute {
+                    launch(Dispatchers.IO) {
                         val galley = DatabaseHelper
                             .instance
                             .galleyBucketDAOBridge
@@ -96,49 +96,67 @@ class GalleyBucketAdapter(
         holder: Holder<GalleyBucketListLayoutBinding>,
         item: Pair<Uri, Array<String>>
     ) {
-        if (!multiChoose) clearSelected()
-        selectList.add(item)
-        setSelect(holder, true)
+        launch(Dispatchers.IO) {
+            if (!multiChoose) clearSelected()
+            selectList.add(item)
+            setSelect(holder, true)
+        }
     }
 
     private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
-        val index = galleries.indexOf(bucket)
-        if (index != -1) {
-            galleries.removeAt(index)
-            selectList.remove(bucket)
-            notifyItemRemoved(index)
+        launch(Dispatchers.IO) {
+            val index = galleries.indexOf(bucket)
+            if (index != -1) {
+                galleries.removeAt(index)
+                selectList.remove(bucket)
+                withContext(Dispatchers.Main) {
+                    notifyItemRemoved(index)
+                }
+            }
         }
     }
 
     fun refreshBucket(item: Pair<Uri, Array<String>>) {
-        val iterator = galleries.iterator()
-        var index = 0
-        while (iterator.hasNext()) {
-            if (iterator.next().second[0] == item.second[0]) {
-                galleries[index] = item
-                context.onUiThread {
-                    notifyItemChanged(index)
+        launch(Dispatchers.IO) {
+            val iterator = galleries.iterator()
+            var index = 0
+            while (iterator.hasNext()) {
+                if (iterator.next().second[0] == item.second[0]) {
+                    galleries[index] = item
+                    withContext(Dispatchers.Main) {
+                        notifyItemChanged(index)
+                    }
+                    break
                 }
-                break
+                index++
             }
-            index++
         }
     }
 
     fun insertBucket(item: Pair<Uri, Array<String>>) {
-        galleries.add(item)
-        context.onUiThread {
-            notifyItemInserted(galleries.size)
+        launch(Dispatchers.IO) {
+            galleries.add(item)
+            withContext(Dispatchers.Main) {
+                notifyItemInserted(galleries.size)
+            }
         }
     }
 
     fun performSelect() {
-        galleries.stream()
-            .filter { it.second[0] == R.string.all_galley.getString() }
-            .toList()
-            .let { if (it.isNotEmpty()) selectList.add(it[0]) }
-        context.onUiThread {
-            notifyItemChanged(0)
+        launch(Dispatchers.IO) {
+            var index = -1
+            galleries.stream()
+                .filter { it.second[0] == R.string.all_galley.getString() }
+                .toList()
+                .let {
+                    if (it.isNotEmpty()) {
+                        selectList.add(it[0])
+                        index = galleries.indexOf(it[0])
+                    }
+                }
+            withContext(Dispatchers.Main) {
+                if (index != -1) notifyItemChanged(0)
+            }
         }
     }
 

@@ -1,14 +1,13 @@
 package com.protone.seenn.activity
 
 import android.content.Intent
+import android.view.View
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
-import com.protone.api.context.intent
 import com.protone.api.context.root
-import com.protone.api.entity.GalleyMedia
 import com.protone.api.json.toJson
 import com.protone.api.json.toUriJson
 import com.protone.seen.R
@@ -17,52 +16,46 @@ import com.protone.seenn.Medias
 import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.GalleyActivityBinding
 import com.protone.seenn.fragment.GalleyFragment
-import com.protone.seenn.viewModel.BaseViewModel
+import com.protone.seenn.viewModel.GalleyFragmentViewModel
 import com.protone.seenn.viewModel.GalleyViewModel
-import com.protone.seenn.viewModel.GalleyViewViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>(false) {
     override val viewModel: GalleyViewModel by viewModels()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = GalleyActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBar(binding.root)
         initPop()
+        return binding.root
     }
-
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     override suspend fun GalleyViewModel.init() {
         chooseType = intent.getStringExtra(GalleyViewModel.CHOOSE_MODE) ?: ""
 
-        if (chooseType.isNotEmpty()) showActionBtn()
+        if (chooseType.isNotEmpty()) binding.galleyActionMenu.isVisible = false
 
-        fun initPager() {
-            initPager(arrayListOf<Fragment>().apply {
-                add(GalleyFragment(false, userConfig.lockGalley.isNotEmpty()).also {
-                    setMailer(frag1 = it.fragMailer)
-                    it.iGalleyFragment = iGalleyFragment
-                })
-                add(GalleyFragment(true, userConfig.lockGalley.isNotEmpty()).also {
-                    setMailer(frag2 = it.fragMailer)
-                    it.iGalleyFragment = iGalleyFragment
-                })
-            }, chooseType)
-        }
-
-        startActivity = { galleyMedia: GalleyMedia, galley: String ->
-            startActivity(GalleyViewActivity::class.intent.apply {
-                putExtra(GalleyViewViewModel.MEDIA, galleyMedia.toJson())
-                putExtra(GalleyViewViewModel.TYPE, galleyMedia.isVideo)
-                putExtra(GalleyViewViewModel.GALLEY, galley)
+        initPager(arrayListOf<Fragment>().apply {
+            val action: suspend (value: GalleyFragmentViewModel.FragEvent) -> Unit = {
+                when (it) {
+                    is GalleyFragmentViewModel.FragEvent.OnSelect -> {
+                        if (chooseData == null) chooseData = it.galleyMedia
+                        if (it.galleyMedia.size > 0) {
+                            onAction()
+                        }
+                    }
+                    else -> {}
+                }
+            }
+            add(GalleyFragment(false, userConfig.lockGalley.isNotEmpty()) {
+                setMailer(frag1 = it.apply { launch { collect(action) } })
             })
-        }
-
-        initPager()
+            add(GalleyFragment(true, userConfig.lockGalley.isNotEmpty()) {
+                setMailer(frag2 = it.apply { launch { collect(action) } })
+            })
+        }, chooseType)
 
         Medias.galleyNotifier.collect {
             if (!onTransaction) {
@@ -70,20 +63,10 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
             }
             onTransaction = false
         }
-
-        chooseData.observe(this@GalleyActivity) {
-            if (it.size > 0) {
-                onAction()
-            }
-        }
     }
 
     fun showPop() {
-        showPop(binding.galleyActionMenu, (viewModel.chooseData()?.size ?: 0) <= 0)
-    }
-
-    private fun showActionBtn() {
-        binding.galleyActionMenu.isVisible = false
+        showPop(binding.galleyActionMenu, (viewModel.chooseData?.size ?: 0) <= 0)
     }
 
     private fun initViewMode(chooseMode: Boolean) {
@@ -122,7 +105,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
     }
 
     private fun confirm() {
-        viewModel.chooseData()?.let { list ->
+        viewModel.chooseData?.let { list ->
             if (list.size > 0) {
                 setResult(RESULT_OK, Intent().apply {
                     putExtra(GalleyViewModel.URI, list[0].uri.toUriJson())
@@ -134,7 +117,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
     }
 
     override fun popDelete() {
-        viewModel.chooseData()?.let {
+        viewModel.chooseData?.let {
             viewModel.onTransaction = true
             tryDelete(it) { re ->
                 viewModel.deleteMedia(re)
@@ -143,7 +126,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
     }
 
     override fun popMoveTo() {
-        viewModel.chooseData()?.let {
+        viewModel.chooseData?.let {
             moveTo(binding.galleyBar, viewModel.rightMailer != 0, it) { target, list ->
                 viewModel.addBucket(target, list)
             }
@@ -151,7 +134,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
     }
 
     override fun popRename() {
-        viewModel.chooseData()?.let {
+        viewModel.chooseData?.let {
             viewModel.onTransaction = true
             tryRename(it)
         }
@@ -162,18 +145,13 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
     }
 
     override fun popSetCate() {
-        viewModel.chooseData()?.let { list ->
+        viewModel.chooseData?.let { list ->
             addCate(list)
         }
     }
 
     override fun popIntoBox() {
-        launch(Dispatchers.IO) {
-            viewModel.apply {
-                putGainIntentData((chooseData() ?: getChooseGalley()))
-                startActivity(PictureBoxActivity::class.intent)
-            }
-        }
+        viewModel.intoBox()
     }
 
 }

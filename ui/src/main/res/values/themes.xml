@@ -13,8 +13,8 @@
         <item name="android:windowBackground">@drawable/main_background</item>
 
         <!--设置全屏-->
-<!--        <item name="android:windowTranslucentNavigation">true</item>-->
-<!--        <item name="android:windowTranslucentStatus">true</item>-->
+        <!--        <item name="android:windowTranslucentNavigation">true</item>-->
+        <!--        <item name="android:windowTranslucentStatus">true</item>-->
         <!-- 设置statusBarColor 为透明-->
         <item name="android:statusBarColor">@color/blue_5</item>
         <item name="android:navigationBarColor">@color/blue_5</item>
@@ -22,23 +22,14 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="Theme.SeennWithBar" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
-        <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/blue_1</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/blue_1</item>
-        <item name="colorSecondaryVariant">@color/blue_5</item>
-        <item name="colorOnSecondary">@color/blue_3</item>
-        <!-- Status bar color. -->
-        <!--        <item name="android:windowTranslucentNavigation">true</item>-->
-        <!--        <item name="android:windowTranslucentStatus">false</item>-->
-        <!-- 设置statusBarColor 为透明-->
-        <item name="android:statusBarColor">@color/foreDark</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <!-- Customize your theme here. -->
+    <style name="Theme.Seenn.FlatBar" parent="Theme.Seenn">
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+
+        <item name="android:statusBarColor">@color/transparent</item>
+        <item name="android:navigationBarColor">@color/transparent</item>
         <item name="android:windowDisablePreview">false</item>
+        <item name="android:fontFamily">sans-serif</item>
     </style>
 
     <style name="MyCheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">

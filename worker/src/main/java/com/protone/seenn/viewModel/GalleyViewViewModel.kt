@@ -1,5 +1,6 @@
 package com.protone.seenn.viewModel
 
+import android.net.Uri
 import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleyMedia
 import com.protone.seenn.R
@@ -38,6 +39,9 @@ class GalleyViewViewModel : BaseViewModel() {
         DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMediaRs(galleyMedias[curPosition].uri)
 
     fun getCurrentMedia() = galleyMedias[curPosition]
+
+    suspend fun getMediaByUri(uri: Uri) =
+        DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMediaRs(uri)
 
     suspend fun getNotesWithGalley(mediaId: Long?): MutableList<String> =
         withContext(Dispatchers.IO) {

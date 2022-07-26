@@ -1,5 +1,6 @@
 package com.protone.seenn.activity
 
+import android.view.View
 import android.view.ViewTreeObserver
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
@@ -23,7 +24,6 @@ import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.MainActivityBinding
 import com.protone.seenn.service.WorkService
 import com.protone.seenn.service.getEmptyMusic
-import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.MainViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +58,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
             field = value
         }
 
-    override fun createView() {
+    override fun createView(): View {
         binding = MainActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MainActivity
             root.viewTreeObserver.addOnGlobalLayoutListener(this@MainActivity)
@@ -76,9 +76,8 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
 
         }
         refreshModelList()
+        return binding.root
     }
-
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     override suspend fun MainViewModel.init() {
         val musicController = MusicControllerIMP(binding.musicPlayer)

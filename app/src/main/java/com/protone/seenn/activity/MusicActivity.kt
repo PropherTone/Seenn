@@ -24,7 +24,6 @@ import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.MusicActivtiyBinding
 import com.protone.seenn.viewModel.AddBucketViewModel
-import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.seenn.viewModel.MusicModel
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +35,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
     ViewTreeObserver.OnGlobalLayoutListener {
     override val viewModel: MusicModel by viewModels()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = MusicActivtiyBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MusicActivity
             root.viewTreeObserver.addOnGlobalLayoutListener(this@MusicActivity)
@@ -45,13 +44,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                     -verticalOffset / appBarLayout.totalScrollRange.toFloat()
             }
         }
-    }
-
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
-        when (event) {
-            MusicModel.MusicEvent.Delete -> viewModel.delete()
-            MusicModel.MusicEvent.RefreshBucket -> viewModel.refreshBucket()
-        }
+        return binding.root
     }
 
     @Suppress("ObjectLiteralToLambda")
@@ -95,6 +88,13 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
         }
 
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
+
+        onViewEvent {
+            when (it) {
+                MusicModel.MusicEvent.Delete -> viewModel.delete()
+                MusicModel.MusicEvent.RefreshBucket -> viewModel.refreshBucket()
+            }
+        }
     }
 
     private fun MusicModel.updateBucket() {

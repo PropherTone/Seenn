@@ -75,13 +75,15 @@ class DatabaseHelper {
 
     inner class MusicBucketDAOBridge {
         suspend fun getAllMusicBucketRs() = onResult {
-            execute {
-                it.resumeWith(Result.success(getAllMusicBucket()))
-            }
+            it.resumeWith(Result.success(getAllMusicBucket()))
         }
 
         fun getAllMusicBucket(): List<MusicBucket>? {
             return musicBucketDAO.getAllMusicBucket()
+        }
+
+        suspend fun getMusicBucketByNameRs(name: String):MusicBucket? = onResult {
+            it.resumeWith(Result.success(getMusicBucketByName(name)))
         }
 
         fun getMusicBucketByName(name: String): MusicBucket? {
@@ -118,7 +120,6 @@ class DatabaseHelper {
                 addMusicBucket(musicBucket)
                 callBack(getMusicBucketByName(musicBucket.name) != null, musicBucket.name)
             }
-
         }
 
         fun updateMusicBucket(bucket: MusicBucket): Int {
@@ -132,16 +133,13 @@ class DatabaseHelper {
         }
 
         suspend fun updateMusicBucketRs(bucket: MusicBucket) = onResult {
-            execute {
-                it.resumeWith(Result.success(updateMusicBucket(bucket)))
-            }
+            it.resumeWith(Result.success(updateMusicBucket(bucket)))
         }
 
         suspend fun deleteMusicBucketRs(bucket: MusicBucket) = onResult {
-            execute {
-                deleteMusicBucket(bucket)
-                it.resumeWith(Result.success(musicBucketDAO.getMusicBucketByName(bucket.name) == null))
-            }
+            deleteMusicBucket(bucket)
+            it.resumeWith(Result.success(musicBucketDAO.getMusicBucketByName(bucket.name) == null))
+
         }
 
         fun deleteMusicBucketAsync(bucket: MusicBucket) {
@@ -209,17 +207,14 @@ class DatabaseHelper {
         fun getMusicByUri(uri: Uri): Music? = musicDAO.getMusicByUri(uri)
 
         suspend fun updateMusicRs(music: Music) = onResult {
-            execute {
-                it.resumeWith(Result.success(updateMusic(music)))
-            }
+            it.resumeWith(Result.success(updateMusic(music)))
+
         }
     }
 
     inner class GalleyDAOBridge {
         suspend fun getAllSignedMediaRs() = onResult {
-            execute {
-                it.resumeWith(Result.success(getAllSignedMedia()))
-            }
+            it.resumeWith(Result.success(getAllSignedMedia()))
         }
 
         fun getAllSignedMedia(): List<GalleyMedia>? =
@@ -237,10 +232,8 @@ class DatabaseHelper {
         }
 
         fun deleteSignedMediaMultiAsync(list: MutableList<GalleyMedia>) {
-            execute {
-                list.forEach {
-                    deleteSignedMediaByUri(it.uri)
-                }
+            list.forEach {
+                deleteSignedMediaByUri(it.uri)
             }
         }
 
@@ -290,9 +283,7 @@ class DatabaseHelper {
             signedGalleyDAO.getSignedMedia(path)
 
         suspend fun getSignedMediaRs(uri: Uri) = onResult {
-            execute {
-                it.resumeWith(Result.success(getSignedMedia(uri)))
-            }
+            it.resumeWith(Result.success(getSignedMedia(uri)))
         }
 
         fun updateSignedMedia(galleyMedia: GalleyMedia) {
@@ -352,22 +343,20 @@ class DatabaseHelper {
         suspend fun insertNoteDirRs(
             noteDir: NoteDir,
         ) = onResult<Pair<Boolean, String>> {
-            execute {
-                var count = 0
-                val tempName = noteDir.name
-                val names = mutableMapOf<String, Int>()
-                getALLNoteDir()?.forEach {
-                    names[it.name] = 1
-                    if (it.name == noteDir.name) {
-                        noteDir.name = "${tempName}(${++count})"
-                    }
-                }
-                while (names[noteDir.name] != null) {
+            var count = 0
+            val tempName = noteDir.name
+            val names = mutableMapOf<String, Int>()
+            getALLNoteDir()?.forEach {
+                names[it.name] = 1
+                if (it.name == noteDir.name) {
                     noteDir.name = "${tempName}(${++count})"
                 }
-                insertNoteDir(noteDir)
-                it.resumeWith(Result.success(Pair(getNoteDir(noteDir.name) != null, noteDir.name)))
             }
+            while (names[noteDir.name] != null) {
+                noteDir.name = "${tempName}(${++count})"
+            }
+            insertNoteDir(noteDir)
+            it.resumeWith(Result.success(Pair(getNoteDir(noteDir.name) != null, noteDir.name)))
         }
 
         fun insertNoteDir(noteDir: NoteDir) {
@@ -382,10 +371,8 @@ class DatabaseHelper {
         }
 
         suspend fun doDeleteNoteDirRs(noteDir: NoteDir) = onResult {
-            execute {
-                deleteNoteDir(noteDir)
-                it.resumeWith(Result.success(getNoteDir(noteDir.name) != null))
-            }
+            deleteNoteDir(noteDir)
+            it.resumeWith(Result.success(getNoteDir(noteDir.name) != null))
         }
 
         fun getALLNoteDir(): List<NoteDir>? = noteTypeDAO.getALLNoteDir()
@@ -432,9 +419,7 @@ class DatabaseHelper {
         }
 
         suspend fun getGalleyBucketRs(name: String) = onResult {
-            execute {
-                it.resumeWith(Result.success(getGalleyBucket(name)))
-            }
+            it.resumeWith(Result.success(getGalleyBucket(name)))
         }
 
         fun getALLGalleyBucket(isVideo: Boolean): List<GalleyBucket>? =

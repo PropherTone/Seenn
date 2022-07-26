@@ -16,14 +16,16 @@ import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
 import com.protone.seenn.Medias
 import com.protone.seenn.database.DatabaseHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class AddMusicListAdapter(
     context: Context,
     private val bucket: String,
     private val multiSelect: Boolean
-) :
-    SelectListAdapter<MusicListLayoutBinding, Music>(context) {
+) : SelectListAdapter<MusicListLayoutBinding, Music>(context) {
 
     init {
         multiChoose = multiSelect.also { b ->
@@ -97,7 +99,7 @@ class AddMusicListAdapter(
                             is Animatable -> {
                                 d.start()
                                 if (multiSelect) {
-                                    DatabaseHelper.instance.execute {
+                                    launch(Dispatchers.IO) {
                                         val re = DatabaseHelper
                                             .instance
                                             .musicWithMusicBucketDAOBridge
@@ -115,8 +117,10 @@ class AddMusicListAdapter(
                                 d.stop()
                             }
                             else -> {
-                                selectList.remove(music)
-                                notifyItemChanged()
+                                launch(Dispatchers.IO) {
+                                    selectList.remove(music)
+                                    notifyItemChanged()
+                                }
                             }
                         }
                     }
@@ -131,11 +135,11 @@ class AddMusicListAdapter(
         }
     }
 
-    private fun notifyItemChanged() {
+    private suspend fun notifyItemChanged() {
         while (!viewQueue.isEmpty()) {
             val poll = viewQueue.poll()
             if (poll != null) {
-                context.onUiThread {
+                withContext(Dispatchers.Main) {
                     notifyItemChanged(poll)
                 }
             }
@@ -153,9 +157,13 @@ class AddMusicListAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     fun noticeDataUpdate(list: MutableList<Music>) {
-        musicList.clear()
-        musicList.addAll(list)
-        notifyDataSetChanged()
+        launch(Dispatchers.IO) {
+            musicList.clear()
+            musicList.addAll(list)
+            withContext(Dispatchers.Main){
+                notifyDataSetChanged()
+            }
+        }
     }
 
 

@@ -25,9 +25,8 @@ private var create: AlertDialog? = null
                 val height =
                     SApplication.screenHeight / 2 - ((value.window?.decorView?.height ?: 0) / 2)
                 (value.ownerActivity as Activity).setSoftInputStatusListener { h, b ->
-                    if (b && h + value.context.navigationBarHeight > height) {
+                    if (b && h > height) {
                         attributes?.y = attributes?.y?.minus(h - height)
-                            ?.minus(value.context.navigationBarHeight)
                         value.onWindowAttributesChanged(attributes)
                     } else {
                         attributes?.y = 0

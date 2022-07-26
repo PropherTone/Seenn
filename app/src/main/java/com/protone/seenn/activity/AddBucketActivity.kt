@@ -2,6 +2,7 @@ package com.protone.seenn.activity
 
 import android.content.Intent
 import android.net.Uri
+import android.view.View
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
 import com.protone.api.baseType.toast
@@ -14,14 +15,14 @@ import com.protone.api.json.toUri
 import com.protone.seenn.R
 import com.protone.seenn.databinding.AddBucketActivityBinding
 import com.protone.seenn.viewModel.AddBucketViewModel
-import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleyViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewModel>(true) {
+class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewModel>(false) {
     override val viewModel: AddBucketViewModel by viewModels()
 
-    var name: String
+    private var name: String
         set(value) {
             binding.musicBucketEnterName.setText(value)
         }
@@ -33,13 +34,13 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
         }
         get() = binding.musicBucketEnterDetail.text.toString()
 
-    var uri: Uri? = null
+    private var uri: Uri? = null
         set(value) {
             Glide.with(this).load(value).into(binding.musicBucketIcon)
             field = value
         }
 
-    override fun createView() {
+    override fun createView(): View {
         binding = AddBucketActivityBinding.inflate(layoutInflater, root, false)
         fitStatuesBarUsePadding(binding.root)
         binding.activity = this
@@ -50,12 +51,7 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
                 binding.root.marginBottom(0)
             }
         }
-    }
-
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
-        when (event) {
-            AddBucketViewModel.AddBucketEvent.Confirm -> confirm()
-        }
+        return binding.root
     }
 
     override suspend fun AddBucketViewModel.init() {
@@ -72,18 +68,16 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
         }
     }
 
-    fun chooseIcon() {
-        launch {
-            startActivityForResult(
-                GalleyActivity::class.intent.also { intent ->
-                    intent.putExtra(
-                        GalleyViewModel.CHOOSE_MODE,
-                        GalleyViewModel.CHOOSE_PHOTO
-                    )
-                }
-            ).let { result ->
-                uri = result?.data?.getStringExtra(GalleyViewModel.URI)?.toUri()
+    fun chooseIcon() = launch(Dispatchers.Main) {
+        startActivityForResult(
+            GalleyActivity::class.intent.also { intent ->
+                intent.putExtra(
+                    GalleyViewModel.CHOOSE_MODE,
+                    GalleyViewModel.CHOOSE_PHOTO
+                )
             }
+        ).let { result ->
+            uri = result?.data?.getStringExtra(GalleyViewModel.URI)?.toUri()
         }
     }
 
@@ -92,30 +86,28 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
         finish()
     }
 
-    fun sendConfirm() {
-        sendViewEvent(AddBucketViewModel.AddBucketEvent.Confirm)
-    }
-
-    private suspend fun confirm(): Unit = viewModel.run {
-        var intent: Intent?
-        if (editName != null) {
-            val re = musicBucket?.let {
-                updateMusicBucket(it, name, uri, detail)
-            }
-            if (re != 0 || re != -1) {
-                filterMusicBucket(name)
-                intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
-                setResult(RESULT_OK, intent)
-                finish()
-            } else {
-                setResult(RESULT_CANCELED)
-                finish()
-            }
-        } else addMusicBucket(name, uri, detail) { re, name ->
-            if (re) {
-                intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
-                setResult(RESULT_OK, intent)
-                finish()
+    fun confirm(): Unit = viewModel.run {
+        launch {
+            var intent: Intent?
+            if (editName != null) {
+                val re = musicBucket?.let {
+                    updateMusicBucket(it, name, uri, detail)
+                }
+                if (re != 0 || re != -1) {
+                    filterMusicBucket(name)
+                    intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
+                    setResult(RESULT_OK, intent)
+                    finish()
+                } else {
+                    setResult(RESULT_CANCELED)
+                    finish()
+                }
+            } else addMusicBucket(name, uri, detail) { re, name ->
+                if (re) {
+                    intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
+                    setResult(RESULT_OK, intent)
+                    finish()
+                }
             }
         }
     }

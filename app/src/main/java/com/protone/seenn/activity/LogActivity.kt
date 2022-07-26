@@ -1,6 +1,7 @@
 package com.protone.seenn.activity
 
 import android.content.Intent
+import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,7 +14,6 @@ import com.protone.seen.adapter.LogListAdapter
 import com.protone.seenn.R
 import com.protone.seenn.database.DatabaseHelper
 import com.protone.seenn.databinding.LogActivityBinding
-import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.LogViewModel
 import com.protone.seenn.viewModel.NoteEditViewModel
 import kotlinx.coroutines.Dispatchers
@@ -23,10 +23,10 @@ import java.io.File
 class LogActivity : BaseActivity<LogActivityBinding, LogViewModel>(false) {
     override val viewModel: LogViewModel by viewModels()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = LogActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
-        fitStatuesBar(binding.root)
+        return binding.root
     }
 
     override suspend fun LogViewModel.init() {
@@ -61,8 +61,6 @@ class LogActivity : BaseActivity<LogActivityBinding, LogViewModel>(false) {
 
         })
     }
-
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     override suspend fun doStart() {
         viewModel.initLogList()

@@ -3,6 +3,7 @@ package com.protone.seenn.activity
 import android.content.Intent
 import android.graphics.drawable.Animatable
 import android.net.Uri
+import android.view.View
 import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
@@ -20,7 +21,10 @@ import com.protone.seen.popWindows.ColorfulPopWindow
 import com.protone.seenn.R
 import com.protone.seenn.databinding.NoteEditActivityBinding
 import com.protone.seenn.note.spans.ISpanForUse
-import com.protone.seenn.viewModel.*
+import com.protone.seenn.viewModel.GalleyViewModel
+import com.protone.seenn.viewModel.NoteEditViewModel
+import com.protone.seenn.viewModel.NoteViewViewModel
+import com.protone.seenn.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -38,7 +42,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         }
         get() = binding.noteEditTitle.text.toString()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = NoteEditActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         binding.noteEditToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -56,6 +60,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             isEditable = true
             setRichList(listOf(RichNoteStates("", arrayListOf())))
         }
+        return binding.root
     }
 
     override suspend fun NoteEditViewModel.init() {
@@ -87,15 +92,14 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             }
         }
 
-    }
-
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
-        when (event) {
-            NoteEditViewModel.NoteEvent.Confirm -> confirm()
-            NoteEditViewModel.NoteEvent.PickIcon -> pickIcon()
-            NoteEditViewModel.NoteEvent.PickImage -> pickImage()
-            NoteEditViewModel.NoteEvent.PickVideo -> pickVideo()
-            NoteEditViewModel.NoteEvent.PickMusic -> pickMusic()
+        onViewEvent {
+            when (it) {
+                NoteEditViewModel.NoteEvent.Confirm -> confirm()
+                NoteEditViewModel.NoteEvent.PickIcon -> pickIcon()
+                NoteEditViewModel.NoteEvent.PickImage -> pickImage()
+                NoteEditViewModel.NoteEvent.PickVideo -> pickVideo()
+                NoteEditViewModel.NoteEvent.PickMusic -> pickMusic()
+            }
         }
     }
 

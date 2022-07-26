@@ -27,7 +27,6 @@ import com.protone.seen.databinding.TextCateLayoutBinding
 import com.protone.seenn.R
 import com.protone.seenn.databinding.GalleyViewActivityBinding
 import com.protone.seenn.fragment.GalleyViewFragment
-import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.GalleyViewViewModel
 import com.protone.seenn.viewModel.NoteViewViewModel
 import kotlinx.coroutines.Dispatchers
@@ -38,13 +37,15 @@ class GalleyViewActivity :
     BaseMediaActivity<GalleyViewActivityBinding, GalleyViewViewModel>(true) {
     override val viewModel: GalleyViewViewModel by viewModels()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = GalleyViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBarUsePadding(binding.galleyVCover)
+        fitNavigationBarUsePadding(binding.galleyVCover)
         initPop()
         popLayout?.galleyIntoBox?.isGone = true
         popLayout?.galleySelectAll?.isGone = true
+        return binding.root
     }
 
     override suspend fun GalleyViewViewModel.init() {
@@ -53,12 +54,12 @@ class GalleyViewActivity :
             intent.getStringExtra(GalleyViewViewModel.GALLEY) ?: R.string.all_galley.getString()
         initGalleyData(galley, isVideo)
         init(isVideo)
-    }
 
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) {
-        when (event) {
-            GalleyViewViewModel.GalleyViewEvent.SetNote -> viewModel.setInfo()
-            else -> {}
+        onViewEvent {
+            when (it) {
+                GalleyViewViewModel.GalleyViewEvent.SetNote -> viewModel.setInfo()
+                else -> {}
+            }
         }
     }
 
@@ -85,34 +86,42 @@ class GalleyViewActivity :
         val galleyMedia = getSignedMedia()
         removeCato()
         galleyMedia?.cate?.onEach {
-            if (it.contains("content://")) {
-                addCato(
-                    ImageCateLayoutBinding.inflate(
-                        layoutInflater,
-                        root,
-                        false
-                    ).apply {
-                        Glide.with(this@GalleyViewActivity).asDrawable().load(it.toUri())
-                            .into(catoBack)
-                        catoName.text = galleyMedia.name
-                        root.setOnClickListener {
-                            startActivity(GalleySearchActivity::class.intent.apply {
-                                putExtra(GalleyViewViewModel.MEDIA, galleyMedia.toJson())
-                                putExtra(GalleyViewViewModel.TYPE, galleyMedia.isVideo)
-                            })
+            withContext(Dispatchers.IO) {
+                if (it.contains("content://")) {
+                    val mediaByUri = getMediaByUri(it.toUri())
+                    addCato(
+                        withContext(Dispatchers.Main) {
+                            ImageCateLayoutBinding.inflate(
+                                layoutInflater,
+                                root,
+                                false
+                            ).apply {
+                                Glide.with(this@GalleyViewActivity).asDrawable().load(it.toUri())
+                                    .into(catoBack)
+                                catoName.text = mediaByUri?.name
+                                root.setOnClickListener {
+                                    startActivity(GalleyViewActivity::class.intent.apply {
+                                        putExtra(GalleyViewViewModel.MEDIA, mediaByUri?.toJson())
+                                        putExtra(GalleyViewViewModel.TYPE, mediaByUri?.isVideo)
+                                    })
+                                }
+                            }.root
                         }
-                    }.root
-                )
-            } else {
-                addCato(
-                    TextCateLayoutBinding.inflate(
-                        layoutInflater,
-                        root,
-                        false
-                    ).apply {
-                        cato.text = it
-                    }.root
-                )
+
+                    )
+                } else {
+                    addCato(
+                        withContext(Dispatchers.Main) {
+                            TextCateLayoutBinding.inflate(
+                                layoutInflater,
+                                root,
+                                false
+                            ).apply {
+                                cato.text = it
+                            }.root
+                        }
+                    )
+                }
             }
         }
         setNotes(getNotesWithGalley(galleyMedia?.mediaId))

@@ -1,6 +1,7 @@
 package com.protone.seenn.activity
 
 import android.transition.TransitionManager
+import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.core.view.isGone
@@ -12,18 +13,18 @@ import com.protone.seen.adapter.TransparentPlayListAdapter
 import com.protone.seen.itemDecoration.GalleyItemDecoration
 import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.MusicViewActivityBinding
-import com.protone.seenn.viewModel.BaseViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.seenn.viewModel.MusicViewModel
 
 class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>(false) {
     override val viewModel: MusicViewModel by viewModels()
 
-    override fun createView() {
+    override fun createView(): View {
         binding = MusicViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         binding.toolBar.layoutParams =
             binding.toolBar.layoutParams.apply { height = statuesBarHeight }
+        return binding.root
     }
 
     override suspend fun MusicViewModel.init() {
@@ -43,8 +44,6 @@ class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>
                 })
         }
     }
-
-    override suspend fun onViewEvent(event: BaseViewModel.ViewEvent) = Unit
 
     private fun initPlayList(
         playList: MutableList<Music>, onPlay: Music?,

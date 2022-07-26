@@ -176,7 +176,8 @@ var onLayoutChangeListener: View.OnLayoutChangeListener? = null
 inline fun Activity.setSoftInputStatusListener(crossinline onSoftInput: (Int, Boolean) -> Unit = { _, _ -> }) {
     isKeyBroadShow = false
     removeSoftInputStatusListener()
-    val nvH = if (hasNavigationBar) navigationBarHeight else 0
+//    val nvH = if (hasNavigationBar) navigationBarHeight else 0
+    val nvH = 0
     onLayoutChangeListener = View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
         val rect = Rect()
         v.getWindowVisibleDisplayFrame(rect)

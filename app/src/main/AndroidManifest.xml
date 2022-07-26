@@ -34,15 +34,18 @@
         <activity android:name=".activity.AddBucketActivity" />
         <activity android:name=".activity.NoteEditActivity" />
         <activity android:name=".activity.NoteViewActivity" />
-        <activity android:name=".activity.GalleyViewActivity" />
+        <activity
+            android:name=".activity.GalleyViewActivity"
+            android:theme="@style/Theme.Seenn.FlatBar" />
         <activity android:name=".activity.PickMusicActivity" />
         <activity android:name=".activity.UserConfigActivity" />
         <activity android:name=".activity.LogActivity" />
         <activity android:name=".activity.MusicViewActivity" />
         <activity android:name=".activity.GalleySearchActivity" />
-        <activity android:name=".activity.MainActivity"
+        <activity
+            android:name=".activity.MainActivity"
             android:exported="false"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop" />
         <activity
             android:name=".activity.SplashActivity"
             android:exported="true">
