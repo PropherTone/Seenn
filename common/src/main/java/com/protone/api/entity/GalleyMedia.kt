@@ -34,9 +34,9 @@ data class GalleyMedia(
     val duration: Long,
     @ColumnInfo(name = "isVideo")
     val isVideo: Boolean,
-    @Ignore
-    var mediaStatus: MediaStatus = MediaStatus.NewInsert,
 ) {
+    @Ignore
+    var mediaStatus: MediaStatus = MediaStatus.NewInsert
 
     enum class MediaStatus{
         Updated,

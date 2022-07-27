@@ -186,7 +186,7 @@ suspend fun Activity.imageListDialog(
     binding.apply {
         listList.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = object : BaseAdapter<PhotoCardLayoutBinding>(context) {
+            adapter = object : BaseAdapter<PhotoCardLayoutBinding, Any>(context) {
 
                 override fun onCreateViewHolder(
                     parent: ViewGroup,

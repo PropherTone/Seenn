@@ -35,7 +35,7 @@ class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true
                 SplashViewModel.SplashEvent.InitConfig -> {
                     viewModel.firstBootWork()
                     startService(MusicService::class.intent)
-                    startActivity(TestActivity::class.intent)
+                    startActivity(MainActivity::class.intent)
                     finish()
                 }
                 SplashViewModel.SplashEvent.UpdateMedia -> updateMedia()
