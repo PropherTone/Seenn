@@ -11,10 +11,19 @@ import com.protone.seenn.R
 import com.protone.seenn.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlin.streams.toList
 
 class GalleyFragmentViewModel : ViewModel() {
+
+    companion object {
+        const val OnUpdated = "Media_Updated"
+        const val OnDeleted = "Media_Deleted"
+        const val OnNew = "New_Media"
+    }
+
 
     private val _fragFlow = MutableSharedFlow<FragEvent>()
     val fragFlow get() = _fragFlow
@@ -109,30 +118,62 @@ class GalleyFragmentViewModel : ViewModel() {
 
     fun updateGalley(
         updateList: MutableList<GalleyMedia>,
-        callBack: (Boolean, Pair<Uri, Array<String>>) -> Unit
+        callBack: (GalleyMedia.MediaStatus, GalleyMedia) -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
-        var isNew: Boolean
-        DatabaseHelper
-            .instance
-            .signedGalleyDAOBridge
-            .getAllMediaByType(isVideo)
-            ?.let { list ->
-                galleyMap[R.string.all_galley.getString()] = list as MutableList<GalleyMedia>
+        val allGalley = R.string.all_galley.getString()
+        flow {
+            updateList.forEach {
+                when (it.mediaStatus) {
+                    GalleyMedia.MediaStatus.Updated -> {
+                        galleyMap[allGalley]?.first { media -> it.uri == media.uri }?.let { media ->
+                            val allIndex = galleyMap[allGalley]?.indexOf(media)
+                            if (allIndex != null && allIndex != -1) {
+                                galleyMap[allGalley]?.set(allIndex, media)
+                                val index = galleyMap[media.bucket]?.indexOf(media)
+                                if (it.bucket != media.bucket) {
+                                    galleyMap[media.bucket]?.remove(media)
+                                    insertNewMedia(it)
+                                    emit(Pair(GalleyMedia.MediaStatus.NewInsert, it))
+                                    return@let
+                                } else if (index != null && index != -1) {
+                                    galleyMap[it.bucket]?.set(index, it)
+                                }
+                            }
+                            emit(Pair(GalleyMedia.MediaStatus.Updated, media))
+                        }
+                    }
+                    GalleyMedia.MediaStatus.Deleted -> {
+                        galleyMap[it.bucket]?.remove(it)
+                        galleyMap[allGalley]?.remove(it)
+                        emit(Pair(GalleyMedia.MediaStatus.Deleted, it))
+                    }
+                    GalleyMedia.MediaStatus.NewInsert -> {
+                        insertNewMedia(it)
+                        galleyMap[allGalley]?.add(0, it)
+                        emit(Pair(GalleyMedia.MediaStatus.NewInsert, it))
+                    }
+                }
             }
-        updateList.stream().map { galley -> galley.bucket }.toList().forEach { bucket ->
-            isNew = galleyMap[bucket] == null
-
-            galleyMap[bucket] = DatabaseHelper.instance.signedGalleyDAOBridge
-                .getAllMediaByGalley(bucket, isVideo) as MutableList<GalleyMedia>
-
-            galleyMap[bucket]?.let { list ->
-                val pair = Pair(
-                    if (list.size > 0) list[0].uri else Uri.EMPTY,
-                    arrayOf(bucket, list.size.toString())
-                )
-                callBack.invoke(isNew, pair)
-            }
+        }.buffer().collect {
+            callBack.invoke(it.first, it.second)
         }
+    }
+
+    fun onTargetGalley(bucket: String): Boolean {
+        return bucket == rightGalley || rightGalley == R.string.all_galley.getString()
+    }
+
+    private suspend fun insertNewMedia(it: GalleyMedia) {
+        if (galleyMap[it.bucket] == null) {
+            galleyMap[it.bucket] = mutableListOf()
+            FragEvent.OnNewBucket(
+                Pair(
+                    it.uri,
+                    arrayOf(it.bucket, galleyMap[it.bucket]?.size.toString())
+                )
+            ).apply { fragFlow.emit(this) }
+        }
+        galleyMap[it.bucket]?.add(0, it)
     }
 
     fun addBucket(name: String) {

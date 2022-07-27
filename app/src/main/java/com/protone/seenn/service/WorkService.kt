@@ -186,6 +186,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             allSignedMedia.stream().filter { it.uri == galleyMedia.uri }
                 .collect(Collectors.toList()).let { list ->
                     if (list.size > 0) allSignedMedia.remove(list[0])
+                    else galleyMedia.mediaStatus = GalleyMedia.MediaStatus.Deleted
                 }
         }
 
@@ -221,7 +222,6 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                         updatedMedia.add(checkedMedia)
                     }
                 }
-
             }
             scanPicture.await()
             scanVideo.await()

@@ -33,8 +33,16 @@ data class GalleyMedia(
     @ColumnInfo(name = "duration")
     val duration: Long,
     @ColumnInfo(name = "isVideo")
-    val isVideo: Boolean
+    val isVideo: Boolean,
+    @Ignore
+    var mediaStatus: MediaStatus = MediaStatus.NewInsert,
 ) {
+
+    enum class MediaStatus{
+        Updated,
+        Deleted,
+        NewInsert
+    }
 
     override fun toString(): String {
         return "GalleyMedia(id=$mediaId, name='$name', bucket='$bucket', size=$size, type='$type', cate='$cate', uri=$uri, date=$date, thumbnailUri=$thumbnailUri, duration=$duration, isVideo=$isVideo)"

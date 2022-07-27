@@ -121,7 +121,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                 if (re.resultCode != RESULT_OK) return@also
                 re.data?.getStringExtra(AddBucketViewModel.BUCKET_NAME)?.let {
                     viewModel.bucket = it
-                    getMusicBucketAdapter().clickCallback(viewModel.bucket)
+                    getMusicBucketAdapter().clickCallback?.invoke(viewModel.bucket)
                     sendRefreshBucket()
                 }
             }

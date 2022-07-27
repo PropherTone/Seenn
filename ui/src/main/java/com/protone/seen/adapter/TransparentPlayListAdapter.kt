@@ -11,8 +11,7 @@ class TransparentPlayListAdapter(
     context: Context,
     onPlay: Music?,
     private val playList: MutableList<Music>
-) :
-    SelectListAdapter<TpPlaylistAdapterLayoutBinding, Music>(context) {
+) : SelectListAdapter<TpPlaylistAdapterLayoutBinding, Music,Any>(context) {
     override val select: (holder: Holder<TpPlaylistAdapterLayoutBinding>, isSelect: Boolean) -> Unit =
         { holder, isSelect ->
             if (isSelect) {

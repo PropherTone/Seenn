@@ -8,6 +8,7 @@ import android.view.ViewTreeObserver
 import androidx.activity.viewModels
 import com.protone.api.context.*
 import com.protone.seenn.GalleyHelper
+import com.protone.seenn.TestActivity
 import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.databinding.SplashActivityBinding
 import com.protone.seenn.service.MusicService
@@ -34,7 +35,7 @@ class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true
                 SplashViewModel.SplashEvent.InitConfig -> {
                     viewModel.firstBootWork()
                     startService(MusicService::class.intent)
-                    startActivity(MainActivity::class.intent)
+                    startActivity(TestActivity::class.intent)
                     finish()
                 }
                 SplashViewModel.SplashEvent.UpdateMedia -> updateMedia()

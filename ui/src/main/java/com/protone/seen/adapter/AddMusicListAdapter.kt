@@ -25,7 +25,7 @@ class AddMusicListAdapter(
     context: Context,
     private val bucket: String,
     private val multiSelect: Boolean
-) : SelectListAdapter<MusicListLayoutBinding, Music>(context) {
+) : SelectListAdapter<MusicListLayoutBinding, Music, Any>(context) {
 
     init {
         multiChoose = multiSelect.also { b ->
@@ -155,17 +155,17 @@ class AddMusicListAdapter(
         }
     }
 
+
     @SuppressLint("NotifyDataSetChanged")
     fun noticeDataUpdate(list: MutableList<Music>) {
         launch(Dispatchers.IO) {
             musicList.clear()
             musicList.addAll(list)
-            withContext(Dispatchers.Main){
+            withContext(Dispatchers.Main) {
                 notifyDataSetChanged()
             }
         }
     }
-
 
     override fun getItemCount(): Int = musicList.size
 }

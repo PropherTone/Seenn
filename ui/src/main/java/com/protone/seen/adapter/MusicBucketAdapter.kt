@@ -16,10 +16,21 @@ import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.MusicBucket
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicBucketAdapterLayoutBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
-    SelectListAdapter<MusicBucketAdapterLayoutBinding, MusicBucket>(context) {
+    SelectListAdapter<MusicBucketAdapterLayoutBinding, MusicBucket, MusicBucketAdapter.MusicBucketAEvent>(
+        context,
+        true
+    ) {
+
+    sealed class MusicBucketAEvent {
+        data class AddBucket(val musicBucket: MusicBucket) : MusicBucketAEvent()
+        data class RefreshBucket(val name: String, val bucket: MusicBucket) : MusicBucketAEvent()
+    }
 
     init {
         selectList.add(musicBucket)
@@ -33,7 +44,32 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
             notifyDataSetChanged()
         }
 
-    var clickCallback: (String) -> Unit? = { }
+    var musicBucketEvent: MusicBucketEvent? = null
+
+    var clickCallback: ((String) -> Unit)? = null
+
+    override suspend fun onEventIO(data: MusicBucketAEvent) {
+        when (data) {
+            is MusicBucketAEvent.AddBucket -> {
+                musicBuckets.add(data.musicBucket)
+                val index = musicBuckets.indexOf(data.musicBucket)
+                if (index != -1) {
+                    withContext(Dispatchers.IO) {
+                        notifyItemInserted(index)
+                    }
+                }
+            }
+            is MusicBucketAEvent.RefreshBucket -> {
+                val index = musicBuckets.indexOfFirst { it.name == data.name }
+                if (index != -1 && index != 0) {
+                    musicBuckets[index] = data.bucket
+                    withContext(Dispatchers.Main) {
+                        notifyItemChanged(index)
+                    }
+                }
+            }
+        }
+    }
 
     override val select: (
         holder: Holder<MusicBucketAdapterLayoutBinding>,
@@ -85,7 +121,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
             musicBucketBack.setOnClickListener {
                 if (!selectList.contains(musicBuckets[position]))
                     checkSelect(holder, musicBuckets[position])
-                clickCallback(musicBuckets[holder.layoutPosition].name)
+                clickCallback?.invoke(musicBuckets[holder.layoutPosition].name)
             }
 
             fun closeMusicBucketBack() {
@@ -135,14 +171,6 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
         }
     }
 
-    var musicBucketEvent: MusicBucketEvent? = null
-
-    interface MusicBucketEvent {
-        fun addList(bucket: String, position: Int)
-        fun delete(bucket: String, position: Int)
-        fun edit(bucket: String, position: Int)
-    }
-
     private fun loadIcon(
         imageView: ImageView,
         iconPath: String? = null,
@@ -161,11 +189,6 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
 
     override fun getItemCount(): Int = musicBuckets.size
 
-    fun addBucket(musicBucket: MusicBucket) {
-        musicBuckets.add(musicBucket)
-        notifyItemInserted(musicBuckets.indexOf(musicBucket))
-    }
-
     fun deleteBucket(musicBucket: MusicBucket): Boolean {
         val index = musicBuckets.indexOf(musicBucket)
         musicBuckets.removeAt(index)
@@ -175,12 +198,21 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
         return index != -1
     }
 
-    fun refreshBucket(name: String, bucket: MusicBucket) {
-        val indexOfFirst = musicBuckets.indexOfFirst { it.name == name }
-        if (indexOfFirst != -1 && indexOfFirst != 0) {
-            musicBuckets[indexOfFirst] = bucket
-            notifyItemChanged(indexOfFirst)
+    fun addBucket(musicBucket: MusicBucket) {
+        launch {
+            adapterFlow.emit(MusicBucketAEvent.AddBucket(musicBucket))
         }
     }
 
+    fun refreshBucket(name: String, bucket: MusicBucket) {
+        launch {
+            adapterFlow.emit(MusicBucketAEvent.RefreshBucket(name, bucket))
+        }
+    }
+
+    interface MusicBucketEvent {
+        fun addList(bucket: String, position: Int)
+        fun delete(bucket: String, position: Int)
+        fun edit(bucket: String, position: Int)
+    }
 }

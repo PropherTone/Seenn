@@ -232,8 +232,10 @@ class DatabaseHelper {
         }
 
         fun deleteSignedMediaMultiAsync(list: MutableList<GalleyMedia>) {
-            list.forEach {
-                deleteSignedMediaByUri(it.uri)
+            execute {
+                list.forEach {
+                    deleteSignedMediaByUri(it.uri)
+                }
             }
         }
 
@@ -269,6 +271,7 @@ class DatabaseHelper {
                 it.type = media.type
                 it.date = media.date
                 updateSignedMedia(it)
+                it.mediaStatus = GalleyMedia.MediaStatus.Updated
                 it
             } else {
                 insertSignedMedia(media)

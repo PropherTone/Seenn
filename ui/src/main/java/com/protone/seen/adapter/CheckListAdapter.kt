@@ -11,8 +11,9 @@ class CheckListAdapter(
     context: Context,
     dataList: MutableList<String>? = null,
     private val check: Boolean = true
-) :
-    SelectListAdapter<CheckListAdapterLayoutBinding, String>(context) {
+) : SelectListAdapter<CheckListAdapterLayoutBinding, String, Any>(
+    context
+) {
 
     var dataList: MutableList<String> = mutableListOf()
         @SuppressLint("NotifyDataSetChanged")

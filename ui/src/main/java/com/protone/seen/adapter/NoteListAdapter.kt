@@ -11,7 +11,8 @@ import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.Note
 import com.protone.seen.databinding.NoteListAdapterLayoutBinding
 
-class NoteListAdapter(context: Context) : BaseAdapter<NoteListAdapterLayoutBinding>(context) {
+class NoteListAdapter(context: Context) :
+    BaseAdapter<NoteListAdapterLayoutBinding, Any>(context) {
 
     private val noteList = arrayListOf<Note>()
 

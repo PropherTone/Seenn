@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 
 class NoteTypeListAdapter(
     context: Context,
-) : BaseAdapter<NoteTpyeListAdapterBinding>(context) {
+) : BaseAdapter<NoteTpyeListAdapterBinding, Any>(context) {
 
     private val noteDirList = arrayListOf<NoteDir>()
 

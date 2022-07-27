@@ -7,7 +7,7 @@ import com.protone.api.baseType.getFileName
 import com.protone.api.context.newLayoutInflater
 import com.protone.seen.databinding.LogListLayoutBinding
 
-class LogListAdapter(context: Context) : BaseAdapter<LogListLayoutBinding>(context) {
+class LogListAdapter(context: Context) : BaseAdapter<LogListLayoutBinding, Any>(context) {
 
     private val logs = mutableListOf<String>()
     var logEvent: LogEvent? = null

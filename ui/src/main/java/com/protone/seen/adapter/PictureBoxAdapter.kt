@@ -16,7 +16,7 @@ import com.protone.seen.databinding.PictureBoxAdapterLayoutBinding
 import kotlin.math.roundToInt
 
 class PictureBoxAdapter(context: Context, private val picUri: MutableList<GalleyMedia>) :
-    BaseAdapter<PictureBoxAdapterLayoutBinding>(context) {
+    BaseAdapter<PictureBoxAdapterLayoutBinding,Any>(context) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

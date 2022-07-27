@@ -11,7 +11,7 @@ import com.protone.seen.R
 import com.protone.seen.databinding.MusicListLayoutBinding
 
 class MusicListAdapter(context: Context) :
-    SelectListAdapter<MusicListLayoutBinding, Music>(context) {
+    SelectListAdapter<MusicListLayoutBinding, Music, Any>(context) {
 
     var musicList: MutableList<Music> = mutableListOf()
         @SuppressLint("NotifyDataSetChanged")

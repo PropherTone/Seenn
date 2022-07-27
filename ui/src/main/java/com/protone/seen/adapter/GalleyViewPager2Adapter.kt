@@ -13,7 +13,7 @@ import java.util.*
 import kotlin.concurrent.timerTask
 
 class GalleyViewPager2Adapter(context: Context, private val data: MutableList<GalleyMedia>) :
-    BaseAdapter<GalleyVp2AdapterLayoutBinding>(context) {
+    BaseAdapter<GalleyVp2AdapterLayoutBinding, Any>(context) {
 
     private val clk = longArrayOf(0, 0)
 
@@ -55,6 +55,4 @@ class GalleyViewPager2Adapter(context: Context, private val data: MutableList<Ga
     var onClk: (() -> Unit)? = null
 
     override fun getItemCount(): Int = data.size
-
-
 }

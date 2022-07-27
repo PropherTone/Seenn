@@ -21,9 +21,56 @@ import kotlin.streams.toList
 class GalleyBucketAdapter(
     context: Context,
     val selectBucket: (String) -> Unit
-) : SelectListAdapter<GalleyBucketListLayoutBinding, Pair<Uri, Array<String>>>(context) {
+) : SelectListAdapter<GalleyBucketListLayoutBinding, Pair<Uri, Array<String>>, GalleyBucketAdapter.GalleyBucketEvent>(
+    context, true
+) {
+
+    sealed class GalleyBucketEvent {
+        data class DeleteBucket(val bucket: Pair<Uri, Array<String>>) : GalleyBucketEvent()
+        data class RefreshBucket(val item: Pair<Uri, Array<String>>) : GalleyBucketEvent()
+        data class InsertBucket(val item: Pair<Uri, Array<String>>) : GalleyBucketEvent()
+    }
 
     private var galleries: MutableList<Pair<Uri, Array<String>>> = mutableListOf()
+
+    override suspend fun onEventIO(data: GalleyBucketEvent) {
+        when (data) {
+            is GalleyBucketEvent.DeleteBucket -> {
+                galleries.first { it.second[0] == data.bucket.second[0] }.let {
+                    val index = galleries.indexOf(it)
+                    galleries.removeAt(index)
+                    selectList.removeAt(index)
+                    withContext(Dispatchers.Main) {
+                        notifyItemRemoved(index)
+                    }
+                }
+            }
+            is GalleyBucketEvent.RefreshBucket -> {
+                if (data.item.second[1].toInt() <= 0) {
+                    deleteBucket(data.item)
+                    return
+                }
+                val iterator = galleries.iterator()
+                var index = 0
+                while (iterator.hasNext()) {
+                    if (iterator.next().second[0] == data.item.second[0]) {
+                        galleries[index] = data.item
+                        withContext(Dispatchers.Main) {
+                            notifyItemChanged(index)
+                        }
+                        break
+                    }
+                    index++
+                }
+            }
+            is GalleyBucketEvent.InsertBucket -> {
+                galleries.add(data.item)
+                withContext(Dispatchers.Main) {
+                    notifyItemInserted(galleries.size)
+                }
+            }
+        }
+    }
 
     override val select: (holder: Holder<GalleyBucketListLayoutBinding>, isSelect: Boolean) -> Unit =
         { holder, isSelect ->
@@ -52,12 +99,14 @@ class GalleyBucketAdapter(
             setSelect(holder, selectList.contains(data))
             holder.binding.apply {
                 root.setOnLongClickListener {
-                    launch(Dispatchers.IO) {
-                        val galley = DatabaseHelper
-                            .instance
-                            .galleyBucketDAOBridge
-                            .getGalleyBucketRs(galleries[position].second[0])
-                        if (galley != null) withContext(Dispatchers.Main) {
+                    launch {
+                        val galley = withContext(Dispatchers.IO) {
+                            DatabaseHelper
+                                .instance
+                                .galleyBucketDAOBridge
+                                .getGalleyBucketRs(galleries[position].second[0])
+                        }
+                        if (galley != null) {
                             AlertDialog.Builder(context)
                                 .setTitle(R.string.delete.getString())
                                 .setPositiveButton(
@@ -96,50 +145,9 @@ class GalleyBucketAdapter(
         holder: Holder<GalleyBucketListLayoutBinding>,
         item: Pair<Uri, Array<String>>
     ) {
-        launch(Dispatchers.IO) {
-            if (!multiChoose) clearSelected()
-            selectList.add(item)
-            setSelect(holder, true)
-        }
-    }
-
-    private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
-        launch(Dispatchers.IO) {
-            val index = galleries.indexOf(bucket)
-            if (index != -1) {
-                galleries.removeAt(index)
-                selectList.remove(bucket)
-                withContext(Dispatchers.Main) {
-                    notifyItemRemoved(index)
-                }
-            }
-        }
-    }
-
-    fun refreshBucket(item: Pair<Uri, Array<String>>) {
-        launch(Dispatchers.IO) {
-            val iterator = galleries.iterator()
-            var index = 0
-            while (iterator.hasNext()) {
-                if (iterator.next().second[0] == item.second[0]) {
-                    galleries[index] = item
-                    withContext(Dispatchers.Main) {
-                        notifyItemChanged(index)
-                    }
-                    break
-                }
-                index++
-            }
-        }
-    }
-
-    fun insertBucket(item: Pair<Uri, Array<String>>) {
-        launch(Dispatchers.IO) {
-            galleries.add(item)
-            withContext(Dispatchers.Main) {
-                notifyItemInserted(galleries.size)
-            }
-        }
+        if (!multiChoose) clearSelected()
+        selectList.add(item)
+        setSelect(holder, true)
     }
 
     fun performSelect() {
@@ -157,6 +165,24 @@ class GalleyBucketAdapter(
             withContext(Dispatchers.Main) {
                 if (index != -1) notifyItemChanged(0)
             }
+        }
+    }
+
+    private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
+        launch {
+            adapterFlow.emit(GalleyBucketEvent.DeleteBucket(bucket))
+        }
+    }
+
+    fun refreshBucket(item: Pair<Uri, Array<String>>) {
+        launch {
+            adapterFlow.emit(GalleyBucketEvent.RefreshBucket(item))
+        }
+    }
+
+    fun insertBucket(item: Pair<Uri, Array<String>>) {
+        launch {
+            adapterFlow.emit(GalleyBucketEvent.InsertBucket(item))
         }
     }
 

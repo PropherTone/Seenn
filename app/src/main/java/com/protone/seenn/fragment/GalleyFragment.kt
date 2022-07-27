@@ -111,10 +111,31 @@ class GalleyFragment(
                             startActivity(PictureBoxActivity::class.intent)
                         }
                         is GalleyFragmentViewModel.FragEvent.OnGalleyUpdate -> {
-                            updateGalley(it.updateList) { isNew, pair ->
-                                if (isNew) insertBucket(pair) else refreshBucket(pair)
+                            updateGalley(it.updateList) { status, media ->
+                                when (status) {
+                                    GalleyMedia.MediaStatus.Updated -> {
+                                        if (onTargetGalley(media.bucket)) {
+                                            getListAdapter().noticeListItemUpdate(media)
+                                        }
+                                    }
+                                    GalleyMedia.MediaStatus.Deleted -> {
+                                        val index =
+                                            viewModel.galleyMap[media.bucket]?.indexOf(media)
+                                        if (index != null && index == 0) {
+                                            refreshBucket(media)
+                                        }
+                                        if (onTargetGalley(media.bucket)) {
+                                            getListAdapter().noticeListItemDelete(media)
+                                        }
+                                    }
+                                    GalleyMedia.MediaStatus.NewInsert -> {
+                                        refreshBucket(media)
+                                        if (onTargetGalley(media.bucket)) {
+                                            getListAdapter().noticeListItemInsert(media)
+                                        }
+                                    }
+                                }
                             }
-                            noticeListUpdate(galleyMap[rightGalley])
                         }
                         is GalleyFragmentViewModel.FragEvent.OnNewBucket -> {
                             insertBucket(it.pairs)
@@ -123,7 +144,7 @@ class GalleyFragment(
                             getBucketAdapter().performSelect()
                             noticeListUpdate(it.data)
                         }
-                        is GalleyFragmentViewModel.FragEvent.OnGetAllGalley ->{
+                        is GalleyFragmentViewModel.FragEvent.OnGetAllGalley -> {
                             getBucketAdapter().performSelect()
                         }
                         else -> {}
@@ -249,8 +270,14 @@ class GalleyFragment(
         getBucketAdapter().insertBucket(pairs)
     }
 
-    private fun refreshBucket(pairs: Pair<Uri, Array<String>>) {
-        getBucketAdapter().refreshBucket(pairs)
+    private fun refreshBucket(media: GalleyMedia) {
+        Pair(
+            media.uri,
+            arrayOf(
+                media.name,
+                viewModel.galleyMap[media.bucket]?.size.toString()
+            )
+        ).apply { getBucketAdapter().refreshBucket(this) }
     }
 
     private fun noticeListUpdate(data: MutableList<GalleyMedia>?) {
