@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 abstract class BaseAdapter<B : ViewDataBinding, T>(
     val context: Context,
-    protected val handleEvent: Boolean = false
+    private val handleEvent: Boolean = false
 ) : RecyclerView.Adapter<BaseAdapter.Holder<B>>(),
     CoroutineScope by CoroutineScope(Dispatchers.Main) {
 

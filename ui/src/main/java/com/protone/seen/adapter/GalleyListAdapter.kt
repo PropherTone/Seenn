@@ -83,7 +83,7 @@ class GalleyListAdapter(
             }
             is GalleyListEvent.NoticeListItemInsert -> {
                 medias.add(0, data.media)
-                withContext(Dispatchers.IO) {
+                withContext(Dispatchers.Main) {
                     notifyItemInserted(0)
                 }
             }

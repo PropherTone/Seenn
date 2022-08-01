@@ -186,7 +186,6 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             allSignedMedia.stream().filter { it.uri == galleyMedia.uri }
                 .collect(Collectors.toList()).let { list ->
                     if (list.size > 0) allSignedMedia.remove(list[0])
-                    else galleyMedia.mediaStatus = GalleyMedia.MediaStatus.Deleted
                 }
         }
 
@@ -225,8 +224,11 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             }
             scanPicture.await()
             scanVideo.await()
+            allSignedMedia.forEach {
+                it.mediaStatus = GalleyMedia.MediaStatus.Deleted
+                deleteSignedMedia(it)
+            }
             updatedMedia.addAll(allSignedMedia)
-            deleteSignedMediaMultiAsync(allSignedMedia)
             if (updatedMedia.size != 0) {
                 galleyNotifier.emit(updatedMedia)
                 makeToast("相册更新完毕")
