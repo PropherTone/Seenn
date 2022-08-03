@@ -8,38 +8,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
-import com.protone.api.context.*
+import com.protone.api.context.newLayoutInflater
+import com.protone.api.context.root
 import com.protone.api.onResult
 import com.protone.seen.R
 import com.protone.seen.adapter.BaseAdapter
 import com.protone.seen.adapter.CheckListAdapter
 import com.protone.seen.databinding.*
 import kotlinx.coroutines.Dispatchers
-
-private var create: AlertDialog? = null
-    set(value) {
-        field = value
-        if (value?.ownerActivity != null) {
-            value.setOnShowListener {
-                val attributes = value.window?.attributes
-                val height =
-                    SApplication.screenHeight / 2 - ((value.window?.decorView?.height ?: 0) / 2)
-                (value.ownerActivity as Activity).setSoftInputStatusListener { h, b ->
-                    if (b && h > height) {
-                        attributes?.y = attributes?.y?.minus(h - height)
-                        value.onWindowAttributesChanged(attributes)
-                    } else {
-                        attributes?.y = 0
-                        value.onWindowAttributesChanged(attributes)
-                    }
-                }
-            }
-            value.setOnDismissListener {
-                (value.ownerActivity as Activity).removeSoftInputStatusListener()
-                create = null
-            }
-        }
-    }
 
 fun Activity.loginDialog(
     isReg: Boolean,
@@ -48,9 +24,7 @@ fun Activity.loginDialog(
 ) {
     val binding = LoginPopLayoutBinding.inflate(layoutInflater, root, false)
     if (isReg) binding.btnReg.isGone = true
-    create = AlertDialog.Builder(this).setView(binding.root).create().also {
-        it.setOwnerActivity(this)
-    }
+    val create = AlertDialog.Builder(this).setView(binding.root).create()
     binding.btnLogin.setOnClickListener {
         loginCall.invoke(
             binding.userName.text.toString(),
@@ -62,31 +36,29 @@ fun Activity.loginDialog(
                 binding.userNameLayout.error = " "
                 binding.userPasswordLayout.error = " "
             } else {
-                create?.dismiss()
+                create.dismiss()
             }
         }
     }
     binding.btnReg.setOnClickListener {
-        create?.dismiss()
+        create.dismiss()
         regClk.invoke()
     }
-    create?.show()
+    create.show()
 }
 
 fun Activity.regDialog(confirmCall: (String, String) -> Boolean) {
     val binding = RegPopLayoutBinding.inflate(layoutInflater, root, false)
-    create = AlertDialog.Builder(this).setView(binding.root).create().also {
-        it.setOwnerActivity(this)
-    }
+    val create = AlertDialog.Builder(this).setView(binding.root).create()
     binding.btnLogin.setOnClickListener {
         confirmCall.invoke(
             binding.userName.text.toString(),
             binding.userPassword.text.toString()
         ).let { re ->
-            if (re) create?.dismiss()
+            if (re) create.dismiss()
         }
     }
-    create?.show()
+    create.show()
 
 }
 
@@ -114,10 +86,7 @@ fun Activity.titleDialog(title: String, name: String, callBack: (String) -> Unit
         it.setNegativeButton(R.string.cancel) { p0, _ ->
             p0?.dismiss()
         }
-    }.create().also {
-        it.setOwnerActivity(this)
-        create = it
-    }.show()
+    }.create().show()
 }
 
 fun Activity.cateDialog(

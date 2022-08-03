@@ -120,7 +120,13 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
         viewModel.chooseData?.let {
             viewModel.onTransaction = true
             tryDelete(it) { re ->
-                viewModel.deleteMedia(re)
+                if (re.size == 1) {
+                    viewModel.deleteMedia(re[0])
+                } else if (re.size > 1) {
+                    re.forEach { gm ->
+                        viewModel.deleteMedia(gm)
+                    }
+                }
             }
         }
     }

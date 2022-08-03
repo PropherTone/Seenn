@@ -83,6 +83,10 @@ class GalleyFragment(
                             if (galleyMap[it.galleyMedia.bucket]?.remove(it.galleyMedia) == true) {
                                 getListAdapter().removeMedia(it.galleyMedia)
                             }
+                            if (galleyMap[R.string.all_galley.toString()]?.remove(it.galleyMedia) == true) {
+                                getListAdapter().removeMedia(it.galleyMedia)
+                            }
+                            refreshBucket(it.galleyMedia)
                         }
                         is GalleyFragmentViewModel.FragEvent.AddBucket -> {
                             if (!isLock) {
@@ -111,7 +115,7 @@ class GalleyFragment(
                             startActivity(PictureBoxActivity::class.intent)
                         }
                         is GalleyFragmentViewModel.FragEvent.OnGalleyUpdate -> {
-                            updateGalley(it.updateList) { status, media ->
+                            updateGalley(it.media) { status, media ->
                                 when (status) {
                                     GalleyMedia.MediaStatus.Updated -> {
                                         if (onTargetGalley(media.bucket)) {
@@ -272,10 +276,24 @@ class GalleyFragment(
 
     private fun refreshBucket(media: GalleyMedia) {
         Pair(
-            media.uri,
+            if ((viewModel.galleyMap[media.bucket]?.size ?: 0) > 0)
+                viewModel.galleyMap[media.bucket]?.get(0)?.uri ?: Uri.EMPTY
+            else
+                Uri.EMPTY,
             arrayOf(
-                media.name,
+                media.bucket,
                 viewModel.galleyMap[media.bucket]?.size.toString()
+            )
+        ).apply { getBucketAdapter().refreshBucket(this) }
+        val all = R.string.all_galley.getString()
+        Pair(
+            if ((viewModel.galleyMap[all]?.size ?: 0) > 0)
+                viewModel.galleyMap[all]?.get(0)?.uri ?: Uri.EMPTY
+            else
+                Uri.EMPTY,
+            arrayOf(
+                all,
+                viewModel.galleyMap[all]?.size.toString()
             )
         ).apply { getBucketAdapter().refreshBucket(this) }
     }

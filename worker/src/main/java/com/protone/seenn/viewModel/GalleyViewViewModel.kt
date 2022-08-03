@@ -43,18 +43,16 @@ class GalleyViewViewModel : BaseViewModel() {
     suspend fun getMediaByUri(uri: Uri) =
         DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMediaRs(uri)
 
-    suspend fun getNotesWithGalley(mediaId: Long?): MutableList<String> =
+    suspend fun getNotesWithGalley(mediaUri: Uri): MutableList<String> =
         withContext(Dispatchers.IO) {
-            mediaId?.let {
-                DatabaseHelper
-                    .instance
-                    .galleriesWithNotesDAOBridge
-                    .getNotesWithGalley(it)
-                    .stream()
-                    .map { note ->
-                        note.title
-                    }.toList() as MutableList<String>
-            } ?: mutableListOf()
+            DatabaseHelper
+                .instance
+                .galleriesWithNotesDAOBridge
+                .getNotesWithGalley(mediaUri)
+                .stream()
+                .map { note ->
+                    note.title
+                }.toList() as MutableList<String>
         }
 
 

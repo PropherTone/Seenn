@@ -135,6 +135,9 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
                         toEntity.uri.toMediaBitmapByteArray()
                     ) { s ->
                         if (!s.isNullOrEmpty()) {
+                            if (userConfig.userIcon.isNotEmpty()) {
+                                viewModel.deleteOldIcon(userConfig.userIcon)
+                            }
                             userConfig.userIcon = s
                         } else {
                             R.string.failed_upload_image.getString().toast()

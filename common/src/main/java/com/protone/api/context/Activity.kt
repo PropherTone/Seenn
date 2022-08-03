@@ -181,7 +181,8 @@ inline fun Activity.setSoftInputStatusListener(crossinline onSoftInput: (Int, Bo
     onLayoutChangeListener = View.OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
         val rect = Rect()
         v.getWindowVisibleDisplayFrame(rect)
-        val i = v.height - rect.bottom - nvH
+        val height = root?.height ?: 0
+        val i = height - rect.bottom - nvH
         if (i > 0 && !isKeyBroadShow) {
             isKeyBroadShow = true
             onSoftInput.invoke(i + nvH, isKeyBroadShow)

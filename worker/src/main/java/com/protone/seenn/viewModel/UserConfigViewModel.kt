@@ -1,5 +1,6 @@
 package com.protone.seenn.viewModel
 
+import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
 import com.protone.api.SCrashHandler
 import com.protone.api.baseType.getParentPath
@@ -8,6 +9,7 @@ import com.protone.api.baseType.toast
 import com.protone.api.context.SApplication
 import com.protone.seenn.R
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -34,6 +36,15 @@ class UserConfigViewModel : BaseViewModel() {
     }
 
     private var onClear = false
+
+    fun deleteOldIcon(path: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val file = File(path)
+            if (file.exists()) {
+                file.delete()
+            }
+        }
+    }
 
     suspend fun clearCache() {
         if (onClear) return

@@ -9,11 +9,14 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
+import android.util.Log
+import com.protone.api.TAG
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.workIntentFilter
 import com.protone.api.entity.GalleyMedia
 import com.protone.api.entity.Music
+import com.protone.seenn.Medias
 import com.protone.seenn.Medias.audioNotifier
 import com.protone.seenn.Medias.galleyNotifier
 import com.protone.seenn.Medias.music
@@ -30,7 +33,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import java.util.stream.Collectors
 
 class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
@@ -175,64 +177,60 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                     .signedGalleyDAOBridge
                     .insertSignedMediaChecked(it)
             if (checkedMedia != null) {
-                galleyNotifier.emit(arrayListOf(checkedMedia))
+                Log.d(TAG, "updateGalley(uri: Uri): 相册更新完毕")
+                galleyNotifier.emit(checkedMedia)
                 makeToast("相册更新完毕")
             }
         }
     }
 
     private fun updateGalley() = DatabaseHelper.instance.signedGalleyDAOBridge.run {
-        fun sortMedia(allSignedMedia: MutableList<GalleyMedia>, galleyMedia: GalleyMedia) {
-            allSignedMedia.stream().filter { it.uri == galleyMedia.uri }
-                .collect(Collectors.toList()).let { list ->
-                    if (list.size > 0) allSignedMedia.remove(list[0])
-                }
-        }
-
-        val updatedMedia = arrayListOf<GalleyMedia>()
         launch(Dispatchers.IO) {
-            val allSignedMedia = getAllSignedMedia() as MutableList
-            val scanPicture = async {
+            val sortMedias = async(Dispatchers.IO) {
+                val allSignedMedia = getAllSignedMedia() as MutableList
+                flow {
+                    allSignedMedia.forEach {
+                        if (!isUriExist(it.uri)) {
+                            emit(it)
+                        }
+                    }
+                }.buffer().collect {
+                    deleteSignedMedia(it)
+                    it.mediaStatus = GalleyMedia.MediaStatus.Deleted
+                    Medias.galleyNotifier.emit(it)
+                }
+            }
+
+            val scanPicture = async(Dispatchers.IO) {
                 flow {
                     scanPicture { _, galleyMedia ->
                         emit(galleyMedia)
                     }
                 }.buffer().collect {
+                    //主要耗时
                     val checkedMedia = insertSignedMediaChecked(it)
-                    synchronized(allSignedMedia) {
-                        sortMedia(allSignedMedia, it)
-                    }
-                    if (checkedMedia != null && !updatedMedia.contains(checkedMedia)) {
-                        updatedMedia.add(checkedMedia)
+                    if (checkedMedia != null) {
+                        Medias.galleyNotifier.emit(it)
                     }
                 }
             }
-            val scanVideo = async {
+
+            val scanVideo = async(Dispatchers.IO) {
                 flow {
                     scanVideo { _, galleyMedia ->
                         emit(galleyMedia)
                     }
                 }.buffer().collect {
                     val checkedMedia = insertSignedMediaChecked(it)
-                    synchronized(allSignedMedia) {
-                        sortMedia(allSignedMedia, it)
-                    }
-                    if (checkedMedia != null && !updatedMedia.contains(checkedMedia)) {
-                        updatedMedia.add(checkedMedia)
+                    if (checkedMedia != null) {
+                        Medias.galleyNotifier.emit(it)
                     }
                 }
             }
+
+            sortMedias.await()
             scanPicture.await()
             scanVideo.await()
-            allSignedMedia.forEach {
-                it.mediaStatus = GalleyMedia.MediaStatus.Deleted
-                deleteSignedMedia(it)
-            }
-            updatedMedia.addAll(allSignedMedia)
-            if (updatedMedia.size != 0) {
-                galleyNotifier.emit(updatedMedia)
-                makeToast("相册更新完毕")
-            }
         }
     }
 

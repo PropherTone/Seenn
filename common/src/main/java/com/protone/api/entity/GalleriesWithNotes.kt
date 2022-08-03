@@ -1,16 +1,18 @@
 package com.protone.api.entity
 
+import android.net.Uri
 import androidx.room.*
 import androidx.room.ForeignKey.CASCADE
 import com.protone.api.converters.ListTypeConverter
+import com.protone.api.converters.UriTypeConverter
 
 @Entity(
-    primaryKeys = ["mediaId", "noteId"],
+    primaryKeys = ["media_uri", "noteId"],
     foreignKeys = [
         ForeignKey(
             entity = GalleyMedia::class,
-            parentColumns = ["mediaId"],
-            childColumns = ["mediaId"],
+            parentColumns = ["media_uri"],
+            childColumns = ["media_uri"],
             onDelete = CASCADE
         ),
         ForeignKey(
@@ -21,15 +23,15 @@ import com.protone.api.converters.ListTypeConverter
         )
     ], indices = [
         Index(
-            value = ["noteId", "mediaId"],
+            value = ["noteId", "media_uri"],
             unique = true
         )
     ]
 )
-@TypeConverters(ListTypeConverter::class)
+@TypeConverters(ListTypeConverter::class,UriTypeConverter::class)
 data class GalleriesWithNotes(
-    @ColumnInfo(name = "mediaId")
-    val mediaId: Long,
+    @ColumnInfo(name = "media_uri")
+    val uri: Uri,
     @ColumnInfo(name = "noteId")
     val noteId: Long
 )

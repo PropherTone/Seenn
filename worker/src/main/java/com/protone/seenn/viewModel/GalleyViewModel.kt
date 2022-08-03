@@ -5,6 +5,7 @@ import com.google.android.material.tabs.TabLayout
 import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleyMedia
 import com.protone.seenn.R
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
@@ -70,9 +71,9 @@ class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
         }
     }
 
-    fun onUpdate(updateList: MutableList<GalleyMedia>) {
-        viewModelScope.launch {
-            mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.OnGalleyUpdate(updateList))
+    fun onUpdate(media: GalleyMedia) {
+        viewModelScope.launch(Dispatchers.IO) {
+            mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.OnGalleyUpdate(media))
         }
     }
 

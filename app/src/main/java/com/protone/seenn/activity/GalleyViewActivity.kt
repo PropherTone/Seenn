@@ -1,5 +1,6 @@
 package com.protone.seenn.activity
 
+import android.net.Uri
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -124,7 +125,7 @@ class GalleyViewActivity :
                 }
             }
         }
-        setNotes(getNotesWithGalley(galleyMedia?.mediaId))
+        setNotes(getNotesWithGalley(galleyMedia?.uri ?: Uri.EMPTY))
     }
 
     private fun GalleyViewViewModel.setMediaInfo(position: Int) = galleyMedias[position].let { m ->
@@ -228,10 +229,12 @@ class GalleyViewActivity :
     override fun popDelete() {
         tryDelete(mutableListOf(viewModel.getCurrentMedia())) {
 //            binding.galleyVView.setCurrentItem(viewModel.curPosition + 1, true)
-            val indexOf = viewModel.galleyMedias.indexOf(it)
-            if (indexOf != -1) {
-                viewModel.galleyMedias.removeAt(indexOf)
-                binding.galleyVView.adapter?.notifyItemChanged(indexOf)
+            if (it.size == 1) {
+                val index = viewModel.galleyMedias.indexOf(it[0])
+                if (index != -1) {
+                    viewModel.galleyMedias.removeAt(index)
+                    binding.galleyVView.adapter?.notifyItemRemoved(index)
+                }
             }
         }
     }

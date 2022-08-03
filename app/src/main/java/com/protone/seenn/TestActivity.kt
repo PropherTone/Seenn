@@ -1,27 +1,36 @@
 package com.protone.seenn
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.protone.api.context.UPDATE_GALLEY
+import android.util.Log
+import android.view.View
+import androidx.activity.viewModels
+import com.protone.api.TAG
 import com.protone.api.context.root
-import com.protone.seenn.broadcast.workLocalBroadCast
+import com.protone.seenn.activity.BaseActivity
 import com.protone.seenn.databinding.ActivityTestBinding
+import com.protone.seenn.viewModel.TestViewModel
+import kotlinx.coroutines.flow.collect
 
-class TestActivity : AppCompatActivity() {
+class TestActivity : BaseActivity<ActivityTestBinding, TestViewModel>(false) {
+    override val viewModel: TestViewModel by viewModels()
 
-    lateinit var binding: ActivityTestBinding
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun createView(): View {
         binding = ActivityTestBinding.inflate(layoutInflater, root, false)
-        setContentView(binding.root)
+        binding.activity = this
+        fitStatuesBar(binding.root)
+        return binding.root
+    }
 
-        binding.btn1.setOnClickListener {
-            workLocalBroadCast.sendBroadcast(Intent(UPDATE_GALLEY))
-        }
-        binding.btn2.setOnClickListener {
-            workLocalBroadCast.sendBroadcast(Intent(UPDATE_GALLEY).putExtra("uri", "content://"))
+    override suspend fun TestViewModel.init() {
+        viewModel.setLogView(binding.logView)
+        binding.model = viewModel
+        Medias.galleyNotifier1.collect {
+            Log.d(TAG, "init: $it")
         }
     }
+
+    fun clear() {
+        binding.logView.text = ""
+        viewModel.stringBuilder.clear()
+    }
+
 }

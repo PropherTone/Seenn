@@ -17,7 +17,6 @@ import com.protone.api.entity.MusicBucket
 import com.protone.seen.R
 import com.protone.seen.databinding.MusicBucketAdapterLayoutBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
@@ -199,15 +198,11 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
     }
 
     fun addBucket(musicBucket: MusicBucket) {
-        launch {
-            adapterFlow.emit(MusicBucketAEvent.AddBucket(musicBucket))
-        }
+       emit(MusicBucketAEvent.AddBucket(musicBucket))
     }
 
     fun refreshBucket(name: String, bucket: MusicBucket) {
-        launch {
-            adapterFlow.emit(MusicBucketAEvent.RefreshBucket(name, bucket))
-        }
+        emit(MusicBucketAEvent.RefreshBucket(name, bucket))
     }
 
     interface MusicBucketEvent {

@@ -11,6 +11,7 @@ import com.protone.api.animation.AnimationHelper
 import com.protone.seen.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 abstract class SelectListAdapter<V : ViewDataBinding, T, D>(
     context: Context,
@@ -50,17 +51,17 @@ abstract class SelectListAdapter<V : ViewDataBinding, T, D>(
             val itemIndex = itemIndex(selectList[0])
             selectList.clear()
             if (itemIndex != -1) {
-                launch(Dispatchers.Main) {
+                launch {
                     notifyItemChanged(itemIndex)
                 }
             }
         }
     }
 
-    fun clearAllSelected() {
+    suspend fun clearAllSelected() {
         selectList.forEach {
             val itemIndex = itemIndex(it)
-            if (itemIndex != -1) launch(Dispatchers.Main) {
+            if (itemIndex != -1) withContext(Dispatchers.Main) {
                 notifyItemChanged(itemIndex)
             }
         }

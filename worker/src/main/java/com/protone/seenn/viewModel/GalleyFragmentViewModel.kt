@@ -1,8 +1,10 @@
 package com.protone.seenn.viewModel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.protone.api.TAG
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.entity.GalleyBucket
@@ -11,9 +13,6 @@ import com.protone.seenn.R
 import com.protone.seenn.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class GalleyFragmentViewModel : ViewModel() {
@@ -35,7 +34,7 @@ class GalleyFragmentViewModel : ViewModel() {
         object OnGetAllGalley : FragEvent()
         data class DeleteMedia(val galleyMedia: GalleyMedia) : FragEvent()
         data class AddBucket(val name: String, val list: MutableList<GalleyMedia>) : FragEvent()
-        data class OnGalleyUpdate(val updateList: MutableList<GalleyMedia>) : FragEvent()
+        data class OnGalleyUpdate(val media: GalleyMedia) : FragEvent()
         data class OnNewBucket(val pairs: Pair<Uri, Array<String>>) : FragEvent()
         data class OnListUpdate(val data: MutableList<GalleyMedia>?) : FragEvent()
         data class OnSelect(val galleyMedia: MutableList<GalleyMedia>) : FragEvent()
@@ -116,54 +115,49 @@ class GalleyFragmentViewModel : ViewModel() {
             }
     }
 
-    fun updateGalley(
-        updateList: MutableList<GalleyMedia>,
-        callBack: (GalleyMedia.MediaStatus, GalleyMedia) -> Unit
+    inline fun updateGalley(
+        media: GalleyMedia,
+        crossinline callBack: (GalleyMedia.MediaStatus, GalleyMedia) -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
         val allGalley = R.string.all_galley.getString()
-        flow {
-            updateList.forEach {
-                when (it.mediaStatus) {
-                    GalleyMedia.MediaStatus.Updated -> {
-                        galleyMap[allGalley]?.first { media -> it.uri == media.uri }?.let { media ->
-                            val allIndex = galleyMap[allGalley]?.indexOf(media)
-                            if (allIndex != null && allIndex != -1) {
-                                galleyMap[allGalley]?.set(allIndex, media)
-                                val index = galleyMap[media.bucket]?.indexOf(media)
-                                if (it.bucket != media.bucket) {
-                                    galleyMap[media.bucket]?.remove(media)
-                                    insertNewMedia(it)
-                                    emit(Pair(GalleyMedia.MediaStatus.NewInsert, it))
-                                    return@let
-                                } else if (index != null && index != -1) {
-                                    galleyMap[it.bucket]?.set(index, it)
-                                }
-                            }
-                            emit(Pair(GalleyMedia.MediaStatus.Updated, media))
+        if (galleyMap[allGalley]?.contains(media) == false && isVideo == media.isVideo) when (media.mediaStatus) {
+            GalleyMedia.MediaStatus.Updated -> {
+                galleyMap[allGalley]?.first { media -> media.uri == media.uri }?.let { media ->
+                    val allIndex = galleyMap[allGalley]?.indexOf(media)
+                    if (allIndex != null && allIndex != -1) {
+                        galleyMap[allGalley]?.set(allIndex, media)
+                        val index = galleyMap[media.bucket]?.indexOf(media)
+                        if (media.bucket != media.bucket) {
+                            galleyMap[media.bucket]?.remove(media)
+                            insertNewMedia(media)
+                            callBack.invoke(GalleyMedia.MediaStatus.NewInsert, media)
+                            return@let
+                        } else if (index != null && index != -1) {
+                            galleyMap[media.bucket]?.set(index, media)
                         }
                     }
-                    GalleyMedia.MediaStatus.Deleted -> {
-                        galleyMap[it.bucket]?.remove(it)
-                        galleyMap[allGalley]?.remove(it)
-                        emit(Pair(GalleyMedia.MediaStatus.Deleted, it))
-                    }
-                    GalleyMedia.MediaStatus.NewInsert -> {
-                        insertNewMedia(it)
-                        galleyMap[allGalley]?.add(0, it)
-                        emit(Pair(GalleyMedia.MediaStatus.NewInsert, it))
-                    }
+                    callBack.invoke(GalleyMedia.MediaStatus.Updated, media)
                 }
             }
-        }.buffer().collect {
-            callBack.invoke(it.first, it.second)
+            GalleyMedia.MediaStatus.Deleted -> {
+                galleyMap[media.bucket]?.remove(media)
+                galleyMap[allGalley]?.remove(media)
+                callBack.invoke(GalleyMedia.MediaStatus.Deleted, media)
+            }
+            GalleyMedia.MediaStatus.NewInsert -> {
+                insertNewMedia(media)
+                galleyMap[allGalley]?.add(0, media)
+                callBack.invoke(GalleyMedia.MediaStatus.NewInsert, media)
+            }
         }
+        Log.d(TAG, "GalleyFragment updateGalley done")
     }
 
     fun onTargetGalley(bucket: String): Boolean {
         return bucket == rightGalley || rightGalley == R.string.all_galley.getString()
     }
 
-    private suspend fun insertNewMedia(it: GalleyMedia) {
+    suspend fun insertNewMedia(it: GalleyMedia) {
         if (galleyMap[it.bucket] == null) {
             galleyMap[it.bucket] = mutableListOf()
             FragEvent.OnNewBucket(

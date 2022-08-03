@@ -45,21 +45,23 @@ fun Uri.toBitmap(
 
 fun Uri.toMediaBitmapByteArray(): ByteArray? {
     var byteArray: ByteArray? = null
-    val ois = SApplication.app.contentResolver.openInputStream(this) ?: return byteArray
+    var ois = SApplication.app.contentResolver.openInputStream(this) ?: return byteArray
     val os = ByteArrayOutputStream()
     try {
         var options = BitmapFactory.Options()
         val dimensionPixelSize =
             SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
         options.inJustDecodeBounds = true
-        val decodeStream = BitmapFactory.decodeStream(ois, null, options)
+        val decodeStream = BitmapFactory.decodeStream(ois)
+        ois.close()
         if (decodeStream != null) {
             options = BitmapFactory.Options()
             options.inJustDecodeBounds = false
             options.inSampleSize =
                 calculateInSampleSize(decodeStream, dimensionPixelSize, dimensionPixelSize)
-            BitmapFactory
-                .decodeStream(ois, null, options)
+            ois = SApplication.app.contentResolver.openInputStream(this) ?: return byteArray
+            BitmapFactory.decodeStream(ois, null, options)
+                ?.compress(Bitmap.CompressFormat.PNG, 100, os)
             byteArray = os.toByteArray()
         } else return null
     } catch (e: Exception) {

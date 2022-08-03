@@ -103,6 +103,11 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         }
     }
 
+    override suspend fun doResume() {
+        binding.root.marginBottom(0)
+        isKeyBroadShow = false
+    }
+
     fun sendConfirm() {
         sendViewEvent(NoteEditViewModel.NoteEvent.Confirm)
     }
@@ -128,11 +133,10 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             iconUri = re.uri
             setNoteIconCache(re.uri)
             showProgress(true)
-            savedIconPath = if (iconUri != null) {
+            if (iconUri != null) {
                 saveIcon(title) { b -> if (b) setNoteIcon(savedIconPath) }
                 showProgress(false)
-                savedIconPath
-            } else ""
+            }
         }
     }
 

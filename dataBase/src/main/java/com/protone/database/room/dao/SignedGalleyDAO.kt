@@ -21,16 +21,16 @@ interface SignedGalleyDAO {
     @Query("SELECT * FROM GalleyMedia WHERE bucket LIKE :name AND isVideo LIKE :isVideo ORDER BY date DESC")
     fun getAllMediaByGalley(name: String, isVideo: Boolean): List<GalleyMedia>?
 
-    @Query("DELETE FROM GalleyMedia WHERE uri LIKE :uri")
+    @Query("DELETE FROM GalleyMedia WHERE media_uri LIKE :uri")
     fun deleteSignedMediaByUri(uri: Uri)
 
     @Delete
     fun deleteSignedMedia(media: GalleyMedia)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertSignedMedia(media: GalleyMedia)
 
-    @Query("SELECT * FROM GalleyMedia WHERE uri LIKE :uri")
+    @Query("SELECT * FROM GalleyMedia WHERE media_uri LIKE :uri")
     fun getSignedMedia(uri: Uri): GalleyMedia?
 
     @Query("SELECT * FROM GalleyMedia WHERE path LIKE :path")

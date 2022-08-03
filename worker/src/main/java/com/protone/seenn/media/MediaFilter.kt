@@ -44,14 +44,13 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
                     Uri.withAppendedPath(externalContentUri, "${it.getLong(tn)}")
                 callBack.invoke(
                     GalleyMedia(
-                        null,
+                        uri,
                         imageName,
                         path,
                         bucketName,
                         imageSize,
                         null,
                         null,
-                        uri,
                         dateTime,
                         thumbnailUri, 0,
                         false
@@ -97,14 +96,13 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
                 val duration = it.getLong(du)
                 callBack.invoke(
                     GalleyMedia(
-                        null,
+                        uri,
                         imageName,
                         path,
                         bucketName,
                         imageSize,
                         null,
                         null,
-                        uri,
                         dateTime,
                         thumbnailUri, duration,
                         true
@@ -184,7 +182,7 @@ inline fun scanAudioWithUri(mediaUri: Uri, callBack: (Music) -> Unit) {
     }
 }
 
-inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)): MutableMap<String, MutableList<GalleyMedia>> {
+inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)) {
     val externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val queryArray = arrayOf(
         MediaStore.Images.Media.DISPLAY_NAME,
@@ -195,7 +193,6 @@ inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)): MutableMap<Strin
         MediaStore.Images.Thumbnails._ID,
         MediaStore.Images.Media.DATA
     )
-    val galley = mutableMapOf<String, MutableList<GalleyMedia>>()
     scan(
         externalContentUri, queryArray,
     ) {
@@ -217,31 +214,25 @@ inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)): MutableMap<Strin
             val dateTime = it.getLong(date)
             val thumbnailUri =
                 Uri.withAppendedPath(externalContentUri, "${it.getLong(tn)}")
-            if (!galley.containsKey(bucketName)) {
-                galley[bucketName] = arrayListOf()
-            }
             GalleyMedia(
-                null,
+                uri,
                 imageName,
                 path,
                 bucketName,
                 imageSize,
                 null,
                 null,
-                uri,
                 dateTime,
                 thumbnailUri, 0,
                 false
             ).let { gm ->
                 function.invoke(gm.uri, gm)
-                galley[bucketName]?.add(gm)
             }
         }
     }
-    return galley
 }
 
-inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)): MutableMap<String, MutableList<GalleyMedia>> {
+inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)) {
     val externalContentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     val query = arrayOf(
         MediaStore.Video.Media.DISPLAY_NAME,
@@ -253,7 +244,6 @@ inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)): MutableMap<String,
         MediaStore.Video.Media.DURATION,
         MediaStore.Video.Media.DATA
     )
-    val galley = mutableMapOf<String, MutableList<GalleyMedia>>()
     scan(
         externalContentUri, query,
     ) {
@@ -277,28 +267,38 @@ inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)): MutableMap<String,
             val thumbnailUri =
                 Uri.withAppendedPath(externalContentUri, "${it.getLong(tn)}")
             val duration = it.getLong(du)
-            if (!galley.containsKey(bucketName)) {
-                galley[bucketName] = arrayListOf()
-            }
             GalleyMedia(
-                null,
+                uri,
                 imageName,
                 path,
                 bucketName,
                 imageSize,
                 null,
                 null,
-                uri,
                 dateTime,
                 thumbnailUri, duration,
                 true
             ).let { gm ->
                 function.invoke(gm.uri, gm)
-                galley[bucketName]?.add(gm)
             }
         }
     }
-    return galley
+}
+
+fun isUriExist(uri: Uri): Boolean {
+    var exist = false
+    val queryArray = arrayOf(MediaStore.MediaColumns._ID)
+    SApplication.app.contentResolver.query(
+        uri,
+        queryArray,
+        MediaStore.MediaColumns.SIZE + ">0",
+        null,
+        MediaStore.MediaColumns.DATE_ADDED + " DESC"
+    )?.let {
+        exist = it.moveToNext()
+        it.close()
+    }
+    return exist
 }
 
 inline fun scanAudio(function: ((Uri, Music) -> Unit)): MutableList<Music> {
@@ -363,7 +363,7 @@ inline fun scanAudio(function: ((Uri, Music) -> Unit)): MutableList<Music> {
                     audioDuration,
                     audioYear,
                     uri
-                ).also { music->
+                ).also { music ->
                     function.invoke(uri, music)
                 }
             )

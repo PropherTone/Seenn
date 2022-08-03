@@ -54,7 +54,7 @@ class GalleySearchViewModel : BaseViewModel() {
                 data.stream().filter {
                     val notesWithGalley =
                         DatabaseHelper.instance
-                            .galleriesWithNotesDAOBridge.getNotesWithGalley(it.mediaId ?: 0)
+                            .galleriesWithNotesDAOBridge.getNotesWithGalley(it.uri)
                             .stream().map { note ->
                                 note.title
                             }.toList()

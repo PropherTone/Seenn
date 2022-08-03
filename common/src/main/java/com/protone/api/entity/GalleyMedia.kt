@@ -6,12 +6,12 @@ import com.protone.api.converters.ListTypeConverter
 import com.protone.api.converters.UriTypeConverter
 
 
-@Entity(indices = [Index(value = ["mediaId"], unique = true)])
+@Entity(indices = [Index(value = ["media_uri"], unique = true)])
 @TypeConverters(UriTypeConverter::class, ListTypeConverter::class)
 data class GalleyMedia(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "mediaId")
-    val mediaId: Long?,
+    @PrimaryKey(autoGenerate = false)
+    @ColumnInfo(name = "media_uri")
+    val uri: Uri,
     @ColumnInfo(name = "name")
     var name: String,
     @ColumnInfo(name = "path")
@@ -24,8 +24,6 @@ data class GalleyMedia(
     var type: List<String>?,
     @ColumnInfo(name = "cate")
     var cate: List<String>?,
-    @ColumnInfo(name = "uri")
-    val uri: Uri,
     @ColumnInfo(name = "date")
     var date: Long,
     @ColumnInfo(name = "thumbnailUri")
@@ -38,14 +36,14 @@ data class GalleyMedia(
     @Ignore
     var mediaStatus: MediaStatus = MediaStatus.NewInsert
 
-    enum class MediaStatus{
+    enum class MediaStatus {
         Updated,
         Deleted,
         NewInsert
     }
 
     override fun toString(): String {
-        return "GalleyMedia(id=$mediaId, name='$name', bucket='$bucket', size=$size, type='$type', cate='$cate', uri=$uri, date=$date, thumbnailUri=$thumbnailUri, duration=$duration, isVideo=$isVideo)"
+        return "GalleyMedia(name='$name', bucket='$bucket', size=$size, type='$type', cate='$cate', uri=$uri, date=$date, thumbnailUri=$thumbnailUri, duration=$duration, isVideo=$isVideo)"
     }
 
     override fun equals(other: Any?): Boolean {

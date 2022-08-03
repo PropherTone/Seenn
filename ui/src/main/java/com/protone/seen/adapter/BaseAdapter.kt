@@ -33,6 +33,12 @@ abstract class BaseAdapter<B : ViewDataBinding, T>(
         }
     }
 
+    protected fun emit(value: T) {
+        launch {
+            adapterFlow.emit(value)
+        }
+    }
+
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
         super.onDetachedFromRecyclerView(recyclerView)
         cancel()

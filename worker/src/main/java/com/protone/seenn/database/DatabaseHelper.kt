@@ -82,7 +82,7 @@ class DatabaseHelper {
             return musicBucketDAO.getAllMusicBucket()
         }
 
-        suspend fun getMusicBucketByNameRs(name: String):MusicBucket? = onResult {
+        suspend fun getMusicBucketByNameRs(name: String): MusicBucket? = onResult {
             it.resumeWith(Result.success(getMusicBucketByName(name)))
         }
 
@@ -434,8 +434,8 @@ class DatabaseHelper {
             galleriesWithNotesDAO.insertGalleriesWithNotes(galleriesWithNotes)
         }
 
-        fun getNotesWithGalley(mediaId: Long): List<Note> {
-            return galleriesWithNotesDAO.getNotesWithGalley(mediaId) ?: mutableListOf()
+        fun getNotesWithGalley(mediaUri: Uri): List<Note> {
+            return galleriesWithNotesDAO.getNotesWithGalley(mediaUri) ?: mutableListOf()
         }
 
         fun getGalleriesWithNote(noteId: Long): List<GalleyMedia> {

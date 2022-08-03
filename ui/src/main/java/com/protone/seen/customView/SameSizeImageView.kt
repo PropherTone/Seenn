@@ -14,6 +14,5 @@ class SameSizeImageView @JvmOverloads constructor(
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(heightMeasureSpec, heightMeasureSpec)
-        Log.d(TAG, "button onMeasure: h $measuredHeight ,w $measuredWidth")
     }
 }

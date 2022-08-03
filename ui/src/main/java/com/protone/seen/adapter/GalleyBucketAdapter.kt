@@ -3,10 +3,12 @@ package com.protone.seen.adapter
 import android.app.AlertDialog
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
+import com.protone.api.TAG
 import com.protone.api.baseType.getString
 import com.protone.api.context.SApplication
 import com.protone.api.context.newLayoutInflater
@@ -26,6 +28,7 @@ class GalleyBucketAdapter(
 ) {
 
     sealed class GalleyBucketEvent {
+        object PerformSelect : GalleyBucketEvent()
         data class DeleteBucket(val bucket: Pair<Uri, Array<String>>) : GalleyBucketEvent()
         data class RefreshBucket(val item: Pair<Uri, Array<String>>) : GalleyBucketEvent()
         data class InsertBucket(val item: Pair<Uri, Array<String>>) : GalleyBucketEvent()
@@ -34,7 +37,23 @@ class GalleyBucketAdapter(
     private var galleries: MutableList<Pair<Uri, Array<String>>> = mutableListOf()
 
     override suspend fun onEventIO(data: GalleyBucketEvent) {
+        Log.d(TAG, "GalleyBucketAdapter onEventIO: $data")
         when (data) {
+            is GalleyBucketEvent.PerformSelect -> {
+                var index = -1
+                galleries.stream()
+                    .filter { it.second[0] == R.string.all_galley.getString() }
+                    .toList()
+                    .let {
+                        if (it.isNotEmpty()) {
+                            selectList.add(it[0])
+                            index = galleries.indexOf(it[0])
+                        }
+                    }
+                withContext(Dispatchers.Main) {
+                    if (index != -1) notifyItemChanged(0)
+                }
+            }
             is GalleyBucketEvent.DeleteBucket -> {
                 galleries.first { it.second[0] == data.bucket.second[0] }.let {
                     val index = galleries.indexOf(it)
@@ -54,6 +73,11 @@ class GalleyBucketAdapter(
                 var index = 0
                 while (iterator.hasNext()) {
                     if (iterator.next().second[0] == data.item.second[0]) {
+                        if (selectList.size > 0) {
+                            if (selectList[0].second[0] == data.item.second[0]) {
+                                selectList[0] = data.item
+                            }
+                        }
                         galleries[index] = data.item
                         withContext(Dispatchers.Main) {
                             notifyItemChanged(index)
@@ -126,8 +150,11 @@ class GalleyBucketAdapter(
                     false
                 }
                 bucketThumb.let { thumb ->
-                    Glide.with(context).load(data.first)
-                        .into(thumb)
+                    if (thumb.tag != data.first) {
+                        thumb.tag = data.first
+                        Glide.with(context).load(data.first)
+                            .into(thumb)
+                    }
                 }
                 data.second.also { sec ->
                     bucketName.text = sec[0]
@@ -151,39 +178,20 @@ class GalleyBucketAdapter(
     }
 
     fun performSelect() {
-        launch(Dispatchers.IO) {
-            var index = -1
-            galleries.stream()
-                .filter { it.second[0] == R.string.all_galley.getString() }
-                .toList()
-                .let {
-                    if (it.isNotEmpty()) {
-                        selectList.add(it[0])
-                        index = galleries.indexOf(it[0])
-                    }
-                }
-            withContext(Dispatchers.Main) {
-                if (index != -1) notifyItemChanged(0)
-            }
-        }
+        emit(GalleyBucketEvent.PerformSelect)
     }
 
     private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
-        launch {
-            adapterFlow.emit(GalleyBucketEvent.DeleteBucket(bucket))
-        }
+        emit(GalleyBucketEvent.DeleteBucket(bucket))
+
     }
 
     fun refreshBucket(item: Pair<Uri, Array<String>>) {
-        launch {
-            adapterFlow.emit(GalleyBucketEvent.RefreshBucket(item))
-        }
+        emit(GalleyBucketEvent.RefreshBucket(item))
     }
 
     fun insertBucket(item: Pair<Uri, Array<String>>) {
-        launch {
-            adapterFlow.emit(GalleyBucketEvent.InsertBucket(item))
-        }
+        emit(GalleyBucketEvent.InsertBucket(item))
     }
 
     override fun getItemCount(): Int {

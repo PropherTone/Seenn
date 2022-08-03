@@ -21,6 +21,7 @@ import com.protone.seenn.viewModel.GalleyViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.streams.toList
 
 abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEvent: Boolean) :
     BaseActivity<VB, VM>(handleEvent),
@@ -84,11 +85,11 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel>(handl
 
     fun tryDelete(
         gm: List<GalleyMedia>,
-        callBack: (GalleyMedia) -> Unit
+        callBack: (List<GalleyMedia>) -> Unit
     ) {
         when {
             gm.size == 1 -> delete(gm[0], callBack)
-            gm.size > 1 -> deleteMulti(gm)
+            gm.size > 1 -> deleteMulti(gm,callBack)
         }
     }
 
@@ -133,32 +134,42 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel>(handl
 
     private fun delete(
         gm: GalleyMedia,
-        callBack: (GalleyMedia) -> Unit
+        callBack: (List<GalleyMedia>) -> Unit
     ) {
         launch(Dispatchers.IO) {
             val result = deleteMedia(gm.uri)
             if (result) {
                 DatabaseHelper.instance.signedGalleyDAOBridge.deleteSignedMedia(gm)
-                callBack.invoke(gm)
+                callBack.invoke(mutableListOf(gm))
                 R.string.success.getString().toast()
             } else R.string.not_supported.getString().toast()
-
         }
     }
 
-    private fun deleteMulti(gm: List<GalleyMedia>) {
+    private fun deleteMulti(
+        gm: List<GalleyMedia>,
+        callBack: (List<GalleyMedia>) -> Unit
+    ) {
         launch(Dispatchers.IO) {
-            val reList = arrayListOf<String>()
+            val reList = arrayListOf<GalleyMedia>()
             gm.forEach {
                 val result = multiDeleteMedia(it.uri)
                 if (result) {
                     DatabaseHelper.instance.signedGalleyDAOBridge.deleteSignedMedia(it)
                 } else {
-                    reList.add(it.name)
+                    reList.add(it)
                 }
             }
-            withContext(Dispatchers.Main) {
-                checkListDialog(R.string.this_file_op_failed.getString(), reList)
+            callBack.invoke(reList)
+            if (reList.size > 0) {
+                reList.stream().map { it.name }.toList().let {
+                    withContext(Dispatchers.Main) {
+                        checkListDialog(
+                            R.string.this_file_op_failed.getString(),
+                            it as MutableList<String>
+                        )
+                    }
+                }
             }
         }
     }

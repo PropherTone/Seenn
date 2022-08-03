@@ -130,9 +130,17 @@ class GalleySearchActivity :
     override fun popDelete() {
         tryDelete(viewModel.selectList) {
             binding.apply {
-                (resultGalleries.adapter as GalleyListAdapter).removeMedia(it)
-                (resultCato.adapter as GalleyListAdapter).removeMedia(it)
-                (resultNotes.adapter as GalleyListAdapter).removeMedia(it)
+                if (it.size == 1) {
+                    (resultGalleries.adapter as GalleyListAdapter).removeMedia(it[0])
+                    (resultCato.adapter as GalleyListAdapter).removeMedia(it[0])
+                    (resultNotes.adapter as GalleyListAdapter).removeMedia(it[0])
+                } else if (it.size > 1) {
+                    it.forEach { gm ->
+                        (resultGalleries.adapter as GalleyListAdapter).removeMedia(gm)
+                        (resultCato.adapter as GalleyListAdapter).removeMedia(gm)
+                        (resultNotes.adapter as GalleyListAdapter).removeMedia(gm)
+                    }
+                }
             }
         }
     }

@@ -104,17 +104,10 @@ class NoteEditViewModel : BaseViewModel() {
                     }
                 }
                 medias.forEach {
-                    if (it.mediaId != null) {
-                        DatabaseHelper
-                            .instance
-                            .galleriesWithNotesDAOBridge
-                            .insertGalleriesWithNotes(
-                                GalleriesWithNotes(
-                                    it.mediaId!!,
-                                    result.second
-                                )
-                            )
-                    }
+                    DatabaseHelper
+                        .instance
+                        .galleriesWithNotesDAOBridge
+                        .insertGalleriesWithNotes(GalleriesWithNotes(it.uri, result.second))
                 }
                 true
             } else {

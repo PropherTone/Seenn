@@ -1,6 +1,8 @@
 package com.protone.seen.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -9,11 +11,11 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.protone.api.TAG
 import com.protone.api.context.SApplication
 import com.protone.api.entity.GalleyMedia
 import com.protone.seen.databinding.PictureBoxAdapterLayoutBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class GalleyListAdapter(
@@ -21,11 +23,14 @@ class GalleyListAdapter(
     private val isVideo: Boolean = false,
     private val useSelect: Boolean = true
 ) : SelectListAdapter<PictureBoxAdapterLayoutBinding, GalleyMedia, GalleyListAdapter.GalleyListEvent>(
-    context,true
+    context, true
 ) {
     private val medias: MutableList<GalleyMedia> = mutableListOf()
 
     sealed class GalleyListEvent {
+        object SelectAll : GalleyListEvent()
+        object QuiteSelectAll : GalleyListEvent()
+        data class NoticeDataUpdate(val item: MutableList<GalleyMedia>?) : GalleyListEvent()
         data class NoticeSelectChange(val item: GalleyMedia) : GalleyListEvent()
         data class RemoveMedia(val galleyMedia: GalleyMedia) : GalleyListEvent()
         data class NoticeListItemUpdate(val media: GalleyMedia) : GalleyListEvent()
@@ -44,8 +49,34 @@ class GalleyListAdapter(
         hasFixedSize = false
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override suspend fun onEventIO(data: GalleyListEvent) {
+        Log.d(TAG, "GalleyListAdapter(isVideo:$isVideo) onEventIO: $data")
         when (data) {
+            is GalleyListEvent.QuiteSelectAll -> {
+                if (!onSelectMod) return
+                onSelectMod = false
+                withContext(Dispatchers.Main) {
+                    clearAllSelected()
+                    onSelectListener?.select(selectList)
+                }
+            }
+            is GalleyListEvent.SelectAll -> {
+                medias.onEach {
+                    if (!selectList.contains(it)) {
+                        selectList.add(it)
+                        withContext(Dispatchers.Main) { notifyItemChanged(medias.indexOf(it)) }
+                    }
+                }
+            }
+            is GalleyListEvent.NoticeDataUpdate -> {
+                if (data.item == null) return
+                medias.clear()
+                medias.addAll(data.item)
+                withContext(Dispatchers.Main) {
+                    notifyDataSetChanged()
+                }
+            }
             is GalleyListEvent.NoticeSelectChange -> {
                 val indexOf = medias.indexOf(data.item)
                 if (indexOf != -1) {
@@ -82,8 +113,8 @@ class GalleyListAdapter(
                 }
             }
             is GalleyListEvent.NoticeListItemInsert -> {
-                medias.add(0, data.media)
                 withContext(Dispatchers.Main) {
+                    medias.add(0, data.media)
                     notifyItemInserted(0)
                 }
             }
@@ -153,62 +184,35 @@ class GalleyListAdapter(
     }
 
     fun noticeDataUpdate(item: MutableList<GalleyMedia>?) {
-        launch(Dispatchers.IO) {
-            if (item == null) return@launch
-            val size = medias.size
-            medias.clear()
-            withContext(Dispatchers.Main) { notifyItemRangeRemoved(0, size) }
-            medias.addAll(item)
-            withContext(Dispatchers.Main) { notifyItemRangeInserted(0, medias.size) }
-        }
+        emit(GalleyListEvent.NoticeDataUpdate(item))
     }
 
     fun selectAll() {
-        launch(Dispatchers.IO) {
-            medias.onEach {
-                if (!selectList.contains(it)) {
-                    selectList.add(it)
-                    withContext(Dispatchers.Main) { notifyItemChanged(medias.indexOf(it)) }
-                }
-            }
-        }
+        emit(GalleyListEvent.SelectAll)
     }
 
     fun quitSelectMod() {
-        if (!onSelectMod) return
-        onSelectMod = false
-        clearAllSelected()
-        onSelectListener?.select(selectList)
+        emit(GalleyListEvent.QuiteSelectAll)
     }
 
     fun noticeSelectChange(item: GalleyMedia) {
-        launch {
-            adapterFlow.emit(GalleyListEvent.NoticeSelectChange(item))
-        }
+        emit(GalleyListEvent.NoticeSelectChange(item))
     }
 
     fun removeMedia(galleyMedia: GalleyMedia) {
-        launch {
-            adapterFlow.emit(GalleyListEvent.RemoveMedia(galleyMedia))
-        }
+        emit(GalleyListEvent.RemoveMedia(galleyMedia))
     }
 
     fun noticeListItemUpdate(media: GalleyMedia) {
-        launch {
-            adapterFlow.emit(GalleyListEvent.NoticeListItemUpdate(media))
-        }
+        emit(GalleyListEvent.NoticeListItemUpdate(media))
     }
 
     fun noticeListItemDelete(media: GalleyMedia) {
-        launch {
-            adapterFlow.emit(GalleyListEvent.NoticeListItemDelete(media))
-        }
+        emit(GalleyListEvent.NoticeListItemDelete(media))
     }
 
     fun noticeListItemInsert(media: GalleyMedia) {
-        launch {
-            adapterFlow.emit(GalleyListEvent.NoticeListItemInsert(media))
-        }
+        emit(GalleyListEvent.NoticeListItemInsert(media))
     }
 
     override fun getItemCount(): Int {

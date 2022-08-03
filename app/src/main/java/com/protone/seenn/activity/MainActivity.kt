@@ -108,9 +108,9 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
         }
 
         Medias.apply {
-            galleyNotifier.collect {
-                refreshModelList()
-            }
+//            galleyNotifier.collect {
+//                refreshModelList()
+//            }
             audioNotifier.collect {
                 musicController.refresh()
             }
@@ -125,7 +125,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
 
     }
 
-    override suspend fun doStart() {
+    override suspend fun doResume() {
         userName = userConfig.userName
         userIcon = userConfig.userIcon
     }

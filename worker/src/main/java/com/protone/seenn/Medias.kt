@@ -14,7 +14,7 @@ import java.util.*
 
 object Medias {
 
-    val galleyNotifier = MutableSharedFlow<MutableList<GalleyMedia>>()
+    val galleyNotifier = MutableSharedFlow<GalleyMedia>()
     val audioNotifier = MutableSharedFlow<MutableList<Music>>()
     val musicBucketNotifier = MutableLiveData<Int>()
 
