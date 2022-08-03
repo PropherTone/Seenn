@@ -23,7 +23,7 @@ class TestActivity : BaseActivity<ActivityTestBinding, TestViewModel>(false) {
     override suspend fun TestViewModel.init() {
         viewModel.setLogView(binding.logView)
         binding.model = viewModel
-        Medias.galleyNotifier1.collect {
+        Medias.galleyNotifier.collect {
             Log.d(TAG, "init: $it")
         }
     }

@@ -1,16 +1,19 @@
 package com.protone.seenn.activity
 
 import android.content.Intent
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.protone.api.TAG
 import com.protone.api.baseType.getFileName
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.root
 import com.protone.seen.adapter.LogListAdapter
+import com.protone.seen.dialog.titleDialog
 import com.protone.seenn.R
 import com.protone.seenn.database.DatabaseHelper
 import com.protone.seenn.databinding.LogActivityBinding
@@ -26,6 +29,7 @@ class LogActivity : BaseActivity<LogActivityBinding, LogViewModel>(false) {
     override fun createView(): View {
         binding = LogActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
+        fitStatuesBar(binding.root)
         return binding.root
     }
 
@@ -67,7 +71,15 @@ class LogActivity : BaseActivity<LogActivityBinding, LogViewModel>(false) {
     }
 
     fun action(){
-        DatabaseHelper.instance.showDataBase(this)
+        val randomCode = (0..10000).random().toString()
+        Log.d(TAG, "--=====<randomCode here: $randomCode>=====--")
+        titleDialog(R.string.password.getString(),""){
+            if (it == randomCode) {
+                DatabaseHelper.instance.showDataBase(this)
+            }else{
+                R.string.wrong_password.getString().toast()
+            }
+        }
     }
 
     private suspend fun LogViewModel.initLogList() {

@@ -83,7 +83,7 @@ class GalleyFragment(
                             if (galleyMap[it.galleyMedia.bucket]?.remove(it.galleyMedia) == true) {
                                 getListAdapter().removeMedia(it.galleyMedia)
                             }
-                            if (galleyMap[R.string.all_galley.toString()]?.remove(it.galleyMedia) == true) {
+                            if (galleyMap[R.string.all_galley.getString()]?.remove(it.galleyMedia) == true) {
                                 getListAdapter().removeMedia(it.galleyMedia)
                             }
                             refreshBucket(it.galleyMedia)
@@ -150,6 +150,7 @@ class GalleyFragment(
                         }
                         is GalleyFragmentViewModel.FragEvent.OnGetAllGalley -> {
                             getBucketAdapter().performSelect()
+                            noticeListUpdate(viewModel.galleyMap[R.string.all_galley.getString()])
                         }
                         else -> {}
                     }

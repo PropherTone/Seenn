@@ -122,7 +122,7 @@ class GalleySearchActivity :
             putExtra(GalleyViewViewModel.TYPE, galleyMedia.isVideo)
             putExtra(
                 GalleyViewViewModel.GALLEY,
-                intent.getStringExtra("GALLEY") ?: getString(R.string.all_galley)
+                intent.getStringExtra("GALLEY") ?: R.string.all_galley.getString()
             )
         })
     }

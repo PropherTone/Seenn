@@ -24,15 +24,17 @@ import com.protone.seenn.database.userConfig
 import com.protone.seenn.databinding.MainActivityBinding
 import com.protone.seenn.service.WorkService
 import com.protone.seenn.service.getEmptyMusic
+import com.protone.seenn.viewModel.GalleyViewViewModel
 import com.protone.seenn.viewModel.MainViewModel
 import com.protone.seenn.viewModel.MusicControllerIMP
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
-    ViewTreeObserver.OnGlobalLayoutListener {
+    ViewTreeObserver.OnGlobalLayoutListener, MainModelListAdapter.ModelClk {
     override val viewModel: MainViewModel by viewModels()
 
     private var userName: String? = null
@@ -48,12 +50,23 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
     private var userIcon: String? = null
         set(value) {
             if (value == null) return
+            if (field == value) return
             if (value.isNotEmpty()) {
                 Glide.with(this)
                     .asDrawable()
                     .load(value)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(binding.userIcon)
+                launch(Dispatchers.IO) {
+                    val loadBlurIcon = viewModel.loadBlurIcon(value)
+                    withContext(Dispatchers.Main){
+                        Glide.with(this@MainActivity)
+                            .asDrawable()
+                            .load(loadBlurIcon)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .into(binding.userBack)
+                    }
+                }
             }
             field = value
         }
@@ -143,7 +156,9 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
     private fun refreshModelList() {
         binding.modelList.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = MainModelListAdapter(context)
+            adapter = MainModelListAdapter(context).apply {
+                modelClkListener = this@MainActivity
+            }
             addItemDecoration(ModelListItemDecoration(0))
         }
     }
@@ -166,5 +181,22 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
             }
             root.viewTreeObserver.removeOnGlobalLayoutListener(this@MainActivity)
         }
+    }
+
+    override fun onPhoto(json: String) {
+        startActivity(GalleyViewActivity::class.intent.apply {
+            putExtra(GalleyViewViewModel.MEDIA, json)
+            putExtra(GalleyViewViewModel.TYPE, false)
+            putExtra(GalleyViewViewModel.GALLEY, R.string.all_galley.getString())
+        })
+    }
+
+    override fun onNote(json: String) {
+    }
+
+    override fun onVideo(json: String) {
+    }
+
+    override fun onMusic(json: String) {
     }
 }

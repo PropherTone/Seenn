@@ -131,7 +131,12 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
                 val media = itemList[position].substring(6).toEntity(GalleyMedia::class.java)
                 holder.binding.videoPlayer.apply {
                     setVideoPath(media.uri)
+                    setFullScreen {
+                        modelClkListener?.onVideo(media.toJson())
+                    }
                 }
+                holder.binding.videoCardTitle.text =
+                    media.date.toDateString("yyyy/MM/dd E").toString()
             }
             is DateViewHolder -> holder.binding.modelTime.text = itemList[position].substring(6)
         }

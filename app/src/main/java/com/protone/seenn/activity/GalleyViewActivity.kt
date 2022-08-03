@@ -42,7 +42,6 @@ class GalleyViewActivity :
         binding = GalleyViewActivityBinding.inflate(layoutInflater, root, false)
         binding.activity = this
         fitStatuesBarUsePadding(binding.galleyVCover)
-        fitNavigationBarUsePadding(binding.galleyVCover)
         initPop()
         popLayout?.galleyIntoBox?.isGone = true
         popLayout?.galleySelectAll?.isGone = true

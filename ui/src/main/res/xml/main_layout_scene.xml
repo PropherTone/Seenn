@@ -13,6 +13,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
+            android:id="@+id/userBack"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/musicPlayer"
+            app:layout_constraintTop_toTopOf="@id/userCard" />
+
+        <Constraint
             android:id="@+id/color_bar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/small_elevation"
@@ -25,10 +32,12 @@
             android:alpha="1"
             android:textColor="@color/black"
             android:textSize="@dimen/hug_title_text"
+            app:layout_constraintBottom_toBottomOf="@id/user_icon"
             app:layout_constraintEnd_toEndOf="@id/userCard"
             app:layout_constraintHorizontal_bias="0.16"
             app:layout_constraintStart_toEndOf="@id/user_icon"
-            app:layout_constraintTop_toTopOf="@id/user_icon" />
+            app:layout_constraintTop_toTopOf="@id/user_icon"
+            app:layout_constraintVertical_bias="0.12" />
 
         <Constraint
             android:id="@+id/user_date"
@@ -51,7 +60,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.72" />
 
         <Constraint
             android:id="@+id/card"
@@ -118,6 +128,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Constraint
+            android:id="@+id/userBack"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/musicPlayer"
+            app:layout_constraintTop_toTopOf="@id/userCard" />
+
+        <Constraint
             android:id="@+id/color_bar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/small_elevation"
@@ -130,10 +147,12 @@
             android:alpha="0"
             android:textColor="@color/black"
             android:textSize="@dimen/hug_title_text"
+            app:layout_constraintBottom_toBottomOf="@id/user_icon"
             app:layout_constraintEnd_toEndOf="@id/userCard"
             app:layout_constraintHorizontal_bias="0.16"
             app:layout_constraintStart_toEndOf="@id/user_icon"
-            app:layout_constraintTop_toTopOf="@id/user_icon" />
+            app:layout_constraintTop_toTopOf="@id/user_icon"
+            app:layout_constraintVertical_bias="0.12" />
 
         <Constraint
             android:id="@+id/user_date"
@@ -155,7 +174,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.72" />
 
         <Constraint
             android:id="@+id/card"

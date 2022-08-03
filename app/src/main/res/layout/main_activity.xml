@@ -40,6 +40,13 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <ImageView
+                    android:id="@+id/userBack"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/icon"
+                    android:scaleType="centerCrop" />
+
                 <TextView
                     android:id="@+id/user_welcome"
                     android:layout_width="wrap_content"
@@ -49,10 +56,12 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/hug_title_text"
                     android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/user_icon"
                     app:layout_constraintEnd_toEndOf="@id/userCard"
                     app:layout_constraintHorizontal_bias="0.16"
                     app:layout_constraintStart_toEndOf="@id/user_icon"
-                    app:layout_constraintTop_toTopOf="@id/user_icon" />
+                    app:layout_constraintTop_toTopOf="@id/user_icon"
+                    app:layout_constraintVertical_bias="0.12" />
 
                 <TextView
                     android:id="@+id/user_date"
@@ -78,6 +87,7 @@
                     app:layout_constraintHorizontal_bias="0.1"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.72"
                     app:shapeAppearanceOverlay="@style/roundCornerImage" />
 
                 <View
@@ -159,7 +169,6 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/action_icon_p"
             android:layout_gravity="bottom"
-            android:background="@color/transparent_white"
             android:orientation="horizontal">
 
             <ImageView
