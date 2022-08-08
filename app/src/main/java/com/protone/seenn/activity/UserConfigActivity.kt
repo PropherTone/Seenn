@@ -126,28 +126,28 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
                     GalleyViewModel.CHOOSE_PHOTO
                 )
             }).let { re ->
-            if (re != null) {
-                val toEntity = re.data?.getStringExtra(GalleyViewModel.GALLEY_DATA)
-                    ?.toEntity(GalleyMedia::class.java)
-                if (toEntity != null) {
-                    GalleyHelper.saveIconToLocal(
-                        toEntity.name,
-                        toEntity.uri.toMediaBitmapByteArray()
-                    ) { s ->
-                        if (!s.isNullOrEmpty()) {
-                            if (userConfig.userIcon.isNotEmpty()) {
-                                viewModel.deleteOldIcon(userConfig.userIcon)
-                            }
-                            userConfig.userIcon = s
-                        } else {
-                            R.string.failed_upload_image.getString().toast()
-                        }
-                    }
-                } else {
-                    R.string.come_up_unknown_error.getString().toast()
-                }
-            } else {
+            if (re == null) {
                 R.string.come_up_unknown_error.getString().toast()
+                return@let
+            }
+            val toEntity = re.data?.getStringExtra(GalleyViewModel.GALLEY_DATA)
+                ?.toEntity(GalleyMedia::class.java)
+            if (toEntity == null) {
+                R.string.come_up_unknown_error.getString().toast()
+                return@let
+            }
+            GalleyHelper.saveIconToLocal(
+                toEntity.name,
+                toEntity.uri.toMediaBitmapByteArray()
+            ) { s ->
+                if (!s.isNullOrEmpty()) {
+                    if (userConfig.userIcon.isNotEmpty()) {
+                        viewModel.deleteOldIcon(userConfig.userIcon)
+                    }
+                    userConfig.userIcon = s
+                } else {
+                    R.string.failed_upload_image.getString().toast()
+                }
             }
         }
     }

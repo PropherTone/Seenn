@@ -23,8 +23,12 @@ class TestActivity : BaseActivity<ActivityTestBinding, TestViewModel>(false) {
     override suspend fun TestViewModel.init() {
         viewModel.setLogView(binding.logView)
         binding.model = viewModel
-        val open = assets.open("card.png")
-        binding.sImageView.setImageResource(open,7800,6240)
+        binding.sImageView.setImageResource("shot.jpg")
+        binding.sImageView2.setImageResource("shot.jpg")
+        binding.sImageView3.setImageResource("shot.jpg")
+        binding.sImageView4.setImageResource("shot.jpg")
+        binding.sImageView5.setImageResource("shot.jpg")
+        binding.sImageView6.setImageResource("shot.jpg")
         Medias.galleyNotifier.collect {
             Log.d(TAG, "init: $it")
         }
