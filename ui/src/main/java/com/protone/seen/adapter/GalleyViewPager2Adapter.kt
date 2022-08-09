@@ -1,25 +1,15 @@
 package com.protone.seen.adapter
 
 import android.content.Context
-import android.os.SystemClock
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.protone.api.context.newLayoutInflater
-import com.protone.api.context.onUiThread
 import com.protone.api.entity.GalleyMedia
-import com.protone.seen.customView.ScaleImageView
 import com.protone.seen.databinding.GalleyVp2AdapterLayoutBinding
-import java.util.*
-import kotlin.concurrent.timerTask
+import kotlinx.coroutines.launch
 
 class GalleyViewPager2Adapter(context: Context, private val data: MutableList<GalleyMedia>) :
     BaseAdapter<GalleyVp2AdapterLayoutBinding, Any>(context) {
-
-    private val clk = longArrayOf(0, 0)
-
-    private var timer: Timer? = null
-
-    private val delay = 260L
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -28,25 +18,24 @@ class GalleyViewPager2Adapter(context: Context, private val data: MutableList<Ga
         Holder(GalleyVp2AdapterLayoutBinding.inflate(context.newLayoutInflater, parent, false))
 
     override fun onBindViewHolder(holder: Holder<GalleyVp2AdapterLayoutBinding>, position: Int) {
-        (holder.binding.root as ScaleImageView).also { iv ->
-            Glide.with(context)
-                .asDrawable()
-                .load(data[position].uri)
-                .skipMemoryCache(true)
-                .into(iv)
-            holder.binding.root.setOnClickListener {
-                System.arraycopy(clk, 1, clk, 0, clk.size - 1)
-                clk[clk.size - 1] = SystemClock.uptimeMillis()
-                if (timer == null) timer = Timer()
-                timer?.schedule(timerTask {
-                    context.onUiThread {
-                        onClk?.invoke()
-                    }
-                }, delay)
-                if (clk[clk.size - 1] - clk[0] < delay) {
-                    timer?.cancel()
-                    timer = null
-                    iv.performZoom()
+        holder.binding.apply {
+            if (!data[position].name.contains("gif")) {
+                image.setImageResource(data[position].uri)
+            } else {
+                Glide.with(context)
+                    .asDrawable()
+                    .load(data[position].uri)
+                    .skipMemoryCache(true)
+                    .into(image)
+            }
+            image.onSingleTap = {
+                launch {
+                    onClk?.invoke()
+                }
+            }
+            root.setOnClickListener {
+                launch {
+                    onClk?.invoke()
                 }
             }
         }

@@ -10,13 +10,13 @@ import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
 import android.util.Log
+import com.protone.api.ActiveTimer
 import com.protone.api.TAG
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.workIntentFilter
 import com.protone.api.entity.GalleyMedia
 import com.protone.api.entity.Music
-import com.protone.seenn.Medias
 import com.protone.seenn.Medias.audioNotifier
 import com.protone.seenn.Medias.galleyNotifier
 import com.protone.seenn.Medias.music
@@ -36,6 +36,11 @@ import kotlinx.coroutines.flow.flow
 
 class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) {
 
+    private val activeTimer = ActiveTimer().apply {
+        addFunction(1) { this@WorkService.updateMusic() }
+        addFunction(2) { this@WorkService.updateGalley() }
+    }
+
     private val workReceiver: BroadcastReceiver = object : WorkReceiver() {
         override fun updateMusicBucket() {
             this@WorkService.updateMusicBucket()
@@ -45,7 +50,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             if (data != null) {
                 this@WorkService.updateMusic(data)
             } else {
-                this@WorkService.updateMusic()
+                activeTimer.active(1)
             }
         }
 
@@ -53,7 +58,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             if (data != null) {
                 this@WorkService.updateGalley(data)
             } else {
-                this@WorkService.updateGalley()
+                activeTimer.active(2)
             }
         }
     }
@@ -72,6 +77,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
 
     override fun onDestroy() {
         super.onDestroy()
+        activeTimer.destroy()
         cancel()
         workLocalBroadCast.unregisterReceiver(workReceiver)
         contentResolver.unregisterContentObserver(mediaContentObserver)
@@ -197,7 +203,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                 }.buffer().collect {
                     deleteSignedMedia(it)
                     it.mediaStatus = GalleyMedia.MediaStatus.Deleted
-                    Medias.galleyNotifier.emit(it)
+                    galleyNotifier.emit(it)
                 }
             }
 
@@ -210,7 +216,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                     //主要耗时
                     val checkedMedia = insertSignedMediaChecked(it)
                     if (checkedMedia != null) {
-                        Medias.galleyNotifier.emit(it)
+                        galleyNotifier.emit(it)
                     }
                 }
             }
@@ -223,7 +229,7 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                 }.buffer().collect {
                     val checkedMedia = insertSignedMediaChecked(it)
                     if (checkedMedia != null) {
-                        Medias.galleyNotifier.emit(it)
+                        galleyNotifier.emit(it)
                     }
                 }
             }

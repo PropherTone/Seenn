@@ -17,15 +17,26 @@ import kotlinx.coroutines.*
 import java.io.*
 import kotlin.math.sqrt
 
-val sBitmapCache = LruCache<String, Bitmap>(16)
+val bitmapCache = object : LruCache<String, Bitmap>(16) {
+    override fun entryRemoved(
+        evicted: Boolean,
+        key: String?,
+        oldValue: Bitmap?,
+        newValue: Bitmap?
+    ) {
+        super.entryRemoved(evicted, key, oldValue, newValue)
+        oldValue?.recycle()
+    }
+}
 
 class ScalableRegionLoadingImageView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : AppCompatImageView(context, attrs, defStyleAttr), DecodeListener {
+) : AppCompatImageView(context, attrs, defStyleAttr), DecodeListener,
+    GestureDetector.OnDoubleTapListener, GestureDetector.OnGestureListener {
 
-    private var decoder: SBitmapDecoder? = null
+    private var decoder: BitmapDecoder? = null
 
-    private val gestureDetector = GestureDetector(context, GestureListener())
+    private val gestureDetector = GestureDetector(context, this)
 
     //缩放相关
     private var mFinger1DownX = 0f
@@ -45,21 +56,42 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     private var zoomIn = 0
 
     init {
-        gestureDetector.setOnDoubleTapListener(DoubleTapListener())
+        gestureDetector.setOnDoubleTapListener(this)
     }
 
     fun setImageResource(assetsRes: String) {
-        decoder = SBitmapDecoder(context, this)
+        decoder = BitmapDecoder(context, this)
         decoder?.setImageResource(assetsRes)
     }
 
     fun setImageResource(uri: Uri) {
-        decoder = SBitmapDecoder(context, this)
+        decoder = BitmapDecoder(context, this)
         decoder?.setImageResource(uri)
     }
 
     fun setImageResource(file: File) {
         decoder?.setImageResource(file)
+    }
+
+    fun setCalculateSampleSize(func: (Int, Int, Int, Int) -> Int) {
+        decoder?.calculateInSampleSize = func
+    }
+
+    fun isLongImage(): Boolean {
+        return decoder?.isLongImage == true
+    }
+
+    fun reZone(){
+        val rect = Rect()
+        decoder?.calculateDisplayZone(scaleX, getGlobalVisibleRect(rect).let {
+            rect
+        }, getLocalVisibleRect(rect).let {
+            rect
+        },true)
+    }
+
+    fun clear() {
+        decoder?.clear()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -91,7 +123,13 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
             srcScaledH = bitH / height.toFloat()
             sampleRect.set(0, 0, bitW, bitH)
             displayRect.set(0, 0, width, height)
-            setOriginDisplayRect(0, 0, width, height)
+            setOriginDisplayRect(
+                0,
+                0,
+                width,
+                height,
+                if (rootView.height > 0) rootView.height else width
+            )
             setMeasuredDimension(width, height)
         }
     }
@@ -103,10 +141,18 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
             super.onDraw(canvas)
         } else {
             decoder?.apply {
-                originalBitmap?.let { canvas?.drawBitmap(it, null, originalRect, null) }
+                originalBitmap?.let {
+                    if (!it.isRecycled) {
+                        canvas?.drawBitmap(it, null, originalRect, null)
+                    }
+                }
                 if (!onDraw) {
-                    mBitmap?.let { canvas?.drawBitmap(it, null, displayRect, null) }
-                    mBitmap?.recycle()
+                    mBitmap?.let {
+                        if (!it.isRecycled) {
+                            canvas?.drawBitmap(it, null, displayRect, null)
+                            it.recycle()
+                        }
+                    }
                     //测试画框用
 //            if (scaleX > 1f) {
 //                canvas?.drawRect(displayRect, Paint().apply {
@@ -125,12 +171,15 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(ev: MotionEvent): Boolean {
-        val fingerCounts = ev.pointerCount
-        when (ev.action and MotionEvent.ACTION_MASK) {
+    override fun onTouchEvent(ev: MotionEvent?): Boolean {
+        val fingerCounts = ev?.pointerCount
+        when (ev?.action?.and(MotionEvent.ACTION_MASK)) {
             MotionEvent.ACTION_UP -> {
                 clkX = ev.x
                 clkY = ev.y
+                if (clkX != 0f || clkY != 0f) {
+                    onScale(scaleX)
+                }
             }
             MotionEvent.ACTION_POINTER_UP -> {
                 if (fingerCounts == 2) {
@@ -182,7 +231,6 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 if (scaleX > 1f) parent.requestDisallowInterceptTouchEvent(true)
             }
-            else -> return gestureDetector.onTouchEvent(ev)
         }
         return gestureDetector.onTouchEvent(ev)
     }
@@ -193,11 +241,6 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
 
     override suspend fun onDecode() {
         invalidate()
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        decoder?.clear()
     }
 
     private fun performZoom() {
@@ -226,13 +269,21 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
 
     private fun animateScale(scale: Float) {
         elevation = if (scale > 1f) 10f else 0f
-        animate().scaleX(scale).scaleY(scale).setDuration(100)
+        animate().translationX(0f).translationY(0f).setDuration(100)
             .setListener(object : Animator.AnimatorListener {
                 override fun onAnimationStart(animation: Animator?) = Unit
                 override fun onAnimationCancel(animation: Animator?) = Unit
                 override fun onAnimationRepeat(animation: Animator?) = Unit
                 override fun onAnimationEnd(animation: Animator?) {
-                    onScale(scale)
+                    animate().scaleX(scale).scaleY(scale).setDuration(100)
+                        .setListener(object : Animator.AnimatorListener {
+                            override fun onAnimationStart(animation: Animator?) = Unit
+                            override fun onAnimationCancel(animation: Animator?) = Unit
+                            override fun onAnimationRepeat(animation: Animator?) = Unit
+                            override fun onAnimationEnd(animation: Animator?) {
+                                onScale(scale)
+                            }
+                        }).start()
                 }
             }).start()
     }
@@ -292,96 +343,47 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         }
     }
 
-    inner class GestureListener : GestureDetector.OnGestureListener {
+    override fun onDown(e: MotionEvent?): Boolean = true
+    override fun onShowPress(e: MotionEvent?) = Unit
+    override fun onSingleTapUp(e: MotionEvent?): Boolean = false
+    override fun onDoubleTapEvent(e: MotionEvent?): Boolean = false
+    override fun onLongPress(e: MotionEvent?) = Unit
 
-        override fun onDown(e: MotionEvent?): Boolean {
-//            Log.d(TAG, "onDown: ")
-            return true
-        }
-
-        override fun onShowPress(e: MotionEvent?) {
-//            Log.d(TAG, "onShowPress: ")
-        }
-
-        override fun onSingleTapUp(e: MotionEvent?): Boolean {
-//            Log.d(TAG, "onSingleTapUp: ")
-            return true
-        }
-
-        private val rect = Rect()
-
-        override fun onScroll(
-            e1: MotionEvent?,
-            e2: MotionEvent?,
-            distanceX: Float,
-            distanceY: Float
-        ): Boolean {
-            if (scaleX <= 1f) return false
-            parent.requestDisallowInterceptTouchEvent(true)
-//            val scaledWidth = width * scaleX
-//            val scaledHeight = height * scaleX
-            /*
-            * GlobalVisibleRect
-            * Left : left - 父View与屏幕左边距离 = 与父View左边的距离
-            *        值和getLocationOnScreen、getLocationInWindow的array[0]相同
-            *        view未超出显示区域为0
-            * Top : top - 通知栏高度 - 父View与屏幕顶端距离 = 与父View顶端的距离
-            *
-            * */
-//            getGlobalVisibleRect(rect)
-//            Log.d(TAG, "getGlobalVisibleRect: $rect")
-//            getLocalVisibleRect(rect)
-//            Log.d(TAG, "getLocalVisibleRect: $rect")
-//            val location = intArrayOf(0, 0)
-//            getLocationOnScreen(location)
-//            Log.d(TAG, "getLocationOnScreen: ${location[0]},${location[1]}")
-//            getLocationInWindow(location)
-            //intArrayOf[0] - parent.marginTop = 触顶高度
-//            Log.d(TAG, "getLocationInWindow: ${location[0]},${location[1]}")
-            //distanceY>0上滑,distanceX>0左滑
-            y -= distanceY
-            x -= distanceX
-            return true
-        }
-
-        override fun onLongPress(e: MotionEvent?) {
-//            Log.d(TAG, "onLongPress: ")
-        }
-
-        override fun onFling(
-            e1: MotionEvent?,
-            e2: MotionEvent?,
-            velocityX: Float,
-            velocityY: Float
-        ): Boolean {
-            Log.d(TAG, "onFling: ")
-            return true
-        }
-
+    override fun onScroll(
+        e1: MotionEvent?,
+        e2: MotionEvent?,
+        distanceX: Float,
+        distanceY: Float
+    ): Boolean {
+        if (scaleX <= 1f) return false
+        translationX -= distanceX
+        translationY -= distanceY
+        return true
     }
 
-    inner class DoubleTapListener : GestureDetector.OnDoubleTapListener {
-        override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
-//            Log.d(TAG, "onSingleTapConfirmed: ")
-            Log.d(TAG, "animateScale:x $clkX,y $clkY")
-            return true
-        }
+    override fun onFling(
+        e1: MotionEvent?,
+        e2: MotionEvent?,
+        velocityX: Float,
+        velocityY: Float
+    ): Boolean {
+        return false
+    }
 
-        override fun onDoubleTap(e: MotionEvent?): Boolean {
-//            Log.d(TAG, "onDoubleTap: ")
-            performZoom()
-            return true
-        }
+    var onSingleTap: (() -> Unit)? = null
+    override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+        onSingleTap?.invoke()
+        return false
+    }
 
-        override fun onDoubleTapEvent(e: MotionEvent?): Boolean {
-//            Log.d(TAG, "onDoubleTapEvent: ")
-            return true
-        }
+    override fun onDoubleTap(e: MotionEvent?): Boolean {
+        performZoom()
+        return true
     }
 
 }
 
-class SBitmapDecoder(val context: Context, private val onDecodeListener: DecodeListener?) :
+class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeListener?) :
     CoroutineScope by CoroutineScope(Dispatchers.IO) {
     private var bitmapRegionDecoder: BitmapRegionDecoder? = null
     private var inputStream: InputStream? = null
@@ -408,6 +410,9 @@ class SBitmapDecoder(val context: Context, private val onDecodeListener: DecodeL
     //资源和View大小比例
     var srcScaledW = 0f
     var srcScaledH = 0f
+
+    var isLongImage = false
+        private set
 
     fun setImageResource(assetsRes: String) {
         resName = assetsRes
@@ -476,6 +481,7 @@ class SBitmapDecoder(val context: Context, private val onDecodeListener: DecodeL
         BitmapFactory.decodeStream(input, null, options)
         bitH = options.outHeight
         bitW = options.outWidth
+        isLongImage = bitH / bitW > 2
         options.inJustDecodeBounds = false
         input.close()
         srcWHScaled = bitW.toFloat() / bitH
@@ -492,95 +498,104 @@ class SBitmapDecoder(val context: Context, private val onDecodeListener: DecodeL
         }
     }
 
-    fun setOriginDisplayRect(left: Int, top: Int, right: Int, bottom: Int) {
+    fun setOriginDisplayRect(left: Int, top: Int, right: Int, bottom: Int, maxHeight: Int) {
         if (resName == null) return
         launch(Dispatchers.IO) {
+            if (resName == null) return@launch
             if (originalBitmap != null) return@launch
             originalRect.set(left, top, right, bottom)
-            options.inSampleSize = calculateInSampleSize(bitW, bitH, right, bottom)
-            options.inJustDecodeBounds = true
-            bitmapRegionDecoder?.decodeRegion(sampleRect, options)
-            val outWidth = options.outWidth
-            val outHeight = options.outHeight
-            options.inJustDecodeBounds = false
-            synchronized(sBitmapCache) {
-                sBitmapCache.get(resName).let {
+            options.inSampleSize = calculateInSampleSize.invoke(
+                bitW,
+                bitH,
+                right,
+                if (maxHeight in 1 until bottom) maxHeight else bottom
+            )
+            synchronized(bitmapCache) {
+                bitmapCache.get(resName).also {
                     if (it != null) {
-                        if (it.width == outWidth && it.height == outHeight) {
+                        if (it.width == bitW && it.height == bitH) {
                             originalBitmap = it
-                        } else {
-                            originalBitmap =
-                                bitmapRegionDecoder?.decodeRegion(sampleRect, options)
-                            sBitmapCache.put(resName, originalBitmap)
-                        }
-                    } else {
-                        originalBitmap = bitmapRegionDecoder?.decodeRegion(sampleRect, options)
-                        sBitmapCache.put(resName, originalBitmap)
-                    }
+                        } else putCache()
+                    } else putCache()
                 }
             }
             withContext(Dispatchers.Main) { onDecodeListener?.onDecode() }
         }
     }
 
-    fun calculateDisplayZone(scale: Float, globalRect: Rect, localRect: Rect) {
+    private fun putCache() {
+        try {
+            originalBitmap = bitmapRegionDecoder?.decodeRegion(sampleRect, options)
+            if (originalBitmap != null) {
+                bitmapCache.put(resName, originalBitmap)
+            }
+        } catch (e: IllegalArgumentException) {
+            Log.e(TAG, "putCache: sampleRect $sampleRect")
+        }
+    }
+
+    fun calculateDisplayZone(scale: Float, globalRect: Rect, localRect: Rect,onReZone : Boolean = false) {
         launch {
-            if (scale <= 1f) {
+            try {
+                if (scale <= 1f && !onReZone) {
+                    mBitmap = bitmapRegionDecoder?.decodeRegion(sampleRect, options)
+                    withContext(Dispatchers.Main) {
+                        onDecodeListener?.onDecode()
+                    }
+                    return@launch
+                }
+                //1
+                val scaledW = (displayRect.right * scale).toInt()
+                val scaledH = (displayRect.bottom * scale).toInt()
+                options.inSampleSize = calculateInSampleSize.invoke(bitW, bitH, scaledW,if (onReZone) bitH else scaledH)
+                //2
+                val l = localRect.left / scale
+                val t = localRect.top / scale
+
+                val displayW = globalRect.right / scale
+                val displayH = (localRect.bottom - localRect.top) / scale
+                val r = l + displayW
+                val b = t + displayH
+                //3
+                displayRect.set(l.toInt(), t.toInt(), r.toInt(), b.toInt())
+                //4
+                sampleRect.set(
+                    (l * srcScaledW).toInt(),
+                    (t * srcScaledH).toInt(),
+                    (r * srcScaledW).toInt(),
+                    (b * srcScaledH).toInt()
+                )
+                //5
                 mBitmap = bitmapRegionDecoder?.decodeRegion(sampleRect, options)
                 withContext(Dispatchers.Main) {
                     onDecodeListener?.onDecode()
                 }
-                return@launch
-            }
-            //1
-            val scaledW = (displayRect.right * scale).toInt()
-            val scaledH = (displayRect.bottom * scale).toInt()
-            options.inSampleSize = calculateInSampleSize(bitW, bitH, scaledW, scaledH)
-            //2
-            val l = localRect.left / scale
-            val t = localRect.top / scale
-
-            val displayW = globalRect.right / scale
-            val displayH = (localRect.bottom - localRect.top) / scale
-            val r = l + displayW
-            val b = t + displayH
-            //3
-            displayRect.set(l.toInt(), t.toInt(), r.toInt(), b.toInt())
-            //4
-            sampleRect.set(
-                (l * srcScaledW).toInt(),
-                (t * srcScaledH).toInt(),
-                (r * srcScaledW).toInt(),
-                (b * srcScaledH).toInt()
-            )
-            //5
-            mBitmap = bitmapRegionDecoder?.decodeRegion(sampleRect, options)
-            withContext(Dispatchers.Main) {
-                onDecodeListener?.onDecode()
+            } catch (e: IllegalArgumentException) {
+                Log.e(TAG, "calculateDisplayZone: localRect $localRect")
+                Log.e(TAG, "calculateDisplayZone: globalRect $globalRect")
             }
         }
     }
 
-    //Google 采样率算法
-    private fun calculateInSampleSize(
-        outWidth: Int, outHeight: Int, reqWidth: Int, reqHeight: Int
-    ): Int {
-        // Raw height and width of image
-        var inSampleSize = 1
-        if (outHeight > reqHeight || outWidth > reqWidth) {
-            val halfHeight = outHeight / 2
-            val halfWidth = outWidth / 2
+    //采样率算法
+    var calculateInSampleSize: (Int, Int, Int, Int) -> Int =
+        { outWidth, outHeight, reqWidth, reqHeight ->
+            // Raw height and width of image
+            var inSampleSize = 1
+            if (outHeight > reqHeight || outWidth > reqWidth) {
+                val halfHeight = outHeight / 2
+                val halfWidth = outWidth / 2
 
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while (halfHeight / inSampleSize >= reqHeight
-                && halfWidth / inSampleSize >= reqWidth
-            ) {
-                inSampleSize *= 2
+                // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+                // height and width larger than the requested height and width.
+                while (halfHeight / inSampleSize >= reqHeight
+                    || halfWidth / inSampleSize >= reqWidth
+                ) {
+                    inSampleSize *= 2
+                }
             }
+            inSampleSize
         }
-        return inSampleSize
-    }
 
     fun clear() {
         inputStream?.close()

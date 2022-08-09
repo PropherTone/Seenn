@@ -78,10 +78,6 @@ class GalleyViewActivity :
         setInfo()
     }
 
-    fun sendSetInfo() {
-        sendViewEvent(GalleyViewViewModel.GalleyViewEvent.SetNote)
-    }
-
     private suspend fun GalleyViewViewModel.setInfo() {
         val galleyMedia = getSignedMedia()
         removeCato()
@@ -174,7 +170,7 @@ class GalleyViewActivity :
 
                 override fun onPageScrollStateChanged(state: Int) {
                     super.onPageScrollStateChanged(state)
-                    if (state == ViewPager2.SCREEN_STATE_OFF) sendSetInfo()
+                    if (state == ViewPager2.SCREEN_STATE_OFF) sendViewEvent(GalleyViewViewModel.GalleyViewEvent.SetNote)
                 }
             })
             setCurrentItem(position, false)
@@ -209,6 +205,7 @@ class GalleyViewActivity :
     }
 
     private suspend fun setNotes(notes: MutableList<String>) = withContext(Dispatchers.Main) {
+        binding.galleyVLinks.isGone = notes.isEmpty()
         if (binding.galleyVLinks.adapter is CheckListAdapter)
             (binding.galleyVLinks.adapter as CheckListAdapter).dataList = notes
     }

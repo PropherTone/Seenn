@@ -3,6 +3,7 @@ package com.protone.seenn
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
+import com.bumptech.glide.Glide
 import com.protone.api.TAG
 import com.protone.api.context.root
 import com.protone.seenn.activity.BaseActivity
@@ -23,12 +24,12 @@ class TestActivity : BaseActivity<ActivityTestBinding, TestViewModel>(false) {
     override suspend fun TestViewModel.init() {
         viewModel.setLogView(binding.logView)
         binding.model = viewModel
-        binding.sImageView.setImageResource("shot.jpg")
-        binding.sImageView2.setImageResource("shot.jpg")
-        binding.sImageView3.setImageResource("shot.jpg")
-        binding.sImageView4.setImageResource("shot.jpg")
-        binding.sImageView5.setImageResource("shot.jpg")
-        binding.sImageView6.setImageResource("shot.jpg")
+        binding.sImageView.setImageResource("long.jpeg")
+        binding.sImageView2.setImageResource("long.jpeg")
+        binding.sImageView3.setImageResource("long.jpeg")
+        binding.sImageView4.setImageResource("long.jpeg")
+        binding.sImageView5.setImageResource("long.jpeg")
+        binding.sImageView6.setImageResource("long.jpeg")
         Medias.galleyNotifier.collect {
             Log.d(TAG, "init: $it")
         }

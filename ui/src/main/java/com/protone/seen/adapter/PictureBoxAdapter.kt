@@ -16,7 +16,7 @@ import com.protone.seen.databinding.PictureBoxAdapterLayoutBinding
 import kotlin.math.roundToInt
 
 class PictureBoxAdapter(context: Context, private val picUri: MutableList<GalleyMedia>) :
-    BaseAdapter<PictureBoxAdapterLayoutBinding,Any>(context) {
+    BaseAdapter<PictureBoxAdapterLayoutBinding, Any>(context) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -28,42 +28,50 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galley
     }
 
     override fun onBindViewHolder(holder: Holder<PictureBoxAdapterLayoutBinding>, position: Int) {
-        holder.binding.imageView.let { image ->
-            image.openDoubleClick()
+        holder.binding.apply {
             image.scaleType = ImageView.ScaleType.FIT_XY
-            Glide.with(context).load(picUri[position].uri)
-                .addListener(object : RequestListener<Drawable> {
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        resource?.apply {
-                            val mix = this.intrinsicWidth.toFloat().let {
-                                image.width / it
+            if (!picUri[position].name.contains("gif")) {
+                image.setImageResource(picUri[position].uri)
+            } else {
+                Glide.with(context).load(picUri[position].uri)
+                    .addListener(object : RequestListener<Drawable> {
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            resource?.apply {
+                                val mix = this.intrinsicWidth.toFloat().let {
+                                    image.width / it
+                                }
+                                val heightSpan = (this.intrinsicHeight * mix).roundToInt()
+                                image.updateLayoutParams {
+                                    this.height = heightSpan
+                                }
                             }
-                            val heightSpan = (this.intrinsicHeight * mix).roundToInt()
-                            image.updateLayoutParams {
-                                this.height = heightSpan
-                            }
+                            return false
                         }
-                        return false
-                    }
 
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return false
+                        }
 
-                })
-                .into(image)
+                    })
+                    .into(image)
+            }
         }
+    }
+
+    override fun onViewRecycled(holder: Holder<PictureBoxAdapterLayoutBinding>) {
+        holder.binding.image.clear()
+        super.onViewRecycled(holder)
     }
 
 

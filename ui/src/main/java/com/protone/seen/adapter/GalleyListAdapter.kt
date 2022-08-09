@@ -2,7 +2,6 @@ package com.protone.seen.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -11,10 +10,9 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.protone.api.TAG
 import com.protone.api.context.SApplication
 import com.protone.api.entity.GalleyMedia
-import com.protone.seen.databinding.PictureBoxAdapterLayoutBinding
+import com.protone.seen.databinding.GalleyListAdapterLayoutBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -22,7 +20,7 @@ class GalleyListAdapter(
     context: Context,
     private val isVideo: Boolean = false,
     private val useSelect: Boolean = true
-) : SelectListAdapter<PictureBoxAdapterLayoutBinding, GalleyMedia, GalleyListAdapter.GalleyListEvent>(
+) : SelectListAdapter<GalleyListAdapterLayoutBinding, GalleyMedia, GalleyListAdapter.GalleyListEvent>(
     context, true
 ) {
     private val medias: MutableList<GalleyMedia> = mutableListOf()
@@ -51,7 +49,6 @@ class GalleyListAdapter(
 
     @SuppressLint("NotifyDataSetChanged")
     override suspend fun onEventIO(data: GalleyListEvent) {
-        Log.d(TAG, "GalleyListAdapter(isVideo:$isVideo) onEventIO: $data")
         when (data) {
             is GalleyListEvent.QuiteSelectAll -> {
                 if (!onSelectMod) return
@@ -121,7 +118,7 @@ class GalleyListAdapter(
         }
     }
 
-    override val select: (Holder<PictureBoxAdapterLayoutBinding>, Boolean) -> Unit =
+    override val select: (Holder<GalleyListAdapterLayoutBinding>, Boolean) -> Unit =
         { holder, select ->
             holder.binding.apply {
                 checkSeen.isVisible = select
@@ -141,8 +138,8 @@ class GalleyListAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): Holder<PictureBoxAdapterLayoutBinding> {
-        return Holder(PictureBoxAdapterLayoutBinding.inflate(
+    ): Holder<GalleyListAdapterLayoutBinding> {
+        return Holder(GalleyListAdapterLayoutBinding.inflate(
             LayoutInflater.from(context),
             parent,
             false
@@ -160,7 +157,7 @@ class GalleyListAdapter(
         })
     }
 
-    override fun onBindViewHolder(holder: Holder<PictureBoxAdapterLayoutBinding>, position: Int) {
+    override fun onBindViewHolder(holder: Holder<GalleyListAdapterLayoutBinding>, position: Int) {
         setSelect(holder, selectList.contains(medias[position]))
         holder.binding.imageView.let { image ->
             Glide.with(context).load(medias[position].thumbnailUri).into(image)
