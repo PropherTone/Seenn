@@ -81,13 +81,13 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         return decoder?.isLongImage == true
     }
 
-    fun reZone(){
+    fun reZone() {
         val rect = Rect()
         decoder?.calculateDisplayZone(scaleX, getGlobalVisibleRect(rect).let {
             rect
         }, getLocalVisibleRect(rect).let {
             rect
-        },true)
+        }, true)
     }
 
     fun clear() {
@@ -99,42 +99,71 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             return
         }
-        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
-        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        var l = 0
+        var t = 0
         decoder?.apply {
-            var width = getDefaultSize(bitW, widthMeasureSpec)
-            var height = getDefaultSize(bitH, heightMeasureSpec)
-            if (widthMode == MeasureSpec.EXACTLY) {
-                width = widthSize
-                height = (width / srcWHScaled).toInt()
-            } else if (heightMode == MeasureSpec.EXACTLY) {
-                height = heightSize
-                width = (height * srcWHScaled).toInt()
-            } else if (widthMode == MeasureSpec.AT_MOST || widthMode == MeasureSpec.UNSPECIFIED) {
-                width = rootView.width
-                height = (width / srcWHScaled).toInt()
-            } else if (heightMode == MeasureSpec.AT_MOST || heightMode == MeasureSpec.UNSPECIFIED) {
-                height = rootView.height
-                width = (height * srcWHScaled).toInt()
+            var width = getDefaultSize(widthSize, widthMeasureSpec)
+            var height = getDefaultSize(heightSize, heightMeasureSpec)
+            var displayWidth = width
+            var disPlayHeight = height
+            when (widthMode) {
+                MeasureSpec.EXACTLY -> {
+                    when (heightMode) {
+                        MeasureSpec.EXACTLY -> {
+                            displayWidth = width
+                            disPlayHeight = (displayWidth / srcWHScaled).toInt()
+                            t = height / 2 - (disPlayHeight / 2)
+                            if (disPlayHeight > height) {
+                                disPlayHeight = height
+                                displayWidth = (disPlayHeight * srcWHScaled).toInt()
+                                t = 0
+                                l = width / 2 - (displayWidth / 2)
+                            }
+                        }
+                        MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED -> {
+                            displayWidth = width
+                            disPlayHeight = (displayWidth / srcWHScaled).toInt()
+                            height = disPlayHeight
+                            t = 0
+                            l = 0
+                        }
+                    }
+                }
+                MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED -> {
+                    when (heightMode) {
+                        MeasureSpec.EXACTLY -> {
+                            disPlayHeight = height
+                            displayWidth = (disPlayHeight * srcWHScaled).toInt()
+                            width = displayWidth
+                        }
+                        MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED -> {
+                            displayWidth = bitW
+                            disPlayHeight = bitH
+                            width = displayWidth
+                            height = disPlayHeight
+                        }
+                    }
+                }
             }
-            srcScaledW = bitW / width.toFloat()
-            srcScaledH = bitH / height.toFloat()
-            sampleRect.set(0, 0, bitW, bitH)
-            displayRect.set(0, 0, width, height)
+            srcScaledW = bitW / displayWidth.toFloat()
+            srcScaledH = bitH / disPlayHeight.toFloat()
+            marginLeft = l
+            marginTop = t
+            displayRect.set(l, t, displayWidth + l, disPlayHeight + t)
             setOriginDisplayRect(
-                0,
-                0,
-                width,
-                height,
-                if (rootView.height > 0) rootView.height else width
+                l,
+                t,
+                displayWidth + l,
+                disPlayHeight + t,
+                if (rootView.height > 0) rootView.height else displayWidth
             )
             setMeasuredDimension(width, height)
         }
     }
-
-    private var onDraw = false
 
     override fun onDraw(canvas: Canvas?) {
         if (decoder == null) {
@@ -146,14 +175,14 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
                         canvas?.drawBitmap(it, null, originalRect, null)
                     }
                 }
-                if (!onDraw) {
+                if (isLongImage || scaleX >= 1f) {
                     mBitmap?.let {
                         if (!it.isRecycled) {
                             canvas?.drawBitmap(it, null, displayRect, null)
                             it.recycle()
                         }
                     }
-                    //测试画框用
+//                    测试画框用
 //            if (scaleX > 1f) {
 //                canvas?.drawRect(displayRect, Paint().apply {
 //                    color = Color.RED
@@ -177,9 +206,6 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
             MotionEvent.ACTION_UP -> {
                 clkX = ev.x
                 clkY = ev.y
-                if (clkX != 0f || clkY != 0f) {
-                    onScale(scaleX)
-                }
             }
             MotionEvent.ACTION_POINTER_UP -> {
                 if (fingerCounts == 2) {
@@ -268,7 +294,6 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     }
 
     private fun animateScale(scale: Float) {
-        elevation = if (scale > 1f) 10f else 0f
         animate().translationX(0f).translationY(0f).setDuration(100)
             .setListener(object : Animator.AnimatorListener {
                 override fun onAnimationStart(animation: Animator?) = Unit
@@ -281,6 +306,7 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
                             override fun onAnimationCancel(animation: Animator?) = Unit
                             override fun onAnimationRepeat(animation: Animator?) = Unit
                             override fun onAnimationEnd(animation: Animator?) {
+                                elevation = if (scale > 1f) 10f else 0f
                                 onScale(scale)
                             }
                         }).start()
@@ -289,7 +315,14 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     }
 
     private fun onScale(scale: Float) {
-        onDraw = scale == 1f
+        if (scale <= 1f) {
+            if (isLongImage()) {
+                reZone()
+            } else {
+                invalidate()
+            }
+            return
+        }
         val globalRect = Rect()
         getGlobalVisibleRect(globalRect)
         val localRect = Rect()
@@ -391,7 +424,7 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
     private var resName: String? = null
 
     private var options: BitmapFactory.Options = BitmapFactory.Options()
-    val sampleRect = Rect()
+    private val sampleRect = Rect()
     var originalRect = Rect()
         private set
     var displayRect: Rect = Rect()
@@ -403,6 +436,9 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
 
     var bitH = 0
     var bitW = 0
+
+    var marginLeft = 0
+    var marginTop = 0
 
     //资源宽高比
     var srcWHScaled = 0f
@@ -485,6 +521,7 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
         options.inJustDecodeBounds = false
         input.close()
         srcWHScaled = bitW.toFloat() / bitH
+        sampleRect.set(0, 0, bitW, bitH)
     }
 
     private fun generateDecoder() {
@@ -534,28 +571,41 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
         }
     }
 
-    fun calculateDisplayZone(scale: Float, globalRect: Rect, localRect: Rect,onReZone : Boolean = false) {
+    fun calculateDisplayZone(
+        scale: Float,
+        globalRect: Rect,
+        localRect: Rect,
+        onReZone: Boolean = false
+    ) {
+        if ((scale <= 1f) && !onReZone) {
+            launch(Dispatchers.Main) {
+                onDecodeListener?.onDecode()
+            }
+            return
+        }
         launch {
             try {
-                if (scale <= 1f && !onReZone) {
-                    mBitmap = bitmapRegionDecoder?.decodeRegion(sampleRect, options)
-                    withContext(Dispatchers.Main) {
-                        onDecodeListener?.onDecode()
-                    }
-                    return@launch
-                }
                 //1
-                val scaledW = (displayRect.right * scale).toInt()
-                val scaledH = (displayRect.bottom * scale).toInt()
-                options.inSampleSize = calculateInSampleSize.invoke(bitW, bitH, scaledW,if (onReZone) bitH else scaledH)
+                val scaledW = ((displayRect.right - marginLeft) * scale).toInt()
+                val scaledH = ((displayRect.bottom - marginTop) * scale).toInt()
+                options.inSampleSize = calculateInSampleSize.invoke(
+                    bitW,
+                    bitH,
+                    scaledW,
+                    if (onReZone) bitH else scaledH
+                )
                 //2
-                val l = localRect.left / scale
-                val t = localRect.top / scale
+                var l = localRect.left / scale + marginLeft
+                var t = localRect.top / scale + marginTop
 
-                val displayW = globalRect.right / scale
-                val displayH = (localRect.bottom - localRect.top) / scale
+                val displayW = globalRect.right / scale - marginLeft
+                val displayH =
+                    (localRect.bottom / scale - marginTop) - (localRect.top / scale + marginTop)
                 val r = l + displayW
                 val b = t + displayH
+
+                l = if (l > 0f) l else 0f
+                t = if (t > 0f) t else 0f
                 //3
                 displayRect.set(l.toInt(), t.toInt(), r.toInt(), b.toInt())
                 //4
@@ -588,10 +638,15 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
 
                 // Calculate the largest inSampleSize value that is a power of 2 and keeps both
                 // height and width larger than the requested height and width.
-                while (halfHeight / inSampleSize >= reqHeight
-                    || halfWidth / inSampleSize >= reqWidth
-                ) {
-                    inSampleSize *= 2
+                try {
+                    while (halfHeight / inSampleSize >= reqHeight
+                        || halfWidth / inSampleSize >= reqWidth
+                    ) {
+                        inSampleSize *= 12
+                    }
+                } catch (e: ArithmeticException) {
+                    Log.e(TAG, "half$halfHeight,$halfWidth,inSampleSize$inSampleSize")
+                    Log.e(TAG, "reqHeight$reqHeight,reqWidth$reqWidth")
                 }
             }
             inSampleSize
