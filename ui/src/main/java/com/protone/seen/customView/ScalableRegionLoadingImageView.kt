@@ -1,6 +1,7 @@
 package com.protone.seen.customView
 
 import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
@@ -11,6 +12,8 @@ import android.util.Log
 import android.util.LruCache
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.animation.Interpolator
+import android.widget.OverScroller
 import androidx.appcompat.widget.AppCompatImageView
 import com.protone.api.TAG
 import kotlinx.coroutines.*
@@ -32,7 +35,8 @@ val bitmapCache = object : LruCache<String, Bitmap>(16) {
 class ScalableRegionLoadingImageView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : AppCompatImageView(context, attrs, defStyleAttr), DecodeListener,
-    GestureDetector.OnDoubleTapListener, GestureDetector.OnGestureListener {
+    GestureDetector.OnDoubleTapListener, GestureDetector.OnGestureListener,
+    CoroutineScope by MainScope() {
 
     private var decoder: BitmapDecoder? = null
 
@@ -51,9 +55,15 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         const val SCALE_MIN = 1.0f
     }
 
+    private val overScroller = OverScroller(context, FlingInterpolator())
+
     private var clkX = 0f
     private var clkY = 0f
     private var zoomIn = 0
+
+    private var isWidthOverParent = false
+    private val viewDisPlayRect = Rect()
+    private var isHeightOverParent = false
 
     init {
         gestureDetector.setOnDoubleTapListener(this)
@@ -165,11 +175,23 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         }
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        val localRect = Rect()
+        getLocalVisibleRect(localRect)
+        val globalRect = Rect()
+        getGlobalVisibleRect(globalRect)
+        viewDisPlayRect.set(globalRect)
+        isWidthOverParent = localRect.right > globalRect.right
+        isHeightOverParent = localRect.bottom > globalRect.bottom
+    }
+
     override fun onDraw(canvas: Canvas?) {
         if (decoder == null) {
             super.onDraw(canvas)
         } else {
             decoder?.apply {
+                Log.d(TAG, "onDraw: $x,$y")
                 originalBitmap?.let {
                     if (!it.isRecycled) {
                         canvas?.drawBitmap(it, null, originalRect, null)
@@ -206,6 +228,7 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
             MotionEvent.ACTION_UP -> {
                 clkX = ev.x
                 clkY = ev.y
+                parent.requestDisallowInterceptTouchEvent(false)
             }
             MotionEvent.ACTION_POINTER_UP -> {
                 if (fingerCounts == 2) {
@@ -255,7 +278,8 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
                 }
             }
             MotionEvent.ACTION_DOWN -> {
-                if (scaleX > 1f) parent.requestDisallowInterceptTouchEvent(true)
+                if (isWidthOverParent || isHeightOverParent || scaleX > 1f)
+                    parent.requestDisallowInterceptTouchEvent(true)
             }
         }
         return gestureDetector.onTouchEvent(ev)
@@ -272,12 +296,12 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     private fun performZoom() {
         when (zoomIn) {
             0 -> {
-                setPivotXYNoCalculate(clkX, clkY)
+                setPivotNoCalculate(clkX, clkY)
                 animateScale(SCALE_MID)
                 zoomIn++
             }
             1 -> {
-                setPivotXYNoCalculate(clkX, clkY)
+                setPivotNoCalculate(clkX, clkY)
                 animateScale(SCALE_MAX)
                 zoomIn++
             }
@@ -288,28 +312,34 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         }
     }
 
-    private fun setPivotXYNoCalculate(x: Float, y: Float) {
-        pivotX = x
-        pivotY = y
+    private fun setPivotNoCalculate(newPivotX: Float, newPivotY: Float) {
+        pivotX = newPivotX
+        pivotY = newPivotY
     }
 
     private fun animateScale(scale: Float) {
-        animate().translationX(0f).translationY(0f).setDuration(100)
-            .setListener(object : Animator.AnimatorListener {
-                override fun onAnimationStart(animation: Animator?) = Unit
-                override fun onAnimationCancel(animation: Animator?) = Unit
-                override fun onAnimationRepeat(animation: Animator?) = Unit
+        if (isWidthOverParent || isHeightOverParent) {
+            animate().apply {
+                if (isWidthOverParent) translationY(0f)
+                if (isHeightOverParent) translationX(0f)
+                setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        doAnimateScale(scale)
+                    }
+                })
+            }.setDuration(100).start()
+        } else {
+            doAnimateScale(scale)
+        }
+    }
+
+    private fun doAnimateScale(scale: Float) {
+        animate().scaleX(scale).scaleY(scale).setDuration(100)
+            .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator?) {
-                    animate().scaleX(scale).scaleY(scale).setDuration(100)
-                        .setListener(object : Animator.AnimatorListener {
-                            override fun onAnimationStart(animation: Animator?) = Unit
-                            override fun onAnimationCancel(animation: Animator?) = Unit
-                            override fun onAnimationRepeat(animation: Animator?) = Unit
-                            override fun onAnimationEnd(animation: Animator?) {
-                                elevation = if (scale > 1f) 10f else 0f
-                                onScale(scale)
-                            }
-                        }).start()
+                    elevation = if (scale > 1f) 10f else 0f
+                    onScale(scale)
                 }
             }).start()
     }
@@ -376,7 +406,11 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         }
     }
 
-    override fun onDown(e: MotionEvent?): Boolean = true
+    override fun onDown(e: MotionEvent?): Boolean {
+        overScroller.forceFinished(true)
+        return true
+    }
+
     override fun onShowPress(e: MotionEvent?) = Unit
     override fun onSingleTapUp(e: MotionEvent?): Boolean = false
     override fun onDoubleTapEvent(e: MotionEvent?): Boolean = false
@@ -388,9 +422,13 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         distanceX: Float,
         distanceY: Float
     ): Boolean {
-        if (scaleX <= 1f) return false
-        translationX -= distanceX
-        translationY -= distanceY
+        if (!(isWidthOverParent || isHeightOverParent) && scaleX <= 1f) return false
+        if (isWidthOverParent || scaleX > 1f) {
+            doScrollHorizontally(-distanceX)
+        }
+        if (isHeightOverParent || scaleY > 1f) {
+            doScrollVertically(-distanceY)
+        }
         return true
     }
 
@@ -400,7 +438,65 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         velocityX: Float,
         velocityY: Float
     ): Boolean {
-        return false
+        if (scaleX > 1f) {
+            onScale(scaleX)
+            return false
+        }
+        if (isWidthOverParent || scaleX > 1f) {
+            onFlingAni(velocityX, 0f)
+        }
+        if (isHeightOverParent || scaleY > 1f) {
+            onFlingAni(0f, velocityY)
+        }
+        return true
+    }
+
+    private fun onFlingAni(velocityX: Float, velocityY: Float) {
+        launch(Dispatchers.IO) {
+            overScroller.fling(
+                x.toInt(),
+                y.toInt(),
+                velocityX.toInt(),
+                velocityY.toInt(),
+                Int.MIN_VALUE,
+                Int.MAX_VALUE,
+                Int.MIN_VALUE,
+                Int.MAX_VALUE
+            )
+            while (overScroller.computeScrollOffset() && isActive) {
+                if (velocityX == 0f) {
+                    doScrollVertically(overScroller.currY.toFloat() - y)
+                } else {
+                    doScrollHorizontally(overScroller.currX.toFloat() - x)
+                }
+            }
+            onScale(scaleX)
+        }
+    }
+
+    private fun doScrollHorizontally(value: Float) {
+        var tempX = x
+        tempX += value
+        val rect = Rect()
+        getLocalVisibleRect(rect)
+//        if (rect.left >= 0) {
+//            tempX = 0f
+//        }
+        x = tempX
+    }
+
+    private fun doScrollVertically(value: Float) {
+        var tempY = y
+        tempY += value
+        val rect = Rect()
+        getLocalVisibleRect(rect)
+        if (rect.top <= 0 && value > 0) {
+            tempY = 0f
+        }
+        if (rect.bottom >= height * scaleX && value < 0) {
+            tempY = -(height * scaleX - viewDisPlayRect.bottom)
+        }
+        y = tempY
     }
 
     var onSingleTap: (() -> Unit)? = null
@@ -662,6 +758,15 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
         bitmapRegionDecoder = null
         cancel()
     }
+}
+
+class FlingInterpolator : Interpolator {
+    override fun getInterpolation(input: Float): Float {
+        var t = input
+        t -= 1f
+        return t * t * t * t * t + 1f
+    }
+
 }
 
 interface DecodeListener {
