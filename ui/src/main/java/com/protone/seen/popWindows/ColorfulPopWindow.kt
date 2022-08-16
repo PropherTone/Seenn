@@ -49,6 +49,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
         }
 
     inline fun startListPopup(
+        title: String = "",
         anchor: View,
         dataList: MutableList<String>,
         crossinline onCall: (String?) -> Unit
@@ -56,6 +57,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
         weakContext.get()?.let { context ->
             val binder =
                 ListPopWindowsLayoutBinding.inflate(context.newLayoutInflater, context.root, false)
+            binder.listTitle.text = title
             binder.listList.apply {
                 layoutManager = LinearLayoutManager(context)
                 adapter = CheckListAdapter(context, dataList)
@@ -66,6 +68,9 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
                         if (it is CheckListAdapter)
                             onCall.invoke(if (it.selectList.size > 0) it.selectList[0] else null)
                     }
+                }
+                binder.listConfirm.setOnClickListener {
+                    onCall.invoke(null)
                 }
             }
             startPopup(context, binder.root, anchor, func)

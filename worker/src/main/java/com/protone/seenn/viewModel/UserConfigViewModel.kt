@@ -20,19 +20,21 @@ class UserConfigViewModel : BaseViewModel() {
         object Icon : ViewEvent
         object Name : ViewEvent
         object PassWord : ViewEvent
-        object ShareNote : ViewEvent
-        object ShareData : ViewEvent
+        object Share : ViewEvent
         object Lock : ViewEvent
         object Unlock : ViewEvent
         object Refresh : ViewEvent
         object ClearCache : ViewEvent
         object Log : ViewEvent
+        object CombineGalley : ViewEvent
+        object DispatchGalley : ViewEvent
     }
 
     enum class DisplayMode {
         UnRegis,
         Locked,
-        Normal
+        Normal,
+        CombineGalley
     }
 
     private var onClear = false

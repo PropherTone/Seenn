@@ -31,6 +31,9 @@ class UserConfig(context: Context) {
 
     var lockMusic by config.string("LOCK_MUSIC", "")
 
+    var combineGalley by config.boolean("COMBINE_GALLEY", false)
+
+
     var lastMusicBucket by config.string(
         "PLAYED_MUSIC_BUCKET",
         SApplication.app.getString(R.string.all_music)

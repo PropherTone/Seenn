@@ -5,6 +5,7 @@ import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleyMedia
 import com.protone.seenn.R
 import com.protone.seenn.database.DatabaseHelper
+import com.protone.seenn.database.userConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.stream.Collectors
@@ -26,8 +27,9 @@ class GalleyViewViewModel : BaseViewModel() {
     lateinit var galleyMedias: MutableList<GalleyMedia>
 
     suspend fun initGalleyData(galley: String, isVideo: Boolean) = withContext(Dispatchers.IO) {
-        var allMedia = (DatabaseHelper.instance.signedGalleyDAOBridge.getAllMediaByType(isVideo)
-            ?: mutableListOf()) as MutableList<GalleyMedia>
+        var allMedia = (DatabaseHelper.instance.signedGalleyDAOBridge.let {
+            if (userConfig.combineGalley) it.getAllSignedMediaRs() else it.getAllMediaByType(isVideo)
+        } ?: mutableListOf()) as MutableList<GalleyMedia>
         if (galley != R.string.all_galley.getString()) allMedia =
             allMedia.stream().filter {
                 (it.bucket == galley) || (it.type?.contains(galley) == true)

@@ -3,7 +3,6 @@ package com.protone.seenn.activity
 import android.net.Uri
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -22,7 +21,6 @@ import com.protone.api.json.toJson
 import com.protone.api.json.toUri
 import com.protone.api.onResult
 import com.protone.seen.adapter.CheckListAdapter
-import com.protone.seen.adapter.GalleyViewPager2Adapter
 import com.protone.seen.databinding.ImageCateLayoutBinding
 import com.protone.seen.databinding.TextCateLayoutBinding
 import com.protone.seenn.R
@@ -45,6 +43,12 @@ class GalleyViewActivity :
         initPop()
         popLayout?.galleyIntoBox?.isGone = true
         popLayout?.galleySelectAll?.isGone = true
+        binding.next.setOnClickListener {
+            binding.galleyVView.setCurrentItem(1 + binding.galleyVView.currentItem, true)
+        }
+        binding.previous.setOnClickListener {
+            binding.galleyVView.setCurrentItem(binding.galleyVView.currentItem - 1, true)
+        }
         return binding.root
     }
 
@@ -70,7 +74,7 @@ class GalleyViewActivity :
             })
         }
         val mediaIndex = getMediaIndex()
-        initViewPager(mediaIndex, galleyMedias, isVideo) { position ->
+        initViewPager(mediaIndex, galleyMedias) { position ->
             curPosition = position
             setMediaInfo(position)
         }
@@ -144,24 +148,19 @@ class GalleyViewActivity :
     private fun initViewPager(
         position: Int,
         data: MutableList<GalleyMedia>,
-        isVideo: Boolean = false,
         onChange: (Int) -> Unit
     ) {
         binding.galleyVView.apply {
-            if (!isVideo) {
-                adapter = GalleyViewPager2Adapter(context, data).also { a ->
-                    a.onClk = {
-                        binding.galleyVCover.isVisible = !binding.galleyVCover.isVisible
-                    }
-                }
-            } else {
-                adapter = object : FragmentStateAdapter(context as AppCompatActivity) {
-                    override fun getItemCount(): Int = data.size
-                    override fun createFragment(position: Int): Fragment =
-                        GalleyViewFragment(data[position])
-                }
-                binding.galleyVCover.isVisible = false
+            val onSingleClick = {
+                binding.galleyVCover.isVisible = !binding.galleyVCover.isVisible
             }
+            adapter = object : FragmentStateAdapter(this@GalleyViewActivity) {
+                override fun getItemCount(): Int = data.size
+                override fun createFragment(position: Int): Fragment =
+                    GalleyViewFragment(data[position], onSingleClick)
+            }
+            binding.galleyVCover.isVisible = false
+
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     onChange.invoke(position)
@@ -224,7 +223,6 @@ class GalleyViewActivity :
 
     override fun popDelete() {
         tryDelete(mutableListOf(viewModel.getCurrentMedia())) {
-//            binding.galleyVView.setCurrentItem(viewModel.curPosition + 1, true)
             if (it.size == 1) {
                 val index = viewModel.galleyMedias.indexOf(it[0])
                 if (index != -1) {

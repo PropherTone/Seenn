@@ -18,8 +18,8 @@ import kotlinx.coroutines.withContext
 
 class GalleyListAdapter(
     context: Context,
-    private val isVideo: Boolean = false,
-    private val useSelect: Boolean = true
+    private val useSelect: Boolean = true,
+    private val combine: Boolean = false
 ) : SelectListAdapter<GalleyListAdapterLayoutBinding, GalleyMedia, GalleyListAdapter.GalleyListEvent>(
     context, true
 ) {
@@ -153,12 +153,12 @@ class GalleyListAdapter(
                 height = width
             }
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-            videoIcon.isGone = !isVideo
         })
     }
 
     override fun onBindViewHolder(holder: Holder<GalleyListAdapterLayoutBinding>, position: Int) {
         setSelect(holder, selectList.contains(medias[position]))
+        holder.binding.videoIcon.isGone = !medias[position].isVideo && !combine
         holder.binding.imageView.let { image ->
             Glide.with(context).load(medias[position].thumbnailUri).into(image)
             image.setOnClickListener {

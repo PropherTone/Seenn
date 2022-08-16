@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="do_not_cache">不缓存</string>
-    <string name="retry">重试</string>
-    <string name="image_cache_failed">以下图片缓存失败</string>
-</resources>

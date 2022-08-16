@@ -42,6 +42,9 @@ class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>
                         musicController.play(music)
                     }
                 })
+            musicController.binder?.onMusicPlaying()?.observe(this@MusicViewActivity){
+                (binding.playList.adapter as TransparentPlayListAdapter).setOnPlay(it)
+            }
         }
     }
 

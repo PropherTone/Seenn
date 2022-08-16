@@ -227,8 +227,16 @@ class DatabaseHelper {
             return signedGalleyDAO.getAllGalley(isVideo)
         }
 
+        fun getAllGalley(): List<String>? {
+            return signedGalleyDAO.getAllGalley()
+        }
+
         fun getAllMediaByGalley(name: String, isVideo: Boolean): List<GalleyMedia>? {
             return signedGalleyDAO.getAllMediaByGalley(name, isVideo)
+        }
+
+        fun getAllMediaByGalley(name: String): List<GalleyMedia>? {
+            return signedGalleyDAO.getAllMediaByGalley(name)
         }
 
         fun deleteSignedMediaMultiAsync(list: MutableList<GalleyMedia>) {

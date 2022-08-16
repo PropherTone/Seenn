@@ -55,7 +55,7 @@ class GalleySearchActivity :
     }
 
     private fun newAdapter(list: MutableList<GalleyMedia>) = GalleyListAdapter(
-        this@GalleySearchActivity, viewModel.isVideo(), true
+        this@GalleySearchActivity,true
     ).also {
         it.setMedias(list)
         it.multiChoose = true

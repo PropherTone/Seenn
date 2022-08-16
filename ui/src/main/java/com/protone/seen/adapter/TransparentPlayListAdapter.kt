@@ -11,7 +11,7 @@ class TransparentPlayListAdapter(
     context: Context,
     onPlay: Music?,
     private val playList: MutableList<Music>
-) : SelectListAdapter<TpPlaylistAdapterLayoutBinding, Music,Any>(context) {
+) : SelectListAdapter<TpPlaylistAdapterLayoutBinding, Music, Any>(context) {
     override val select: (holder: Holder<TpPlaylistAdapterLayoutBinding>, isSelect: Boolean) -> Unit =
         { holder, isSelect ->
             if (isSelect) {
@@ -31,7 +31,8 @@ class TransparentPlayListAdapter(
         parent: ViewGroup,
         viewType: Int
     ): Holder<TpPlaylistAdapterLayoutBinding> {
-        val binding = TpPlaylistAdapterLayoutBinding.inflate(context.newLayoutInflater, parent, false)
+        val binding =
+            TpPlaylistAdapterLayoutBinding.inflate(context.newLayoutInflater, parent, false)
         return Holder(binding)
     }
 
@@ -47,6 +48,17 @@ class TransparentPlayListAdapter(
     }
 
     override fun getItemCount(): Int = playList.size
+
+    fun setOnPlay(music: Music) {
+        val oldIndex = playList.indexOf(selectList.first())
+        selectList.clear()
+        notifyItemChanged(oldIndex)
+        val newIndex = playList.indexOf(music)
+        if (newIndex != -1) {
+            selectList.add(music)
+            notifyItemChanged(newIndex)
+        }
+    }
 
     var onPlayListClkListener: OnPlayListClk? = null
 

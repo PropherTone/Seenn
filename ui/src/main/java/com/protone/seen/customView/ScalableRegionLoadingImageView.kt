@@ -41,9 +41,12 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     private val regionHandler = Handler(Looper.getMainLooper()) { msg ->
         if (msg.what == REGION_DECODE_MSG) {
             onScale(scaleX)
+            drawRegion = true
         }
         true
     }
+
+    private var drawRegion = false
 
     private var decoder: BitmapDecoder? = null
 
@@ -76,11 +79,18 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     private val viewDisPlayRect = Rect()
     private var isHeightOverParent = false
 
-    private var originalX = -1f
-    private var originalY = -1f
-
     init {
         gestureDetector.setOnDoubleTapListener(this)
+    }
+
+    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
+        super.onWindowFocusChanged(hasWindowFocus)
+        Log.d(TAG, "onWindowFocusChanged: $hasWindowFocus")
+    }
+
+    override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
+        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
+        Log.d(TAG, "onFocusChanged: $gainFocus")
     }
 
     fun setImageResource(assetsRes: String) {
@@ -106,9 +116,8 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     }
 
     fun reZone() {
-        originalX = x
-        originalY = y
         val rect = Rect()
+        drawRegion = true
         decoder?.calculateDisplayZone(
             scaleX,
             getGlobalVisibleRect(rect).let { rect },
@@ -119,6 +128,16 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
 
     fun clear() {
         decoder?.clear()
+    }
+
+    fun locate(){
+        val localRect = Rect()
+        getLocalVisibleRect(localRect)
+        val globalRect = Rect()
+        getGlobalVisibleRect(globalRect)
+        viewDisPlayRect.set(globalRect)
+        isWidthOverParent = localRect.right > globalRect.right
+        isHeightOverParent = localRect.bottom > globalRect.bottom
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -194,16 +213,8 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        val localRect = Rect()
-        getLocalVisibleRect(localRect)
-        val globalRect = Rect()
-        getGlobalVisibleRect(globalRect)
-        viewDisPlayRect.set(globalRect)
-        isWidthOverParent = localRect.right > globalRect.right
-        isHeightOverParent = localRect.bottom > globalRect.bottom
-        originalX = x
-        originalY = y
-        if (isLongImage()) reZone()
+        locate()
+        if (isLongImage()) doAnimateScale(1f)
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -211,13 +222,13 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
             super.onDraw(canvas)
         } else {
             decoder?.apply {
-                x
-                y
                 originalBitmap?.let {
                     if (!it.isRecycled) {
                         canvas?.drawBitmap(it, null, originalRect, null)
                     }
                 }
+                if (!drawRegion) return
+                drawRegion = false
                 if (isLongImage || scaleX >= 1f) {
                     mBitmap?.let {
                         if (!it.isRecycled) {
@@ -339,40 +350,17 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     }
 
     private fun animateScale(scale: Float) {
-        if (isWidthOverParent || isHeightOverParent) {
-            animate().apply {
-                if (isWidthOverParent && scale == 1f) y(originalY)
-                if (isHeightOverParent && scale == 1f) x(originalX)
-                this.withEndAction {
-                    doAnimateScale(scale)
-                }
-            }.setDuration(100).start()
-        } else {
-            doAnimateScale(scale)
-        }
+        scrollY = 0
+        scrollX = 0
+        doAnimateScale(scale)
     }
 
     private fun doAnimateScale(scale: Float) {
-        animate().apply {
-            if (!(isWidthOverParent || isHeightOverParent) && scale == 1f) {
-                x(originalX)
-                y(originalY)
-            }
-        }.scaleX(scale).scaleY(scale).setDuration(100)
+        animate().scaleX(scale).scaleY(scale).setDuration(100)
             .withEndAction {
                 elevation = if (scale > 1f) 10f else 0f
-                onScale(scale)
+                regionHandler.sendEmptyMessage(REGION_DECODE_MSG)
                 getGlobalVisibleRect(localRect)
-                if (scale > 1f && (isWidthOverParent || isHeightOverParent)) return@withEndAction
-                animate().apply {
-                    if (localRect.bottom < viewDisPlayRect.bottom) {
-                        if (localRect.top > 0) {
-                            y(y - localRect.top)
-                        } else {
-                            y(y + (viewDisPlayRect.bottom - localRect.bottom))
-                        }
-                    }
-                }.setDuration(100).start()
             }.start()
     }
 
@@ -456,10 +444,10 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     ): Boolean {
         if (!(isWidthOverParent || isHeightOverParent) && scaleX <= 1f) return false
         if (isWidthOverParent || scaleX > 1f) {
-            doScrollHorizontally(-distanceX)
+            doScrollHorizontally(distanceX)
         }
         if (isHeightOverParent || scaleY > 1f) {
-            doScrollVertically(-distanceY)
+            doScrollVertically(distanceY)
         }
         regionHandler.sendEmptyMessageDelayed(REGION_DECODE_MSG, REGION_DECODER_DELAY)
         return true
@@ -481,18 +469,18 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     private fun onFlingAni(velocityX: Float, velocityY: Float) {
         launch(Dispatchers.IO) {
             overScroller.fling(
-                x.toInt(),
-                y.toInt(),
-                velocityX.toInt(),
-                velocityY.toInt(),
+                scrollX,
+                scrollY,
+                -velocityX.toInt(),
+                -velocityY.toInt(),
                 Int.MIN_VALUE,
                 Int.MAX_VALUE,
                 Int.MIN_VALUE,
                 Int.MAX_VALUE
             )
             while (overScroller.computeScrollOffset() && isActive) {
-                doScrollVertically(overScroller.currY.toFloat() - y)
-                doScrollHorizontally(overScroller.currX.toFloat() - x)
+                doScrollVertically(overScroller.currY.toFloat() - scrollY)
+                doScrollHorizontally(overScroller.currX.toFloat() - scrollX)
             }
             regionHandler.sendEmptyMessageDelayed(REGION_DECODE_MSG, REGION_DECODER_DELAY)
         }
@@ -501,53 +489,35 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
     private val localRect = Rect()
 
     private fun doScrollHorizontally(value: Float) {
-        //value > 0 scroll left
+        //value < 0 scroll left
         regionHandler.removeMessages(REGION_DECODE_MSG)
-        var tempX = x
-        getLocalVisibleRect(localRect)
-        tempX += if (localRect.left - value <= 0) {
-            localRect.left.toFloat()
-        } else if (localRect.left - value + viewDisPlayRect.right >= width * scaleX) {
-            getGlobalVisibleRect(localRect)
-            (viewDisPlayRect.right - localRect.right).toFloat()
-        } else {
-            value
+        var tempValue = value
+        val rect = Rect()
+        getLocalVisibleRect(rect)
+        if (rect.left + tempValue <= 0 && value <= 0) {
+            tempValue = if (rect.left > 0) rect.left.toFloat() else 0f
         }
-        getLocalVisibleRect(localRect)
-        if (localRect.left <= 0 && value > 0) {
-            getGlobalVisibleRect(localRect)
-            tempX = x - localRect.left
+        if (rect.left + viewDisPlayRect.right + tempValue >= width * scaleX && value > 0) {
+            tempValue = (width * scaleX) - (rect.left + viewDisPlayRect.right)
+            if (tempValue < 0) tempValue = 0f
         }
-        if (localRect.right >= width * scaleX && value < 0) {
-            getGlobalVisibleRect(localRect)
-            tempX = x + viewDisPlayRect.right - localRect.right
-        }
-        x = tempX
+        scrollX += tempValue.toInt()
     }
 
     private fun doScrollVertically(value: Float) {
-        //value > 0 scroll up
+        //value < 0 scroll up
         regionHandler.removeMessages(REGION_DECODE_MSG)
-        var tempY = y
-        getLocalVisibleRect(localRect)
-        tempY += if (localRect.top - value <= 0) {
-            localRect.top.toFloat()
-        } else if (localRect.top - value + viewDisPlayRect.bottom >= height * scaleX) {
-            getGlobalVisibleRect(localRect)
-            (viewDisPlayRect.bottom - localRect.bottom).toFloat()
-        } else {
-            value
+        var tempValue = value
+        val rect = Rect()
+        getLocalVisibleRect(rect)
+        if (rect.top + value <= 0 && value <= 0) {
+            tempValue = if (rect.top > 0) -rect.top.toFloat() else 0f
         }
-        getLocalVisibleRect(localRect)
-        if (localRect.top <= 0 && value > 0) {
-            getGlobalVisibleRect(localRect)
-            tempY = y - localRect.top
+        if (rect.top + viewDisPlayRect.bottom + tempValue >= height * scaleX && value > 0) {
+            tempValue = height * scaleX - (rect.top + viewDisPlayRect.bottom)
+            if (tempValue < 0) tempValue = 0f
         }
-        if (localRect.bottom >= height * scaleX && value < 0) {
-            getGlobalVisibleRect(localRect)
-            tempY = y + viewDisPlayRect.bottom - localRect.bottom
-        }
-        y = tempY
+        scrollY += tempValue.toInt()
     }
 
     var onSingleTap: (() -> Unit)? = null

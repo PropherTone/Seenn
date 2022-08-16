@@ -375,4 +375,18 @@ II. 幂等 的意味着对同一URL的多个请求应该返回同样的结果。
     <string name="random">随机播放</string>
     <string name="log">日志</string>
     <string name="music_bucket">MusicBucket</string>
+    <string name="pick_note">链接笔记</string>
+    <string name="change_icon">修改头像</string>
+    <string name="change_name">修改名称</string>
+    <string name="change_password">修改密码</string>
+    <string name="share_data">数据共享</string>
+    <string name="encryp_model">模块加密</string>
+    <string name="clear_cache">清理缓存</string>
+    <string name="unlock_model">模块解锁</string>
+    <string name="do_not_cache">不缓存</string>
+    <string name="retry">重试</string>
+    <string name="image_cache_failed">以下图片缓存失败</string>
+    <string name="share">笔记</string>
+    <string name="combine_galley">设置合并相册</string>
+    <string name="dispatch_galley">设置拆分相册</string>
 </resources>

@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="activity"
             type="com.protone.seenn.activity.GalleyViewActivity" />
@@ -23,10 +24,10 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/galleyV_cover"
-            android:visibility="invisible"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:elevation="@dimen/small_elevation">
+            android:elevation="@dimen/small_elevation"
+            android:visibility="invisible">
 
             <TextView
                 android:id="@+id/galleyV_title"
@@ -135,6 +136,30 @@
                 android:overScrollMode="never"
                 android:padding="@dimen/main_padding"
                 app:layout_constraintBottom_toBottomOf="parent" />
+
+            <ImageView
+                android:id="@+id/previous"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:contentDescription="@string/action"
+                android:background="@drawable/black_gradient_left"
+                android:src="@drawable/ic_round_arrow_left__white_24"
+                app:layout_constraintBottom_toTopOf="@+id/galleyV_time"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/galleyV_back"
+                app:layout_constraintWidth_percent="0.12" />
+
+            <ImageView
+                android:id="@+id/next"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:contentDescription="@string/action"
+                android:background="@drawable/black_gradient_right"
+                android:src="@drawable/ic_round_arrow_right_white_24"
+                app:layout_constraintBottom_toTopOf="@+id/galleyV_time"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/galleyV_action"
+                app:layout_constraintWidth_percent="0.12" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

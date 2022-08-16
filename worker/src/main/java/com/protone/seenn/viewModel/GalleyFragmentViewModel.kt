@@ -44,6 +44,7 @@ class GalleyFragmentViewModel : ViewModel() {
 
     var isVideo: Boolean = false
     var isLock: Boolean = false
+    var combine: Boolean = false
 
     var isBucketShowUp = true
 
@@ -69,7 +70,8 @@ class GalleyFragmentViewModel : ViewModel() {
             .instance
             .signedGalleyDAOBridge
             .run {
-                val signedMedias = getAllMediaByType(isVideo) as MutableList<GalleyMedia>?
+                val signedMedias =
+                    (if (combine) getAllSignedMediaRs() else getAllMediaByType(isVideo)) as MutableList<GalleyMedia>?
                 if (signedMedias == null) {
                     R.string.none.getString().toast()
                     return@launch
@@ -99,9 +101,13 @@ class GalleyFragmentViewModel : ViewModel() {
                         }
                     }
                 }
-                getAllGalley(isVideo)?.forEach {
-                    galleyMap[it] = (getAllMediaByGalley(it, isVideo) as MutableList<GalleyMedia>)
-                        .also { list ->
+                (if (combine) getAllGalley() else getAllGalley(isVideo))?.forEach {
+                    galleyMap[it] =
+                        ((if (combine) getAllMediaByGalley(it)
+                        else getAllMediaByGalley(
+                            it,
+                            isVideo
+                        )) as MutableList<GalleyMedia>).also { list ->
                             sendEvent(
                                 FragEvent.OnNewBucket(
                                     Pair(
@@ -120,7 +126,7 @@ class GalleyFragmentViewModel : ViewModel() {
         crossinline callBack: (GalleyMedia.MediaStatus, GalleyMedia) -> Unit
     ) = viewModelScope.launch(Dispatchers.IO) {
         val allGalley = R.string.all_galley.getString()
-        if (galleyMap[allGalley]?.contains(media) == false && isVideo == media.isVideo) when (media.mediaStatus) {
+        if (galleyMap[allGalley]?.contains(media) == false && (isVideo == media.isVideo || combine)) when (media.mediaStatus) {
             GalleyMedia.MediaStatus.Updated -> {
                 galleyMap[allGalley]?.first { media -> media.uri == media.uri }?.let { media ->
                     val allIndex = galleyMap[allGalley]?.indexOf(media)

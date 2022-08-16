@@ -38,29 +38,25 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
     }
 
     override suspend fun UserConfigViewModel.init() {
-        chooseMode(
-            if (!userConfig.isLogin) {
-                UserConfigViewModel.DisplayMode.UnRegis
-            } else if (userConfig.lockGalley != "" || userConfig.lockNote != "" || userConfig.lockMusic != "") {
-                UserConfigViewModel.DisplayMode.Locked
-            } else {
-                UserConfigViewModel.DisplayMode.Normal
-            }
-        )
-
+        refreshLayout()
         onViewEvent {
             when (it) {
                 UserConfigViewModel.UserConfigEvent.Login -> startLoginDialog()
                 UserConfigViewModel.UserConfigEvent.Icon -> startIconPick()
                 UserConfigViewModel.UserConfigEvent.Name -> startNameDialog()
                 UserConfigViewModel.UserConfigEvent.PassWord -> startPasswordDialog()
-                UserConfigViewModel.UserConfigEvent.ShareNote -> {}
-                UserConfigViewModel.UserConfigEvent.ShareData -> {}
+                UserConfigViewModel.UserConfigEvent.Share -> {}
                 UserConfigViewModel.UserConfigEvent.Lock -> startLockListPop()
                 UserConfigViewModel.UserConfigEvent.Unlock -> startUnlockListPop()
                 UserConfigViewModel.UserConfigEvent.Refresh -> refreshLayout()
                 UserConfigViewModel.UserConfigEvent.ClearCache -> viewModel.clearCache()
                 UserConfigViewModel.UserConfigEvent.Log -> startActivity(LogActivity::class.intent)
+                UserConfigViewModel.UserConfigEvent.CombineGalley -> {
+                    userConfig.combineGalley = true
+                }
+                UserConfigViewModel.UserConfigEvent.DispatchGalley -> {
+                    userConfig.combineGalley = false
+                }
             }
         }
     }
@@ -69,9 +65,15 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
         binding.userRoot.removeAllViews()
     }
 
-    private fun chooseMode(mode: UserConfigViewModel.DisplayMode) {
-        val logView = initModeView("日志", UserConfigViewModel.UserConfigEvent.Log)
-        if (mode == UserConfigViewModel.DisplayMode.UnRegis) {
+    private fun chooseMode(
+        loginMode: UserConfigViewModel.DisplayMode,
+        lockMode: UserConfigViewModel.DisplayMode,
+        galleyMode: UserConfigViewModel.DisplayMode
+    ) {
+        val logView = initModeView(R.string.log.getString()) {
+            UserConfigViewModel.UserConfigEvent.Log
+        }
+        if (loginMode == UserConfigViewModel.DisplayMode.UnRegis) {
             UserConfigItemLayoutBinding.inflate(layoutInflater, root, false)
                 .apply {
                     itemName.text = R.string.login.getString()
@@ -87,20 +89,41 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
             return
         }
         val views = mutableListOf<View>(
-            initModeView("修改头像", UserConfigViewModel.UserConfigEvent.Icon),
-            initModeView("修改名称", UserConfigViewModel.UserConfigEvent.Name),
-            initModeView("修改密码", UserConfigViewModel.UserConfigEvent.PassWord),
-            initModeView("笔记共享", UserConfigViewModel.UserConfigEvent.ShareNote),
-            initModeView("数据共享", UserConfigViewModel.UserConfigEvent.ShareData),
-            initModeView("模块加密", UserConfigViewModel.UserConfigEvent.Lock),
-            initModeView("清理缓存", UserConfigViewModel.UserConfigEvent.ClearCache),
-            logView
-        )
-        if (mode == UserConfigViewModel.DisplayMode.Locked) views.add(
             initModeView(
-                "模块解锁",
-                UserConfigViewModel.UserConfigEvent.Unlock
-            )
+                R.string.change_icon.getString()
+            ) { UserConfigViewModel.UserConfigEvent.Icon },
+            initModeView(
+                R.string.change_name.getString()
+            ) { UserConfigViewModel.UserConfigEvent.Name },
+            initModeView(
+                R.string.change_password.getString()
+            ) { UserConfigViewModel.UserConfigEvent.PassWord },
+            initModeView(
+                R.string.share.getString()
+            ) { UserConfigViewModel.UserConfigEvent.Share },
+            initModeView(
+                if (lockMode != UserConfigViewModel.DisplayMode.Locked)
+                    R.string.encryp_model.getString() else R.string.unlock_model.getString()
+            ) {
+                if (lockMode != UserConfigViewModel.DisplayMode.Locked)
+                    UserConfigViewModel.UserConfigEvent.Lock else UserConfigViewModel.UserConfigEvent.Unlock
+            },
+            initModeView(
+                if (galleyMode == UserConfigViewModel.DisplayMode.CombineGalley)
+                    R.string.dispatch_galley.getString() else R.string.combine_galley.getString()
+            ) {
+                if (it.itemName.text.equals(R.string.dispatch_galley.getString())) {
+                    it.itemName.text = R.string.combine_galley.getString()
+                    UserConfigViewModel.UserConfigEvent.DispatchGalley
+                } else {
+                    it.itemName.text = R.string.dispatch_galley.getString()
+                    UserConfigViewModel.UserConfigEvent.CombineGalley
+                }
+            },
+            initModeView(
+                R.string.clear_cache.getString()
+            ) { UserConfigViewModel.UserConfigEvent.ClearCache },
+            logView
         )
         launch {
             views.forEach {
@@ -111,11 +134,16 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
         }
     }
 
-    private fun initModeView(name: String, event: BaseViewModel.ViewEvent) =
+    private fun initModeView(
+        name: String,
+        onClick: (UserConfigItemLayoutBinding) -> BaseViewModel.ViewEvent
+    ) =
         UserConfigItemLayoutBinding.inflate(layoutInflater, root, false)
             .apply {
                 itemName.text = name
-                itemName.setOnClickListener { sendViewEvent(event) }
+                itemName.setOnClickListener {
+                    sendViewEvent(onClick.invoke(this))
+                }
             }.root
 
     private suspend fun startIconPick() {
@@ -200,11 +228,15 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
     private fun refreshLayout() {
         clear()
         chooseMode(
+            if (!userConfig.isLogin) {
+                UserConfigViewModel.DisplayMode.UnRegis
+            } else UserConfigViewModel.DisplayMode.Normal,
             if (userConfig.lockGalley != "" || userConfig.lockNote != "" || userConfig.lockMusic != "") {
                 UserConfigViewModel.DisplayMode.Locked
-            } else {
-                UserConfigViewModel.DisplayMode.Normal
-            }
+            } else UserConfigViewModel.DisplayMode.Normal,
+            if (userConfig.combineGalley) {
+                UserConfigViewModel.DisplayMode.CombineGalley
+            } else UserConfigViewModel.DisplayMode.Normal
         )
     }
 

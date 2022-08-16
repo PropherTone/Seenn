@@ -222,8 +222,8 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel>(handl
     ) = launch(Dispatchers.Main) {
         val pop = ColorfulPopWindow(this@BaseMediaActivity)
         pop.startListPopup(
-            anchor,
-            withContext(Dispatchers.IO) {
+           anchor =  anchor,
+            dataList = withContext(Dispatchers.IO) {
                 val list = mutableListOf<String>()
                 DatabaseHelper.instance.galleyBucketDAOBridge.getALLGalleyBucket(isVideo)
                     ?.forEach {

@@ -25,6 +25,12 @@ class MyVideoController @JvmOverloads constructor(
     private var pauseVideo: (() -> Unit)? = null
     private var fullScreen: (() -> Unit)? = null
 
+    var title : String = ""
+    set(value) {
+        binding.vTitle.text = value
+        field = value
+    }
+
     fun playVideo(func: () -> Unit) {
         playVideo = func
     }

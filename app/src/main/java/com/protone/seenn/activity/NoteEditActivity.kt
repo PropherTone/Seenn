@@ -142,8 +142,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
 
     private suspend fun pickVideo() = viewModel.apply {
         startGalleyPick(false)?.let { re ->
-            if (allNote == null) allNote = getAllNote()
-            insertVideo(re.uri, allNote!!)
+            insertVideo(re.uri)
         }
     }
 
@@ -257,18 +256,8 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
 
     private fun insertImage(photo: RichPhotoStates) = binding.noteEditRichNote.insertImage(photo)
 
-    private fun insertVideo(uri: Uri, list: MutableList<String>) {
-        if (listPopWindow != null) {
-            listPopWindow?.dismiss()
-            listPopWindow = null
-        } else ColorfulPopWindow(this).also {
-            listPopWindow = it
-            it.setOnDismissListener { listPopWindow = null }
-        }.startListPopup(binding.noteEditTool, list) {
-            listPopWindow?.dismiss()
-            binding.noteEditRichNote.insertVideo(RichVideoStates(uri, it, name = ""))
-        }
-
+    private fun insertVideo(uri: Uri) {
+        binding.noteEditRichNote.insertVideo(RichVideoStates(uri, null, name = ""))
     }
 
     private fun insertMusic(uri: Uri, list: MutableList<String>, title: String) {
@@ -278,7 +267,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         } else ColorfulPopWindow(this).also {
             listPopWindow = it
             it.setOnDismissListener { listPopWindow = null }
-        }.startListPopup(binding.noteEditTool, list) {
+        }.startListPopup(R.string.pick_note.getString(), binding.noteEditTool, list) {
             listPopWindow?.dismiss()
             binding.noteEditRichNote.insertMusic(RichMusicStates(uri, it, title))
         }

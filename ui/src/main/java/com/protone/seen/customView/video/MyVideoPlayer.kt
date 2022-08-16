@@ -33,6 +33,12 @@ class MyVideoPlayer @JvmOverloads constructor(
 
     private val videoController: MyVideoController by lazy { MyVideoController(context) }
 
+    var title : String = ""
+        set(value) {
+            videoController.title = value
+            field = value
+        }
+
     fun setFullScreen(listener: () -> Unit) {
         videoController.fullScreen(listener)
     }
@@ -141,50 +147,62 @@ class MyVideoPlayer @JvmOverloads constructor(
     }
 
     fun release() {
-        mediaPlayer?.apply {
-            stop()
-            release()
-            isPrepared = false
+        try {
+            mediaPlayer?.apply {
+                stop()
+                release()
+                isPrepared = false
+            }
+            mediaPlayer = null
+            progressHandler.removeCallbacksAndMessages(null)
+        } catch (e: IllegalStateException) {
+            if (isInDebug()) e.printStackTrace()
         }
-        mediaPlayer = null
-        progressHandler.removeCallbacksAndMessages(null)
     }
 
     private fun videoSeekTo(position: Long) {
-        mediaPlayer?.duration?.let {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                mediaPlayer?.seekTo(
-                    (position.toFloat() / 100 * it).toLong(),
-                    MediaPlayer.SEEK_CLOSEST
-                )
-            } else {
-                mediaPlayer?.seekTo((position.toFloat() / 100 * it).toInt())
+        try {
+            mediaPlayer?.duration?.let {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    mediaPlayer?.seekTo(
+                        (position.toFloat() / 100 * it).toLong(),
+                        MediaPlayer.SEEK_CLOSEST
+                    )
+                } else {
+                    mediaPlayer?.seekTo((position.toFloat() / 100 * it).toInt())
+                }
             }
+        } catch (e: IllegalStateException) {
+            if (isInDebug()) e.printStackTrace()
         }
     }
 
     override fun onSurfaceTextureAvailable(p0: SurfaceTexture, p1: Int, p2: Int) {
-        if (surfaceTexture == null) {
-            surfaceTexture = p0
-            mediaPlayer?.apply {
-                setAudioAttributes(
-                    AudioAttributes
-                        .Builder()
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
-                        .build()
-                )
-                setDataSource(context, path)
-                setSurface(surface)
-                prepareAsync()
-                setOnVideoSizeChangedListener(this@MyVideoPlayer)
-                setOnCompletionListener(this@MyVideoPlayer)
-                setOnPreparedListener(this@MyVideoPlayer)
+        try {
+            if (surfaceTexture == null) {
+                surfaceTexture = p0
+                mediaPlayer?.apply {
+                    setAudioAttributes(
+                        AudioAttributes
+                            .Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MOVIE)
+                            .build()
+                    )
+                    setDataSource(context, path)
+                    setSurface(surface)
+                    prepareAsync()
+                    setOnVideoSizeChangedListener(this@MyVideoPlayer)
+                    setOnCompletionListener(this@MyVideoPlayer)
+                    setOnPreparedListener(this@MyVideoPlayer)
+                }
+            } else {
+                surfaceTexture?.apply {
+                    textureView?.setSurfaceTexture(this)
+                }
             }
-        } else {
-            surfaceTexture?.apply {
-                textureView?.setSurfaceTexture(this)
-            }
+        } catch (e: Exception) {
+            if (isInDebug()) e.printStackTrace()
         }
     }
 

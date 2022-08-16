@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,6 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.protone.api.TAG
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
@@ -43,6 +41,7 @@ import kotlinx.coroutines.flow.collect
 class GalleyFragment(
     private val isVideo: Boolean,
     private val isLock: Boolean,
+    private val combine : Boolean,
     private val onAttach: (MutableSharedFlow<GalleyFragmentViewModel.FragEvent>) -> Unit
 ) : Fragment(), CoroutineScope by MainScope(),
     ViewTreeObserver.OnGlobalLayoutListener,
@@ -160,6 +159,7 @@ class GalleyFragment(
         viewModel.rightGalley = R.string.all_galley.getString()
         viewModel.isVideo = isVideo
         viewModel.isLock = isLock
+        viewModel.combine = combine
     }
 
     override fun onCreateView(
@@ -198,7 +198,6 @@ class GalleyFragment(
 
     override fun onDestroy() {
         cancel()
-        Log.d(TAG, "GalleyFragment onDestroy: ")
         super.onDestroy()
     }
 
@@ -219,7 +218,7 @@ class GalleyFragment(
     private fun initList() = binding.run {
         galleyList.apply {
             layoutManager = GridLayoutManager(context, 4)
-            adapter = GalleyListAdapter(context, viewModel.isVideo).also {
+            adapter = GalleyListAdapter(context,true).also {
                 it.multiChoose = true
                 it.setOnSelectListener(this@GalleyFragment)
             }
@@ -322,4 +321,5 @@ class GalleyFragment(
             putExtra(GalleyViewViewModel.GALLEY, viewModel.rightGalley)
         })
     }
+
 }

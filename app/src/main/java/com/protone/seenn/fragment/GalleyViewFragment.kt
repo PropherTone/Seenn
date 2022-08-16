@@ -6,38 +6,54 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.protone.api.entity.GalleyMedia
+import com.protone.seen.databinding.GalleyVp2AdapterLayoutBinding
 import com.protone.seen.databinding.RichVideoLayoutBinding
 
-class GalleyViewFragment(private val galleyMedia: GalleyMedia) : Fragment() {
+class GalleyViewFragment(
+    private val galleyMedia: GalleyMedia,
+    private val singleClick: () -> Unit
+) : Fragment() {
 
-    private lateinit var binding: RichVideoLayoutBinding
+    private var videoBinding: RichVideoLayoutBinding? = null
+    private var imageBinding: GalleyVp2AdapterLayoutBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = RichVideoLayoutBinding.inflate(inflater, container, false)
-        return binding.root
+        return if (galleyMedia.isVideo) {
+            videoBinding = RichVideoLayoutBinding.inflate(inflater, container, false)
+            videoBinding!!.root
+        } else {
+            imageBinding = GalleyVp2AdapterLayoutBinding.inflate(inflater, container, false)
+            imageBinding?.image?.onSingleTap = singleClick
+            imageBinding!!.root
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        binding.richVideo.setVideoPath(galleyMedia.uri)
+        if (galleyMedia.isVideo) {
+            videoBinding?.richVideo?.setVideoPath(galleyMedia.uri)
+            videoBinding?.richVideo?.title = galleyMedia.name
+        } else imageBinding?.image?.setImageResource(galleyMedia.uri)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        binding.richVideo.release()
+        if (galleyMedia.isVideo) videoBinding?.richVideo?.release()
+        else imageBinding?.image?.clear()
     }
 
     override fun onResume() {
         super.onResume()
-        binding.richVideo.play()
+        if (galleyMedia.isVideo) videoBinding?.richVideo?.play()
+        else imageBinding?.image?.locate()
     }
 
     override fun onPause() {
         super.onPause()
-        binding.richVideo.pause()
+        if (galleyMedia.isVideo) videoBinding?.richVideo?.pause()
     }
 }

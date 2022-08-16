@@ -42,19 +42,24 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
                 when (it) {
                     is GalleyFragmentViewModel.FragEvent.OnSelect -> {
                         if (chooseData == null) chooseData = it.galleyMedia
-                        if (it.galleyMedia.size > 0) {
-                            onAction()
-                        }
+                        if (it.galleyMedia.size > 0) onAction()
                     }
                     else -> {}
                 }
             }
-            add(GalleyFragment(false, userConfig.lockGalley.isNotEmpty()) {
-                setMailer(frag1 = it.apply { launch { collect(action) } })
-            })
-            add(GalleyFragment(true, userConfig.lockGalley.isNotEmpty()) {
-                setMailer(frag2 = it.apply { launch { collect(action) } })
-            })
+            add(
+                GalleyFragment(
+                    false,
+                    userConfig.lockGalley.isNotEmpty(),
+                    userConfig.combineGalley
+                ) {
+                    setMailer(frag1 = it.apply { launch { collect(action) } })
+                })
+            if (!userConfig.combineGalley) {
+                add(GalleyFragment(true, userConfig.lockGalley.isNotEmpty(), false) {
+                    setMailer(frag2 = it.apply { launch { collect(action) } })
+                })
+            }
         }, chooseType)
 
         Medias.galleyNotifier.collect {
@@ -84,23 +89,28 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
         binding.galleyPager.let {
             it.adapter = MyFragmentStateAdapter(
                 this@GalleyActivity,
-                when (chooseType) {
+                if (userConfig.combineGalley) {
+                    fragments
+                } else when (chooseType) {
                     GalleyViewModel.CHOOSE_PHOTO -> arrayListOf(fragments[0])
                     GalleyViewModel.CHOOSE_VIDEO -> arrayListOf(fragments[1])
                     else -> fragments
                 }
             )
-            TabLayoutMediator(binding.galleyTab.apply {
-                addOnTabSelectedListener(viewModel)
-            }, it) { tab, position ->
-                tab.setText(
-                    when (chooseType) {
-                        GalleyViewModel.CHOOSE_PHOTO -> arrayOf(R.string.photo)
-                        GalleyViewModel.CHOOSE_VIDEO -> arrayOf(R.string.video)
-                        else -> arrayOf(R.string.photo, R.string.video)
-                    }[position]
-                )
-            }.attach()
+            when (chooseType) {
+                GalleyViewModel.CHOOSE_PHOTO -> arrayOf(R.string.photo)
+                GalleyViewModel.CHOOSE_VIDEO -> arrayOf(R.string.video)
+                else -> if (userConfig.combineGalley)
+                    arrayOf(R.string.model_Galley) else arrayOf(R.string.photo, R.string.video)
+            }.let { tabName ->
+                TabLayoutMediator(binding.galleyTab.apply {
+                    addOnTabSelectedListener(viewModel)
+                }, it) { tab, position ->
+                    tab.setText(
+                        tabName[position]
+                    )
+                }.attach()
+            }
         }
     }
 

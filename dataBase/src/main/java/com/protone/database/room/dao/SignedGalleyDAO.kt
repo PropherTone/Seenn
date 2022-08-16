@@ -18,8 +18,14 @@ interface SignedGalleyDAO {
     @Query("SELECT DISTINCT bucket FROM GalleyMedia WHERE isVideo LIKE :isVideo ORDER BY date DESC")
     fun getAllGalley(isVideo: Boolean): List<String>?
 
+    @Query("SELECT DISTINCT bucket FROM GalleyMedia ORDER BY date DESC")
+    fun getAllGalley(): List<String>?
+
     @Query("SELECT * FROM GalleyMedia WHERE bucket LIKE :name AND isVideo LIKE :isVideo ORDER BY date DESC")
     fun getAllMediaByGalley(name: String, isVideo: Boolean): List<GalleyMedia>?
+
+    @Query("SELECT * FROM GalleyMedia WHERE bucket LIKE :name ORDER BY date DESC")
+    fun getAllMediaByGalley(name: String): List<GalleyMedia>?
 
     @Query("DELETE FROM GalleyMedia WHERE media_uri LIKE :uri")
     fun deleteSignedMediaByUri(uri: Uri)

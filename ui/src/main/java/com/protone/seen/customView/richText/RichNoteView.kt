@@ -248,7 +248,9 @@ class RichNoteView @JvmOverloads constructor(
                 richLinkContainer.setOnClickListener {
                     music.link?.let { note -> iRichListener?.jumpTo(note) }
                 }
-                richLink.text = music.link ?: ""
+                richLink.text = music.link ?: "".also{
+                    richLink.isGone = true
+                }
             }
             richMusic.cover = music.uri
             richMusic.setName(music.name)
