@@ -49,6 +49,16 @@ class GalleyViewActivity :
         binding.previous.setOnClickListener {
             binding.galleyVView.setCurrentItem(binding.galleyVView.currentItem - 1, true)
         }
+        binding.galleyVLinks.apply {
+            adapter = CheckListAdapter(this@GalleyViewActivity, check = false).also {
+                it.startNote = {
+                    startActivity(NoteViewActivity::class.intent.apply {
+                        putExtra(NoteViewViewModel.NOTE_NAME, it)
+                    })
+                }
+            }
+            layoutManager = LinearLayoutManager(context)
+        }
         return binding.root
     }
 
@@ -57,22 +67,7 @@ class GalleyViewActivity :
         val galley =
             intent.getStringExtra(GalleyViewViewModel.GALLEY) ?: R.string.all_galley.getString()
         initGalleyData(galley, isVideo)
-        init(isVideo)
 
-        onViewEvent {
-            when (it) {
-                GalleyViewViewModel.GalleyViewEvent.SetNote -> viewModel.setInfo()
-                else -> {}
-            }
-        }
-    }
-
-    private suspend fun GalleyViewViewModel.init(isVideo: Boolean) {
-        initList {
-            startActivity(NoteViewActivity::class.intent.apply {
-                putExtra(NoteViewViewModel.NOTE_NAME, it)
-            })
-        }
         val mediaIndex = getMediaIndex()
         initViewPager(mediaIndex, galleyMedias) { position ->
             curPosition = position
@@ -80,6 +75,13 @@ class GalleyViewActivity :
         }
         setMediaInfo(mediaIndex)
         setInfo()
+
+        onViewEvent {
+            when (it) {
+                GalleyViewViewModel.GalleyViewEvent.SetNote -> viewModel.setInfo()
+                else -> {}
+            }
+        }
     }
 
     private suspend fun GalleyViewViewModel.setInfo() {

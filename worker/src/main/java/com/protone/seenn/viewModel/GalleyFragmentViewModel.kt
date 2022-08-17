@@ -17,13 +17,6 @@ import kotlinx.coroutines.launch
 
 class GalleyFragmentViewModel : ViewModel() {
 
-    companion object {
-        const val OnUpdated = "Media_Updated"
-        const val OnDeleted = "Media_Deleted"
-        const val OnNew = "New_Media"
-    }
-
-
     private val _fragFlow = MutableSharedFlow<FragEvent>()
     val fragFlow get() = _fragFlow
 
@@ -171,7 +164,7 @@ class GalleyFragmentViewModel : ViewModel() {
                     it.uri,
                     arrayOf(it.bucket, galleyMap[it.bucket]?.size.toString())
                 )
-            ).apply { fragFlow.emit(this) }
+            ).apply { _fragFlow.emit(this) }
         }
         galleyMap[it.bucket]?.add(0, it)
     }
