@@ -1,12 +1,13 @@
 package com.protone.seenn.viewModel
 
 import android.content.Intent
-import android.widget.Toast
+import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.protone.api.baseType.getString
 import com.protone.api.context.*
 import com.protone.api.entity.Music
 import com.protone.seen.R
+import com.protone.seen.customView.Bubble
 import com.protone.seen.customView.ColorfulProgressBar
 import com.protone.seen.customView.musicPlayer.BaseMusicPlayer
 import com.protone.seenn.broadcast.musicBroadCastManager
@@ -24,6 +25,8 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
     }
 
     var loop = 1
+
+    private val bubble = Bubble(controller.context)
 
     fun setBinder(
         lifecycle: LifecycleOwner,
@@ -45,7 +48,7 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
             looper?.setOnClickListener {
                 if (loop == 4) loop = 0
                 this@MusicControllerIMP.binder?.setLoopMode(++loop)
-                setLoopMode(loop)
+                setLoopMode(loop, it)
                 onLoop?.invoke(loop)
             }
             this@MusicControllerIMP.binder?.run {
@@ -104,28 +107,28 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
         }
     }
 
-    fun setLoopMode(mode: Int) {
+    fun setLoopMode(mode: Int, targetView: View? = null) {
         loop = mode
         when (mode) {
             LOOP_LIST -> {
                 controller.looper?.setImageResource(R.drawable.ic_round_repeat_24_white)
-                showToast(R.string.loop_list.getString())
+                showToast(targetView, R.string.loop_list.getString())
             }
             LOOP_SINGLE -> {
                 controller.looper?.setImageResource(R.drawable.ic_round_repeat_one_24_white)
-                showToast(R.string.loop_single.getString())
+                showToast(targetView, R.string.loop_single.getString())
             }
             PLAY_LIST -> {
                 controller.looper?.setImageResource(R.drawable.ic_round_playlist_play_24_white)
-                showToast(R.string.play_list.getString())
+                showToast(targetView, R.string.play_list.getString())
             }
             NO_LOOP -> {
                 controller.looper?.setImageResource(R.drawable.ic_round_block_24_white)
-                showToast(R.string.no_loop.getString())
+                showToast(targetView, R.string.no_loop.getString())
             }
             RANDOM -> {
                 controller.looper?.setImageResource(R.drawable.ic_round_loop_24_white)
-                showToast(R.string.random.getString())
+                showToast(targetView, R.string.random.getString())
             }
         }
         binder?.setLoopMode(mode)
@@ -150,7 +153,8 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
 
     fun getProgress() = controller.progress?.barDuration
 
-    private fun showToast(msg: String) {
-        Toast.makeText(controller.context, msg, Toast.LENGTH_SHORT).show()
+    private fun showToast(target: View?, msg: CharSequence) {
+        if (target == null) return
+        bubble.setText(msg).showBubble(target)
     }
 }
