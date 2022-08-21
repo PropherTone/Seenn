@@ -317,7 +317,7 @@ class DatabaseHelper {
 
         fun deleteNoteAsync(note: Note) {
             execute {
-                noteDAO.deleteNote(note)
+                deleteNote(note)
             }
         }
 

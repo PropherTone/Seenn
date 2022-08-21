@@ -22,7 +22,7 @@ class NoteViewModel : BaseViewModel() {
 
     fun getNoteList(type: String?) = noteList[type.also { selected = it }] ?: mutableListOf()
 
-    fun deleteNote(note: Note) = DatabaseHelper.instance.noteDAOBridge.deleteNote(note)
+    fun deleteNote(note: Note) = DatabaseHelper.instance.noteDAOBridge.deleteNoteAsync(note)
 
 
     suspend fun queryAllNote() = withContext(Dispatchers.IO) {

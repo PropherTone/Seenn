@@ -26,6 +26,7 @@ import com.protone.seenn.viewModel.NoteEditViewModel
 import com.protone.seenn.viewModel.NoteViewViewModel
 import com.protone.seenn.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel>(true),
@@ -274,12 +275,14 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
     }
 
     private fun setNoteIcon(path: String) {
-        Glide.with(this)
-            .asDrawable()
-            .load(path)
-            .skipMemoryCache(true)
-            .diskCacheStrategy(DiskCacheStrategy.NONE)
-            .into(binding.noteEditIcon)
+        launch {
+            Glide.with(this@NoteEditActivity)
+                .asDrawable()
+                .load(path)
+                .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(binding.noteEditIcon)
+        }
     }
 
     private fun setNoteIconCache(uri: Uri?) {

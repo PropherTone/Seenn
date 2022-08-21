@@ -46,7 +46,7 @@ class GalleySearchActivity :
             R.string.none.getString().toast()
         } else {
             data.addAll(gainListData)
-            initList(isVideo())
+            initList()
         }
 
         onFinish = {
@@ -63,7 +63,7 @@ class GalleySearchActivity :
         it.setOnSelectListener(this@GalleySearchActivity)
     }
 
-    private fun initList(isVideo: Boolean) {
+    private fun initList() {
         binding.apply {
             linkInput(scroll, inputSearch)
             fun RecyclerView.initRecyclerView() {

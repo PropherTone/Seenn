@@ -221,8 +221,15 @@ class MyVideoPlayer @JvmOverloads constructor(
         }
     }
 
+    private var onComplete : (()->Unit)? = null
+
+    fun doOnCompletion(block:()->Unit){
+        onComplete = block
+    }
+
     override fun onCompletion(p0: MediaPlayer?) {
         videoController.complete()
+        onComplete?.invoke()
     }
 
     override fun onPrepared(p0: MediaPlayer?) {
