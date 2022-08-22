@@ -103,12 +103,11 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
 
     private fun updateMusicBucket() = launch(Dispatchers.IO) {
         DatabaseHelper.instance.run {
-            val allMusicBucket = musicBucketDAOBridge.getAllMusicBucket().let { l ->
+            musicBucketDAOBridge.getAllMusicBucket().let { l ->
                 (l as ArrayList).filter {
                     it.name != R.string.all_music.getString()
                 }
-            }
-            allMusicBucket.forEach {
+            }.forEach {
                 musicBucket[it.name] =
                     musicWithMusicBucketDAOBridge
                         .getMusicWithMusicBucket(it.musicBucketId) as MutableList<Music>

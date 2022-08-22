@@ -81,8 +81,6 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
 
     private var serviceConnection: ServiceConnection? = null
 
-    lateinit var binder: MusicService.MusicBinder
-
     override fun onCreate(savedInstanceState: Bundle?) {
         setTransparentClipStatusBar()
         super.onCreate(savedInstanceState)
@@ -147,11 +145,10 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
         viewEvent = null
     }
 
-    fun bindMusicService(block: () -> Unit) {
+    fun bindMusicService(block: (MusicService.MusicBinder) -> Unit) {
         serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-                binder = (p1 as MusicService.MusicBinder)
-                block()
+                block(p1 as MusicService.MusicBinder)
             }
 
             override fun onServiceDisconnected(p0: ComponentName?) {

@@ -30,13 +30,13 @@ class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>
     override suspend fun MusicViewModel.init() {
         val musicController = MusicControllerIMP(binding.musicPlayer)
         bindMusicService {
-            musicController.setBinder(this@MusicViewActivity, binder) {
+            musicController.setBinder(this@MusicViewActivity, it) {
                 userConfig.musicLoopMode = it
             }
             musicController.refresh()
             musicController.setLoopMode(userConfig.musicLoopMode)
             initPlayList(
-                binder.getPlayList(), musicController.getPlayingMusic(),
+                it.getPlayList(), musicController.getPlayingMusic(),
                 object : TransparentPlayListAdapter.OnPlayListClk {
                     override fun onClk(music: Music) {
                         musicController.play(music)

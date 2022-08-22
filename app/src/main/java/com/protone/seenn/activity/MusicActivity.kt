@@ -79,7 +79,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
         }
         setBucket()
         bindMusicService {
-            musicController.setBinder(this@MusicActivity, binder, onPlaying = {
+            musicController.setBinder(this@MusicActivity, it, onPlaying = {
                 onUiThread {
                     getMusicListAdapter().playPosition(it)
                 }

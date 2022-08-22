@@ -20,7 +20,7 @@ abstract class BaseAdapter<B : ViewDataBinding, T>(
     class Holder<B : ViewDataBinding>(val binding: B) : RecyclerView.ViewHolder(binding.root)
 
     private val _adapterFlow = MutableSharedFlow<T>()
-    val adapterFlow get() = _adapterFlow
+    private val adapterFlow get() = _adapterFlow
 
     open suspend fun onEventIO(data: T) {}
 

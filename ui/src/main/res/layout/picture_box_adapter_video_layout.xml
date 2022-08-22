@@ -13,6 +13,7 @@
         <ImageView
             android:id="@+id/start"
             android:layout_width="@dimen/small_Icon"
+            android:layout_gravity="center"
             android:layout_height="@dimen/small_Icon"
             android:background="@drawable/oval_fore_dark"
             android:contentDescription="@string/action"

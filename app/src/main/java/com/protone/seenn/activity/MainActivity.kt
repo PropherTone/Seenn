@@ -99,7 +99,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
         }
 
         bindMusicService {
-            musicController.setBinder(this@MainActivity, binder) {
+            musicController.setBinder(this@MainActivity, it) {
                 userConfig.musicLoopMode = it
             }
             musicController.setLoopMode(userConfig.musicLoopMode)
@@ -133,7 +133,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
             DatabaseHelper.instance.shutdownNow()
             stopService(WorkService::class.intent)
             userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
-            userConfig.lastMusic = binder.onMusicPlaying().value?.toJson() ?: ""
+            userConfig.lastMusic = musicController.getPlayingMusic()?.toJson() ?: ""
         }
 
         onViewEvent {
