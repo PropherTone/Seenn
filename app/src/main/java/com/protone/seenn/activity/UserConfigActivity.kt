@@ -51,12 +51,8 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
                 UserConfigViewModel.UserConfigEvent.Refresh -> refreshLayout()
                 UserConfigViewModel.UserConfigEvent.ClearCache -> viewModel.clearCache()
                 UserConfigViewModel.UserConfigEvent.Log -> startActivity(LogActivity::class.intent)
-                UserConfigViewModel.UserConfigEvent.CombineGalley -> {
-                    userConfig.combineGalley = true
-                }
-                UserConfigViewModel.UserConfigEvent.DispatchGalley -> {
-                    userConfig.combineGalley = false
-                }
+                UserConfigViewModel.UserConfigEvent.CombineGalley -> userConfig.combineGalley = true
+                UserConfigViewModel.UserConfigEvent.DispatchGalley -> userConfig.combineGalley = false
             }
         }
     }

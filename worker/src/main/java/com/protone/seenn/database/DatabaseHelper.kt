@@ -217,6 +217,10 @@ class DatabaseHelper {
             it.resumeWith(Result.success(getAllSignedMedia()))
         }
 
+        suspend fun getAllMediaByTypeRs(isVideo: Boolean) = onResult {
+            it.resumeWith(Result.success(getAllMediaByType(isVideo)))
+        }
+
         fun getAllSignedMedia(): List<GalleyMedia>? =
             signedGalleyDAO.getAllSignedMedia()
 

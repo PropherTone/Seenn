@@ -78,7 +78,7 @@ class GalleyViewActivity :
 
         onViewEvent {
             when (it) {
-                GalleyViewViewModel.GalleyViewEvent.SetNote -> viewModel.setInfo()
+                GalleyViewViewModel.GalleyViewEvent.SetNote -> setInfo()
                 else -> {}
             }
         }
@@ -88,7 +88,7 @@ class GalleyViewActivity :
         val galleyMedia = getSignedMedia()
         removeCato()
         galleyMedia?.cate?.onEach {
-            withContext(Dispatchers.IO) {
+            withContext(Dispatchers.Default) {
                 if (it.contains("content://")) {
                     val mediaByUri = getMediaByUri(it.toUri())
                     addCato(
@@ -175,15 +175,6 @@ class GalleyViewActivity :
                 }
             })
             setCurrentItem(position, false)
-        }
-    }
-
-    private fun initList(startNote: (String) -> Unit) {
-        binding.galleyVLinks.apply {
-            adapter = CheckListAdapter(context, check = false).also {
-                it.startNote = startNote
-            }
-            layoutManager = LinearLayoutManager(context)
         }
     }
 

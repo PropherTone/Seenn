@@ -19,6 +19,7 @@ class AddBucketViewModel : BaseViewModel() {
     sealed class AddBucketEvent {
         object Confirm : ViewEvent
         object ChooseIcon : ViewEvent
+        object Cancel : ViewEvent
     }
 
     var editName: String? = null

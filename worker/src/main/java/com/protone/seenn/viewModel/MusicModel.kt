@@ -5,6 +5,7 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.saveToFile
 import com.protone.api.baseType.toast
 import com.protone.api.entity.MusicBucket
+import com.protone.api.onResult
 import com.protone.api.todayDate
 import com.protone.seenn.Medias
 import com.protone.seenn.R
@@ -14,13 +15,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.stream.Collectors
-import kotlin.coroutines.suspendCoroutine
 
 class MusicModel : BaseViewModel() {
 
     sealed class MusicEvent {
         object Delete : ViewEvent
         object RefreshBucket : ViewEvent
+        object Edit : ViewEvent
+        object AddList : ViewEvent
+        object AddBucket : ViewEvent
     }
 
     var bucket = R.string.all_music.getString()
@@ -38,7 +41,7 @@ class MusicModel : BaseViewModel() {
 
     suspend fun getMusicBucket(): MutableList<MusicBucket> {
         val list = DatabaseHelper.instance.musicBucketDAOBridge.getAllMusicBucketRs()
-        return suspendCoroutine { co ->
+        return onResult { co ->
             if (list == null || list.isEmpty()) {
                 DatabaseHelper.instance.musicBucketDAOBridge.addMusicBucketWithCallBack(
                     MusicBucket(
@@ -87,7 +90,8 @@ class MusicModel : BaseViewModel() {
         }
     }
 
-    fun getMusicBucketByName(name: String) =
+    suspend fun getMusicBucketByName(name: String) = withContext(Dispatchers.IO){
         DatabaseHelper.instance.musicBucketDAOBridge.getMusicBucketByName(name)
+    }
 
 }

@@ -27,10 +27,10 @@ class GalleySearchViewModel : BaseViewModel() {
 
     fun query(input: String) {
         if (input.isEmpty()) return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Default) {
             val lowercase = input.lowercase(Locale.getDefault())
             val uppercase = input.uppercase(Locale.getDefault())
-            launch(Dispatchers.IO) {
+            launch(Dispatchers.Default) {
                 data.stream().filter {
                     it.name.contains(input, true)
                 }.toList().let { nameFilterList ->
@@ -38,7 +38,7 @@ class GalleySearchViewModel : BaseViewModel() {
                     cancel()
                 }
             }
-            launch(Dispatchers.IO) {
+            launch(Dispatchers.Default) {
                 data.stream().filter {
                     it.cate?.contains(input) == true
                             || it.cate?.contains(lowercase) == true
@@ -50,7 +50,7 @@ class GalleySearchViewModel : BaseViewModel() {
                     cancel()
                 }
             }
-            launch(Dispatchers.IO) {
+            launch(Dispatchers.Default) {
                 data.stream().filter {
                     val notesWithGalley =
                         DatabaseHelper.instance

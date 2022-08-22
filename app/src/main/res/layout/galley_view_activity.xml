@@ -7,6 +7,8 @@
         <variable
             name="activity"
             type="com.protone.seenn.activity.GalleyViewActivity" />
+
+        <import type="com.protone.seenn.viewModel.GalleyViewViewModel.GalleyViewEvent" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -60,7 +62,7 @@
                 android:layout_width="@dimen/action_icon_p"
                 android:layout_height="@dimen/action_icon_p"
                 android:contentDescription="@string/action"
-                android:onClick="@{()->activity.showPop()}"
+                android:onClick="@{()->activity.sendViewEvent(GalleyViewEvent.SetNote.INSTANCE)}"
                 android:padding="@dimen/icon_padding_mid"
                 android:src="@drawable/ic_baseline_more_horiz_24_white"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -141,8 +143,8 @@
                 android:id="@+id/previous"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:contentDescription="@string/action"
                 android:background="@drawable/black_gradient_left"
+                android:contentDescription="@string/action"
                 android:src="@drawable/ic_round_arrow_left__white_24"
                 app:layout_constraintBottom_toTopOf="@+id/galleyV_time"
                 app:layout_constraintStart_toStartOf="parent"
@@ -153,8 +155,8 @@
                 android:id="@+id/next"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:contentDescription="@string/action"
                 android:background="@drawable/black_gradient_right"
+                android:contentDescription="@string/action"
                 android:src="@drawable/ic_round_arrow_right_white_24"
                 app:layout_constraintBottom_toTopOf="@+id/galleyV_time"
                 app:layout_constraintEnd_toEndOf="parent"

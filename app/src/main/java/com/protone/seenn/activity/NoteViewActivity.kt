@@ -44,17 +44,9 @@ class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel
         }
     }
 
-    fun sendNext() {
-        sendViewEvent(NoteViewViewModel.NoteViewEvent.Next)
-    }
-
-    fun sendEdit() {
-        sendViewEvent(NoteViewViewModel.NoteViewEvent.Edit)
-    }
-
     override fun finish() {
         if (viewModel.noteQueue.isNotEmpty()) {
-            sendNext()
+            sendViewEvent(NoteViewViewModel.NoteViewEvent.Next)
         } else super.finish()
     }
 
@@ -82,7 +74,7 @@ class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel
 
                 override fun jumpTo(note: String) {
                     noteQueue.offer(note)
-                    sendNext()
+                    sendViewEvent(NoteViewViewModel.NoteViewEvent.Next)
                 }
 
                 override fun open(uri: Uri, name: String, isVideo: Boolean) {

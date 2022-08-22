@@ -57,14 +57,14 @@ class GalleyFragmentViewModel : ViewModel() {
         }
     }
 
-    fun sortData() = viewModelScope.launch(Dispatchers.IO) {
+    fun sortData() = viewModelScope.launch(Dispatchers.Default) {
         galleyMap[R.string.all_galley.getString()] = mutableListOf()
         DatabaseHelper
             .instance
             .signedGalleyDAOBridge
             .run {
                 val signedMedias =
-                    (if (combine) getAllSignedMediaRs() else getAllMediaByType(isVideo)) as MutableList<GalleyMedia>?
+                    (if (combine) getAllSignedMediaRs() else getAllMediaByTypeRs(isVideo)) as MutableList<GalleyMedia>?
                 if (signedMedias == null) {
                     R.string.none.getString().toast()
                     return@launch
@@ -84,7 +84,7 @@ class GalleyFragmentViewModel : ViewModel() {
                     )
                     sendEvent(FragEvent.OnGetAllGalley)
                 }
-                if (!isLock) launch(Dispatchers.IO) {
+                if (!isLock) launch(Dispatchers.Default) {
                     signedMedias.forEach {
                         it.type?.forEach { type ->
                             if (galleyMap[type] == null) {
@@ -117,7 +117,7 @@ class GalleyFragmentViewModel : ViewModel() {
     inline fun updateGalley(
         media: GalleyMedia,
         crossinline callBack: (GalleyMedia.MediaStatus, GalleyMedia) -> Unit
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    ) = viewModelScope.launch(Dispatchers.Default) {
         val allGalley = R.string.all_galley.getString()
         if (galleyMap[allGalley]?.contains(media) == false && (isVideo == media.isVideo || combine)) when (media.mediaStatus) {
             GalleyMedia.MediaStatus.Updated -> {

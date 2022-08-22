@@ -8,6 +8,7 @@
             name="activity"
             type="com.protone.seenn.activity.NoteEditActivity" />
 
+        <import type="com.protone.seenn.viewModel.NoteEditViewModel.NoteEvent" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -37,7 +38,7 @@
                     android:layout_height="@dimen/huge_icon"
                     android:background="@drawable/main_background"
                     android:contentDescription="@string/icon"
-                    android:onClick="@{()->activity.sendPickIcon()}"
+                    android:onClick="@{()->activity.sendViewEvent(NoteEvent.PickIcon.INSTANCE)}"
                     android:scaleType="centerCrop"
                     app:layout_collapseMode="parallax" />
 
@@ -96,7 +97,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
                         android:contentDescription="@string/action"
-                        android:onClick="@{()->activity.sendConfirm()}"
+                        android:onClick="@{()->activity.sendViewEvent(NoteEvent.Confirm.INSTANCE)}"
                         android:paddingStart="0dp"
                         android:paddingTop="@dimen/main_margin"
                         android:paddingEnd="@dimen/main_padding"
@@ -203,7 +204,7 @@
                     android:layout_height="@dimen/small_Icon"
                     android:layout_marginStart="@dimen/icon_margin"
                     android:contentDescription="@string/action"
-                    android:onClick="@{()->activity.sendPickImage()}"
+                    android:onClick="@{()->activity.sendViewEvent(NoteEvent.PickImage.INSTANCE)}"
                     android:padding="@dimen/texts_padding"
                     android:src="@drawable/ic_baseline_image_24_black" />
 
@@ -212,7 +213,7 @@
                     android:layout_height="@dimen/small_Icon"
                     android:layout_marginStart="@dimen/icon_margin"
                     android:contentDescription="@string/action"
-                    android:onClick="@{()->activity.sendPickMusic()}"
+                    android:onClick="@{()->activity.sendViewEvent(NoteEvent.PickMusic.INSTANCE)}"
                     android:padding="@dimen/texts_padding"
                     android:src="@drawable/ic_baseline_music_note_24" />
 
@@ -221,7 +222,7 @@
                     android:layout_height="@dimen/small_Icon"
                     android:layout_marginStart="@dimen/icon_margin"
                     android:contentDescription="@string/action"
-                    android:onClick="@{()->activity.sendPickVideo()}"
+                    android:onClick="@{()->activity.sendViewEvent(NoteEvent.PickVideo.INSTANCE)}"
                     android:padding="@dimen/texts_padding"
                     android:src="@drawable/ic_baseline_play_circle_filled_24_black" />
 

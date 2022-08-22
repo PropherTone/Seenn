@@ -48,7 +48,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
     }
 
     @Suppress("ObjectLiteralToLambda")
-    override suspend fun MusicModel.init()  {
+    override suspend fun MusicModel.init() {
         bucket = userConfig.lastMusicBucket
         val musicController = MusicControllerIMP(binding.mySmallMusicPlayer)
         musicController.onClick {
@@ -75,7 +75,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
         }
 
         Medias.musicBucketNotifier.observe(this@MusicActivity) {
-            sendRefreshBucket()
+            sendViewEvent(MusicModel.MusicEvent.RefreshBucket)
         }
         setBucket()
         bindMusicService {
@@ -91,26 +91,35 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
 
         onViewEvent {
             when (it) {
-                MusicModel.MusicEvent.Delete -> viewModel.delete()
-                MusicModel.MusicEvent.RefreshBucket -> viewModel.refreshBucket()
+                MusicModel.MusicEvent.Delete -> delete()
+                MusicModel.MusicEvent.RefreshBucket -> refreshBucket()
+                MusicModel.MusicEvent.Edit -> edit()
+                MusicModel.MusicEvent.AddList -> {
+                    if (viewModel.compareName()) return@onViewEvent
+                    startActivity(
+                        PickMusicActivity::class.intent.putExtra(
+                            "BUCKET",
+                            viewModel.bucket
+                        )
+                    )
+                }
+                MusicModel.MusicEvent.AddBucket -> addBucket()
             }
         }
     }
 
-    private fun MusicModel.updateBucket() {
-        onUiThread {
-            setBucket()
-            getMusicListAdapter().musicList = getMusicList()
-        }
+    private fun MusicModel.updateBucket() = launch(Dispatchers.Main) {
+        setBucket()
+        getMusicListAdapter().musicList = getMusicList()
     }
 
     fun sendDelete() {
         sendViewEvent(MusicModel.MusicEvent.Delete)
     }
 
-    fun edit() {
+    private suspend fun edit() {
         if (viewModel.compareName()) return
-        launch {
+        withContext(Dispatchers.Default) {
             val ar = startActivityForResult(
                 AddBucketActivity::class.intent.putExtra(
                     AddBucketViewModel.BUCKET_NAME,
@@ -122,30 +131,19 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                 re.data?.getStringExtra(AddBucketViewModel.BUCKET_NAME)?.let {
                     viewModel.bucket = it
                     getMusicBucketAdapter().clickCallback?.invoke(viewModel.bucket)
-                    sendRefreshBucket()
+                    sendViewEvent(MusicModel.MusicEvent.RefreshBucket)
                 }
             }
         }
     }
 
-    fun addList() {
-        if (viewModel.compareName()) return
-        startActivity(PickMusicActivity::class.intent.putExtra("BUCKET", viewModel.bucket))
-    }
-
-    fun addBucket() {
-        launch {
-            val re = startActivityForResult(AddBucketActivity::class.intent)
-            when (re?.resultCode) {
-                RESULT_OK -> re.data?.getStringExtra(AddBucketViewModel.BUCKET_NAME)
-                    ?.let { addBucket(it) }
-                RESULT_CANCELED -> R.string.cancel.getString().toast()
-            }
+    private suspend fun addBucket(): Unit = withContext(Dispatchers.Default) {
+        val re = startActivityForResult(AddBucketActivity::class.intent)
+        when (re?.resultCode) {
+            RESULT_OK -> re.data?.getStringExtra(AddBucketViewModel.BUCKET_NAME)
+                ?.let { addBucket(it) }
+            RESULT_CANCELED -> R.string.cancel.getString().toast()
         }
-    }
-
-    private fun sendRefreshBucket() {
-        sendViewEvent(MusicModel.MusicEvent.RefreshBucket)
     }
 
     private suspend fun MusicModel.refreshBucket() {
@@ -154,9 +152,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
 
     private suspend fun MusicModel.delete() {
         if (compareName()) return
-        val musicBucket = withContext(Dispatchers.IO) {
-            getMusicBucketByName(bucket)
-        }
+        val musicBucket = getMusicBucketByName(bucket)
         if (musicBucket != null) {
             if (getMusicBucketAdapter().deleteBucket(musicBucket)) {
                 val re = doDeleteBucket(musicBucket)
@@ -177,7 +173,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
         }
     }
 
-    private fun MusicModel.setBucket() = launch(Dispatchers.IO) {
+    private suspend fun MusicModel.setBucket() {
         getBucket()?.let {
             setBucket(
                 it.icon,
@@ -199,7 +195,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                     override fun addList(bucket: String, position: Int) {
                         this@initList.bucket = bucket
                         actionPosition = position
-                        addList()
+                        sendViewEvent(MusicModel.MusicEvent.AddList)
                     }
 
                     override fun delete(bucket: String, position: Int) {
@@ -211,7 +207,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                     override fun edit(bucket: String, position: Int) {
                         this@initList.bucket = bucket
                         actionPosition = position
-                        edit()
+                        sendViewEvent(MusicModel.MusicEvent.Edit)
                     }
                 }
             }
@@ -246,11 +242,9 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
         }
     }
 
-    private fun addBucket(name: String) = launch(Dispatchers.IO) {
-        viewModel.getMusicBucketByName(name)?.let {
-            withContext(Dispatchers.Main) {
-                getMusicBucketAdapter().addBucket(it)
-            }
+    private suspend fun addBucket(name: String): Unit? = viewModel.getMusicBucketByName(name)?.let {
+        withContext(Dispatchers.Main) {
+            getMusicBucketAdapter().addBucket(it)
         }
     }
 

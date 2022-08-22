@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import java.util.concurrent.atomic.AtomicInteger
 
-abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven: Boolean) :
+abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEvent: Boolean) :
     AppCompatActivity(),
     CoroutineScope by MainScope() {
     protected abstract val viewModel: VM
@@ -50,7 +50,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
     protected var onStop: (suspend () -> Unit)? = null
 
     init {
-        if (handleEven) {
+        if (handleEvent) {
             viewEvent = Channel(Channel.UNLIMITED)
             viewEventTask = launch(Dispatchers.Main) {
                 viewEvent?.receiveAsFlow()?.collect {

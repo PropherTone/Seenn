@@ -25,11 +25,11 @@ import com.protone.seenn.viewModel.MusicControllerIMP.Companion.LOOP_SINGLE
 import com.protone.seenn.viewModel.MusicControllerIMP.Companion.NO_LOOP
 import com.protone.seenn.viewModel.MusicControllerIMP.Companion.PLAY_LIST
 import com.protone.seenn.viewModel.MusicControllerIMP.Companion.RANDOM
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.timerTask
 import kotlin.system.exitProcess
 
@@ -55,7 +55,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
 
                 field = MediaPlayer.create(
                     SApplication.app,
-                    playList[playPosition].uri
+                    playList[playPosition.get()].uri
                 ).also {
                     it.setAudioAttributes(
                         AudioAttributes
@@ -71,7 +71,9 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         }
     private var progressTimer: Timer? = null
 
-    private var playPosition = 0
+    private val mutex by lazy { Mutex() }
+
+    private var playPosition = AtomicInteger(0)
     private val playList = mutableListOf<Music>()
     private val progress = MutableLiveData<Long>()
     private val playState = MutableLiveData<Boolean>()
@@ -114,35 +116,38 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
             notificationPlayState(b, ref)
         }
 
-        private fun notificationPlayState(state: Boolean, ref: Boolean) {
-            synchronized(playList) {
-                if (playList.isEmpty()) return
-                playState.postValue(state)
-                initMusicNotification()
-                remoteViews?.setImageViewResource(
-                    R.id.notify_music_control,
-                    if (state) R.drawable.ic_baseline_pause_24
-                    else R.drawable.ic_baseline_play_arrow_24
-                )
-                if (state || ref) {
-                    remoteViews?.setTextViewText(
-                        R.id.notify_music_name,
-                        playList[playPosition].title
-                    )
-                    playList[playPosition].uri.toBitmapByteArray()?.let { ba ->
-                        remoteViews?.setImageViewBitmap(
-                            R.id.notify_music_icon,
-                            BitmapFactory.decodeByteArray(
-                                ba,
-                                0,
-                                ba.size
-                            )
+        private fun notificationPlayState(state: Boolean, ref: Boolean) =
+            launch(Dispatchers.Default) {
+                mutex.withLock {
+                    if (playList.isEmpty()) return@launch
+                    playState.postValue(state)
+                    initMusicNotification()
+                    withContext(Dispatchers.Main) {
+                        remoteViews?.setImageViewResource(
+                            R.id.notify_music_control,
+                            if (state) R.drawable.ic_baseline_pause_24
+                            else R.drawable.ic_baseline_play_arrow_24
                         )
+                        if (state || ref) {
+                            remoteViews?.setTextViewText(
+                                R.id.notify_music_name,
+                                playList[playPosition.get()].title
+                            )
+                            playList[playPosition.get()].uri.toBitmapByteArray()?.let { ba ->
+                                remoteViews?.setImageViewBitmap(
+                                    R.id.notify_music_icon,
+                                    BitmapFactory.decodeByteArray(
+                                        ba,
+                                        0,
+                                        ba.size
+                                    )
+                                )
+                            }
+                        }
                     }
+                    notificationManager?.notify(NOTIFICATION_ID, notification)
                 }
-                notificationManager?.notify(NOTIFICATION_ID, notification)
             }
-        }
     }
 
     override fun onCreate() {
@@ -156,7 +161,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         launch(Dispatchers.IO) {
             synchronized(playList) {
                 if (playList.isNotEmpty())
-                    currentMusic.postValue(playList[playPosition])
+                    currentMusic.postValue(playList[playPosition.get()])
             }
         }
         return MusicBinder()
@@ -254,7 +259,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
 
     override fun play(music: Music?) {
         launch {
-            synchronized(this@MusicService) {
+            mutex.withLock {
                 if (playList.isEmpty()) {
                     currentMusic.postValue(getEmptyMusic())
                     return@launch
@@ -264,12 +269,12 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
                         playList.add(music)
                     }
                     val index = playList.indexOf(music)
-                    playPosition = index
+                    playPosition.set(index)
                     finishMusic()
                 }
                 musicPlayer?.apply {
                     start()
-                    currentMusic.postValue(playList[playPosition])
+                    currentMusic.postValue(playList[playPosition.get()])
                     playState.postValue(true)
                     if (progressTimer == null) progressTimer = Timer()
                     progressTimer?.schedule(timerTask {
@@ -300,7 +305,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     override fun next() {
         if (playList.isEmpty()) return
         launch {
-            if (++playPosition > playList.size - 1) playPosition = 0
+            if (playPosition.incrementAndGet() > playList.size - 1) playPosition.set(0)
             finishMusic()
             play()
         }
@@ -309,7 +314,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     override fun previous() {
         if (playList.isEmpty()) return
         launch {
-            if (--playPosition <= 0) playPosition = playList.size - 1
+            if (playPosition.decrementAndGet() <= 0) playPosition.set(playList.size - 1)
             finishMusic()
             play()
         }
@@ -322,7 +327,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     }
 
     override fun setPlayList(list: MutableList<Music>) {
-        launch {
+        launch(Dispatchers.Default) {
             synchronized(playList) {
                 playList.clear()
                 playList.addAll(list)
@@ -339,27 +344,27 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     override fun setProgress(progress: Long) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             musicPlayer?.seekTo(
-                progress * playList[playPosition].duration / 100,
+                progress * playList[playPosition.get()].duration / 100,
                 MediaPlayer.SEEK_CLOSEST
             )
         } else {
-            musicPlayer?.seekTo((progress * playList[playPosition].duration).toInt())
+            musicPlayer?.seekTo((progress * playList[playPosition.get()].duration).toInt())
         }
     }
 
     override fun onMusicPlaying(): LiveData<Music> = currentMusic
 
     override fun init(music: Music, progress: Long) {
-        launch {
+        launch(Dispatchers.Default) {
             synchronized(this@MusicService) {
                 currentMusic.postValue(
                     if (playList.isNotEmpty() && music.title != "NO MUSIC") {
-                        playPosition = playList.indexOf(music)
-                        if (playPosition == -1) {
-                            playPosition = 0
+                        playPosition.set(playList.indexOf(music))
+                        if (playPosition.get() == -1) {
+                            playPosition.set(0)
                             getEmptyMusic()
                         } else {
-                            playList[playPosition]
+                            playList[playPosition.get()]
                         }
                     } else getEmptyMusic()
                 )
@@ -399,16 +404,18 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
         when (loopModeLive.value) {
             LOOP_LIST -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
             LOOP_SINGLE -> {
-                --playPosition
+                playPosition.decrementAndGet()
                 musicBroadCastManager.sendBroadcast(Intent(MUSIC_NEXT))
             }
             NO_LOOP -> musicBroadCastManager.sendBroadcast(Intent(MUSIC_PAUSE))
             RANDOM -> {
-                playPosition = (0 until playList.size - 1).random()
-                musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY))
+                playPosition.set((0 until playList.size - 1).random())
+                repeat(2) {
+                    musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY))
+                }
             }
             PLAY_LIST -> {
-                if (playPosition <= playList.size - 1) musicBroadCastManager.sendBroadcast(
+                if (playPosition.get() <= playList.size - 1) musicBroadCastManager.sendBroadcast(
                     Intent(
                         MUSIC_NEXT
                     )

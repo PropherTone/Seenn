@@ -109,27 +109,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         isKeyBroadShow = false
     }
 
-    fun sendConfirm() {
-        sendViewEvent(NoteEditViewModel.NoteEvent.Confirm)
-    }
-
-    fun sendPickIcon() {
-        sendViewEvent(NoteEditViewModel.NoteEvent.PickIcon)
-    }
-
-    fun sendPickImage() {
-        sendViewEvent(NoteEditViewModel.NoteEvent.PickImage)
-    }
-
-    fun sendPickVideo() {
-        sendViewEvent(NoteEditViewModel.NoteEvent.PickVideo)
-    }
-
-    fun sendPickMusic() {
-        sendViewEvent(NoteEditViewModel.NoteEvent.PickMusic)
-    }
-
-    private suspend fun pickIcon() = viewModel.apply {
+    private suspend fun NoteEditViewModel.pickIcon() {
         startGalleyPick(true)?.let { re ->
             iconUri = re.uri
             setNoteIconCache(re.uri)
@@ -141,13 +121,13 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         }
     }
 
-    private suspend fun pickVideo() = viewModel.apply {
+    private suspend fun pickVideo() {
         startGalleyPick(false)?.let { re ->
             insertVideo(re.uri)
         }
     }
 
-    private suspend fun pickMusic() = viewModel.apply {
+    private suspend fun NoteEditViewModel.pickMusic() {
         startActivityForResult(
             PickMusicActivity::class.intent.apply {
                 putExtra(PickMusicViewModel.MODE, PickMusicViewModel.PICK_MUSIC)
@@ -160,7 +140,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         }
     }
 
-    private suspend fun pickImage() = viewModel.apply {
+    private suspend fun NoteEditViewModel.pickImage() {
         startGalleyPick(true)?.let { re ->
             insertImage(
                 RichPhotoStates(
@@ -172,10 +152,10 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         }
     }
 
-    private suspend fun confirm() = viewModel.apply {
+    private suspend fun NoteEditViewModel.confirm() {
         if (title.isEmpty()) {
             R.string.enter_title.getString().toast()
-            return@apply
+            return
         }
         showProgress(true)
         val indexedRichNote = binding.noteEditRichNote.indexRichNote(title) {
@@ -193,13 +173,13 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             if (intent.getStringExtra(NoteEditViewModel.NOTE) == null) {
                 setResult(RESULT_CANCELED)
                 finish()
-                return@apply
+                return
             }
             val inNote = noteByName
             if (inNote == null) {
                 setResult(RESULT_CANCELED)
                 finish()
-                return@apply
+                return
             }
             copyNote(inNote, note)
             val re = updateNote(inNote)

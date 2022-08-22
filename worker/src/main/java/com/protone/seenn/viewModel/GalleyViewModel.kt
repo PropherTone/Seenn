@@ -72,7 +72,7 @@ class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     }
 
     fun onUpdate(media: GalleyMedia) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Default) {
             mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.OnGalleyUpdate(media))
         }
     }

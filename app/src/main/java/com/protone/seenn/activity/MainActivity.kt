@@ -33,7 +33,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
+class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
     ViewTreeObserver.OnGlobalLayoutListener, MainModelListAdapter.ModelClk {
     override val viewModel: MainViewModel by viewModels()
 
@@ -59,7 +59,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
                     .into(binding.userIcon)
                 launch(Dispatchers.IO) {
                     val loadBlurIcon = viewModel.loadBlurIcon(value)
-                    withContext(Dispatchers.Main){
+                    withContext(Dispatchers.Main) {
                         Glide.with(this@MainActivity)
                             .asDrawable()
                             .load(loadBlurIcon)
@@ -103,7 +103,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
                 userConfig.musicLoopMode = it
             }
             musicController.setLoopMode(userConfig.musicLoopMode)
-            launch(Dispatchers.IO) {
+            launch(Dispatchers.Default) {
                 while (isActive) {
                     if (Medias.musicBucketNotifier.value != null && Medias.musicBucketNotifier.value == 1) {
                         break
@@ -114,18 +114,18 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
                     musicController.refresh(
                         if (userConfig.lastMusic.isNotEmpty())
                             userConfig.lastMusic.toEntity(Music::class.java)
-                        else if (it.size > 0)it[0] else getEmptyMusic(), userConfig.lastMusicProgress
+                        else if (it.size > 0) it[0] else getEmptyMusic(),
+                        userConfig.lastMusicProgress
                     )
                 }
             }
         }
 
-        Medias.apply {
-//            galleyNotifier.collect {
-//                refreshModelList()
-//            }
-            audioNotifier.collect {
-                musicController.refresh()
+        launch {
+            Medias.apply {
+                audioNotifier.collect {
+                    musicController.refresh()
+                }
             }
         }
 
@@ -136,22 +136,28 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(false),
             userConfig.lastMusic = binder.onMusicPlaying().value?.toJson() ?: ""
         }
 
+        onViewEvent {
+            when (it) {
+                MainViewModel.MainViewEvent.Galley ->
+                    startActivity(GalleyActivity::class.intent)
+                MainViewModel.MainViewEvent.Note ->
+                    if (userConfig.lockNote == "")
+                        startActivity(NoteActivity::class.intent)
+                    else R.string.locked.getString().toast()
+                MainViewModel.MainViewEvent.Music ->
+                    if (userConfig.lockMusic == "")
+                        startActivity(MusicActivity::class.intent)
+                    else R.string.locked.getString().toast()
+                MainViewModel.MainViewEvent.UserConfig ->
+                    startActivity(UserConfigActivity::class.intent)
+            }
+        }
     }
 
     override suspend fun doResume() {
         userName = userConfig.userName
         userIcon = userConfig.userIcon
     }
-
-    fun onGalley() = startActivity(GalleyActivity::class.intent)
-
-    fun onNote() = if (userConfig.lockNote == "")
-        startActivity(NoteActivity::class.intent) else R.string.locked.getString().toast()
-
-    fun onMusic() = if (userConfig.lockMusic == "")
-        startActivity(MusicActivity::class.intent) else R.string.locked.getString().toast()
-
-    fun onUserConfig() = startActivity(UserConfigActivity::class.intent)
 
     private fun refreshModelList() {
         binding.modelList.apply {

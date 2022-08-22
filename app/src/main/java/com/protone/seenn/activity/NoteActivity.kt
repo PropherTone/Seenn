@@ -63,8 +63,11 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
 
         onViewEvent {
             when (it) {
-                NoteViewModel.NoteViewEvent.Init -> viewModel.init()
+                NoteViewModel.NoteViewEvent.Init -> init()
                 NoteViewModel.NoteViewEvent.RefreshList -> refreshList()
+                NoteViewModel.NoteViewEvent.AddBucket -> addBucket()
+                NoteViewModel.NoteViewEvent.Refresh -> refresh()
+                NoteViewModel.NoteViewEvent.HandleBucketEvent-> handleBucketEvent()
             }
         }
     }
@@ -73,10 +76,10 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
         sendViewEvent(NoteViewModel.NoteViewEvent.RefreshList)
     }
 
-    fun addBucket() {
+    private fun addBucket() {
         titleDialog(getString(R.string.add_dir), "") { re ->
             if (re.isNotEmpty()) {
-                launch(Dispatchers.IO) {
+                launch {
                     viewModel.insertNoteDir(re, "").let { pair ->
                         if (pair.first) {
                             (binding.noteBucketList.adapter as NoteTypeListAdapter)
@@ -94,11 +97,21 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
         }
     }
 
-    fun refresh() {
+    private fun refresh() {
         handleBucketEvent()
         TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
         sendViewEvent(NoteViewModel.NoteViewEvent.Init)
         sendViewEvent(NoteViewModel.NoteViewEvent.RefreshList)
+    }
+
+    private fun handleBucketEvent() {
+        val progress = binding.noteContainer.progress
+        ValueAnimator.ofFloat(progress, abs(progress - 1f)).apply {
+            addUpdateListener {
+                binding.noteContainer.progress = (it.animatedValue as Float)
+                binding.noteBucket.progress = binding.noteContainer.progress
+            }
+        }.start()
     }
 
     private suspend fun refreshList() {
@@ -136,15 +149,5 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     private fun refreshNoteType(list: List<NoteDir>) {
         if (binding.noteBucketList.adapter is NoteTypeListAdapter)
             (binding.noteBucketList.adapter as NoteTypeListAdapter).setNoteTypeList(list)
-    }
-
-    fun handleBucketEvent() {
-        val progress = binding.noteContainer.progress
-        ValueAnimator.ofFloat(progress, abs(progress - 1f)).apply {
-            addUpdateListener {
-                binding.noteContainer.progress = (it.animatedValue as Float)
-                binding.noteBucket.progress = binding.noteContainer.progress
-            }
-        }.start()
     }
 }

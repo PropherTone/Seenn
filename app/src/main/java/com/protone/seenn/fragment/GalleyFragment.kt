@@ -68,7 +68,7 @@ class GalleyFragment(
         viewModel = model
         viewModel.apply {
             onAttach.invoke(fragFlow)
-            launch(Dispatchers.IO) {
+            launch(Dispatchers.Default) {
                 fragFlow.collect {
                     when (it) {
                         is GalleyFragmentViewModel.FragEvent.DeleteMedia -> {

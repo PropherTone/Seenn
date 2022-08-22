@@ -14,6 +14,9 @@ class NoteViewModel : BaseViewModel() {
     sealed class NoteViewEvent {
         object Init : ViewEvent
         object RefreshList : ViewEvent
+        object AddBucket : ViewEvent
+        object Refresh : ViewEvent
+        object HandleBucketEvent : ViewEvent
     }
 
     private val noteList = mutableMapOf<String, MutableList<Note>>()

@@ -8,6 +8,7 @@
             name="activity"
             type="com.protone.seenn.activity.NoteViewActivity" />
 
+        <import type="com.protone.seenn.viewModel.NoteViewViewModel.NoteViewEvent" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -77,7 +78,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="end|center_vertical"
                         android:contentDescription="@string/action"
-                        android:onClick="@{()->activity.sendEdit()}"
+                        android:onClick="@{()->activity.sendViewEvent(NoteViewEvent.Edit.INSTANCE)}"
                         android:paddingTop="@dimen/main_margin"
                         android:paddingBottom="@dimen/main_margin"
                         android:src="@drawable/ic_baseline_edit_24_white" />

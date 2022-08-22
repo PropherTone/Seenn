@@ -83,16 +83,6 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         gestureDetector.setOnDoubleTapListener(this)
     }
 
-    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-        super.onWindowFocusChanged(hasWindowFocus)
-        Log.d(TAG, "onWindowFocusChanged: $hasWindowFocus")
-    }
-
-    override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
-        super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
-        Log.d(TAG, "onFocusChanged: $gainFocus")
-    }
-
     fun setImageResource(assetsRes: String) {
         decoder = BitmapDecoder(context, this)
         decoder?.setImageResource(assetsRes)

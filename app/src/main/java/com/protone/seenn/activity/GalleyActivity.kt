@@ -18,8 +18,10 @@ import com.protone.seenn.databinding.GalleyActivityBinding
 import com.protone.seenn.fragment.GalleyFragment
 import com.protone.seenn.viewModel.GalleyFragmentViewModel
 import com.protone.seenn.viewModel.GalleyViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>(false) {
     override val viewModel: GalleyViewModel by viewModels()
@@ -74,18 +76,14 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
         showPop(binding.galleyActionMenu, (viewModel.chooseData?.size ?: 0) <= 0)
     }
 
-    private fun initViewMode(chooseMode: Boolean) {
-        if (chooseMode) {
-            binding.galleyChooseConfirm.isGone = !chooseMode
-            binding.galleyChooseConfirm.setOnClickListener { confirm() }
-        }
-    }
-
-    private fun initPager(
+    private suspend fun initPager(
         fragments: ArrayList<Fragment>,
         chooseType: String = "",
-    ) = launch {
-        initViewMode(chooseType.isNotEmpty())
+    ) = withContext(Dispatchers.Main) {
+        if (chooseType.isNotEmpty()) {
+            binding.galleyChooseConfirm.isGone = !chooseType.isNotEmpty()
+            binding.galleyChooseConfirm.setOnClickListener { confirm() }
+        }
         binding.galleyPager.let {
             it.adapter = MyFragmentStateAdapter(
                 this@GalleyActivity,

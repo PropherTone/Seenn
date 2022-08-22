@@ -9,6 +9,8 @@
             name="activity"
             type="com.protone.seenn.activity.AddBucketActivity" />
 
+        <import type="com.protone.seenn.viewModel.AddBucketViewModel" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,7 +36,7 @@
                     android:layout_marginTop="50dp"
                     android:background="@drawable/icon_add_back"
                     android:contentDescription="@string/icon"
-                    android:onClick="@{()->activity.chooseIcon()}"
+                    android:onClick="@{()->activity.sendViewEvent(AddBucketViewModel.AddBucketEvent.ChooseIcon.INSTANCE)}"
                     android:scaleType="centerCrop" />
 
                 <TextView
@@ -112,7 +114,7 @@
             android:layout_height="@dimen/action_icon_p"
             android:background="@drawable/background_ripple_red"
             android:contentDescription="@string/action"
-            android:onClick="@{()->activity.cancelAdd()}"
+            android:onClick="@{()->activity.sendViewEvent(AddBucketViewModel.AddBucketEvent.Cancel.INSTANCE)}"
             android:padding="@dimen/main_padding"
             android:src="@drawable/ic_round_close_24_white"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -125,7 +127,7 @@
             android:layout_height="@dimen/action_icon_p"
             android:background="@drawable/background_ripple_blue"
             android:contentDescription="@string/action"
-            android:onClick="@{()->activity.confirm()}"
+            android:onClick="@{()->activity.sendViewEvent(AddBucketViewModel.AddBucketEvent.Confirm.INSTANCE)}"
             android:padding="@dimen/main_padding"
             android:src="@drawable/ic_baseline_check_24_white"
             app:layout_constraintBottom_toBottomOf="parent"

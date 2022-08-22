@@ -17,7 +17,7 @@ import com.protone.seenn.databinding.AddBucketActivityBinding
 import com.protone.seenn.viewModel.AddBucketViewModel
 import com.protone.seenn.viewModel.GalleyViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewModel>(false) {
     override val viewModel: AddBucketViewModel by viewModels()
@@ -66,9 +66,17 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
                 musicBucket?.let { refresh(it) }
             }
         }
+
+        onViewEvent {
+            when (it) {
+                AddBucketViewModel.AddBucketEvent.ChooseIcon -> chooseIcon()
+                AddBucketViewModel.AddBucketEvent.Confirm -> confirm()
+                AddBucketViewModel.AddBucketEvent.Cancel -> cancelAdd()
+            }
+        }
     }
 
-    fun chooseIcon() = launch(Dispatchers.Main) {
+    private suspend fun chooseIcon() = withContext(Dispatchers.Main) {
         startActivityForResult(
             GalleyActivity::class.intent.also { intent ->
                 intent.putExtra(
@@ -81,40 +89,38 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
         }
     }
 
-    fun cancelAdd() {
+    private suspend fun cancelAdd() = withContext(Dispatchers.Default) {
         setResult(RESULT_CANCELED)
         finish()
     }
 
-    fun confirm(): Unit = viewModel.run {
-        launch {
-            var intent: Intent?
-            if (editName != null) {
-                val re = musicBucket?.let {
-                    updateMusicBucket(it, name, uri, detail)
-                }
-                if (re != 0 || re != -1) {
-                    filterMusicBucket(name)
-                    intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
-                    setResult(RESULT_OK, intent)
-                    finish()
-                } else {
-                    setResult(RESULT_CANCELED)
-                    finish()
-                }
-            } else addMusicBucket(name, uri, detail) { re, name ->
-                if (re) {
-                    intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
-                    setResult(RESULT_OK, intent)
-                    finish()
-                }
+    private suspend fun AddBucketViewModel.confirm() = withContext(Dispatchers.Main) {
+        var intent: Intent?
+        if (editName != null) {
+            val re = musicBucket?.let {
+                updateMusicBucket(it, name, uri, detail)
+            }
+            if (re != 0 || re != -1) {
+                filterMusicBucket(name)
+                intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
+                setResult(RESULT_OK, intent)
+                finish()
+            } else {
+                setResult(RESULT_CANCELED)
+                finish()
+            }
+        } else addMusicBucket(name, uri, detail) { re, name ->
+            if (re) {
+                intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
+                setResult(RESULT_OK, intent)
+                finish()
             }
         }
     }
 
-    private fun refresh(musicBucket: MusicBucket) {
-        this.name = musicBucket.name
+    private suspend fun refresh(musicBucket: MusicBucket) = withContext(Dispatchers.Main) {
+        this@AddBucketActivity.name = musicBucket.name
         detail = musicBucket.detail.toString()
-        Glide.with(this).load(musicBucket.icon).into(binding.musicBucketIcon)
+        Glide.with(this@AddBucketActivity).load(musicBucket.icon).into(binding.musicBucketIcon)
     }
 }
