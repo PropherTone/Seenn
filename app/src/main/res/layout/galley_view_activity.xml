@@ -6,7 +6,7 @@
 
         <variable
             name="activity"
-            type="com.protone.worker.activity.GalleyViewActivity" />
+            type="com.protone.seenn.activity.GalleyViewActivity" />
 
         <import type="com.protone.worker.viewModel.GalleyViewViewModel.GalleyViewEvent" />
     </data>

@@ -19,12 +19,12 @@ import com.protone.ui.adapter.MusicBucketAdapter
 import com.protone.ui.adapter.MusicListAdapter
 import com.protone.ui.customView.StatusImageView
 import com.protone.worker.Medias
-import com.protone.worker.R
-import com.protone.worker.broadcast.workLocalBroadCast
+import com.protone.seenn.R
+import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.worker.database.userConfig
-import com.protone.worker.databinding.MusicActivtiyBinding
+import com.protone.seenn.databinding.MusicActivtiyBinding
 import com.protone.worker.viewModel.AddBucketViewModel
-import com.protone.worker.viewModel.MusicControllerIMP
+import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.worker.viewModel.MusicModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

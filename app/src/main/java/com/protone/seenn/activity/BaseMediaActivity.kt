@@ -14,7 +14,7 @@ import com.protone.ui.dialog.checkListDialog
 import com.protone.ui.dialog.titleDialog
 import com.protone.ui.popWindows.ColorfulPopWindow
 import com.protone.ui.popWindows.GalleyOptionPop
-import com.protone.worker.R
+import com.protone.seenn.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.GalleyViewModel

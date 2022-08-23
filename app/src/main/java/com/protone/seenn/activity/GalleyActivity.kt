@@ -10,12 +10,12 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.api.context.root
 import com.protone.api.json.toJson
 import com.protone.api.json.toUriJson
+import com.protone.seenn.databinding.GalleyActivityBinding
+import com.protone.seenn.fragment.GalleyFragment
 import com.protone.ui.R
 import com.protone.ui.adapter.MyFragmentStateAdapter
 import com.protone.worker.Medias
 import com.protone.worker.database.userConfig
-import com.protone.worker.databinding.GalleyActivityBinding
-import com.protone.worker.fragment.GalleyFragment
 import com.protone.worker.viewModel.GalleyFragmentViewModel
 import com.protone.worker.viewModel.GalleyViewModel
 import kotlinx.coroutines.Dispatchers
@@ -81,7 +81,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
         chooseType: String = "",
     ) = withContext(Dispatchers.Main) {
         if (chooseType.isNotEmpty()) {
-            binding.galleyChooseConfirm.isGone = !chooseType.isNotEmpty()
+            binding.galleyChooseConfirm.isGone = chooseType.isEmpty()
             binding.galleyChooseConfirm.setOnClickListener { confirm() }
         }
         binding.galleyPager.let {

@@ -10,8 +10,8 @@ import com.protone.ui.R
 import com.protone.ui.customView.Bubble
 import com.protone.ui.customView.ColorfulProgressBar
 import com.protone.ui.customView.musicPlayer.BaseMusicPlayer
-import com.protone.worker.broadcast.musicBroadCastManager
-import com.protone.worker.service.MusicService
+import com.protone.seenn.broadcast.musicBroadCastManager
+import com.protone.seenn.service.MusicService
 
 class MusicControllerIMP(private val controller: BaseMusicPlayer) {
     var binder: MusicService.MusicBinder? = null

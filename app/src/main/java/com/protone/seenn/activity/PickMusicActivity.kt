@@ -14,9 +14,9 @@ import com.protone.api.context.root
 import com.protone.api.entity.Music
 import com.protone.ui.adapter.AddMusicListAdapter
 import com.protone.worker.Medias
-import com.protone.worker.R
-import com.protone.worker.broadcast.workLocalBroadCast
-import com.protone.worker.databinding.PickMusicActivityBinding
+import com.protone.seenn.R
+import com.protone.seenn.broadcast.workLocalBroadCast
+import com.protone.seenn.databinding.PickMusicActivityBinding
 import com.protone.worker.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

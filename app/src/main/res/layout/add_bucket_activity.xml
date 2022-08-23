@@ -7,7 +7,7 @@
 
         <variable
             name="activity"
-            type="com.protone.worker.activity.AddBucketActivity" />
+            type="com.protone.seenn.activity.AddBucketActivity" />
 
         <import type="com.protone.worker.viewModel.AddBucketViewModel" />
 

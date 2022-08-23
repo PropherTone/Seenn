@@ -19,9 +19,9 @@ import com.protone.ui.dialog.loginDialog
 import com.protone.ui.dialog.regDialog
 import com.protone.ui.dialog.titleDialog
 import com.protone.worker.GalleyHelper
-import com.protone.worker.R
+import com.protone.seenn.R
 import com.protone.worker.database.userConfig
-import com.protone.worker.databinding.UserConfigActivityBinding
+import com.protone.seenn.databinding.UserConfigActivityBinding
 import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.GalleyViewModel
 import com.protone.worker.viewModel.UserConfigViewModel

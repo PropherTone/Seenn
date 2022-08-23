@@ -22,11 +22,11 @@ import com.protone.worker.Medias.galleyNotifier
 import com.protone.worker.Medias.music
 import com.protone.worker.Medias.musicBucket
 import com.protone.worker.Medias.musicBucketNotifier
-import com.protone.worker.R
-import com.protone.worker.broadcast.IWorkService
-import com.protone.worker.broadcast.MediaContentObserver
-import com.protone.worker.broadcast.WorkReceiver
-import com.protone.worker.broadcast.workLocalBroadCast
+import com.protone.seenn.R
+import com.protone.seenn.broadcast.IWorkService
+import com.protone.seenn.broadcast.MediaContentObserver
+import com.protone.seenn.broadcast.WorkReceiver
+import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.media.*
 import kotlinx.coroutines.*

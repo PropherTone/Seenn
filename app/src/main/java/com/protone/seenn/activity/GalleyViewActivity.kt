@@ -23,9 +23,9 @@ import com.protone.api.onResult
 import com.protone.ui.adapter.CheckListAdapter
 import com.protone.ui.databinding.ImageCateLayoutBinding
 import com.protone.ui.databinding.TextCateLayoutBinding
-import com.protone.worker.R
-import com.protone.worker.databinding.GalleyViewActivityBinding
-import com.protone.worker.fragment.GalleyViewFragment
+import com.protone.seenn.R
+import com.protone.seenn.databinding.GalleyViewActivityBinding
+import com.protone.seenn.fragment.GalleyViewFragment
 import com.protone.worker.viewModel.GalleyViewViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
 import kotlinx.coroutines.Dispatchers

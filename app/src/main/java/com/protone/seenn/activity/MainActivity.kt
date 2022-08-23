@@ -21,12 +21,12 @@ import com.protone.worker.Medias
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.userConfig
-import com.protone.worker.databinding.MainActivityBinding
-import com.protone.worker.service.WorkService
-import com.protone.worker.service.getEmptyMusic
+import com.protone.seenn.databinding.MainActivityBinding
+import com.protone.seenn.service.WorkService
+import com.protone.seenn.service.getEmptyMusic
 import com.protone.worker.viewModel.GalleyViewViewModel
 import com.protone.worker.viewModel.MainViewModel
-import com.protone.worker.viewModel.MusicControllerIMP
+import com.protone.seenn.viewModel.MusicControllerIMP
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive

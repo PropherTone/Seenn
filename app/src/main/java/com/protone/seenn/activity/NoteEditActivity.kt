@@ -18,8 +18,8 @@ import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.ui.dialog.imageListDialog
 import com.protone.ui.popWindows.ColorfulPopWindow
-import com.protone.worker.R
-import com.protone.worker.databinding.NoteEditActivityBinding
+import com.protone.seenn.R
+import com.protone.seenn.databinding.NoteEditActivityBinding
 import com.protone.worker.note.spans.ISpanForUse
 import com.protone.worker.viewModel.GalleyViewModel
 import com.protone.worker.viewModel.NoteEditViewModel

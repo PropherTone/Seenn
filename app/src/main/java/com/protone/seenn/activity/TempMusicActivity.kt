@@ -3,8 +3,8 @@ package com.protone.seenn.activity
 import android.view.View
 import androidx.activity.viewModels
 import com.protone.api.context.root
-import com.protone.worker.databinding.MusicActivtiyBinding
-import com.protone.worker.viewModel.MusicControllerIMP
+import com.protone.seenn.databinding.MusicActivtiyBinding
+import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.worker.viewModel.TempMusicModel
 
 class TempMusicActivity : BaseActivity<MusicActivtiyBinding, TempMusicModel>(true) {

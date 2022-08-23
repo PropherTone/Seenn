@@ -6,7 +6,7 @@
 
         <variable
             name="activity"
-            type="com.protone.worker.activity.NoteViewActivity" />
+            type="com.protone.seenn.activity.NoteViewActivity" />
 
         <import type="com.protone.worker.viewModel.NoteViewViewModel.NoteViewEvent" />
     </data>

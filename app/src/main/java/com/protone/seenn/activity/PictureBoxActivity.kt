@@ -11,8 +11,8 @@ import com.protone.api.entity.GalleyMedia
 import com.protone.ui.adapter.PictureBoxAdapter
 import com.protone.ui.customView.ScalableRegionLoadingImageView
 import com.protone.ui.customView.bitmapCache
-import com.protone.worker.R
-import com.protone.worker.databinding.PictureBoxActivityBinding
+import com.protone.seenn.R
+import com.protone.seenn.databinding.PictureBoxActivityBinding
 import com.protone.worker.viewModel.PictureBoxViewModel
 
 class PictureBoxActivity : BaseActivity<PictureBoxActivityBinding, PictureBoxViewModel>(false) {

@@ -6,7 +6,7 @@
 
         <variable
             name="activity"
-            type="com.protone.worker.activity.LogActivity" />
+            type="com.protone.seenn.activity.LogActivity" />
 
     </data>
 

@@ -6,7 +6,7 @@
 
         <variable
             name="activity"
-            type="com.protone.worker.activity.GalleyActivity" />
+            type="com.protone.seenn.activity.GalleyActivity" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

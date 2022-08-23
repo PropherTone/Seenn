@@ -16,7 +16,7 @@ import com.protone.ui.R
 import com.protone.ui.adapter.NoteListAdapter
 import com.protone.ui.adapter.NoteTypeListAdapter
 import com.protone.ui.dialog.titleDialog
-import com.protone.worker.databinding.NoteActivityBinding
+import com.protone.seenn.databinding.NoteActivityBinding
 import com.protone.worker.viewModel.NoteEditViewModel
 import com.protone.worker.viewModel.NoteViewModel
 import com.protone.worker.viewModel.NoteViewViewModel

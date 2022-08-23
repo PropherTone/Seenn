@@ -5,8 +5,9 @@ import android.view.View
 import androidx.activity.viewModels
 import com.protone.api.TAG
 import com.protone.api.context.root
-import com.protone.worker.activity.BaseActivity
-import com.protone.worker.databinding.ActivityTestBinding
+import com.protone.seenn.activity.BaseActivity
+import com.protone.seenn.databinding.ActivityTestBinding
+import com.protone.worker.Medias
 import com.protone.worker.viewModel.TestViewModel
 import kotlinx.coroutines.flow.collect
 

@@ -14,8 +14,8 @@ import com.protone.api.TAG
 import com.protone.api.context.*
 import com.protone.api.onResult
 import com.protone.worker.IntentDataHolder
-import com.protone.worker.broadcast.MusicReceiver
-import com.protone.worker.service.MusicService
+import com.protone.seenn.broadcast.MusicReceiver
+import com.protone.seenn.service.MusicService
 import com.protone.worker.viewModel.BaseViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel

@@ -28,10 +28,10 @@ import com.protone.ui.databinding.GalleyFragmentLayoutBinding
 import com.protone.ui.dialog.titleDialog
 import com.protone.ui.itemDecoration.GalleyItemDecoration
 import com.protone.worker.IntentDataHolder
-import com.protone.worker.R
-import com.protone.worker.activity.GalleySearchActivity
-import com.protone.worker.activity.GalleyViewActivity
-import com.protone.worker.activity.PictureBoxActivity
+import com.protone.seenn.R
+import com.protone.seenn.activity.GalleySearchActivity
+import com.protone.seenn.activity.GalleyViewActivity
+import com.protone.seenn.activity.PictureBoxActivity
 import com.protone.worker.viewModel.GalleyFragmentViewModel
 import com.protone.worker.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.*

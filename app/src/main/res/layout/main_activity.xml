@@ -6,7 +6,7 @@
 
         <variable
             name="activity"
-            type="com.protone.worker.activity.MainActivity" />
+            type="com.protone.seenn.activity.MainActivity" />
 
         <import type="com.protone.worker.viewModel.MainViewModel.MainViewEvent" />
     </data>

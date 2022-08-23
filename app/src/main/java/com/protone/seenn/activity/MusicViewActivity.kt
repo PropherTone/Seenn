@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.root
 import com.protone.api.context.statuesBarHeight
 import com.protone.api.entity.Music
+import com.protone.seenn.databinding.MusicViewActivityBinding
+import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.ui.adapter.TransparentPlayListAdapter
 import com.protone.ui.itemDecoration.GalleyItemDecoration
 import com.protone.worker.database.userConfig
-import com.protone.worker.databinding.MusicViewActivityBinding
-import com.protone.worker.viewModel.MusicControllerIMP
 import com.protone.worker.viewModel.MusicViewModel
 
 class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>(false) {
@@ -29,14 +29,14 @@ class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>
 
     override suspend fun MusicViewModel.init() {
         val musicController = MusicControllerIMP(binding.musicPlayer)
-        bindMusicService {
-            musicController.setBinder(this@MusicViewActivity, it) {
+        bindMusicService { binder->
+            musicController.setBinder(this@MusicViewActivity, binder) {
                 userConfig.musicLoopMode = it
             }
             musicController.refresh()
             musicController.setLoopMode(userConfig.musicLoopMode)
             initPlayList(
-                it.getPlayList(), musicController.getPlayingMusic(),
+                binder.getPlayList(), musicController.getPlayingMusic(),
                 object : TransparentPlayListAdapter.OnPlayListClk {
                     override fun onClk(music: Music) {
                         musicController.play(music)
