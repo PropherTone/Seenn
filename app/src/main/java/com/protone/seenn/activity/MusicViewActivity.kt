@@ -9,12 +9,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.root
 import com.protone.api.context.statuesBarHeight
 import com.protone.api.entity.Music
-import com.protone.seen.adapter.TransparentPlayListAdapter
-import com.protone.seen.itemDecoration.GalleyItemDecoration
-import com.protone.seenn.database.userConfig
-import com.protone.seenn.databinding.MusicViewActivityBinding
-import com.protone.seenn.viewModel.MusicControllerIMP
-import com.protone.seenn.viewModel.MusicViewModel
+import com.protone.ui.adapter.TransparentPlayListAdapter
+import com.protone.ui.itemDecoration.GalleyItemDecoration
+import com.protone.worker.database.userConfig
+import com.protone.worker.databinding.MusicViewActivityBinding
+import com.protone.worker.viewModel.MusicControllerIMP
+import com.protone.worker.viewModel.MusicViewModel
 
 class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>(false) {
     override val viewModel: MusicViewModel by viewModels()

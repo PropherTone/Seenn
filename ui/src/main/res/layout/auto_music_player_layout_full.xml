@@ -123,7 +123,7 @@
                 app:layout_constraintTop_toBottomOf="@id/music_name"
                 app:layout_constraintWidth_percent="0.5" />
 
-            <com.protone.seen.customView.ColorfulProgressBar
+            <com.protone.ui.customView.ColorfulProgressBar
                 android:id="@+id/music_progress"
                 android:layout_width="0dp"
                 android:layout_height="0dp"

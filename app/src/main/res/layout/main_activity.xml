@@ -6,9 +6,9 @@
 
         <variable
             name="activity"
-            type="com.protone.seenn.activity.MainActivity" />
+            type="com.protone.worker.activity.MainActivity" />
 
-        <import type="com.protone.seenn.viewModel.MainViewModel.MainViewEvent" />
+        <import type="com.protone.worker.viewModel.MainViewModel.MainViewEvent" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -145,7 +145,7 @@
                     app:layout_constraintStart_toEndOf="@id/noteBook"
                     app:layout_constraintTop_toBottomOf="@id/userCard" />
 
-                <com.protone.seen.customView.musicPlayer.MusicPlayerViewMid
+                <com.protone.ui.customView.musicPlayer.MusicPlayerViewMid
                     android:id="@+id/musicPlayer"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/music_player_mid"

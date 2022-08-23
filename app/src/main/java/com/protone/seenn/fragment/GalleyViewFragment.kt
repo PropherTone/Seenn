@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.protone.api.entity.GalleyMedia
-import com.protone.seen.databinding.GalleyVp2AdapterLayoutBinding
-import com.protone.seen.databinding.RichVideoLayoutBinding
+import com.protone.ui.databinding.GalleyVp2AdapterLayoutBinding
+import com.protone.ui.databinding.RichVideoLayoutBinding
 
 class GalleyViewFragment(
     private val galleyMedia: GalleyMedia,

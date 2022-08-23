@@ -6,9 +6,9 @@
 
         <variable
             name="activity"
-            type="com.protone.seenn.activity.GalleyViewActivity" />
+            type="com.protone.worker.activity.GalleyViewActivity" />
 
-        <import type="com.protone.seenn.viewModel.GalleyViewViewModel.GalleyViewEvent" />
+        <import type="com.protone.worker.viewModel.GalleyViewViewModel.GalleyViewEvent" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

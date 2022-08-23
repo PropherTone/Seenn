@@ -12,10 +12,10 @@ import com.protone.api.context.root
 import com.protone.api.context.setSoftInputStatusListener
 import com.protone.api.entity.MusicBucket
 import com.protone.api.json.toUri
-import com.protone.seenn.R
-import com.protone.seenn.databinding.AddBucketActivityBinding
-import com.protone.seenn.viewModel.AddBucketViewModel
-import com.protone.seenn.viewModel.GalleyViewModel
+import com.protone.worker.R
+import com.protone.worker.databinding.AddBucketActivityBinding
+import com.protone.worker.viewModel.AddBucketViewModel
+import com.protone.worker.viewModel.GalleyViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

@@ -12,7 +12,7 @@
             android:layout_height="match_parent"
             android:overScrollMode="never" />
 
-        <com.protone.seen.customView.PictureListScrollView
+        <com.protone.ui.customView.PictureListScrollView
             android:id="@+id/ddd"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

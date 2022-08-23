@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="80dp">
 
-        <com.protone.seen.customView.RoundImageView
+        <com.protone.ui.customView.RoundImageView
             android:id="@+id/bucket_thumb"
             android:layout_width="80dp"
             android:layout_height="80dp"

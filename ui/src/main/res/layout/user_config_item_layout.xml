@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/user_icon">
 
-    <com.protone.seen.customView.AnimateGradientView
+    <com.protone.ui.customView.AnimateGradientView
         android:id="@+id/item_back"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

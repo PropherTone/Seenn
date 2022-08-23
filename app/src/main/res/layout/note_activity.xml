@@ -7,9 +7,9 @@
 
         <variable
             name="activity"
-            type="com.protone.seenn.activity.NoteActivity" />
+            type="com.protone.worker.activity.NoteActivity" />
 
-        <import type="com.protone.seenn.viewModel.NoteViewModel.NoteViewEvent" />
+        <import type="com.protone.worker.viewModel.NoteViewModel.NoteViewEvent" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout

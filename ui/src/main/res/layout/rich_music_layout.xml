@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.protone.seen.customView.musicPlayer.MusicPlayerViewMid
+        <com.protone.ui.customView.musicPlayer.MusicPlayerViewMid
             android:id="@+id/rich_music"
             android:layout_width="match_parent"
             android:layout_height="@dimen/music_player_mid"

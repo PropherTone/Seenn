@@ -55,7 +55,7 @@
             android:gravity="end"
             android:textSize="@dimen/subContent_text" />
 
-        <com.protone.seen.customView.ColorfulProgressBar
+        <com.protone.ui.customView.ColorfulProgressBar
             android:id="@+id/music_progress"
             android:layout_width="match_parent"
             android:layout_height="5dp"

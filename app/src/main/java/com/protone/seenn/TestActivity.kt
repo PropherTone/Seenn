@@ -3,12 +3,11 @@ package com.protone.seenn
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
-import com.bumptech.glide.Glide
 import com.protone.api.TAG
 import com.protone.api.context.root
-import com.protone.seenn.activity.BaseActivity
-import com.protone.seenn.databinding.ActivityTestBinding
-import com.protone.seenn.viewModel.TestViewModel
+import com.protone.worker.activity.BaseActivity
+import com.protone.worker.databinding.ActivityTestBinding
+import com.protone.worker.viewModel.TestViewModel
 import kotlinx.coroutines.flow.collect
 
 class TestActivity : BaseActivity<ActivityTestBinding, TestViewModel>(false) {

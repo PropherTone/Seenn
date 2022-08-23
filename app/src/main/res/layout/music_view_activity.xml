@@ -6,7 +6,7 @@
 
         <variable
             name="activity"
-            type="com.protone.seenn.activity.MusicViewActivity" />
+            type="com.protone.worker.activity.MusicViewActivity" />
 
     </data>
 
@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.protone.seen.customView.musicPlayer.MusicPlayerViewFull
+        <com.protone.ui.customView.musicPlayer.MusicPlayerViewFull
             android:id="@+id/musicPlayer"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

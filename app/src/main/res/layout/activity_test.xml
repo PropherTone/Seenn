@@ -7,11 +7,11 @@
 
         <variable
             name="activity"
-            type="com.protone.seenn.TestActivity" />
+            type="com.protone.worker.TestActivity" />
 
         <variable
             name="model"
-            type="com.protone.seenn.viewModel.TestViewModel" />
+            type="com.protone.worker.viewModel.TestViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -127,49 +127,49 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.protone.seen.customView.ScalableRegionLoadingImageView
+                <com.protone.ui.customView.ScalableRegionLoadingImageView
                     android:id="@+id/s_imageView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.protone.seen.customView.ScalableRegionLoadingImageView
+                <com.protone.ui.customView.ScalableRegionLoadingImageView
                     android:id="@+id/s_imageView2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.protone.seen.customView.ScalableRegionLoadingImageView
+                <com.protone.ui.customView.ScalableRegionLoadingImageView
                     android:id="@+id/s_imageView3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.protone.seen.customView.ScalableRegionLoadingImageView
+                <com.protone.ui.customView.ScalableRegionLoadingImageView
                     android:id="@+id/s_imageView4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.protone.seen.customView.ScalableRegionLoadingImageView
+                <com.protone.ui.customView.ScalableRegionLoadingImageView
                     android:id="@+id/s_imageView5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.protone.seen.customView.ScalableRegionLoadingImageView
+                <com.protone.ui.customView.ScalableRegionLoadingImageView
                     android:id="@+id/s_imageView6"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.protone.seen.customView.ScalableRegionLoadingImageView
+                <com.protone.ui.customView.ScalableRegionLoadingImageView
                     android:id="@+id/s_imageView7"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

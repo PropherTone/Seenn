@@ -7,9 +7,9 @@
 
         <variable
             name="activity"
-            type="com.protone.seenn.activity.MusicActivity" />
+            type="com.protone.worker.activity.MusicActivity" />
 
-        <import type="com.protone.seenn.viewModel.MusicModel.MusicEvent" />
+        <import type="com.protone.worker.viewModel.MusicModel.MusicEvent" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -148,7 +148,7 @@
             android:elevation="2dp"
             android:orientation="vertical">
 
-            <com.protone.seen.customView.StatusImageView
+            <com.protone.ui.customView.StatusImageView
                 android:id="@+id/music_showBucket"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/smaller_Icon"
@@ -163,7 +163,7 @@
                 app:layout_constraintWidth_percent="0.4"
                 tools:ignore="ContentDescription" />
 
-            <com.protone.seen.customView.musicPlayer.MusicPlayerViewLite
+            <com.protone.ui.customView.musicPlayer.MusicPlayerViewLite
                 android:id="@+id/mySmallMusicPlayer"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/model_icon_dimen"

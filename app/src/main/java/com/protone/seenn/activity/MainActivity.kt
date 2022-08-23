@@ -15,18 +15,18 @@ import com.protone.api.entity.Music
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.todayDate
-import com.protone.seen.adapter.MainModelListAdapter
-import com.protone.seen.itemDecoration.ModelListItemDecoration
-import com.protone.seenn.Medias
-import com.protone.seenn.R
-import com.protone.seenn.database.DatabaseHelper
-import com.protone.seenn.database.userConfig
-import com.protone.seenn.databinding.MainActivityBinding
-import com.protone.seenn.service.WorkService
-import com.protone.seenn.service.getEmptyMusic
-import com.protone.seenn.viewModel.GalleyViewViewModel
-import com.protone.seenn.viewModel.MainViewModel
-import com.protone.seenn.viewModel.MusicControllerIMP
+import com.protone.ui.adapter.MainModelListAdapter
+import com.protone.ui.itemDecoration.ModelListItemDecoration
+import com.protone.worker.Medias
+import com.protone.worker.R
+import com.protone.worker.database.DatabaseHelper
+import com.protone.worker.database.userConfig
+import com.protone.worker.databinding.MainActivityBinding
+import com.protone.worker.service.WorkService
+import com.protone.worker.service.getEmptyMusic
+import com.protone.worker.viewModel.GalleyViewViewModel
+import com.protone.worker.viewModel.MainViewModel
+import com.protone.worker.viewModel.MusicControllerIMP
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
@@ -41,7 +41,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
         set(value) {
             if (value == null) return
             binding.userWelcome.text =
-                if (value == "") getString(com.protone.seen.R.string.welcome_msg) else value
+                if (value == "") getString(com.protone.ui.R.string.welcome_msg) else value
             binding.userDate.text = todayDate("yyyy/MM/dd")
             field = value
         }

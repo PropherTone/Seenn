@@ -7,13 +7,12 @@ import android.view.View
 import android.view.ViewTreeObserver
 import androidx.activity.viewModels
 import com.protone.api.context.*
-import com.protone.seenn.GalleyHelper
-import com.protone.seenn.TestActivity
-import com.protone.seenn.broadcast.workLocalBroadCast
-import com.protone.seenn.databinding.SplashActivityBinding
-import com.protone.seenn.service.MusicService
-import com.protone.seenn.service.WorkService
-import com.protone.seenn.viewModel.SplashViewModel
+import com.protone.worker.GalleyHelper
+import com.protone.worker.broadcast.workLocalBroadCast
+import com.protone.worker.databinding.SplashActivityBinding
+import com.protone.worker.service.MusicService
+import com.protone.worker.service.WorkService
+import com.protone.worker.viewModel.SplashViewModel
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true),

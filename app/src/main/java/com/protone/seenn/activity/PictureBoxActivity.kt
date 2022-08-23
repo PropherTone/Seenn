@@ -8,12 +8,12 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.root
 import com.protone.api.entity.GalleyMedia
-import com.protone.seen.adapter.PictureBoxAdapter
-import com.protone.seen.customView.ScalableRegionLoadingImageView
-import com.protone.seen.customView.bitmapCache
-import com.protone.seenn.R
-import com.protone.seenn.databinding.PictureBoxActivityBinding
-import com.protone.seenn.viewModel.PictureBoxViewModel
+import com.protone.ui.adapter.PictureBoxAdapter
+import com.protone.ui.customView.ScalableRegionLoadingImageView
+import com.protone.ui.customView.bitmapCache
+import com.protone.worker.R
+import com.protone.worker.databinding.PictureBoxActivityBinding
+import com.protone.worker.viewModel.PictureBoxViewModel
 
 class PictureBoxActivity : BaseActivity<PictureBoxActivityBinding, PictureBoxViewModel>(false) {
     override val viewModel: PictureBoxViewModel by viewModels()

@@ -11,16 +11,19 @@ import com.protone.api.context.intent
 import com.protone.api.context.root
 import com.protone.api.entity.Note
 import com.protone.api.json.toJson
-import com.protone.seen.customView.richText.RichNoteView
-import com.protone.seenn.R
-import com.protone.seenn.databinding.NoteViewActivityBinding
-import com.protone.seenn.viewModel.GalleyViewViewModel
-import com.protone.seenn.viewModel.NoteEditViewModel
-import com.protone.seenn.viewModel.NoteViewViewModel
+import com.protone.worker.R
+import com.protone.worker.databinding.NoteViewActivityBinding
+import com.protone.worker.service.MusicService
+import com.protone.worker.viewModel.GalleyViewViewModel
+import com.protone.worker.viewModel.NoteEditViewModel
+import com.protone.worker.viewModel.NoteViewViewModel
+import com.protone.ui.customView.richText.RichNoteView
 import kotlinx.coroutines.launch
 
 class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel>(true) {
     override val viewModel: NoteViewViewModel by viewModels()
+
+    private var binder: MusicService.MusicBinder? = null
 
     override fun createView(): View {
         binding = NoteViewActivityBinding.inflate(layoutInflater, root, false)
@@ -29,7 +32,7 @@ class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel
     }
 
     override suspend fun NoteViewViewModel.init() {
-        bindMusicService {}
+        bindMusicService { binder = it }
 
         intent.getStringExtra(NoteViewViewModel.NOTE_NAME)?.let {
             noteQueue.offer(it)
@@ -59,17 +62,17 @@ class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel
                     launch {
                         getMusicByUri(uri)?.let {
                             setMusicDuration(it.duration)
-                            binder.play(it)
-                            binder.setProgress(progress)
+                            binder?.play(it)
+                            binder?.setProgress(progress)
                         }
                     }
-                    binder.onProgress().observe(this@NoteViewActivity) {
+                    binder?.onProgress()?.observe(this@NoteViewActivity) {
                         setMusicProgress(it)
                     }
                 }
 
                 override fun pause() {
-                    binder.pause()
+                    binder?.pause()
                 }
 
                 override fun jumpTo(note: String) {

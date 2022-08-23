@@ -6,12 +6,12 @@ import androidx.lifecycle.LifecycleOwner
 import com.protone.api.baseType.getString
 import com.protone.api.context.*
 import com.protone.api.entity.Music
-import com.protone.seen.R
-import com.protone.seen.customView.Bubble
-import com.protone.seen.customView.ColorfulProgressBar
-import com.protone.seen.customView.musicPlayer.BaseMusicPlayer
-import com.protone.seenn.broadcast.musicBroadCastManager
-import com.protone.seenn.service.MusicService
+import com.protone.ui.R
+import com.protone.ui.customView.Bubble
+import com.protone.ui.customView.ColorfulProgressBar
+import com.protone.ui.customView.musicPlayer.BaseMusicPlayer
+import com.protone.worker.broadcast.musicBroadCastManager
+import com.protone.worker.service.MusicService
 
 class MusicControllerIMP(private val controller: BaseMusicPlayer) {
     var binder: MusicService.MusicBinder? = null

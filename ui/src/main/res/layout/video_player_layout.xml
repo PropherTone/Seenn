@@ -4,12 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.protone.seen.customView.video.MyTextureView
+    <com.protone.ui.customView.video.MyTextureView
         android:id="@+id/video_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <com.protone.seen.customView.video.MyVideoController
+    <com.protone.ui.customView.video.MyVideoController
         android:id="@+id/videoController"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

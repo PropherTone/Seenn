@@ -38,7 +38,7 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <com.protone.seen.customView.ColorfulProgressBar
+        <com.protone.ui.customView.ColorfulProgressBar
             android:id="@+id/v_seekBar"
             android:layout_width="match_parent"
             android:layout_height="16dp"
