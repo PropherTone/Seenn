@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -93,7 +94,7 @@ fun View.paddingBottom(padding: Int) {
 fun View.marginTop(margin: Int) {
     if (this !is ViewGroup) return
     val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams
-    marginLayoutParams.topMargin = margin
+    marginLayoutParams.topMargin += margin
     layoutParams = marginLayoutParams
 }
 
@@ -102,4 +103,13 @@ fun View.marginBottom(margin: Int) {
     val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams
     marginLayoutParams.bottomMargin = margin
     layoutParams = marginLayoutParams
+}
+
+inline fun View.onGlobalLayout(crossinline block:View.()->Unit){
+    var onGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+    onGlobalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+        block.invoke(this)
+        viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
+    }
+    viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
 }

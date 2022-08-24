@@ -17,16 +17,16 @@ import com.protone.api.baseType.toast
 import com.protone.api.context.workIntentFilter
 import com.protone.api.entity.GalleyMedia
 import com.protone.api.entity.Music
-import com.protone.worker.Medias.audioNotifier
-import com.protone.worker.Medias.galleyNotifier
-import com.protone.worker.Medias.music
-import com.protone.worker.Medias.musicBucket
-import com.protone.worker.Medias.musicBucketNotifier
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.IWorkService
 import com.protone.seenn.broadcast.MediaContentObserver
 import com.protone.seenn.broadcast.WorkReceiver
 import com.protone.seenn.broadcast.workLocalBroadCast
+import com.protone.worker.Medias.audioNotifier
+import com.protone.worker.Medias.galleyNotifier
+import com.protone.worker.Medias.music
+import com.protone.worker.Medias.musicBucket
+import com.protone.worker.Medias.musicBucketNotifier
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.media.*
 import kotlinx.coroutines.*
@@ -112,9 +112,8 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                     musicWithMusicBucketDAOBridge
                         .getMusicWithMusicBucket(it.musicBucketId) as MutableList<Music>
             }
-            musicDAOBridge.getAllMusicRs()?.let {
-                music = it as MutableList<Music>
-            }
+            music = ( musicDAOBridge.getAllMusicRs()) as MutableList<Music>
+
             musicBucket.keys.forEach {
                 musicBucketDAOBridge.getMusicBucketByName(it)?.let { mb ->
                     musicBucket[it]?.size?.let { size ->

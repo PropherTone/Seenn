@@ -140,12 +140,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.protone.ui.customView.TableCardView
             android:id="@+id/music_bucketContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize"
             android:background="@color/zima_blue"
             android:elevation="2dp"
+            android:focusable="false"
+            android:clickable="false"
             android:orientation="vertical">
 
             <com.protone.ui.customView.StatusImageView
@@ -204,7 +207,7 @@
                 android:background="@color/zima_blue"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.protone.ui.customView.TableCardView>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

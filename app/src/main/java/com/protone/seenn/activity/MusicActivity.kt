@@ -2,43 +2,49 @@ package com.protone.seenn.activity
 
 import android.content.Intent
 import android.view.View
-import android.view.ViewTreeObserver
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.protone.api.animation.AnimationHelper
 import com.protone.api.baseType.getDrawable
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.*
 import com.protone.api.entity.Music
 import com.protone.api.entity.MusicBucket
+import com.protone.seenn.R
+import com.protone.seenn.broadcast.workLocalBroadCast
+import com.protone.seenn.databinding.MusicActivtiyBinding
+import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.ui.adapter.MusicBucketAdapter
 import com.protone.ui.adapter.MusicListAdapter
 import com.protone.ui.customView.StatusImageView
 import com.protone.worker.Medias
-import com.protone.seenn.R
-import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.worker.database.userConfig
-import com.protone.seenn.databinding.MusicActivtiyBinding
 import com.protone.worker.viewModel.AddBucketViewModel
-import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.worker.viewModel.MusicModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
-    StatusImageView.StateListener,
-    ViewTreeObserver.OnGlobalLayoutListener {
+    StatusImageView.StateListener {
     override val viewModel: MusicModel by viewModels()
 
     override fun createView(): View {
         binding = MusicActivtiyBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MusicActivity
-            root.viewTreeObserver.addOnGlobalLayoutListener(this@MusicActivity)
+            fitStatuesBar(musicBucketContainer)
+            root.onGlobalLayout {
+                appToolbar.paddingTop(appToolbar.paddingTop + statuesBarHeight)
+                musicBucketContainer.botBlock = mySmallMusicPlayer.measuredHeight.toFloat()
+                musicShowBucket.setOnStateListener(this@MusicActivity)
+                musicMusicList.setPadding(0, 0, 0, mySmallMusicPlayer.height)
+                appToolbar.onGlobalLayout {
+                    appToolbar.setExpanded(false, false)
+                }
+            }
             appToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
                 binding.toolbar.progress =
                     -verticalOffset / appBarLayout.totalScrollRange.toFloat()
@@ -276,51 +282,14 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
 
     override fun onActive() {
         binding.appToolbar.setExpanded(false, false)
-        viewModel.containerAnimator?.reverse()
+        binding.musicBucketContainer.show()
     }
 
     override fun onNegative() {
-        viewModel.containerAnimator?.start()
+        binding.musicBucketContainer.hide()
     }
 
     private fun hideBucket() {
         binding.musicShowBucket.negative()
     }
-
-    override fun onGlobalLayout() {
-        binding.apply {
-            appToolbar.setPadding(
-                appToolbar.paddingLeft,
-                appToolbar.paddingTop + statuesBarHeight,
-                appToolbar.paddingRight,
-                appToolbar.paddingBottom
-            )
-            musicBucketContainer.let {
-                it.setPadding(
-                    it.paddingLeft,
-                    it.paddingTop,
-                    it.paddingRight,
-                    navigationBarHeight + musicAddBucket.measuredHeight - musicAddBucket.paddingBottom
-                )
-                viewModel.containerAnimator =
-                    getAni(it, mySmallMusicPlayer.measuredHeight.toFloat())
-
-                it.y = toolbar.minHeight + statuesBarHeight.toFloat()
-            }
-            musicShowBucket.setOnStateListener(this@MusicActivity)
-            musicMusicList.setPadding(0, 0, 0, mySmallMusicPlayer.height)
-            var value: ViewTreeObserver.OnGlobalLayoutListener? = null
-            value = ViewTreeObserver.OnGlobalLayoutListener {
-                appToolbar.setExpanded(false, false)
-                appToolbar.viewTreeObserver.removeOnGlobalLayoutListener(value)
-            }
-            appToolbar.viewTreeObserver.addOnGlobalLayoutListener(value)
-            root.viewTreeObserver.removeOnGlobalLayoutListener(this@MusicActivity)
-        }
-    }
-
-    private fun getAni(target: View, value: Float) = AnimationHelper.translationY(
-        target,
-        target.height.toFloat() - value
-    )
 }

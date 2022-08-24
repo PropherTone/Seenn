@@ -19,7 +19,7 @@ import com.protone.worker.viewModel.GalleyViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewModel>(false) {
+class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewModel>(true) {
     override val viewModel: AddBucketViewModel by viewModels()
 
     private var name: String
