@@ -1,7 +1,6 @@
 package com.protone.seenn.activity
 
 import android.view.View
-import android.view.ViewTreeObserver
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -10,23 +9,24 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
+import com.protone.api.context.onGlobalLayout
 import com.protone.api.context.root
 import com.protone.api.entity.Music
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.todayDate
+import com.protone.seenn.databinding.MainActivityBinding
+import com.protone.seenn.service.WorkService
+import com.protone.seenn.service.getEmptyMusic
+import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.ui.adapter.MainModelListAdapter
 import com.protone.ui.itemDecoration.ModelListItemDecoration
 import com.protone.worker.Medias
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.userConfig
-import com.protone.seenn.databinding.MainActivityBinding
-import com.protone.seenn.service.WorkService
-import com.protone.seenn.service.getEmptyMusic
 import com.protone.worker.viewModel.GalleyViewViewModel
 import com.protone.worker.viewModel.MainViewModel
-import com.protone.seenn.viewModel.MusicControllerIMP
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
-    ViewTreeObserver.OnGlobalLayoutListener, MainModelListAdapter.ModelClk {
+    MainModelListAdapter.ModelClk {
     override val viewModel: MainViewModel by viewModels()
 
     private var userName: String? = null
@@ -74,7 +74,22 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
     override fun createView(): View {
         binding = MainActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MainActivity
-            root.viewTreeObserver.addOnGlobalLayoutListener(this@MainActivity)
+            root.onGlobalLayout {
+                actionBtnContainer.also {
+                    it.y = it.y + viewModel.btnH * 2
+                    viewModel.btnY = it.y
+                }
+                toolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+                    binding.toolMotion.progress =
+                        -verticalOffset / appBarLayout.totalScrollRange.toFloat().also {
+                            binding.musicPlayer.isVisible = it > 0.7f
+                            binding.actionBtnContainer.also { btn ->
+                                btn.y =
+                                    viewModel.btnY - (viewModel.btnH * binding.toolMotion.progress) * 2
+                            }
+                        }
+                }
+            }
             musicPlayer.apply {
                 duration
             }
@@ -105,16 +120,16 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
             musicController.setLoopMode(userConfig.musicLoopMode)
             launch(Dispatchers.Default) {
                 while (isActive) {
-                    if (Medias.musicBucketNotifier.value != null && Medias.musicBucketNotifier.value == 1) {
+                    if (Medias.musicBucketNotifier.value != null && Medias.musicBucketNotifier.value == "") {
                         break
                     }
                 }
-                Medias.musicBucket[userConfig.lastMusicBucket]?.let {
-                    musicController.setMusicList(it)
+                Medias.musicBucket[userConfig.lastMusicBucket]?.let { list ->
+                    musicController.setMusicList(list)
                     musicController.refresh(
                         if (userConfig.lastMusic.isNotEmpty())
                             userConfig.lastMusic.toEntity(Music::class.java)
-                        else if (it.size > 0) it[0] else getEmptyMusic(),
+                        else if (list.size > 0) list[0] else getEmptyMusic(),
                         userConfig.lastMusicProgress
                     )
                 }
@@ -146,7 +161,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.Music ->
                     if (userConfig.lockMusic == "")
-                        startActivity(MusicActivity::class.intent)
+                        startActivity(TempMusicActivity::class.intent)
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.UserConfig ->
                     startActivity(UserConfigActivity::class.intent)
@@ -166,26 +181,6 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
                 modelClkListener = this@MainActivity
             }
             addItemDecoration(ModelListItemDecoration(0))
-        }
-    }
-
-    override fun onGlobalLayout() {
-        binding.apply {
-            actionBtnContainer.also {
-                it.y = it.y + viewModel.btnH * 2
-                viewModel.btnY = it.y
-            }
-            toolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-                binding.toolMotion.progress =
-                    -verticalOffset / appBarLayout.totalScrollRange.toFloat().also {
-                        binding.musicPlayer.isVisible = it > 0.7f
-                        binding.actionBtnContainer.also { btn ->
-                            btn.y =
-                                viewModel.btnY - (viewModel.btnH * binding.toolMotion.progress) * 2
-                        }
-                    }
-            }
-            root.viewTreeObserver.removeOnGlobalLayoutListener(this@MainActivity)
         }
     }
 

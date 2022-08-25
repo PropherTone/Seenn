@@ -7,9 +7,9 @@
 
         <variable
             name="activity"
-            type="com.protone.seenn.activity.MusicActivity" />
+            type="com.protone.seenn.activity.TempMusicActivity" />
 
-        <import type="com.protone.worker.viewModel.MusicModel.MusicEvent" />
+        <import type="com.protone.worker.viewModel.TempMusicModel.TempMusicEvent" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -89,7 +89,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginStart="@dimen/icon_margin"
                     android:contentDescription="@string/action"
-                    android:onClick="@{()->activity.sendViewEvent(MusicEvent.Edit.INSTANCE)}"
+                    android:onClick="@{()->activity.sendEdit()}"
                     android:padding="@dimen/icon_padding_mid"
                     android:src="@drawable/ic_baseline_edit_24_white"
                     app:layout_constraintEnd_toStartOf="@id/music_bucketDelete"
@@ -114,7 +114,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginEnd="@dimen/icon_margin"
                     android:contentDescription="@string/action"
-                    android:onClick="@{()->activity.sendViewEvent(MusicEvent.AddList.INSTANCE)}"
+                    android:onClick="@{()->activity.sendAddMusic()}"
                     android:padding="@dimen/icon_padding_mid"
                     android:src="@drawable/ic_baseline_more_24_white"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -146,9 +146,9 @@
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize"
             android:background="@color/zima_blue"
+            android:clickable="false"
             android:elevation="2dp"
             android:focusable="false"
-            android:clickable="false"
             android:orientation="vertical">
 
             <com.protone.ui.customView.StatusImageView
@@ -192,7 +192,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/white"
                 android:contentDescription="@string/action"
-                android:onClick="@{()->activity.sendViewEvent(MusicEvent.AddBucket.INSTANCE)}"
+                android:onClick="@{()->activity.sendViewEvent(TempMusicEvent.AddMusicBucket.INSTANCE)}"
                 android:padding="@dimen/main_padding"
                 android:src="@drawable/ic_baseline_add_24"
                 app:layout_constraintBottom_toBottomOf="parent"

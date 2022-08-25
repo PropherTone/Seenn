@@ -33,8 +33,8 @@ interface SignedGalleyDAO {
     @Delete
     fun deleteSignedMedia(media: GalleyMedia)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertSignedMedia(media: GalleyMedia)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertSignedMedia(media: GalleyMedia) : Long
 
     @Query("SELECT * FROM GalleyMedia WHERE media_uri LIKE :uri")
     fun getSignedMedia(uri: Uri): GalleyMedia?

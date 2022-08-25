@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -19,8 +18,13 @@ import com.protone.api.animation.AnimationHelper
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
+import com.protone.api.context.onGlobalLayout
 import com.protone.api.entity.GalleyMedia
 import com.protone.api.json.toJson
+import com.protone.seenn.R
+import com.protone.seenn.activity.GalleySearchActivity
+import com.protone.seenn.activity.GalleyViewActivity
+import com.protone.seenn.activity.PictureBoxActivity
 import com.protone.ui.adapter.GalleyBucketAdapter
 import com.protone.ui.adapter.GalleyListAdapter
 import com.protone.ui.customView.StatusImageView
@@ -28,10 +32,6 @@ import com.protone.ui.databinding.GalleyFragmentLayoutBinding
 import com.protone.ui.dialog.titleDialog
 import com.protone.ui.itemDecoration.GalleyItemDecoration
 import com.protone.worker.IntentDataHolder
-import com.protone.seenn.R
-import com.protone.seenn.activity.GalleySearchActivity
-import com.protone.seenn.activity.GalleyViewActivity
-import com.protone.seenn.activity.PictureBoxActivity
 import com.protone.worker.viewModel.GalleyFragmentViewModel
 import com.protone.worker.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.*
@@ -41,10 +41,9 @@ import kotlinx.coroutines.flow.collect
 class GalleyFragment(
     private val isVideo: Boolean,
     private val isLock: Boolean,
-    private val combine : Boolean,
+    private val combine: Boolean,
     private val onAttach: (MutableSharedFlow<GalleyFragmentViewModel.FragEvent>) -> Unit
 ) : Fragment(), CoroutineScope by MainScope(),
-    ViewTreeObserver.OnGlobalLayoutListener,
     GalleyListAdapter.OnSelect {
 
     private lateinit var viewModel: GalleyFragmentViewModel
@@ -168,7 +167,27 @@ class GalleyFragment(
         savedInstanceState: Bundle?
     ): View {
         binding = GalleyFragmentLayoutBinding.inflate(inflater, container, false).apply {
-            root.viewTreeObserver.addOnGlobalLayoutListener(this@GalleyFragment)
+            root.onGlobalLayout {
+                binding.galleyBucket.height.toFloat().let {
+                    containerAnimator = AnimationHelper.translationY(
+                        binding.galleyBucketContainer,
+                        it
+                    )
+                }
+                toolButtonAnimator = AnimationHelper.rotation(
+                    binding.galleyToolButton,
+                    45f
+                )
+                binding.galleyShowBucket.setOnStateListener(object : StatusImageView.StateListener {
+                    override fun onActive() {
+                        reverse()
+                    }
+
+                    override fun onNegative() {
+                        start()
+                    }
+                })
+            }
             galleySearch.setOnClickListener {
                 IntentDataHolder.put(viewModel.galleyMap[viewModel.rightGalley])
                 startActivity(GalleySearchActivity::class.intent.also { intent ->
@@ -218,7 +237,7 @@ class GalleyFragment(
     private fun initList() = binding.run {
         galleyList.apply {
             layoutManager = GridLayoutManager(context, 4)
-            adapter = GalleyListAdapter(context,true).also {
+            adapter = GalleyListAdapter(context, true).also {
                 it.multiChoose = true
                 it.setOnSelectListener(this@GalleyFragment)
             }
@@ -245,29 +264,6 @@ class GalleyFragment(
                 }
             })
         }
-    }
-
-    override fun onGlobalLayout() {
-        binding.galleyBucket.height.toFloat().let {
-            containerAnimator = AnimationHelper.translationY(
-                binding.galleyBucketContainer,
-                it
-            )
-        }
-        toolButtonAnimator = AnimationHelper.rotation(
-            binding.galleyToolButton,
-            45f
-        )
-        binding.galleyShowBucket.setOnStateListener(object : StatusImageView.StateListener {
-            override fun onActive() {
-                reverse()
-            }
-
-            override fun onNegative() {
-                start()
-            }
-        })
-        binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
     }
 
     private fun insertBucket(pairs: Pair<Uri, Array<String>>) {

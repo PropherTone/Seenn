@@ -16,7 +16,7 @@ object Medias {
 
     val galleyNotifier = MutableSharedFlow<GalleyMedia>()
     val audioNotifier = MutableSharedFlow<MutableList<Music>>()
-    val musicBucketNotifier = MutableLiveData<Int>()
+    val musicBucketNotifier = MutableLiveData<String>()
 
     var music: MutableList<Music>
         set(value) {

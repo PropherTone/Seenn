@@ -9,6 +9,10 @@ import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.Music
 import com.protone.ui.R
 import com.protone.ui.databinding.MusicListLayoutBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MusicListAdapter(context: Context) :
     SelectListAdapter<MusicListLayoutBinding, Music, Any>(context) {
@@ -22,7 +26,7 @@ class MusicListAdapter(context: Context) :
             notifyDataSetChanged()
         }
 
-    var clickCallback: (Music) -> Unit? = {}
+    var clickCallback: ((Music) -> Unit?)? = null
 
     private var playPosition = -1
 
@@ -76,7 +80,15 @@ class MusicListAdapter(context: Context) :
                         ),
                         true
                     )
-                    clickCallback(music)
+                    clickCallback?.invoke(music)
+                    launch(Dispatchers.Default) {
+                        delay(1000)
+                        if (!selectList.contains(music)) {
+                            withContext(Dispatchers.Main) {
+                                setSelect(holder, false)
+                            }
+                        }
+                    }
                 }
                 musicListName.text = music.title
                 if (music.artist != null && music.album != null) {
@@ -90,15 +102,29 @@ class MusicListAdapter(context: Context) :
     override fun getItemCount(): Int = musicList.size
 
     fun playPosition(music: Music) {
-        if (musicList.size <= 0) return
-        if (musicList.contains(music)) {
-            selectList.clear()
-            selectList.add(music)
-            notifyItemChanged(playPosition)
-            playPosition = musicList.indexOf(music)
-            notifyItemChanged(playPosition)
-        } else {
-            playPosition = -1
+        launch(Dispatchers.Default) {
+            if (musicList.size <= 0) return@launch
+            if (musicList.contains(music)) {
+                selectList.clear()
+                selectList.add(music)
+                withContext(Dispatchers.Main) {
+                    notifyItemChanged(playPosition)
+                }
+                playPosition = musicList.indexOf(music)
+                withContext(Dispatchers.Main) {
+                    notifyItemChanged(playPosition)
+                }
+            } else {
+                playPosition = -1
+                val iterator = selectList.iterator()
+                while (iterator.hasNext()) {
+                    val index = selectList.indexOf(iterator.next())
+                    iterator.remove()
+                    withContext(Dispatchers.Main) {
+                        notifyItemChanged(index)
+                    }
+                }
+            }
         }
     }
 

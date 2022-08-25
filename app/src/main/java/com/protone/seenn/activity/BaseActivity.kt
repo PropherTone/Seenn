@@ -11,11 +11,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.lifecycleScope
 import com.protone.api.TAG
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.toast
 import com.protone.api.context.*
 import com.protone.api.onResult
-import com.protone.worker.IntentDataHolder
+import com.protone.seenn.R
 import com.protone.seenn.broadcast.MusicReceiver
 import com.protone.seenn.service.MusicService
+import com.protone.worker.IntentDataHolder
 import com.protone.worker.viewModel.BaseViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -54,7 +57,11 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
             viewEvent = Channel(Channel.UNLIMITED)
             viewEventTask = launch(Dispatchers.Main) {
                 viewEvent?.receiveAsFlow()?.collect {
-                    onViewEvent?.invoke(it)
+                    try {
+                        onViewEvent?.invoke(it)
+                    } catch (e: Exception) {
+                        R.string.come_up_unknown_error.getString().toast()
+                    }
                 }
             }
         }

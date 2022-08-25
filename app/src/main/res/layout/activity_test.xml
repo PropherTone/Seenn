@@ -33,28 +33,28 @@
                 android:id="@+id/btn1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{()->model.filterGalley()}"
+                android:onClick="@{()->model.sqlTest()}"
                 android:text="btn1" />
 
             <Button
                 android:id="@+id/btn2"
                 android:layout_width="wrap_content"
+                android:onClick="@{()->model.sqlTest2()}"
                 android:layout_height="wrap_content"
-                android:onClick="@{()->model.updateGalley()}"
                 android:text="btn2" />
 
             <Button
                 android:id="@+id/btn3"
                 android:layout_width="wrap_content"
+                android:onClick="@{()->model.sqlTest3()}"
                 android:layout_height="wrap_content"
-                android:onClick="@{()->model.mediasCount()}"
                 android:text="btn3" />
 
             <Button
                 android:id="@+id/btn4"
                 android:layout_width="wrap_content"
+                android:onClick="@{()->model.sqlTest4()}"
                 android:layout_height="wrap_content"
-                android:onClick="@{()->model.updateGalleyNew()}"
                 android:text="btn4" />
 
             <Button
@@ -116,69 +116,6 @@
             </ScrollView>
 
         </LinearLayout>
-
-        <ScrollView
-            android:elevation="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.protone.ui.customView.ScalableRegionLoadingImageView
-                    android:id="@+id/s_imageView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.protone.ui.customView.ScalableRegionLoadingImageView
-                    android:id="@+id/s_imageView2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.protone.ui.customView.ScalableRegionLoadingImageView
-                    android:id="@+id/s_imageView3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.protone.ui.customView.ScalableRegionLoadingImageView
-                    android:id="@+id/s_imageView4"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.protone.ui.customView.ScalableRegionLoadingImageView
-                    android:id="@+id/s_imageView5"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.protone.ui.customView.ScalableRegionLoadingImageView
-                    android:id="@+id/s_imageView6"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.protone.ui.customView.ScalableRegionLoadingImageView
-                    android:id="@+id/s_imageView7"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            </LinearLayout>
-
-        </ScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

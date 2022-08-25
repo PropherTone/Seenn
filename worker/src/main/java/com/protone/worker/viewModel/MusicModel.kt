@@ -1,6 +1,5 @@
 package com.protone.worker.viewModel
 
-import android.animation.ObjectAnimator
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.saveToFile
 import com.protone.api.baseType.toast
@@ -28,7 +27,6 @@ class MusicModel : BaseViewModel() {
 
     var bucket = R.string.all_music.getString()
     var lastBucket = userConfig.lastMusicBucket
-    var containerAnimator: ObjectAnimator? = null
     var actionPosition: Int = 0
 
     fun getMusicList() = Medias.musicBucket[bucket] ?: mutableListOf()

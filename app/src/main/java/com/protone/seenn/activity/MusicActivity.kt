@@ -34,7 +34,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
 
     override fun createView(): View {
         binding = MusicActivtiyBinding.inflate(layoutInflater, root, false).apply {
-            activity = this@MusicActivity
+//            activity = this@MusicActivity
             fitStatuesBar(musicBucketContainer)
             root.onGlobalLayout {
                 appToolbar.paddingTop(appToolbar.paddingTop + statuesBarHeight)
@@ -189,6 +189,28 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
         }
     }
 
+    private suspend fun MusicModel.setBucket(
+        iconPath: String?,
+        bucketName: String,
+        detail: String
+    ) = withContext(Dispatchers.Main) {
+        bucket = bucketName
+        binding.apply {
+            if (iconPath != null) {
+                Glide.with(this@MusicActivity).asDrawable().load(iconPath)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .override(musicBucketIcon.measuredWidth, musicBucketIcon.measuredHeight)
+                    .into(musicBucketIcon)
+            } else {
+                musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
+            }
+            musicBucketName.text = bucketName
+            musicBucketMsg.text = detail
+        }
+    }
+
     suspend fun MusicModel.initList(musicList: MutableList<Music>) {
         binding.musicBucket.apply {
             layoutManager = LinearLayoutManager(context)
@@ -197,8 +219,8 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                 filterBucket()
             ).apply {
                 this.musicBuckets = getMusicBucket()
-                this.musicBucketEvent = object : MusicBucketAdapter.MusicBucketEvent {
-                    override fun addList(bucket: String, position: Int) {
+                this.musicBucketEventListener = object : MusicBucketAdapter.MusicBucketEvent {
+                    override fun addMusic(bucket: String, position: Int) {
                         this@initList.bucket = bucket
                         actionPosition = position
                         sendViewEvent(MusicModel.MusicEvent.AddList)
@@ -223,28 +245,6 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
             adapter = MusicListAdapter(context).apply {
                 this.musicList = musicList
             }
-        }
-    }
-
-    private suspend fun MusicModel.setBucket(
-        iconPath: String?,
-        bucketName: String,
-        detail: String
-    ) = withContext(Dispatchers.Main) {
-        bucket = bucketName
-        binding.apply {
-            if (iconPath != null) {
-                Glide.with(this@MusicActivity).asDrawable().load(iconPath)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .skipMemoryCache(true)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .override(musicBucketIcon.measuredWidth, musicBucketIcon.measuredHeight)
-                    .into(musicBucketIcon)
-            } else {
-                musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
-            }
-            musicBucketName.text = bucketName
-            musicBucketMsg.text = detail
         }
     }
 

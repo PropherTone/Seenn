@@ -131,9 +131,7 @@ abstract class SelectListAdapter<V : ViewDataBinding, T, D>(
             val y = scaleY(target, 0.96f, duration = 50)
             val x1 = scaleX(target, 1f, duration = 360)
             val y1 = scaleY(target, 1f, duration = 360)
-            animatorSet(x, y, play = true, doOnEnd = {
-                animatorSet(x1, y1, play = true)
-            })
+            animatorSet(x, y, play = true, doOnEnd = { animatorSet(x1, y1, play = true) })
         }
     }
 }

@@ -7,133 +7,85 @@ import android.widget.TextView
 import androidx.lifecycle.viewModelScope
 import com.protone.api.TAG
 import com.protone.api.entity.GalleyMedia
-import com.protone.worker.Medias
 import com.protone.worker.database.DatabaseHelper
-import com.protone.worker.media.isUriExist
-import com.protone.worker.media.scanGalleyWithUri
-import com.protone.worker.media.scanPicture
-import com.protone.worker.media.scanVideo
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlin.streams.toList
 
 class TestViewModel : BaseViewModel() {
 
-    fun updateGalley(uri: Uri) = viewModelScope.launch(Dispatchers.IO) {
-        runningTime("updateGalley(uri: Uri) ") {
-            scanGalleyWithUri(uri) {
-                val checkedMedia =
-                    DatabaseHelper
-                        .instance
-                        .signedGalleyDAOBridge
-                        .insertSignedMediaChecked(it)
-                if (checkedMedia != null) {
-                    log("updateGalley(uri: Uri): 相册更新完毕")
-                }
-            }
-        }
-    }
-
-    fun filterGalley() = viewModelScope.launch(Dispatchers.IO) {
-        fun sortMedia(allSignedMedia: MutableList<GalleyMedia>, galleyMedia: GalleyMedia) {
-            allSignedMedia.stream().filter { it.uri == galleyMedia.uri }
-                .toList().let { list ->
-                    if (list.isNotEmpty()) allSignedMedia.remove(list[0])
-                }
-        }
-
-        val updatedMedia = arrayListOf<GalleyMedia>()
-        runningTime("filterGalley()") {
-            val allSignedMedia =
-                DatabaseHelper.instance.signedGalleyDAOBridge.getAllSignedMedia() as MutableList
-            flow {
-                scanPicture { _, galleyMedia ->
-                    emit(galleyMedia)
-                }
-                scanVideo { _, galleyMedia ->
-                    emit(galleyMedia)
-                }
-            }.buffer().collect {
-//                val checkedMedia =
-//                    DatabaseHelper.instance.signedGalleyDAOBridge.insertSignedMediaChecked(it)
-//                sortMedia(allSignedMedia, it)
-//                if (checkedMedia != null && !updatedMedia.contains(checkedMedia)) {
-//                    updatedMedia.add(checkedMedia)
-//                }
-            }
-        }
-    }
-
-    fun updateGalleyNew() = DatabaseHelper.instance.signedGalleyDAOBridge.run {
+    fun sqlTest() {
         viewModelScope.launch(Dispatchers.IO) {
-            runningTime("updateGalleyNew()") {
-                val allMedia = getAllMediaByType(false) as MutableList<GalleyMedia>
-
-            }
+            val galleyMedia = GalleyMedia(
+                Uri.parse("123123"),
+                "123123.jpg",
+                "/asd/asd/123123.jpg",
+                "asd",
+                3111,
+                null,
+                null,
+                41313,
+                Uri.EMPTY,
+                0,
+                false
+            )
+            log(DatabaseHelper.instance.signedGalleyDAOBridge.insertSignedMedia(galleyMedia).toString())
         }
     }
 
-    fun updateGalley() = DatabaseHelper.instance.signedGalleyDAOBridge.run {
+    fun sqlTest2(){
         viewModelScope.launch(Dispatchers.IO) {
-            runningTime("updateGalley()") {
-
-                val sortMedias = async(Dispatchers.IO) {
-                    val allSignedMedia = getAllSignedMedia() as MutableList
-                    flow {
-                        allSignedMedia.forEach {
-                            if (!isUriExist(it.uri)) {
-                                emit(it)
-                            }
-                        }
-                    }.buffer().collect {
-                        deleteSignedMedia(it)
-                        it.mediaStatus = GalleyMedia.MediaStatus.Deleted
-                        Medias.galleyNotifier.emit(it)
-                    }
-                }
-
-                val scanPicture = async(Dispatchers.IO) {
-                    flow {
-                        scanPicture { _, galleyMedia ->
-                            emit(galleyMedia)
-                        }
-                    }.buffer().collect {
-                        //主要耗时
-                        val checkedMedia = insertSignedMediaChecked(it)
-                        if (checkedMedia != null) {
-                            Medias.galleyNotifier.emit(it)
-                        }
-                    }
-                }
-
-                val scanVideo = async(Dispatchers.IO) {
-                    flow {
-                        scanVideo { _, galleyMedia ->
-                            emit(galleyMedia)
-                        }
-                    }.buffer().collect {
-                        val checkedMedia = insertSignedMediaChecked(it)
-                        if (checkedMedia != null) {
-                            Medias.galleyNotifier.emit(it)
-                        }
-                    }
-                }
-
-                sortMedias.await()
-                scanPicture.await()
-                scanVideo.await()
-            }
+            val galleyMedia2 = GalleyMedia(
+                Uri.parse("12311123"),
+                "123123.jpg",
+                "/asd/assd/123123.jpg",
+                "asd",
+                3111,
+                null,
+                null,
+                41313,
+                Uri.EMPTY,
+                0,
+                false
+            )
+            log(DatabaseHelper.instance.signedGalleyDAOBridge.insertSignedMedia(galleyMedia2).toString())
         }
     }
 
-    fun mediasCount() {
+    fun sqlTest3() {
         viewModelScope.launch(Dispatchers.IO) {
-            val allGalley = DatabaseHelper.instance.signedGalleyDAOBridge.getAllSignedMedia()
-            log("galley size :${allGalley?.size}")
+            val galleyMedia = GalleyMedia(
+                Uri.parse("123123"),
+                "123aa123.jpg",
+                "/asd/asd/123123.jpg",
+                "asd",
+                3111,
+                null,
+                null,
+                41313,
+                Uri.EMPTY,
+                0,
+                false
+            )
+           log(DatabaseHelper.instance.signedGalleyDAOBridge.insertSignedMedia(galleyMedia).toString())
+        }
+    }
+
+    fun sqlTest4(){
+        viewModelScope.launch(Dispatchers.IO) {
+            val galleyMedia2 = GalleyMedia(
+                Uri.parse("12311123"),
+                "1231bb23.jpg",
+                "/asd/assd/123123.jpg",
+                "asd",
+                3111,
+                null,
+                null,
+                41313,
+                Uri.EMPTY,
+                0,
+                false
+            )
+            log(DatabaseHelper.instance.signedGalleyDAOBridge.insertSignedMedia(galleyMedia2).toString())
         }
     }
 

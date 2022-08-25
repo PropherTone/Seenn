@@ -35,23 +35,6 @@
             <!--                <category android:name="android.intent.category.LAUNCHER" />-->
             <!--            </intent-filter>-->
         </activity>
-        <activity android:name=".activity.NoteActivity" />
-        <activity android:name=".activity.PictureBoxActivity" />
-        <activity android:name=".activity.GalleyActivity" />
-        <activity android:name=".activity.MusicActivity" />
-        <activity android:name=".activity.AddBucketActivity" />
-        <activity android:name=".activity.NoteEditActivity" />
-        <activity android:name=".activity.NoteViewActivity" />
-        <activity android:name=".activity.GalleyViewActivity" />
-        <activity android:name=".activity.PickMusicActivity" />
-        <activity android:name=".activity.UserConfigActivity" />
-        <activity android:name=".activity.LogActivity" />
-        <activity android:name=".activity.MusicViewActivity" />
-        <activity android:name=".activity.GalleySearchActivity" />
-        <activity
-            android:name=".activity.MainActivity"
-            android:exported="false"
-            android:launchMode="singleTop" />
         <activity
             android:name=".activity.SplashActivity"
             android:exported="true">
@@ -61,6 +44,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.MainActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
+        <activity android:name=".activity.NoteActivity" />
+        <activity android:name=".activity.PictureBoxActivity" />
+        <activity android:name=".activity.GalleyActivity" />
+        <activity android:name=".activity.TempMusicActivity" />
+        <activity android:name=".activity.AddBucketActivity" />
+        <activity android:name=".activity.NoteEditActivity" />
+        <activity android:name=".activity.NoteViewActivity" />
+        <activity android:name=".activity.GalleyViewActivity" />
+        <activity android:name=".activity.PickMusicActivity" />
+        <activity android:name=".activity.UserConfigActivity" />
+        <activity android:name=".activity.LogActivity" />
+        <activity android:name=".activity.MusicViewActivity" />
+        <activity android:name=".activity.GalleySearchActivity" />
 
         <service
             android:name=".service.MusicService"

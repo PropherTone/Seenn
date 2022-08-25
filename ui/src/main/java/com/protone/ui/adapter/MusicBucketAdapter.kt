@@ -29,6 +29,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
     sealed class MusicBucketAEvent {
         data class AddBucket(val musicBucket: MusicBucket) : MusicBucketAEvent()
         data class RefreshBucket(val name: String, val bucket: MusicBucket) : MusicBucketAEvent()
+        data class DeleteBucket(val musicBucket: MusicBucket) : MusicBucketAEvent()
     }
 
     init {
@@ -43,7 +44,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
             notifyDataSetChanged()
         }
 
-    var musicBucketEvent: MusicBucketEvent? = null
+    var musicBucketEventListener: MusicBucketEvent? = null
 
     var clickCallback: ((String) -> Unit)? = null
 
@@ -53,7 +54,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 musicBuckets.add(data.musicBucket)
                 val index = musicBuckets.indexOf(data.musicBucket)
                 if (index != -1) {
-                    withContext(Dispatchers.IO) {
+                    withContext(Dispatchers.Main) {
                         notifyItemInserted(index)
                     }
                 }
@@ -65,6 +66,17 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                     withContext(Dispatchers.Main) {
                         notifyItemChanged(index)
                     }
+                }
+            }
+            is MusicBucketAEvent.DeleteBucket -> {
+                val index = musicBuckets.indexOf(data.musicBucket)
+                if (index < 0) return
+                musicBuckets.removeAt(index)
+                selectList.clear()
+                selectList.add(musicBuckets[0])
+                withContext(Dispatchers.Main) {
+                    notifyItemRemoved(index)
+                    clickCallback?.invoke(musicBuckets[0].name)
                 }
             }
         }
@@ -156,16 +168,19 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 }
             }
             musicBucketEdit.setOnClickListener {
-                musicBucketEvent?.edit(musicBuckets[holder.layoutPosition].name, position)
+                musicBucketEventListener?.edit(musicBuckets[holder.layoutPosition].name, position)
                 closeMusicBucketBack()
             }
             musicBucketDelete.setOnClickListener {
-                musicBucketEvent?.delete(musicBuckets[holder.layoutPosition].name, position)
+                musicBucketEventListener?.delete(musicBuckets[holder.layoutPosition].name, position)
                 closeMusicBucketBack()
             }
             musicBucketAddList.setOnClickListener {
                 closeMusicBucketBack()
-                musicBucketEvent?.addList(musicBuckets[holder.layoutPosition].name, position)
+                musicBucketEventListener?.addMusic(
+                    musicBuckets[holder.layoutPosition].name,
+                    position
+                )
             }
         }
     }
@@ -189,16 +204,12 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
     override fun getItemCount(): Int = musicBuckets.size
 
     fun deleteBucket(musicBucket: MusicBucket): Boolean {
-        val index = musicBuckets.indexOf(musicBucket)
-        musicBuckets.removeAt(index)
-        selectList.clear()
-        selectList.add(musicBuckets[0])
-        notifyItemRemoved(index)
-        return index != -1
+        emit(MusicBucketAEvent.DeleteBucket(musicBucket))
+        return true
     }
 
     fun addBucket(musicBucket: MusicBucket) {
-       emit(MusicBucketAEvent.AddBucket(musicBucket))
+        emit(MusicBucketAEvent.AddBucket(musicBucket))
     }
 
     fun refreshBucket(name: String, bucket: MusicBucket) {
@@ -206,7 +217,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
     }
 
     interface MusicBucketEvent {
-        fun addList(bucket: String, position: Int)
+        fun addMusic(bucket: String, position: Int)
         fun delete(bucket: String, position: Int)
         fun edit(bucket: String, position: Int)
     }

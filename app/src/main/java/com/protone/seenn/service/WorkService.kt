@@ -117,13 +117,16 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
             musicBucket.keys.forEach {
                 musicBucketDAOBridge.getMusicBucketByName(it)?.let { mb ->
                     musicBucket[it]?.size?.let { size ->
-                        mb.size = size
-                        musicBucketDAOBridge.updateMusicBucketAsync(mb)
+                        if (mb.size != size) {
+                            mb.size = size
+                            musicBucketDAOBridge.updateMusicBucket(mb)
+                            musicBucketNotifier.postValue(it)
+                        }
                     }
                 }
             }
         }
-        musicBucketNotifier.postValue(1)
+        musicBucketNotifier.postValue("")
         makeToast("歌单更新完毕")
     }
 
@@ -160,16 +163,13 @@ class WorkService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO) 
                 }.buffer().collect {
                     insertMusic(it)
                 }
-            }
-            deleteMusicMultiAsync(allMusic)
-            updateMusicBucket()
-            if (allMusic.size != 0) {
-                launch {
+                deleteMusicMulti(allMusic)
+                updateMusicBucket()
+                if (allMusic.size != 0) {
                     audioNotifier.emit(allMusic as ArrayList<Music>)
+                    makeToast("音乐更新完毕")
                 }
-                makeToast("音乐更新完毕")
             }
-
         }
     }
 

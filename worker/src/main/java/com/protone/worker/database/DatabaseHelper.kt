@@ -162,7 +162,24 @@ class DatabaseHelper {
             }
         }
 
+        fun insertMusicMultiAsyncWithBucket(musicBucket: String, music: List<Music>) {
+            execute {
+                val bucket = musicBucketDAO.getMusicBucketByName(musicBucket)
+                bucket?.let { b ->
+                    music.forEach {
+                        musicWithMusicBucketDAO.insertMusicWithMusicBucket(
+                            MusicWithMusicBucket(
+                                b.musicBucketId,
+                                it.musicBaseId
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
         fun deleteMusicMultiAsync(music: List<Music>) {
+            if (music.isEmpty()) return
             execute {
                 music.forEach {
                     deleteMusic(it)
@@ -170,6 +187,12 @@ class DatabaseHelper {
             }
         }
 
+        fun deleteMusicMulti(music: List<Music>) {
+            if (music.isEmpty()) return
+            music.forEach {
+                deleteMusic(it)
+            }
+        }
 
         suspend fun getAllMusicRs() = onResult {
             execute {
@@ -269,19 +292,14 @@ class DatabaseHelper {
             execute { list.forEach { updateSignedMedia(it) } }
         }
 
-        fun insertSignedMedia(media: GalleyMedia) {
-            signedGalleyDAO.insertSignedMedia(media)
+        fun insertSignedMedia(media: GalleyMedia): Long {
+            return signedGalleyDAO.insertSignedMedia(media)
         }
 
         fun insertSignedMediaChecked(media: GalleyMedia): GalleyMedia? {
             val it = getSignedMedia(media.uri)
             return if (it != null) {
                 if (it == media) return null
-                it.name = media.name
-                it.path = media.path
-                it.bucket = media.bucket
-                it.type = media.type
-                it.date = media.date
                 updateSignedMedia(it)
                 it.mediaStatus = GalleyMedia.MediaStatus.Updated
                 it

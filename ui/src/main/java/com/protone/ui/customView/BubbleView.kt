@@ -8,10 +8,10 @@ import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.view.animation.AccelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.TextView
+import com.protone.api.context.onGlobalLayout
 
 class Bubble(context: Context) {
 
@@ -86,13 +86,10 @@ class Bubble(context: Context) {
         if (onMeasured) {
             showBubbleImmediately(targetView, location)
         } else {
-            var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
-            globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+            bubbleView.onGlobalLayout {
                 onMeasured = true
                 showBubbleImmediately(targetView, location)
-                bubbleView.viewTreeObserver.removeOnGlobalLayoutListener(globalLayoutListener)
             }
-            bubbleView.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
         }
 
     }
