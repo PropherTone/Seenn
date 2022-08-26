@@ -8,15 +8,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.SearchModel
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
-import com.protone.api.context.UPDATE_MUSIC_BUCKET
 import com.protone.api.context.linkInput
 import com.protone.api.context.root
 import com.protone.api.entity.Music
+import com.protone.seenn.R
+import com.protone.seenn.databinding.PickMusicActivityBinding
 import com.protone.ui.adapter.AddMusicListAdapter
 import com.protone.worker.Medias
-import com.protone.seenn.R
-import com.protone.seenn.broadcast.workLocalBroadCast
-import com.protone.seenn.databinding.PickMusicActivityBinding
 import com.protone.worker.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,11 +52,6 @@ class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewMo
         }
     }
 
-    override fun finish() {
-        workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC_BUCKET))
-        super.finish()
-    }
-
     fun confirm() {
         val selectList = getSelectList()
         if (selectList != null && selectList.size > 0) {
@@ -71,7 +64,7 @@ class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewMo
 
     private fun PickMusicViewModel.query(input: String) {
         if (input.isEmpty()) return
-        launch {
+        launch(Dispatchers.Default) {
             refreshList(filterData(input))
         }
     }

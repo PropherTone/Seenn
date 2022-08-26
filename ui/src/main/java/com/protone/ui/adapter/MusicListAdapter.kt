@@ -23,7 +23,9 @@ class MusicListAdapter(context: Context) :
             field.clear()
             field.addAll(value)
             if (selectList.size >= 1) playPosition = field.indexOf(selectList[0])
-            notifyDataSetChanged()
+            launch {
+                notifyDataSetChanged()
+            }
         }
 
     var clickCallback: ((Music) -> Unit?)? = null

@@ -7,9 +7,9 @@
 
         <variable
             name="activity"
-            type="com.protone.seenn.activity.TempMusicActivity" />
+            type="com.protone.seenn.activity.MusicActivity" />
 
-        <import type="com.protone.worker.viewModel.TempMusicModel.TempMusicEvent" />
+        <import type="com.protone.worker.viewModel.MusicModel.MusicEvent" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -192,7 +192,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/white"
                 android:contentDescription="@string/action"
-                android:onClick="@{()->activity.sendViewEvent(TempMusicEvent.AddMusicBucket.INSTANCE)}"
+                android:onClick="@{()->activity.sendViewEvent(MusicEvent.AddMusicBucket.INSTANCE)}"
                 android:padding="@dimen/main_padding"
                 android:src="@drawable/ic_baseline_add_24"
                 app:layout_constraintBottom_toBottomOf="parent"

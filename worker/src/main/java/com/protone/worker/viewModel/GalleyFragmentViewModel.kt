@@ -9,6 +9,7 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.entity.GalleyBucket
 import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.MediaStatus
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
@@ -116,11 +117,11 @@ class GalleyFragmentViewModel : ViewModel() {
 
     inline fun updateGalley(
         media: GalleyMedia,
-        crossinline callBack: (GalleyMedia.MediaStatus, GalleyMedia) -> Unit
+        crossinline callBack: (MediaStatus, GalleyMedia) -> Unit
     ) = viewModelScope.launch(Dispatchers.Default) {
         val allGalley = R.string.all_galley.getString()
         if (galleyMap[allGalley]?.contains(media) == false && (isVideo == media.isVideo || combine)) when (media.mediaStatus) {
-            GalleyMedia.MediaStatus.Updated -> {
+            MediaStatus.Updated -> {
                 galleyMap[allGalley]?.first { media -> media.uri == media.uri }?.let { media ->
                     val allIndex = galleyMap[allGalley]?.indexOf(media)
                     if (allIndex != null && allIndex != -1) {
@@ -129,24 +130,24 @@ class GalleyFragmentViewModel : ViewModel() {
                         if (media.bucket != media.bucket) {
                             galleyMap[media.bucket]?.remove(media)
                             insertNewMedia(media)
-                            callBack.invoke(GalleyMedia.MediaStatus.NewInsert, media)
+                            callBack.invoke(MediaStatus.NewInsert, media)
                             return@let
                         } else if (index != null && index != -1) {
                             galleyMap[media.bucket]?.set(index, media)
                         }
                     }
-                    callBack.invoke(GalleyMedia.MediaStatus.Updated, media)
+                    callBack.invoke(MediaStatus.Updated, media)
                 }
             }
-            GalleyMedia.MediaStatus.Deleted -> {
+            MediaStatus.Deleted -> {
                 galleyMap[media.bucket]?.remove(media)
                 galleyMap[allGalley]?.remove(media)
-                callBack.invoke(GalleyMedia.MediaStatus.Deleted, media)
+                callBack.invoke(MediaStatus.Deleted, media)
             }
-            GalleyMedia.MediaStatus.NewInsert -> {
+            MediaStatus.NewInsert -> {
                 insertNewMedia(media)
                 galleyMap[allGalley]?.add(0, media)
-                callBack.invoke(GalleyMedia.MediaStatus.NewInsert, media)
+                callBack.invoke(MediaStatus.NewInsert, media)
             }
         }
         Log.d(TAG, "GalleyFragment updateGalley done")

@@ -5,7 +5,6 @@ import androidx.room.*
 import com.protone.api.converters.ListTypeConverter
 import com.protone.api.converters.UriTypeConverter
 
-
 @Entity(indices = [Index(value = ["media_uri"], unique = true)])
 @TypeConverters(UriTypeConverter::class, ListTypeConverter::class)
 data class GalleyMedia(
@@ -35,12 +34,6 @@ data class GalleyMedia(
 ) {
     @Ignore
     var mediaStatus: MediaStatus = MediaStatus.NewInsert
-
-    enum class MediaStatus {
-        Updated,
-        Deleted,
-        NewInsert
-    }
 
     override fun toString(): String {
         return "GalleyMedia(name='$name', bucket='$bucket', size=$size, type='$type', cate='$cate', uri=$uri, date=$date, thumbnailUri=$thumbnailUri, duration=$duration, isVideo=$isVideo)"

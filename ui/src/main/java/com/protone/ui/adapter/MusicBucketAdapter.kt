@@ -28,7 +28,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
 
     sealed class MusicBucketAEvent {
         data class AddBucket(val musicBucket: MusicBucket) : MusicBucketAEvent()
-        data class RefreshBucket(val name: String, val bucket: MusicBucket) : MusicBucketAEvent()
+        data class RefreshBucket(val bucket: MusicBucket) : MusicBucketAEvent()
         data class DeleteBucket(val musicBucket: MusicBucket) : MusicBucketAEvent()
     }
 
@@ -51,16 +51,14 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
     override suspend fun onEventIO(data: MusicBucketAEvent) {
         when (data) {
             is MusicBucketAEvent.AddBucket -> {
-                musicBuckets.add(data.musicBucket)
-                val index = musicBuckets.indexOf(data.musicBucket)
-                if (index != -1) {
-                    withContext(Dispatchers.Main) {
-                        notifyItemInserted(index)
-                    }
+                withContext(Dispatchers.Main) {
+                    musicBuckets.add(data.musicBucket)
+                    notifyItemInserted(musicBuckets.size - 1)
                 }
             }
             is MusicBucketAEvent.RefreshBucket -> {
-                val index = musicBuckets.indexOfFirst { it.name == data.name }
+                val index =
+                    musicBuckets.indexOfFirst { it.musicBucketId == data.bucket.musicBucketId }
                 if (index != -1 && index != 0) {
                     musicBuckets[index] = data.bucket
                     withContext(Dispatchers.Main) {
@@ -71,13 +69,13 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
             is MusicBucketAEvent.DeleteBucket -> {
                 val index = musicBuckets.indexOf(data.musicBucket)
                 if (index < 0) return
-                musicBuckets.removeAt(index)
+                withContext(Dispatchers.Main) {
+                    musicBuckets.removeAt(index)
+                    notifyItemRemoved(index)
+                }
                 selectList.clear()
                 selectList.add(musicBuckets[0])
-                withContext(Dispatchers.Main) {
-                    notifyItemRemoved(index)
-                    clickCallback?.invoke(musicBuckets[0].name)
-                }
+                clickCallback?.invoke(musicBuckets[0].name)
             }
         }
     }
@@ -212,8 +210,8 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
         emit(MusicBucketAEvent.AddBucket(musicBucket))
     }
 
-    fun refreshBucket(name: String, bucket: MusicBucket) {
-        emit(MusicBucketAEvent.RefreshBucket(name, bucket))
+    fun refreshBucket(bucket: MusicBucket) {
+        emit(MusicBucketAEvent.RefreshBucket(bucket))
     }
 
     interface MusicBucketEvent {

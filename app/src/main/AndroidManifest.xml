@@ -51,7 +51,7 @@
         <activity android:name=".activity.NoteActivity" />
         <activity android:name=".activity.PictureBoxActivity" />
         <activity android:name=".activity.GalleyActivity" />
-        <activity android:name=".activity.TempMusicActivity" />
+        <activity android:name=".activity.MusicActivity" />
         <activity android:name=".activity.AddBucketActivity" />
         <activity android:name=".activity.NoteEditActivity" />
         <activity android:name=".activity.NoteViewActivity" />
@@ -90,7 +90,6 @@
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="UPDATE_MUSIC_BUCKET" />
                 <action android:name="UPDATE_MUSIC" />
                 <action android:name="UPDATE_GALLEY" />
             </intent-filter>

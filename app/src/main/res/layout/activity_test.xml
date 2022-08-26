@@ -33,56 +33,61 @@
                 android:id="@+id/btn1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="@{()->model.sqlTest()}"
+                android:onClick="@{()->model.fun1()}"
                 android:text="btn1" />
 
             <Button
                 android:id="@+id/btn2"
                 android:layout_width="wrap_content"
-                android:onClick="@{()->model.sqlTest2()}"
+                android:onClick="@{()->model.fun2()}"
                 android:layout_height="wrap_content"
                 android:text="btn2" />
 
             <Button
                 android:id="@+id/btn3"
                 android:layout_width="wrap_content"
-                android:onClick="@{()->model.sqlTest3()}"
+                android:onClick="@{()->model.fun3()}"
                 android:layout_height="wrap_content"
                 android:text="btn3" />
 
             <Button
                 android:id="@+id/btn4"
                 android:layout_width="wrap_content"
-                android:onClick="@{()->model.sqlTest4()}"
+                android:onClick="@{()->model.fun4()}"
                 android:layout_height="wrap_content"
                 android:text="btn4" />
 
             <Button
                 android:id="@+id/btn5"
+                android:onClick="@{()->model.func5()}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="btn5" />
 
             <Button
                 android:id="@+id/btn6"
+                android:onClick="@{()->model.func6()}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="btn6" />
 
             <Button
                 android:id="@+id/btn7"
+                android:onClick="@{()->model.func7()}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="btn7" />
 
             <Button
                 android:id="@+id/btn8"
+                android:onClick="@{()->model.func8()}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="btn8" />
 
             <Button
                 android:id="@+id/btn9"
+                android:onClick="@{()->model.func9()}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="btn9" />

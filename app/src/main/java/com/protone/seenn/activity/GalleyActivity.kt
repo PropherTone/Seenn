@@ -19,6 +19,7 @@ import com.protone.worker.database.userConfig
 import com.protone.worker.viewModel.GalleyFragmentViewModel
 import com.protone.worker.viewModel.GalleyViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -64,7 +65,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
             }
         }, chooseType)
 
-        Medias.galleyNotifier.collect {
+        Medias.galleyNotifier.buffer().collect {
             if (!onTransaction) {
                 onUpdate(it)
             }

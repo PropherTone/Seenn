@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.MediaStatus
 import com.protone.api.entity.Music
 import com.protone.api.entity.Note
 import com.protone.worker.database.DatabaseHelper
@@ -16,7 +17,7 @@ object Medias {
 
     val galleyNotifier = MutableSharedFlow<GalleyMedia>()
     val audioNotifier = MutableSharedFlow<MutableList<Music>>()
-    val musicBucketNotifier = MutableLiveData<String>()
+    val musicBucketNotifier = MutableLiveData<MediaStatus>()
 
     var music: MutableList<Music>
         set(value) {

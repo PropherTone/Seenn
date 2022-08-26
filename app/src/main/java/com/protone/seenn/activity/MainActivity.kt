@@ -11,6 +11,7 @@ import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.onGlobalLayout
 import com.protone.api.context.root
+import com.protone.api.entity.MediaStatus
 import com.protone.api.entity.Music
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
@@ -120,7 +121,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
             musicController.setLoopMode(userConfig.musicLoopMode)
             launch(Dispatchers.Default) {
                 while (isActive) {
-                    if (Medias.musicBucketNotifier.value != null && Medias.musicBucketNotifier.value == "") {
+                    if (Medias.musicBucketNotifier.value != null && Medias.musicBucketNotifier.value == MediaStatus.Updated) {
                         break
                     }
                 }
@@ -161,7 +162,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.Music ->
                     if (userConfig.lockMusic == "")
-                        startActivity(TempMusicActivity::class.intent)
+                        startActivity(MusicActivity::class.intent)
                     else R.string.locked.getString().toast()
                 MainViewModel.MainViewEvent.UserConfig ->
                     startActivity(UserConfigActivity::class.intent)

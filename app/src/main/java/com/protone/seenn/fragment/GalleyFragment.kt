@@ -20,6 +20,7 @@ import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.onGlobalLayout
 import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.MediaStatus
 import com.protone.api.json.toJson
 import com.protone.seenn.R
 import com.protone.seenn.activity.GalleySearchActivity
@@ -36,6 +37,7 @@ import com.protone.worker.viewModel.GalleyFragmentViewModel
 import com.protone.worker.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 
 class GalleyFragment(
@@ -68,7 +70,7 @@ class GalleyFragment(
         viewModel.apply {
             onAttach.invoke(fragFlow)
             launch(Dispatchers.Default) {
-                fragFlow.collect {
+                fragFlow.buffer().collect {
                     when (it) {
                         is GalleyFragmentViewModel.FragEvent.DeleteMedia -> {
                             if (!isLock) {
@@ -115,12 +117,12 @@ class GalleyFragment(
                         is GalleyFragmentViewModel.FragEvent.OnGalleyUpdate -> {
                             updateGalley(it.media) { status, media ->
                                 when (status) {
-                                    GalleyMedia.MediaStatus.Updated -> {
+                                    MediaStatus.Updated -> {
                                         if (onTargetGalley(media.bucket)) {
                                             getListAdapter().noticeListItemUpdate(media)
                                         }
                                     }
-                                    GalleyMedia.MediaStatus.Deleted -> {
+                                    MediaStatus.Deleted -> {
                                         val index =
                                             viewModel.galleyMap[media.bucket]?.indexOf(media)
                                         if (index != null && index == 0) {
@@ -130,7 +132,7 @@ class GalleyFragment(
                                             getListAdapter().noticeListItemDelete(media)
                                         }
                                     }
-                                    GalleyMedia.MediaStatus.NewInsert -> {
+                                    MediaStatus.NewInsert -> {
                                         refreshBucket(media)
                                         if (onTargetGalley(media.bucket)) {
                                             getListAdapter().noticeListItemInsert(media)

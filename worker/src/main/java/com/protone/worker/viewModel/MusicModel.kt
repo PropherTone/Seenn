@@ -1,95 +1,116 @@
 package com.protone.worker.viewModel
 
-import com.protone.api.baseType.getString
-import com.protone.api.baseType.saveToFile
-import com.protone.api.baseType.toast
+import androidx.lifecycle.viewModelScope
+import com.protone.api.entity.Music
 import com.protone.api.entity.MusicBucket
-import com.protone.api.onResult
-import com.protone.api.todayDate
 import com.protone.worker.Medias
-import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
+import com.protone.worker.database.MediaAction
 import com.protone.worker.database.userConfig
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.stream.Collectors
+import kotlin.streams.toList
 
 class MusicModel : BaseViewModel() {
 
     sealed class MusicEvent {
-        object Delete : ViewEvent
-        object RefreshBucket : ViewEvent
-        object Edit : ViewEvent
-        object AddList : ViewEvent
-        object AddBucket : ViewEvent
+        data class PlayMusic(val music: Music) : ViewEvent
+        data class SetBucketCover(val name: String) : ViewEvent
+        data class AddMusic(val bucket: String) : ViewEvent
+        data class Edit(val bucket: String) : ViewEvent
+        data class Delete(val bucket: String) : ViewEvent
+        data class RefreshBucket(val newName: String) : ViewEvent
+        data class AddBucket(val bucket: String) : ViewEvent
+        data class DeleteBucket(val bucket: String) : ViewEvent
+        object AddMusicBucket : ViewEvent
     }
 
-    var bucket = R.string.all_music.getString()
-    var lastBucket = userConfig.lastMusicBucket
-    var actionPosition: Int = 0
+    var lastBucket: String = userConfig.lastMusicBucket
+        set(value) {
+            userConfig.lastMusicBucket = value
+            field = value
+        }
+        get() = userConfig.lastMusicBucket
 
-    fun getMusicList() = Medias.musicBucket[bucket] ?: mutableListOf()
+    var onMusicDataEvent: OnMusicDataEvent? = null
 
-    suspend fun filterBucket(): MusicBucket =
-        getMusicBucket().stream().filter { it.name == lastBucket }
-            .collect(Collectors.toList()).let {
-                if (it.size > 0) it[0] else MusicBucket()
-            }
-
-    suspend fun getMusicBucket(): MutableList<MusicBucket> {
-        val list = DatabaseHelper.instance.musicBucketDAOBridge.getAllMusicBucketRs()
-        return onResult { co ->
-            if (list == null || list.isEmpty()) {
-                DatabaseHelper.instance.musicBucketDAOBridge.addMusicBucketWithCallBack(
-                    MusicBucket(
-                        R.string.all_music.getString(),
-                        if (Medias.music.size > 0) Medias.music[0].uri.saveToFile(
-                            R.string.all_music.getString(),
-                            R.string.music_bucket.getString()
-                        ) else null,
-                        Medias.music.size,
-                        null,
-                        todayDate("yyyy/MM/dd")
-                    )
-                ) { re, _ ->
-                    if (re) co.resumeWith(
-                        Result.success(
-                            DatabaseHelper
-                                .instance
-                                .musicBucketDAOBridge
-                                .getAllMusicBucketRs() as MutableList<MusicBucket>
-                        )
-                    )
+    init {
+        DatabaseHelper.instance.apply {
+            musicBucketDAOBridge.startEvent()
+            musicDAOBridge.startEvent()
+            musicWithMusicBucketDAOBridge.startEvent()
+        }
+        viewModelScope.launch(Dispatchers.Default) {
+            DatabaseHelper.instance.mediaNotifier.buffer().collect {
+                when (it) {
+                    is MediaAction.OnNewMusicBucket ->
+                        onMusicDataEvent?.onNewMusicBucket(it.musicBucket)
+                    is MediaAction.OnMusicBucketUpdated ->
+                        onMusicDataEvent?.onMusicBucketUpdated(it.musicBucket)
+                    is MediaAction.OnMusicBucketDeleted ->
+                        onMusicDataEvent?.onMusicBucketDeleted(it.musicBucket)
+                    else -> Unit
                 }
-            } else co.resumeWith(Result.success(list as MutableList<MusicBucket>))
+            }
         }
     }
 
-    fun compareName(): Boolean {
-        if (bucket == "" || bucket == R.string.all_music.getString()) {
-            R.string.none.getString().toast()
-            return true
+    override fun onCleared() {
+        DatabaseHelper.instance.apply {
+            musicBucketDAOBridge.stopEvent()
+            musicDAOBridge.stopEvent()
+            musicWithMusicBucketDAOBridge.stopEvent()
         }
-        return false
+        super.onCleared()
     }
 
-    suspend fun getBucket() = withContext(Dispatchers.IO) {
-        DatabaseHelper.instance.musicBucketDAOBridge.getMusicBucketByName(bucket)
-    }
+    fun getCurrentMusicList(bucket: String): MutableList<Music> =
+        Medias.musicBucket[bucket] ?: mutableListOf()
 
-    suspend fun doDeleteBucket(musicBucket: MusicBucket) =
-        DatabaseHelper.instance.musicBucketDAOBridge.deleteMusicBucketRs(musicBucket)
-
-    suspend fun deleteMusicBucketCover(path: String) = withContext(Dispatchers.IO) {
-        val file = File(path)
-        if (file.isFile && file.exists()) {
-            file.delete()
+    suspend fun getBucketRefreshed(name: String) = withContext(Dispatchers.IO) {
+        getBucket(name)?.let {
+            it.size =
+                DatabaseHelper.instance.musicWithMusicBucketDAOBridge.getMusicWithMusicBucket(it.musicBucketId).size
+            it
         }
     }
 
-    suspend fun getMusicBucketByName(name: String) = withContext(Dispatchers.IO){
-        DatabaseHelper.instance.musicBucketDAOBridge.getMusicBucketByName(name)
+    suspend fun getBucket(name: String) =
+        DatabaseHelper.instance.musicBucketDAOBridge.getMusicBucketByNameRs(name)
+
+    suspend fun getLastMusicBucket(list: MutableList<MusicBucket>): MusicBucket =
+        withContext(Dispatchers.Default) {
+            list.stream().filter { it.name == lastBucket }.toList()
+                .let { if (it.isNotEmpty()) it[0] else MusicBucket() }
+        }
+
+    suspend fun getMusicBuckets(): MutableList<MusicBucket> {
+        return DatabaseHelper.instance.musicBucketDAOBridge.getAllMusicBucketRs() as MutableList<MusicBucket>?
+            ?: mutableListOf()
     }
 
+    suspend fun tryDeleteMusicBucket(name: String): MusicBucket? {
+        return DatabaseHelper.instance.musicBucketDAOBridge.let {
+            val musicBucketByName = it.getMusicBucketByNameRs(name)
+            if (musicBucketByName != null) {
+                if (it.deleteMusicBucketRs(musicBucketByName)) {
+                    musicBucketByName.icon?.let { path ->
+                        val file = File(path)
+                        if (file.isFile && file.exists()) file.delete()
+                    }
+                }
+                musicBucketByName
+            } else null
+        }
+    }
+
+    interface OnMusicDataEvent {
+        fun onNewMusicBucket(musicBucket: MusicBucket)
+        fun onMusicBucketUpdated(musicBucket: MusicBucket)
+        fun onMusicBucketDeleted(musicBucket: MusicBucket)
+    }
 }

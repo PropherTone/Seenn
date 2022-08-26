@@ -1,93 +1,59 @@
 package com.protone.worker.viewModel
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.util.Log
 import android.widget.TextView
 import androidx.lifecycle.viewModelScope
 import com.protone.api.TAG
-import com.protone.api.entity.GalleyMedia
-import com.protone.worker.database.DatabaseHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.collect
 
 class TestViewModel : BaseViewModel() {
 
-    fun sqlTest() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val galleyMedia = GalleyMedia(
-                Uri.parse("123123"),
-                "123123.jpg",
-                "/asd/asd/123123.jpg",
-                "asd",
-                3111,
-                null,
-                null,
-                41313,
-                Uri.EMPTY,
-                0,
-                false
-            )
-            log(DatabaseHelper.instance.signedGalleyDAOBridge.insertSignedMedia(galleyMedia).toString())
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    private val flow = MutableSharedFlow<Int>()
+
+    fun fun1() {
+        coroutineScope.launch {
+            flow.buffer().collect {
+                Log.d(TAG, "collect: $it")
+            }
         }
     }
 
-    fun sqlTest2(){
-        viewModelScope.launch(Dispatchers.IO) {
-            val galleyMedia2 = GalleyMedia(
-                Uri.parse("12311123"),
-                "123123.jpg",
-                "/asd/assd/123123.jpg",
-                "asd",
-                3111,
-                null,
-                null,
-                41313,
-                Uri.EMPTY,
-                0,
-                false
-            )
-            log(DatabaseHelper.instance.signedGalleyDAOBridge.insertSignedMedia(galleyMedia2).toString())
+    fun fun2() {
+        viewModelScope.launch {
+            while (isActive) {
+                (0..100).random().let {
+                    Log.d(TAG, "emit: $it")
+                    flow.emit(it)
+                    delay(500L)
+                }
+            }
         }
     }
 
-    fun sqlTest3() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val galleyMedia = GalleyMedia(
-                Uri.parse("123123"),
-                "123aa123.jpg",
-                "/asd/asd/123123.jpg",
-                "asd",
-                3111,
-                null,
-                null,
-                41313,
-                Uri.EMPTY,
-                0,
-                false
-            )
-           log(DatabaseHelper.instance.signedGalleyDAOBridge.insertSignedMedia(galleyMedia).toString())
-        }
+    fun fun3() {
+        coroutineScope.cancel()
     }
 
-    fun sqlTest4(){
-        viewModelScope.launch(Dispatchers.IO) {
-            val galleyMedia2 = GalleyMedia(
-                Uri.parse("12311123"),
-                "1231bb23.jpg",
-                "/asd/assd/123123.jpg",
-                "asd",
-                3111,
-                null,
-                null,
-                41313,
-                Uri.EMPTY,
-                0,
-                false
-            )
-            log(DatabaseHelper.instance.signedGalleyDAOBridge.insertSignedMedia(galleyMedia2).toString())
-        }
+    fun fun4() {
+
     }
+
+    fun func5() {
+
+    }
+
+    fun func6() {}
+
+    fun func7() {}
+
+    fun func8() {}
+
+    fun func9() {}
 
     @SuppressLint("StaticFieldLeak")
     private lateinit var logText: TextView

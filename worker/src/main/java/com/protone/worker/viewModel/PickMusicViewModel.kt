@@ -1,12 +1,10 @@
 package com.protone.worker.viewModel
 
 import com.protone.api.entity.Music
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.withContext
 
 class PickMusicViewModel : BaseViewModel() {
 
@@ -20,12 +18,11 @@ class PickMusicViewModel : BaseViewModel() {
 
     val data: MutableList<Music> = mutableListOf()
 
-    suspend fun filterData(input: String) = withContext(Dispatchers.IO) {
-        data.asFlow().filter {
-            it.displayName?.contains(input, true) == true || it.album?.contains(
-                input,
-                true
-            ) == true
-        }.buffer().toList() as MutableList<Music>
-    }
+    suspend fun filterData(input: String) = data.asFlow().filter {
+        it.displayName?.contains(input, true) == true || it.album?.contains(
+            input,
+            true
+        ) == true
+    }.buffer().toList() as MutableList<Music>
+
 }

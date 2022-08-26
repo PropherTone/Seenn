@@ -5,7 +5,6 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.saveToFile
 import com.protone.api.entity.MusicBucket
 import com.protone.api.todayDate
-import com.protone.worker.Medias
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 
@@ -24,14 +23,6 @@ class AddBucketViewModel : BaseViewModel() {
 
     var editName: String? = null
     var musicBucket: MusicBucket? = null
-
-    fun filterMusicBucket(name: String) {
-        if (Medias.musicBucket.containsKey(editName)) {
-            Medias.musicBucket[name] =
-                Medias.musicBucket.remove(editName)
-                    ?: mutableListOf()
-        }
-    }
 
     fun addMusicBucket(
         name: String,

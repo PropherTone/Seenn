@@ -101,7 +101,6 @@ class AddBucketActivity : BaseActivity<AddBucketActivityBinding, AddBucketViewMo
                 updateMusicBucket(it, name, uri, detail)
             }
             if (re != 0 || re != -1) {
-                filterMusicBucket(name)
                 intent = Intent().putExtra(AddBucketViewModel.BUCKET_NAME, name)
                 setResult(RESULT_OK, intent)
                 finish()
