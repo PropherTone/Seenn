@@ -10,10 +10,7 @@ import com.protone.api.onResult
 import com.protone.database.R
 import com.protone.database.room.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import java.util.concurrent.LinkedBlockingDeque
 
 class DatabaseHelper {
@@ -58,7 +55,7 @@ class DatabaseHelper {
         }
     }
 
-    fun pollEvent(queue: LinkedBlockingDeque<MediaAction>) = execute(Dispatchers.Default) {
+    suspend fun pollEvent(queue: LinkedBlockingDeque<MediaAction>) {
         while (queue.isNotEmpty()) queue.poll()?.let { _mediaNotifier.emit(it) }
     }
 
@@ -69,7 +66,8 @@ class DatabaseHelper {
         try {
             runnable.invoke()
         } catch (e: Exception) {
-            if (isInDebug()) e.printStackTrace()
+            if (e is CancellationException) throw e
+            e.printStackTrace()
             R.string.unknown_error.getString().toast()
         } finally {
             cancel()
@@ -80,10 +78,11 @@ class DatabaseHelper {
 
         override fun startEvent() {
             dataEvent = this@DatabaseHelper.execute(Dispatchers.Default) {
-                observeAllMusicBucket().collect {
+                observeAllMusicBucket().buffer().collect {
                     this@DatabaseHelper.pollEvent(getDeque())
                 }
             }
+            dataEvent?.start()
         }
 
         fun updateMusicBucketAsync(bucket: MusicBucket) {
@@ -379,7 +378,7 @@ class DatabaseHelper {
 
         override fun startEvent() {
             this@DatabaseHelper.execute(Dispatchers.Default) {
-                observeAllMusicBucketWithMusic().collect {
+                observeAllMusicBucketWithMusic().buffer().collect {
                     this@DatabaseHelper.pollEvent(getDeque())
                 }
             }

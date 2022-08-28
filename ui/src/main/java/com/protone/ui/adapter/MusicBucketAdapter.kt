@@ -46,7 +46,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
 
     var musicBucketEventListener: MusicBucketEvent? = null
 
-    var clickCallback: ((String) -> Unit)? = null
+    var clickCallback: ((MusicBucket) -> Unit)? = null
 
     override suspend fun onEventIO(data: MusicBucketAEvent) {
         when (data) {
@@ -75,7 +75,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 }
                 selectList.clear()
                 selectList.add(musicBuckets[0])
-                clickCallback?.invoke(musicBuckets[0].name)
+                clickCallback?.invoke(musicBuckets[0])
             }
         }
     }
@@ -130,7 +130,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
             musicBucketBack.setOnClickListener {
                 if (!selectList.contains(musicBuckets[position]))
                     checkSelect(holder, musicBuckets[position])
-                clickCallback?.invoke(musicBuckets[holder.layoutPosition].name)
+                clickCallback?.invoke(musicBuckets[holder.layoutPosition])
             }
 
             fun closeMusicBucketBack() {

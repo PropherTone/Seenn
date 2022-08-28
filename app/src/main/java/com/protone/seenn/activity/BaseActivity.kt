@@ -60,6 +60,8 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
                     try {
                         onViewEvent?.invoke(it)
                     } catch (e: Exception) {
+                        if (e is CancellationException) throw e
+                        e.printStackTrace()
                         R.string.come_up_unknown_error.getString().toast()
                     }
                 }

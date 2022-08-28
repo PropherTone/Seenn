@@ -1,6 +1,8 @@
 package com.protone.worker.viewModel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.protone.api.TAG
 import com.protone.api.entity.Music
 import com.protone.api.entity.MusicBucket
 import com.protone.worker.Medias
@@ -68,8 +70,9 @@ class MusicModel : BaseViewModel() {
         super.onCleared()
     }
 
-    fun getCurrentMusicList(bucket: String): MutableList<Music> =
-        Medias.musicBucket[bucket] ?: mutableListOf()
+    suspend fun getCurrentMusicList(bucket: MusicBucket): MutableList<Music> = withContext(Dispatchers.IO) {
+        DatabaseHelper.instance.musicWithMusicBucketDAOBridge.getMusicWithMusicBucket(bucket.musicBucketId) as MutableList<Music>
+    }
 
     suspend fun getBucketRefreshed(name: String) = withContext(Dispatchers.IO) {
         getBucket(name)?.let {
