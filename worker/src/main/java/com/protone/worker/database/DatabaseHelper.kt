@@ -5,7 +5,6 @@ import android.net.Uri
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.entity.*
-import com.protone.api.isInDebug
 import com.protone.api.onResult
 import com.protone.database.R
 import com.protone.database.room.*
@@ -158,19 +157,10 @@ class DatabaseHelper {
             }
         }
 
-        fun insertMusicMultiAsyncWithBucket(musicBucket: String, music: List<Music>) {
-            execute {
-                val bucket = musicBucketDAOBridge.getMusicBucketByName(musicBucket)
-                bucket?.let { b ->
-                    music.forEach {
-                        musicWithMusicBucketDAOBridge.insertMusicWithMusicBucket(
-                            MusicWithMusicBucket(
-                                b.musicBucketId,
-                                it.musicBaseId
-                            )
-                        )
-                    }
-                }
+
+        fun insertMusicMulti(music: List<Music>) {
+            music.forEach {
+                insertMusic(it)
             }
         }
 
@@ -282,24 +272,9 @@ class DatabaseHelper {
 
         suspend fun insertNoteRs(note: Note) =
             onResult {
-                execute {
-                    var count = 0
-                    val tempName = note.title
-                    val names = mutableMapOf<String, Int>()
-                    getAllNote()?.forEach {
-                        names[it.title] = 1
-                        if (it.title == note.title) {
-                            note.title = "${tempName}(${++count})"
-                        }
-                    }
-                    while (names[note.title] != null) {
-                        note.title = "${tempName}(${++count})"
-                    }
-                    val id = insertNote(note)
-                    it.resumeWith(Result.success(Pair(getNoteByName(note.title) != null, id)))
-                }
+                val id = insertNote(note)
+                it.resumeWith(Result.success(Pair(getNoteByName(note.title) != null, id)))
             }
-
     }
 
     inner class NoteTypeDAOBridge : BaseNoteTypeDAO() {
@@ -387,6 +362,22 @@ class DatabaseHelper {
         fun deleteMusicWithMusicBucketAsync(musicID: Long) {
             execute {
                 deleteMusicWithMusicBucket(musicID)
+            }
+        }
+
+        fun insertMusicMultiAsyncWithBucket(musicBucket: String, music: List<Music>) {
+            execute {
+                val bucket = musicBucketDAOBridge.getMusicBucketByName(musicBucket)
+                bucket?.let { b ->
+                    music.forEach {
+                        insertMusicWithMusicBucket(
+                            MusicWithMusicBucket(
+                                b.musicBucketId,
+                                it.musicBaseId
+                            )
+                        )
+                    }
+                }
             }
         }
 

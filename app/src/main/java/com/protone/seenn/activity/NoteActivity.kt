@@ -12,17 +12,15 @@ import com.protone.api.context.intent
 import com.protone.api.context.root
 import com.protone.api.entity.Note
 import com.protone.api.entity.NoteDir
+import com.protone.seenn.databinding.NoteActivityBinding
 import com.protone.ui.R
 import com.protone.ui.adapter.NoteListAdapter
 import com.protone.ui.adapter.NoteTypeListAdapter
 import com.protone.ui.dialog.titleDialog
-import com.protone.seenn.databinding.NoteActivityBinding
 import com.protone.worker.viewModel.NoteEditViewModel
 import com.protone.worker.viewModel.NoteViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.math.abs
 
 class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
@@ -85,9 +83,7 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
                             (binding.noteBucketList.adapter as NoteTypeListAdapter)
                                 .insertNoteDir(NoteDir(pair.second, ""))
                         } else {
-                            withContext(Dispatchers.Main) {
-                                R.string.failed_msg.getString().toast()
-                            }
+                            R.string.failed_msg.getString().toast()
                         }
                     }
                 }

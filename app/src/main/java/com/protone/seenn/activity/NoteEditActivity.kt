@@ -8,7 +8,6 @@ import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.protone.api.animation.AnimationHelper
 import com.protone.api.baseType.*
 import com.protone.api.context.*
@@ -16,18 +15,19 @@ import com.protone.api.entity.*
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
-import com.protone.ui.dialog.imageListDialog
-import com.protone.ui.popWindows.ColorfulPopWindow
+import com.protone.api.json.toUri
 import com.protone.seenn.R
 import com.protone.seenn.databinding.NoteEditActivityBinding
+import com.protone.ui.dialog.imageListDialog
+import com.protone.ui.popWindows.ColorfulPopWindow
 import com.protone.worker.note.spans.ISpanForUse
 import com.protone.worker.viewModel.GalleyViewModel
 import com.protone.worker.viewModel.NoteEditViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
 import com.protone.worker.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel>(true),
     ISpanForUse {
@@ -85,6 +85,15 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         } else {
             noteByName = noteName?.let {
                 getNoteByName(it)?.let { n ->
+                    withContext(Dispatchers.IO) {
+                        val file = File(n.imagePath)
+                        if (file.isFile) {
+                            setNoteIcon(n.imagePath)
+                        } else {
+                            iconUri = n.imagePath.toUri()
+                            setNoteIcon(iconUri)
+                        }
+                    }
                     title = n.title
                     initEditor(n.getRichCode(), n.getText())
                     onEdit = true
@@ -112,12 +121,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
     private suspend fun NoteEditViewModel.pickIcon() {
         startGalleyPick(true)?.let { re ->
             iconUri = re.uri
-            setNoteIconCache(re.uri)
-            showProgress(true)
-            if (iconUri != null) {
-                saveIcon(title) { b -> if (b) setNoteIcon(savedIconPath) }
-                showProgress(false)
-            }
+            setNoteIcon(re.uri)
         }
     }
 
@@ -158,14 +162,15 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             return
         }
         showProgress(true)
-        val indexedRichNote = binding.noteEditRichNote.indexRichNote(title) {
+        val checkedTitle = if (onEdit) title else checkNoteTitle(title)
+        val indexedRichNote = binding.noteEditRichNote.indexRichNote(checkedTitle) {
             if (it.size <= 0) return@indexRichNote true
             return@indexRichNote imageListDialog(it)
         }
         val note = Note(
-            title,
+            checkedTitle,
             indexedRichNote.second,
-            savedIconPath,
+            null,
             System.currentTimeMillis(),
             indexedRichNote.first
         )
@@ -182,6 +187,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
                 return
             }
             copyNote(inNote, note)
+            inNote.imagePath = saveIcon(checkedTitle)
             val re = updateNote(inNote)
             if (re == null && re == -1) {
                 insertNote(
@@ -197,11 +203,16 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
                     } else R.string.failed_msg.getString().toast()
                 }
             } else {
+                showProgress(false)
                 setResult(RESULT_OK)
                 finish()
             }
         } else {
-            if (insertNote(note, intent.getStringExtra(NoteEditViewModel.NOTE_DIR))) finish()
+            if (insertNote(
+                    note.apply { imagePath = saveIcon(checkedTitle) },
+                    intent.getStringExtra(NoteEditViewModel.NOTE_DIR)
+                )
+            ) finish()
             else R.string.failed_msg.getString().toast()
         }
     }
@@ -254,19 +265,12 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
         }
     }
 
-    private fun setNoteIcon(path: String) {
-        launch {
-            Glide.with(this@NoteEditActivity)
-                .asDrawable()
-                .load(path)
-                .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(binding.noteEditIcon)
-        }
+    private suspend fun setNoteIcon(uri: Uri?) = withContext(Dispatchers.Main) {
+        Glide.with(this@NoteEditActivity).asDrawable().load(uri).into(binding.noteEditIcon)
     }
 
-    private fun setNoteIconCache(uri: Uri?) {
-        Glide.with(this).asDrawable().load(uri).into(binding.noteEditIcon)
+    private suspend fun setNoteIcon(path: String?) = withContext(Dispatchers.Main) {
+        Glide.with(this@NoteEditActivity).asDrawable().load(path).into(binding.noteEditIcon)
     }
 
     private fun showProgress(isShow: Boolean) = onUiThread {

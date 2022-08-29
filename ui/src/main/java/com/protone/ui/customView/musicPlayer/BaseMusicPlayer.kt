@@ -13,7 +13,10 @@ import com.protone.api.img.Blur
 import com.protone.api.isInDebug
 import com.protone.ui.R
 import com.protone.ui.customView.ColorfulProgressBar
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.withContext
 
 abstract class BaseMusicPlayer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -46,12 +49,14 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
 
     private var albumBitmap: Bitmap? = null
 
-    fun loadAlbum(embeddedPicture: ByteArray?) {
+    suspend fun loadAlbum(embeddedPicture: ByteArray?) {
         if (embeddedPicture == null) {
-            (coverSwitcher.nextView as ImageView).setImageResource(R.drawable.ic_baseline_music_note_24)
-            coverSwitcher.showNext()
+            withContext(Dispatchers.Main) {
+                (coverSwitcher.nextView as ImageView).setImageResource(R.drawable.ic_baseline_music_note_24)
+                coverSwitcher.showNext()
+            }
             albumBitmap = null
-        } else launch {
+        } else withContext(Dispatchers.IO) {
             try {
                 albumBitmap =
                     BitmapFactory.decodeByteArray(embeddedPicture, 0, embeddedPicture.size)
@@ -68,29 +73,31 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
         }
     }
 
-    private fun loadBlurCover() {
+    private suspend fun loadBlurCover() {
         if (albumBitmap != null) {
-            launch(Dispatchers.IO) {
-                try {
-                    val blur =
-                        Blur(context).blur(
-                            albumBitmap!!,
-                            radius = 30,
-                            sampling = 10
-                        )
-                    withContext(Dispatchers.Main) {
-                        (switcher.nextView as ImageView).setImageBitmap(blur)
-                        switcher.showNext()
-                    }
-                } catch (e: Exception) {
-                    if (isInDebug()) e.printStackTrace()
+            try {
+                val blur =
+                    Blur(context).blur(
+                        albumBitmap!!,
+                        radius = 30,
+                        sampling = 10
+                    )
+                withContext(Dispatchers.Main) {
+                    (switcher.nextView as ImageView).setImageBitmap(blur)
+                    switcher.showNext()
+                }
+            } catch (e: Exception) {
+                if (isInDebug()) e.printStackTrace()
+                withContext(Dispatchers.Main) {
                     (switcher.nextView as ImageView).setImageResource(R.drawable.main_background)
                     switcher.showNext()
                 }
             }
         } else {
-            (switcher.nextView as ImageView).setImageResource(R.drawable.main_background)
-            switcher.showNext()
+            withContext(Dispatchers.Main) {
+                (switcher.nextView as ImageView).setImageResource(R.drawable.main_background)
+                switcher.showNext()
+            }
         }
     }
 

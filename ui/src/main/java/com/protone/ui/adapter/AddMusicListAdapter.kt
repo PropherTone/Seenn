@@ -117,7 +117,7 @@ class AddMusicListAdapter(
                                 d.stop()
                             }
                             else -> {
-                                launch(Dispatchers.IO) {
+                                launch(Dispatchers.Default) {
                                     selectList.remove(music)
                                     notifyItemChanged()
                                 }

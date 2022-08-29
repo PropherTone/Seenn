@@ -13,7 +13,7 @@ import android.os.IBinder
 import android.widget.RemoteViews
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.protone.api.baseType.toBitmapByteArray
+import com.protone.api.baseType.toByteArray
 import com.protone.api.context.*
 import com.protone.api.entity.Music
 import com.protone.seenn.R
@@ -133,7 +133,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
                                 R.id.notify_music_name,
                                 playList[playPosition.get()].title
                             )
-                            playList[playPosition.get()].uri.toBitmapByteArray()?.let { ba ->
+                            playList[playPosition.get()].uri.toByteArray()?.let { ba ->
                                 remoteViews?.setImageViewBitmap(
                                     R.id.notify_music_icon,
                                     BitmapFactory.decodeByteArray(

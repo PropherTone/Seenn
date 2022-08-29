@@ -1,11 +1,8 @@
 package com.protone.worker.viewModel
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.protone.api.TAG
 import com.protone.api.entity.Music
 import com.protone.api.entity.MusicBucket
-import com.protone.worker.Medias
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.MediaAction
 import com.protone.worker.database.userConfig

@@ -98,8 +98,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                                     .override(
                                         musicBucketIcon.measuredWidth,
                                         musicBucketIcon.measuredHeight
-                                    )
-                                    .into(musicBucketIcon)
+                                    ).into(musicBucketIcon)
                             } else {
                                 musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
                             }

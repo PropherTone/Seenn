@@ -445,8 +445,8 @@ class RichNoteView @JvmOverloads constructor(
                             taskChannel.trySend(Pair(tag.toJson(), i))
                         } else async(Dispatchers.IO) {
                             tag.uri.saveToFile(
-                                title + "_${System.currentTimeMillis()}",
-                                dir = "NoteCache",
+                                tag.name + "_${System.currentTimeMillis()}",
+                                dir = title,
                                 w = child.measuredWidth,
                                 h = child.measuredHeight
                             )?.let {

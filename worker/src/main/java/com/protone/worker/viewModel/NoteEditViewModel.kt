@@ -2,7 +2,7 @@ package com.protone.worker.viewModel
 
 import android.net.Uri
 import com.protone.api.baseType.getString
-import com.protone.api.baseType.toMediaBitmapByteArray
+import com.protone.api.baseType.toByteArray
 import com.protone.api.baseType.toast
 import com.protone.api.entity.GalleriesWithNotes
 import com.protone.api.entity.GalleyMedia
@@ -15,6 +15,7 @@ import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlin.streams.toList
 
 class NoteEditViewModel : BaseViewModel() {
 
@@ -32,7 +33,6 @@ class NoteEditViewModel : BaseViewModel() {
         const val CONTENT_TITLE = "NoteContentTitle"
     }
 
-    var savedIconPath: String = ""
     var iconUri: Uri? = null
     var noteByName: Note? = null
     var noteName: String? = null
@@ -40,43 +40,37 @@ class NoteEditViewModel : BaseViewModel() {
     var onEdit = false
     var medias = arrayListOf<GalleyMedia>()
 
-    suspend fun saveIcon(name: String, onResult: (Boolean) -> Unit): Unit =
-        withContext(Dispatchers.IO) {
+    suspend fun saveIcon(name: String) = withContext(Dispatchers.IO) {
+        val byteArray = iconUri?.toByteArray()
+        onResult { co ->
             GalleyHelper.saveIconToLocal(
                 name,
-                iconUri?.toMediaBitmapByteArray()
+                byteArray
             ) { s ->
-                savedIconPath = if (!s.isNullOrEmpty()) {
-                    onResult.invoke(true)
-                    s
+                if (!s.isNullOrEmpty()) {
+                    co.resumeWith(Result.success(s))
                 } else {
                     R.string.failed_upload_image.getString().toast()
-                    onResult.invoke(false)
-                    iconUri!!.toUriJson()
+                    co.resumeWith(Result.success(iconUri?.toUriJson()))
                 }
             }
         }
-
-    suspend fun getAllNote() = onResult {
-        val notes = DatabaseHelper.instance.noteDAOBridge.getAllNote()
-        val list = mutableListOf<String>()
-        notes?.forEach { note ->
-            list.add(note.title)
-        }
-        it.resumeWith(Result.success(list))
     }
 
-    suspend fun getMusicTitle(uri: Uri) = onResult { co ->
+    suspend fun getAllNote() = withContext(Dispatchers.IO) {
+        (DatabaseHelper.instance.noteDAOBridge.getAllNote() ?: mutableListOf())
+            .stream()
+            .map { note -> note.title }.toList() as MutableList<String>
+    }
+
+    suspend fun getMusicTitle(uri: Uri) = withContext(Dispatchers.IO) {
         val musicByUri = DatabaseHelper.instance.musicDAOBridge.getMusicByUri(uri)
-        co.resumeWith(
-            Result.success(musicByUri?.title ?: "^ ^")
-        )
+        musicByUri?.title ?: "^ ^"
     }
 
-    suspend fun copyNote(inNote: Note, note: Note) = withContext(Dispatchers.IO) {
+    suspend fun copyNote(inNote: Note, note: Note) = withContext(Dispatchers.Default) {
         inNote.title = note.title
         inNote.text = note.text
-        inNote.imagePath = note.imagePath
         inNote.richCode = note.richCode
         inNote.time = note.time
     }
@@ -115,6 +109,22 @@ class NoteEditViewModel : BaseViewModel() {
                 false
             }
         }
+    }
+
+    suspend fun checkNoteTitle(noteTitle: String): String = withContext(Dispatchers.Default) {
+        var count = 0
+        var tempNoteTitle = noteTitle
+        val names = mutableMapOf<String, Int>()
+        withContext(Dispatchers.IO) { DatabaseHelper.instance.noteDAOBridge.getAllNote() }?.forEach {
+            names[it.title] = 1
+            if (it.title == tempNoteTitle) {
+                tempNoteTitle = "${noteTitle}(${++count})"
+            }
+        }
+        while (names[tempNoteTitle] != null) {
+            tempNoteTitle = "${noteTitle}(${++count})"
+        }
+        tempNoteTitle
     }
 
     suspend fun getNoteByName(name: String) = withContext(Dispatchers.IO) {

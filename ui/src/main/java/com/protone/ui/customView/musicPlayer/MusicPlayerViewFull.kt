@@ -6,11 +6,13 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import android.widget.ViewSwitcher
-import com.protone.api.baseType.toBitmapByteArray
+import com.protone.api.baseType.toByteArray
 import com.protone.api.context.newLayoutInflater
 import com.protone.ui.R
 import com.protone.ui.customView.ColorfulProgressBar
 import com.protone.ui.databinding.AutoMusicPlayerLayoutFullBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MusicPlayerViewFull @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -34,7 +36,9 @@ class MusicPlayerViewFull @JvmOverloads constructor(
 
     override var cover: Uri = Uri.EMPTY
         set(value) {
-            loadAlbum(value.toBitmapByteArray())
+            launch(Dispatchers.Main) {
+                loadAlbum(value.toByteArray())
+            }
             field = value
         }
     override var duration: Long? = 0L

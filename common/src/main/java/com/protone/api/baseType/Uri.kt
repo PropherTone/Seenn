@@ -7,7 +7,10 @@ import android.net.Uri
 import com.protone.api.R
 import com.protone.api.context.SApplication
 import com.protone.api.isInDebug
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.io.InputStream
 
 fun Uri.saveToFile(
@@ -23,24 +26,29 @@ fun Uri.toBitmap(
 ): Bitmap? {
     var ois: InputStream? = null
     return try {
-        ois = SApplication.app.contentResolver.openInputStream(this) ?: return null
-        val bitmap = BitmapFactory.decodeStream(ois, null, null)
-        if (bitmap != null) {
-            Bitmap.createBitmap(
-                bitmap,
-                0,
-                0,
-                bitmap.width,
-                bitmap.height,
-                getMatrix(bitmap.height, bitmap.width, w),
-                true
-            )
-        } else null
-    } catch (e: Exception) {
+        ois = SApplication.app.contentResolver.openInputStream(this)
+        val bitmap = BitmapFactory.decodeStream(ois, null, null) ?: (toMediaBitmapByteArray()
+            ?: toBitmapByteArray())?.let {
+            BitmapFactory.decodeByteArray(it, 0, it.size, null)
+        } ?: return null
+        return Bitmap.createBitmap(
+            bitmap,
+            0,
+            0,
+            bitmap.width,
+            bitmap.height,
+            getMatrix(bitmap.height, bitmap.width, w),
+            true
+        )
+    } catch (e: IOException) {
         null
     } finally {
         ois?.close()
     }
+}
+
+suspend fun Uri.toByteArray(): ByteArray? = withContext(Dispatchers.IO) {
+    toMediaBitmapByteArray() ?: toBitmapByteArray()
 }
 
 fun Uri.toMediaBitmapByteArray(): ByteArray? {
@@ -48,23 +56,24 @@ fun Uri.toMediaBitmapByteArray(): ByteArray? {
     var ois = SApplication.app.contentResolver.openInputStream(this) ?: return byteArray
     val os = ByteArrayOutputStream()
     try {
-        var options = BitmapFactory.Options()
+        val options = BitmapFactory.Options()
+        options.inJustDecodeBounds = true
+        val decodeStream = BitmapFactory.decodeStream(ois, null, options)
+        ois.close()
         val dimensionPixelSize =
             SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
-        options.inJustDecodeBounds = true
-        val decodeStream = BitmapFactory.decodeStream(ois)
-        ois.close()
-        if (decodeStream != null) {
-            options = BitmapFactory.Options()
-            options.inJustDecodeBounds = false
-            options.inSampleSize =
-                calculateInSampleSize(decodeStream, dimensionPixelSize, dimensionPixelSize)
-            ois = SApplication.app.contentResolver.openInputStream(this) ?: return byteArray
-            BitmapFactory.decodeStream(ois, null, options)
-                ?.compress(Bitmap.CompressFormat.PNG, 100, os)
-            byteArray = os.toByteArray()
-        } else return null
-    } catch (e: Exception) {
+        options.inSampleSize = calculateInSampleSize(
+            options.outWidth,
+            options.outHeight,
+            dimensionPixelSize,
+            dimensionPixelSize
+        )
+        options.inJustDecodeBounds = false
+        ois = SApplication.app.contentResolver.openInputStream(this) ?: return byteArray
+        BitmapFactory.decodeStream(ois, null, options)
+            ?.compress(Bitmap.CompressFormat.PNG, 100, os)
+        byteArray = os.toByteArray()
+    } catch (e: IOException) {
         if (isInDebug()) e.printStackTrace()
     } finally {
         ois.close()
@@ -79,9 +88,13 @@ fun Uri.toBitmapByteArray(): ByteArray? {
     try {
         mediaMetadataRetriever.setDataSource(SApplication.app, this)
         embeddedPicture = mediaMetadataRetriever.embeddedPicture
-    } catch (e: Exception) {
+    } catch (e: IllegalArgumentException) {
         if (isInDebug()) e.printStackTrace()
-    } finally {
+    } catch (e: SecurityException) {
+        if (isInDebug()) e.printStackTrace()
+    } catch (e:RuntimeException){
+        if (isInDebug()) e.printStackTrace()
+    }finally {
         mediaMetadataRetriever.release()
     }
     return embeddedPicture

@@ -19,7 +19,8 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
     ) = launch(Dispatchers.IO) {
         var fileOutputStream: FileOutputStream? = null
         try {
-            callBack.invoke(byteArray?.let {
+            if (byteArray == null) return@launch callBack.invoke(null)
+            callBack.invoke(byteArray.let {
                 val tempPath =
                     "${SApplication.app.filesDir.absolutePath}/${fileName.getFileName()}.png"
                 val file = File(tempPath)
@@ -35,12 +36,13 @@ object GalleyHelper : CoroutineScope by CoroutineScope(Dispatchers.IO) {
             })
         } catch (e: IOException) {
             if (isInDebug()) e.printStackTrace()
+            callBack.invoke(null)
+        } finally {
             try {
                 fileOutputStream?.flush()
                 fileOutputStream?.close()
             } catch (e: IOException) {
             }
-            callBack.invoke(null)
         }
     }
 

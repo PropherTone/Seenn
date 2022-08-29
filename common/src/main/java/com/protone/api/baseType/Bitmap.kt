@@ -5,18 +5,22 @@ import android.graphics.Matrix
 import com.protone.api.context.SApplication
 import com.protone.api.isInDebug
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 
 fun Bitmap.saveToFile(fileName: String, dir: String? = null): String? {
     var fileOutputStream: FileOutputStream? = null
+    fun saveFailed(fileName: String): String? {
+        "图片${fileName}.png保存失败!".toast()
+        return null
+    }
     return try {
         val tempPath =
             if (dir != null) {
                 val dirFile = File("${SApplication.app.filesDir.absolutePath}/$dir/")
                 if (!dirFile.exists() && !dirFile.mkdirs()) {
-                    "图片${fileName}.png保存失败!".toast()
-                    return null
+                    return saveFailed(fileName)
                 }
                 "${SApplication.app.filesDir.absolutePath}/$dir/${fileName.getFileName()}.png"
             } else "${SApplication.app.filesDir.absolutePath}/${fileName.getFileName()}.png"
@@ -29,13 +33,13 @@ fun Bitmap.saveToFile(fileName: String, dir: String? = null): String? {
                 tempPath
             }
             else -> {
-                "图片${fileName}.png保存失败!!!".toast()
-                null
+                saveFailed(fileName)
             }
         }
-    } catch (e: Exception) {
-        "图片${fileName}.png保存失败".toast()
-        null
+    } catch (e: IOException) {
+        saveFailed(fileName)
+    } catch (e: FileNotFoundException) {
+        saveFailed(fileName)
     } finally {
         try {
             fileOutputStream?.close()
@@ -69,9 +73,7 @@ fun getMatrix(h: Int, w: Int, output: Int): Matrix {
     return matrix
 }
 
-fun calculateInSampleSize(bitmap: Bitmap, h: Int, w: Int): Int {
-    val outWidth = bitmap.width
-    val outHeight = bitmap.height
+fun calculateInSampleSize(outWidth: Int, outHeight: Int, h: Int, w: Int): Int {
     var sampleSize = 1
     if (outHeight > h || outWidth > w) {
         val halfHeight = outHeight / 2
