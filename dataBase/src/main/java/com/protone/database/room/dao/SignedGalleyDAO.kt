@@ -1,9 +1,11 @@
 package com.protone.database.room.dao
 
 import android.net.Uri
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.protone.api.converters.UriTypeConverter
 import com.protone.api.entity.GalleyMedia
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 @TypeConverters(UriTypeConverter::class)
@@ -11,6 +13,9 @@ interface SignedGalleyDAO {
 
     @Query("SELECT * FROM GalleyMedia ORDER BY date DESC")
     fun getAllSignedMedia(): List<GalleyMedia>?
+
+    @Query("SELECT * FROM GalleyMedia ORDER BY date DESC")
+    fun observeAllSignedMedia(): Flow<List<GalleyMedia>?>
 
     @Query("SELECT * FROM GalleyMedia WHERE isVideo LIKE :isVideo ORDER BY date DESC")
     fun getAllMediaByType(isVideo: Boolean): List<GalleyMedia>?

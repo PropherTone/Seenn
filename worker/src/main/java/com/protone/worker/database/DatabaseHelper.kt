@@ -2,6 +2,7 @@ package com.protone.worker.database
 
 import android.content.Context
 import android.net.Uri
+import androidx.lifecycle.LiveData
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.entity.*
@@ -211,7 +212,12 @@ class DatabaseHelper {
     inner class GalleyDAOBridge : BaseGalleyDAO() {
 
         override fun startEvent() {
-
+            dataEvent = this@DatabaseHelper.execute(Dispatchers.Default) {
+                observeAllSignedMedia().buffer().collect {
+                    this@DatabaseHelper.pollEvent(getDeque())
+                }
+            }
+            dataEvent?.start()
         }
 
         fun deleteSignedMediaMultiAsync(list: MutableList<GalleyMedia>) {
@@ -471,6 +477,9 @@ class DatabaseHelper {
 
         fun getAllSignedMedia(): List<GalleyMedia>? =
             signedGalleyDAO.getAllSignedMedia()
+
+        fun observeAllSignedMedia(): Flow<List<GalleyMedia>?> =
+            signedGalleyDAO.observeAllSignedMedia()
 
         fun getAllMediaByType(isVideo: Boolean): List<GalleyMedia>? =
             signedGalleyDAO.getAllMediaByType(isVideo)

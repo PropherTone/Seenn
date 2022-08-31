@@ -191,6 +191,7 @@ class GalleyFragment(
         }
         initList()
         viewModel.apply {
+            observeGalley()
             sortData()
             if (!isLock) sortPrivateData()
         }

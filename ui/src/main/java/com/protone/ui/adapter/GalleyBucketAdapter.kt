@@ -58,7 +58,7 @@ class GalleyBucketAdapter(
                 galleries.first { it.second[0] == data.bucket.second[0] }.let {
                     val index = galleries.indexOf(it)
                     galleries.removeAt(index)
-                    selectList.removeAt(index)
+                    selectList.remove(it)
                     withContext(Dispatchers.Main) {
                         notifyItemRemoved(index)
                     }
