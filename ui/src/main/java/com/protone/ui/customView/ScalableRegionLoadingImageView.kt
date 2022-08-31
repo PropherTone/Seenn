@@ -64,7 +64,7 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         const val SCALE_MID = 2.5f
         const val SCALE_MIN = 1.0f
 
-        const val REGION_DECODER_DELAY = 10L
+        const val REGION_DECODER_DELAY = 80L
 
         const val REGION_DECODE_MSG = 1
     }
@@ -120,7 +120,7 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         decoder?.clear()
     }
 
-    fun locate(){
+    fun locate() {
         val localRect = Rect()
         getLocalVisibleRect(localRect)
         val globalRect = Rect()
@@ -226,18 +226,18 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
                             it.recycle()
                         }
                     }
-//                    测试画框用
-//            if (scaleX > 1f) {
-//                canvas?.drawRect(displayRect, Paint().apply {
-//                    color = Color.RED
-//                    strokeWidth = 5f
-//                    style = Paint.Style.STROKE
-//                    isAntiAlias = true
-//                    isDither = true
-//                    strokeJoin = Paint.Join.ROUND
-//                    strokeCap = Paint.Cap.ROUND
-//                })
-//            }
+                    //                    测试画框用
+                    //            if (scaleX > 1f) {
+                    //                canvas?.drawRect(displayRect, Paint().apply {
+                    //                    color = Color.RED
+                    //                    strokeWidth = 5f
+                    //                    style = Paint.Style.STROKE
+                    //                    isAntiAlias = true
+                    //                    isDither = true
+                    //                    strokeJoin = Paint.Join.ROUND
+                    //                    strokeCap = Paint.Cap.ROUND
+                    //                })
+                    //            }
                 }
             }
         }
@@ -654,16 +654,22 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
                 right,
                 if (maxHeight in 1 until bottom) maxHeight else bottom
             )
-            synchronized(bitmapCache) {
-                bitmapCache.get(resName).also {
-                    if (it != null) {
-                        if (it.width == bitW && it.height == bitH) {
-                            originalBitmap = it
+            try {
+                synchronized(bitmapCache) {
+
+                    bitmapCache.get(resName).also {
+                        if (it != null) {
+                            if (it.width == bitW && it.height == bitH) {
+                                originalBitmap = it
+                            } else putCache()
                         } else putCache()
-                    } else putCache()
+                    }
+
                 }
+                withContext(Dispatchers.Main) { onDecodeListener?.onDecode() }
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
             }
-            withContext(Dispatchers.Main) { onDecodeListener?.onDecode() }
         }
     }
 
@@ -674,7 +680,7 @@ class BitmapDecoder(val context: Context, private val onDecodeListener: DecodeLi
                 bitmapCache.put(resName, originalBitmap)
             }
         } catch (e: IllegalArgumentException) {
-            Log.e(TAG, "putCache: sampleRect $sampleRect")
+        } catch (e: IllegalStateException) {
         }
     }
 

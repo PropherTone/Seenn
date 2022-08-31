@@ -11,13 +11,13 @@ import com.protone.api.context.intent
 import com.protone.api.context.root
 import com.protone.api.entity.Note
 import com.protone.api.json.toJson
-import com.protone.worker.R
 import com.protone.seenn.databinding.NoteViewActivityBinding
 import com.protone.seenn.service.MusicService
+import com.protone.ui.customView.richText.RichNoteView
+import com.protone.worker.R
 import com.protone.worker.viewModel.GalleyViewViewModel
 import com.protone.worker.viewModel.NoteEditViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
-import com.protone.ui.customView.richText.RichNoteView
 import kotlinx.coroutines.launch
 
 class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel>(true) {

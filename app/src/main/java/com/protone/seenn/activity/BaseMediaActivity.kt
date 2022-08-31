@@ -8,13 +8,13 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.*
 import com.protone.api.entity.GalleyMedia
+import com.protone.seenn.R
 import com.protone.ui.databinding.GalleyOptionPopBinding
 import com.protone.ui.dialog.cateDialog
 import com.protone.ui.dialog.checkListDialog
 import com.protone.ui.dialog.titleDialog
 import com.protone.ui.popWindows.ColorfulPopWindow
 import com.protone.ui.popWindows.GalleyOptionPop
-import com.protone.seenn.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.GalleyViewModel
@@ -89,7 +89,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel>(handl
     ) {
         when {
             gm.size == 1 -> delete(gm[0], callBack)
-            gm.size > 1 -> deleteMulti(gm,callBack)
+            gm.size > 1 -> deleteMulti(gm, callBack)
         }
     }
 
@@ -101,7 +101,6 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel>(handl
         ) { name ->
             val result = renameMedia(name + mimeType, gm.uri)
             if (result) {
-                gm.name = name + mimeType
                 R.string.success.getString().toast()
             } else R.string.not_supported.getString().toast()
         }
@@ -222,7 +221,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel>(handl
     ) = launch(Dispatchers.Main) {
         val pop = ColorfulPopWindow(this@BaseMediaActivity)
         pop.startListPopup(
-           anchor =  anchor,
+            anchor = anchor,
             dataList = withContext(Dispatchers.IO) {
                 val list = mutableListOf<String>()
                 DatabaseHelper.instance.galleyBucketDAOBridge.getALLGalleyBucket(isVideo)

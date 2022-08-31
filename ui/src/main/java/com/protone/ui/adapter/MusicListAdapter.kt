@@ -2,8 +2,10 @@ package com.protone.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.ViewGroup
 import androidx.core.view.isGone
+import com.protone.api.TAG
 import com.protone.api.baseType.toStringMinuteTime
 import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.Music

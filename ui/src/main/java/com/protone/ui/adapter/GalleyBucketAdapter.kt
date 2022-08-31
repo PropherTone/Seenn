@@ -30,8 +30,8 @@ class GalleyBucketAdapter(
     sealed class GalleyBucketEvent {
         object PerformSelect : GalleyBucketEvent()
         data class DeleteBucket(val bucket: Pair<Uri, Array<String>>) : GalleyBucketEvent()
-        data class RefreshBucket(val item: Pair<Uri, Array<String>>) : GalleyBucketEvent()
-        data class InsertBucket(val item: Pair<Uri, Array<String>>) : GalleyBucketEvent()
+        data class RefreshBucket(val bucket: Pair<Uri, Array<String>>) : GalleyBucketEvent()
+        data class InsertBucket(val bucket: Pair<Uri, Array<String>>) : GalleyBucketEvent()
     }
 
     private var galleries: MutableList<Pair<Uri, Array<String>>> = mutableListOf()
@@ -65,20 +65,23 @@ class GalleyBucketAdapter(
                 }
             }
             is GalleyBucketEvent.RefreshBucket -> {
-                if (data.item.second[1].toInt() <= 0) {
-                    deleteBucket(data.item)
+                if (data.bucket.second[0] != R.string.all_galley.getString() &&
+                    data.bucket.second[1].toInt() <= 0
+                ) {
+                    galleries.find { data.bucket.second[0] == it.second[0] }
+                        ?.let { deleteBucket(it) }
                     return
                 }
                 val iterator = galleries.iterator()
                 var index = 0
                 while (iterator.hasNext()) {
-                    if (iterator.next().second[0] == data.item.second[0]) {
+                    if (iterator.next().second[0] == data.bucket.second[0]) {
                         if (selectList.size > 0) {
-                            if (selectList[0].second[0] == data.item.second[0]) {
-                                selectList[0] = data.item
+                            if (selectList[0].second[0] == data.bucket.second[0]) {
+                                selectList[0] = data.bucket
                             }
                         }
-                        galleries[index] = data.item
+                        galleries[index] = data.bucket
                         withContext(Dispatchers.Main) {
                             notifyItemChanged(index)
                         }
@@ -88,7 +91,7 @@ class GalleyBucketAdapter(
                 }
             }
             is GalleyBucketEvent.InsertBucket -> {
-                galleries.add(data.item)
+                galleries.add(data.bucket)
                 withContext(Dispatchers.Main) {
                     notifyItemInserted(galleries.size)
                 }
@@ -183,7 +186,6 @@ class GalleyBucketAdapter(
 
     private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
         emit(GalleyBucketEvent.DeleteBucket(bucket))
-
     }
 
     fun refreshBucket(item: Pair<Uri, Array<String>>) {

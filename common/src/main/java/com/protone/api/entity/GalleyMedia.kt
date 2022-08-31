@@ -5,7 +5,7 @@ import androidx.room.*
 import com.protone.api.converters.ListTypeConverter
 import com.protone.api.converters.UriTypeConverter
 
-@Entity(indices = [Index(value = ["media_uri"], unique = true)])
+@Entity
 @TypeConverters(UriTypeConverter::class, ListTypeConverter::class)
 data class GalleyMedia(
     @PrimaryKey(autoGenerate = false)

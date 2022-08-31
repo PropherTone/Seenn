@@ -40,8 +40,9 @@ class NoteEditViewModel : BaseViewModel() {
     var onEdit = false
     var medias = arrayListOf<GalleyMedia>()
 
-    suspend fun saveIcon(name: String) = withContext(Dispatchers.IO) {
-        val byteArray = iconUri?.toByteArray()
+    suspend fun getIconByteArray() = withContext(Dispatchers.IO) { iconUri?.toByteArray() }
+
+    suspend fun saveIcon(name: String, byteArray: ByteArray?) = withContext(Dispatchers.IO) {
         onResult { co ->
             GalleyHelper.saveIconToLocal(
                 name,
@@ -90,10 +91,7 @@ class NoteEditViewModel : BaseViewModel() {
                             .instance
                             .noteDirWithNoteDAOBridge
                             .insertNoteDirWithNote(
-                                NoteDirWithNotes(
-                                    noteDir.noteDirId,
-                                    result.second
-                                )
+                                NoteDirWithNotes(noteDir.noteDirId, result.second)
                             )
                     }
                 }

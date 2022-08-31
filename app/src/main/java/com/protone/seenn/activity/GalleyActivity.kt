@@ -14,12 +14,10 @@ import com.protone.seenn.databinding.GalleyActivityBinding
 import com.protone.seenn.fragment.GalleyFragment
 import com.protone.ui.R
 import com.protone.ui.adapter.MyFragmentStateAdapter
-import com.protone.worker.Medias
 import com.protone.worker.database.userConfig
 import com.protone.worker.viewModel.GalleyFragmentViewModel
 import com.protone.worker.viewModel.GalleyViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -64,13 +62,6 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
                 })
             }
         }, chooseType)
-
-        Medias.galleyNotifier.buffer().collect {
-            if (!onTransaction) {
-                onUpdate(it)
-            }
-            onTransaction = false
-        }
     }
 
     fun showPop() {
@@ -127,16 +118,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
 
     override fun popDelete() {
         viewModel.chooseData?.let {
-            viewModel.onTransaction = true
-            tryDelete(it) { re ->
-                if (re.size == 1) {
-                    viewModel.deleteMedia(re[0])
-                } else if (re.size > 1) {
-                    re.forEach { gm ->
-                        viewModel.deleteMedia(gm)
-                    }
-                }
-            }
+            tryDelete(it) {}
         }
     }
 
@@ -150,7 +132,6 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
 
     override fun popRename() {
         viewModel.chooseData?.let {
-            viewModel.onTransaction = true
             tryRename(it)
         }
     }

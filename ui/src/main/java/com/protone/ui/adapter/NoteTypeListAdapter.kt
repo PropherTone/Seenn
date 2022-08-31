@@ -10,8 +10,6 @@ import com.protone.api.entity.NoteDir
 import com.protone.ui.R
 import com.protone.ui.databinding.NoteTpyeListAdapterBinding
 import com.protone.worker.database.DatabaseHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class NoteTypeListAdapter(
     context: Context,
@@ -47,12 +45,8 @@ class NoteTypeListAdapter(
                     val noteType = noteDirList[position]
                     DatabaseHelper.instance.execute {
                         DatabaseHelper.instance.noteDirDAOBridge.doDeleteNoteDirRs(noteType)
-                        val index = noteDirList.indexOf(noteType)
-                        noteDirList.removeAt(index)
-                        withContext(Dispatchers.Main) {
-                            notifyItemRemoved(index)
-                        }
                     }
+                    notifyItemRemoved(position)
                     dialog.dismiss()
                 }.setNegativeButton(R.string.cancel.getString()) { dialog, _ ->
                     dialog.dismiss()

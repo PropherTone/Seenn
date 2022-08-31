@@ -86,6 +86,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             noteByName = noteName?.let {
                 getNoteByName(it)?.let { n ->
                     withContext(Dispatchers.IO) {
+                        if (n.imagePath == null) return@withContext
                         val file = File(n.imagePath)
                         if (file.isFile) {
                             setNoteIcon(n.imagePath)
@@ -187,7 +188,10 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
                 return
             }
             copyNote(inNote, note)
-            inNote.imagePath = saveIcon(checkedTitle)
+            inNote.imagePath = if (iconUri != null) saveIcon(
+                checkedTitle,
+                getIconByteArray()
+            ) else inNote.imagePath
             val re = updateNote(inNote)
             if (re == null && re == -1) {
                 insertNote(
@@ -209,7 +213,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
             }
         } else {
             if (insertNote(
-                    note.apply { imagePath = saveIcon(checkedTitle) },
+                    note.apply { imagePath = saveIcon(checkedTitle, getIconByteArray()) },
                     intent.getStringExtra(NoteEditViewModel.NOTE_DIR)
                 )
             ) finish()

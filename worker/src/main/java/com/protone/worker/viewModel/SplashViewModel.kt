@@ -1,14 +1,19 @@
 package com.protone.worker.viewModel
 
+import androidx.lifecycle.viewModelScope
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.saveToFile
 import com.protone.api.entity.MusicBucket
 import com.protone.api.todayDate
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
+import com.protone.worker.database.MediaAction
 import com.protone.worker.database.userConfig
 import com.protone.worker.media.scanAudio
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class SplashViewModel : BaseViewModel() {
@@ -37,10 +42,20 @@ class SplashViewModel : BaseViewModel() {
                         todayDate("yyyy/MM/dd")
                     )
                 )
-                musicWithMusicBucketDAOBridge.insertMusicMultiAsyncWithBucket(
-                    R.string.all_galley.getString(),
-                    allMusicRs
-                )
+                musicBucketDAOBridge.startEvent()
+                var launch: Job? = null
+                launch = viewModelScope.launch(Dispatchers.Default) {
+                    mediaNotifier.collect {
+                        if (it is MediaAction.OnNewMusicBucket) {
+                            musicWithMusicBucketDAOBridge.insertMusicMultiAsyncWithBucket(
+                                R.string.all_music.getString(),
+                                allMusicRs
+                            )
+                            musicBucketDAOBridge.stopEvent()
+                            launch?.cancel()
+                        }
+                    }
+                }
             }
             userConfig.apply {
                 isFirstBoot = false

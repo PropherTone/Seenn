@@ -14,7 +14,8 @@ import java.util.concurrent.LinkedBlockingDeque
 
 class DatabaseHelper {
 
-    val executorService by lazy { CoroutineScope(Dispatchers.IO) }
+    private val executorService by lazy { CoroutineScope(Dispatchers.IO) }
+    fun getScope() = executorService
 
     private val _mediaNotifier = MutableSharedFlow<MediaAction>()
     val mediaNotifier = _mediaNotifier.asSharedFlow()
@@ -61,7 +62,7 @@ class DatabaseHelper {
     inline fun execute(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
         crossinline runnable: suspend () -> Unit
-    ): Job = executorService.launch(dispatcher) {
+    ): Job = getScope().launch(dispatcher) {
         try {
             runnable.invoke()
         } catch (e: Exception) {
@@ -289,9 +290,9 @@ class DatabaseHelper {
             var count = 0
             val tempName = noteDir.name
             val names = mutableMapOf<String, Int>()
-            getALLNoteDir()?.forEach {
-                names[it.name] = 1
-                if (it.name == noteDir.name) {
+            getALLNoteDir()?.forEach { dir ->
+                names[dir.name] = 1
+                if (dir.name == noteDir.name) {
                     noteDir.name = "${tempName}(${++count})"
                 }
             }
@@ -497,22 +498,22 @@ class DatabaseHelper {
             signedGalleyDAO.getSignedMedia(path)
 
         fun deleteSignedMediaByUri(uri: Uri) {
-            offerEvent(MediaAction.OnSignedMediaByUriDeleted(uri))
+            getSignedMedia(uri)?.let { offerEvent(MediaAction.OnMediaByUriDeleted(it)) }
             signedGalleyDAO.deleteSignedMediaByUri(uri)
         }
 
         fun deleteSignedMedia(media: GalleyMedia) {
-            offerEvent(MediaAction.OnSignedMediaDeleted(media))
+            offerEvent(MediaAction.OnMediaDeleted(media))
             signedGalleyDAO.deleteSignedMedia(media)
         }
 
         fun insertSignedMedia(media: GalleyMedia): Long {
-            offerEvent(MediaAction.OnSignedMediaInserted(media))
+            offerEvent(MediaAction.OnMediaInserted(media))
             return signedGalleyDAO.insertSignedMedia(media)
         }
 
         fun updateSignedMedia(media: GalleyMedia) {
-            offerEvent(MediaAction.OnSignedMediaUpdated(media))
+            offerEvent(MediaAction.OnMediaUpdated(media))
             signedGalleyDAO.updateSignedMedia(media)
         }
     }

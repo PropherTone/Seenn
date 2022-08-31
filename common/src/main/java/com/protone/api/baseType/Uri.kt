@@ -58,7 +58,7 @@ fun Uri.toMediaBitmapByteArray(): ByteArray? {
     try {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
-        val decodeStream = BitmapFactory.decodeStream(ois, null, options)
+        BitmapFactory.decodeStream(ois, null, options)
         ois.close()
         val dimensionPixelSize =
             SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
@@ -72,7 +72,10 @@ fun Uri.toMediaBitmapByteArray(): ByteArray? {
         ois = SApplication.app.contentResolver.openInputStream(this) ?: return byteArray
         BitmapFactory.decodeStream(ois, null, options)
             ?.compress(Bitmap.CompressFormat.PNG, 100, os)
-        byteArray = os.toByteArray()
+        byteArray = os.toByteArray().let {
+            if (it.isEmpty()) return null
+            it
+        }
     } catch (e: IOException) {
         if (isInDebug()) e.printStackTrace()
     } finally {

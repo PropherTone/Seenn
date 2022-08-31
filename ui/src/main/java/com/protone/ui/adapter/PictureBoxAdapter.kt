@@ -14,6 +14,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.protone.api.entity.GalleyMedia
+import com.protone.ui.databinding.PictureBoxAdapterGifLayoutBinding
 import com.protone.ui.databinding.PictureBoxAdapterLayoutBinding
 import com.protone.ui.databinding.PictureBoxAdapterVideoLayoutBinding
 import kotlin.math.roundToInt
@@ -23,9 +24,10 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galley
 
     private val image = 0
     private val video = 1
+    private val gif = 3
 
     override fun getItemViewType(position: Int): Int {
-        return if (picUri[position].isVideo) video else image
+        return if (picUri[position].name.contains("gif")) gif else if (picUri[position].isVideo) video else image
     }
 
     override fun onCreateViewHolder(
@@ -35,6 +37,8 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galley
         val binding: ViewDataBinding = when (viewType) {
             video -> PictureBoxAdapterVideoLayoutBinding
                 .inflate(LayoutInflater.from(context), parent, false)
+            gif -> PictureBoxAdapterGifLayoutBinding
+                .inflate(LayoutInflater.from(context), parent, false)
             else -> PictureBoxAdapterLayoutBinding
                 .inflate(LayoutInflater.from(context), parent, false)
         }
@@ -43,43 +47,42 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galley
 
     override fun onBindViewHolder(holder: Holder<ViewDataBinding>, position: Int) {
         when (holder.binding) {
-            is PictureBoxAdapterLayoutBinding -> holder.binding.apply {
+            is PictureBoxAdapterGifLayoutBinding -> holder.binding.apply {
                 image.scaleType = ImageView.ScaleType.FIT_XY
-                if (picUri[position].name.contains("gif") || picUri[position].isVideo) {
-                    Glide.with(context).load(picUri[position].uri)
-                        .addListener(object : RequestListener<Drawable> {
-                            override fun onResourceReady(
-                                resource: Drawable?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                dataSource: DataSource?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-                                resource?.apply {
-                                    val mix = this.intrinsicWidth.toFloat().let {
-                                        image.width / it
-                                    }
-                                    val heightSpan = (this.intrinsicHeight * mix).roundToInt()
-                                    image.updateLayoutParams {
-                                        this.height = heightSpan
-                                    }
+                Glide.with(context).load(picUri[position].uri)
+                    .addListener(object : RequestListener<Drawable> {
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            resource?.apply {
+                                val mix = this.intrinsicWidth.toFloat().let {
+                                    image.width / it
                                 }
-                                return false
+                                val heightSpan = (this.intrinsicHeight * mix).roundToInt()
+                                image.updateLayoutParams {
+                                    this.height = heightSpan
+                                }
                             }
+                            return false
+                        }
 
-                            override fun onLoadFailed(
-                                e: GlideException?,
-                                model: Any?,
-                                target: Target<Drawable>?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-                                return false
-                            }
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return false
+                        }
 
-                        }).into(image)
-                } else {
-                    image.setImageResource(picUri[position].uri)
-                }
+                    }).into(image)
+            }
+            is PictureBoxAdapterLayoutBinding -> holder.binding.apply {
+               image.setImageResource(picUri[position].uri)
             }
             is PictureBoxAdapterVideoLayoutBinding -> holder.binding.apply {
                 start.setOnClickListener {

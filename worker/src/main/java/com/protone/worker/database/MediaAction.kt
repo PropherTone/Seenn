@@ -1,6 +1,5 @@
 package com.protone.worker.database
 
-import android.net.Uri
 import com.protone.api.entity.*
 
 sealed class MediaAction {
@@ -13,10 +12,10 @@ sealed class MediaAction {
     data class OnMusicDeleted(val music: Music) : MediaAction()
     data class OnMusicUpdate(val music: Music) : MediaAction()
 
-    data class OnSignedMediaByUriDeleted(val uri: Uri) : MediaAction()
-    data class OnSignedMediaDeleted(val media: GalleyMedia) : MediaAction()
-    data class OnSignedMediaInserted(val media: GalleyMedia) : MediaAction()
-    data class OnSignedMediaUpdated(val media: GalleyMedia) : MediaAction()
+    data class OnMediaByUriDeleted(val media: GalleyMedia) : MediaAction()
+    data class OnMediaDeleted(val media: GalleyMedia) : MediaAction()
+    data class OnMediaInserted(val media: GalleyMedia) : MediaAction()
+    data class OnMediaUpdated(val media: GalleyMedia) : MediaAction()
 
     data class OnNoteUpdated(val note: Note) : MediaAction()
     data class OnNoteDeleted(val note: Note) : MediaAction()
@@ -36,6 +35,7 @@ sealed class MediaAction {
 
     data class OnMusicWithMusicBucketInserted(val musicWithMusicBucket: MusicWithMusicBucket) :
         MediaAction()
+
     data class OnMusicWithMusicBucketDeleted(val musicID: Long) : MediaAction()
 }
 

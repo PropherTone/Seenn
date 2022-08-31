@@ -20,7 +20,6 @@ import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.onGlobalLayout
 import com.protone.api.entity.GalleyMedia
-import com.protone.api.entity.MediaStatus
 import com.protone.api.json.toJson
 import com.protone.seenn.R
 import com.protone.seenn.activity.GalleySearchActivity
@@ -72,22 +71,6 @@ class GalleyFragment(
             launch(Dispatchers.Default) {
                 fragFlow.buffer().collect {
                     when (it) {
-                        is GalleyFragmentViewModel.FragEvent.DeleteMedia -> {
-                            if (!isLock) {
-                                it.galleyMedia.type?.onEach { type ->
-                                    if (galleyMap[type]?.remove(it.galleyMedia) == true) {
-                                        getListAdapter().removeMedia(it.galleyMedia)
-                                    }
-                                }
-                            }
-                            if (galleyMap[it.galleyMedia.bucket]?.remove(it.galleyMedia) == true) {
-                                getListAdapter().removeMedia(it.galleyMedia)
-                            }
-                            if (galleyMap[R.string.all_galley.getString()]?.remove(it.galleyMedia) == true) {
-                                getListAdapter().removeMedia(it.galleyMedia)
-                            }
-                            refreshBucket(it.galleyMedia)
-                        }
                         is GalleyFragmentViewModel.FragEvent.AddBucket -> {
                             if (!isLock) {
                                 if (galleyMap[it.name] == null) {
@@ -114,33 +97,6 @@ class GalleyFragment(
                             )
                             startActivity(PictureBoxActivity::class.intent)
                         }
-                        is GalleyFragmentViewModel.FragEvent.OnGalleyUpdate -> {
-                            updateGalley(it.media) { status, media ->
-                                when (status) {
-                                    MediaStatus.Updated -> {
-                                        if (onTargetGalley(media.bucket)) {
-                                            getListAdapter().noticeListItemUpdate(media)
-                                        }
-                                    }
-                                    MediaStatus.Deleted -> {
-                                        val index =
-                                            viewModel.galleyMap[media.bucket]?.indexOf(media)
-                                        if (index != null && index == 0) {
-                                            refreshBucket(media)
-                                        }
-                                        if (onTargetGalley(media.bucket)) {
-                                            getListAdapter().noticeListItemDelete(media)
-                                        }
-                                    }
-                                    MediaStatus.NewInsert -> {
-                                        refreshBucket(media)
-                                        if (onTargetGalley(media.bucket)) {
-                                            getListAdapter().noticeListItemInsert(media)
-                                        }
-                                    }
-                                }
-                            }
-                        }
                         is GalleyFragmentViewModel.FragEvent.OnNewBucket -> {
                             insertBucket(it.pairs)
                         }
@@ -152,7 +108,31 @@ class GalleyFragment(
                             getBucketAdapter().performSelect()
                             noticeListUpdate(viewModel.galleyMap[R.string.all_galley.getString()])
                         }
-                        else -> {}
+                        is GalleyFragmentViewModel.FragEvent.OnMediaDeleted -> {
+                            if (!isLock) {
+                                it.galleyMedia.type?.onEach { type ->
+                                    if (galleyMap[type]?.remove(it.galleyMedia) == true) {
+                                        getListAdapter().removeMedia(it.galleyMedia)
+                                    }
+                                }
+                            }
+                            refreshBucket(it.galleyMedia)
+                            if (onTargetGalley(it.galleyMedia.bucket)) {
+                                getListAdapter().noticeListItemDelete(it.galleyMedia)
+                            }
+                        }
+                        is GalleyFragmentViewModel.FragEvent.OnMediaInserted -> {
+                            refreshBucket(it.galleyMedia)
+                            if (onTargetGalley(it.galleyMedia.bucket)) {
+                                getListAdapter().noticeListItemInsert(it.galleyMedia)
+                            }
+                        }
+                        is GalleyFragmentViewModel.FragEvent.OnMediaUpdated -> {
+                            if (onTargetGalley(it.galleyMedia.bucket)) {
+                                getListAdapter().noticeListItemUpdate(it.galleyMedia)
+                            }
+                        }
+                        else -> Unit
                     }
                 }
             }
@@ -280,7 +260,7 @@ class GalleyFragment(
                 Uri.EMPTY,
             arrayOf(
                 media.bucket,
-                viewModel.galleyMap[media.bucket]?.size.toString()
+                (viewModel.galleyMap[media.bucket]?.size ?: 0).toString()
             )
         ).apply { getBucketAdapter().refreshBucket(this) }
         val all = R.string.all_galley.getString()
@@ -291,7 +271,7 @@ class GalleyFragment(
                 Uri.EMPTY,
             arrayOf(
                 all,
-                viewModel.galleyMap[all]?.size.toString()
+                (viewModel.galleyMap[all]?.size ?: 0).toString()
             )
         ).apply { getBucketAdapter().refreshBucket(this) }
     }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.protone.api.context.onGlobalLayout
 import com.protone.api.entity.GalleyMedia
 import com.protone.ui.databinding.GalleyVp2AdapterLayoutBinding
 import com.protone.ui.databinding.RichVideoLayoutBinding
@@ -33,8 +34,8 @@ class GalleyViewFragment(
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
         if (galleyMedia.isVideo) {
             videoBinding?.richVideo?.setVideoPath(galleyMedia.uri)
             videoBinding?.richVideo?.title = galleyMedia.name
@@ -45,18 +46,14 @@ class GalleyViewFragment(
                 imageBinding?.image?.setImageResource(galleyMedia.uri)
             }
         }
+        if (galleyMedia.isVideo) videoBinding?.richVideo?.play()
+        else imageBinding?.image?.locate()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         if (galleyMedia.isVideo) videoBinding?.richVideo?.release()
         else imageBinding?.image?.clear()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (galleyMedia.isVideo) videoBinding?.richVideo?.play()
-        else imageBinding?.image?.locate()
     }
 
     override fun onPause() {

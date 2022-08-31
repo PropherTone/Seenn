@@ -5,7 +5,6 @@ import com.google.android.material.tabs.TabLayout
 import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleyMedia
 import com.protone.worker.R
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
@@ -34,8 +33,6 @@ class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
 
     var rightMailer = 0
 
-    var onTransaction = false
-
     private val mailers = arrayOfNulls<MutableSharedFlow<GalleyFragmentViewModel.FragEvent>>(2)
 
     var chooseData: MutableList<GalleyMedia>? = null
@@ -62,18 +59,6 @@ class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     fun intoBox() {
         viewModelScope.launch {
             mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.IntoBox)
-        }
-    }
-
-    fun deleteMedia(media: GalleyMedia) {
-        viewModelScope.launch {
-            mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.DeleteMedia(media))
-        }
-    }
-
-    fun onUpdate(media: GalleyMedia) {
-        viewModelScope.launch(Dispatchers.Default) {
-            mailers[rightMailer]?.emit(GalleyFragmentViewModel.FragEvent.OnGalleyUpdate(media))
         }
     }
 

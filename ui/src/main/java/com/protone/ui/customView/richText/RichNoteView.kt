@@ -155,13 +155,10 @@ class RichNoteView @JvmOverloads constructor(
                             if (indexOfChild > 0) {
                                 removeViewAt(indexOfChild)
                                 //Delete next view if it's not an edittext
-                                if (indexOfChild-- > 0 && getChildAt(indexOfChild) !is EditText) {
+                                if (--indexOfChild > 0 && getChildAt(indexOfChild) !is EditText) {
                                     removeView(getChildAt(indexOfChild--))
                                     //Insert new edittext when there is no input place
-                                    if ((indexOfChild > 0 && indexOfChild in 0 until childCount && getChildAt(
-                                            indexOfChild
-                                        ) !is EditText) || childCount == 0
-                                    ) {
+                                    if (indexOfChild >= 0 && getChildAt(indexOfChild) !is EditText || childCount <= 0) {
                                         insertText(RichNoteStates("", arrayListOf()))
                                     }
                                 }
@@ -248,7 +245,7 @@ class RichNoteView @JvmOverloads constructor(
                 richLinkContainer.setOnClickListener {
                     music.link?.let { note -> iRichListener?.jumpTo(note) }
                 }
-                richLink.text = music.link ?: "".also{
+                richLink.text = music.link ?: "".also {
                     richLink.isGone = true
                 }
             }

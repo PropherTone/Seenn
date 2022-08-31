@@ -154,10 +154,12 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
         viewEvent = null
     }
 
-    fun bindMusicService(block: (MusicService.MusicBinder) -> Unit) {
+    fun bindMusicService(block:suspend (MusicService.MusicBinder) -> Unit) {
         serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-                block(p1 as MusicService.MusicBinder)
+                launch {
+                    block(p1 as MusicService.MusicBinder)
+                }
             }
 
             override fun onServiceDisconnected(p0: ComponentName?) {

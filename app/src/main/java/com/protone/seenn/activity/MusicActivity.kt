@@ -67,14 +67,6 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
 
     override suspend fun MusicModel.init() {
         val controller = MusicControllerIMP(binding.mySmallMusicPlayer)
-        bindMusicService {
-            controller.setBinder(this@MusicActivity, it, onPlaying = { music ->
-                getMusicListAdapter()?.playPosition(music)
-            })
-            controller.onClick {
-                startActivity(MusicViewActivity::class.intent)
-            }
-        }
 
         onViewEvent {
             when (it) {
@@ -172,6 +164,17 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
 
         initMusicList()
         initMusicBucketList()
+        bindMusicService {
+            controller.getPlayingMusic()?.let { music ->
+                getMusicListAdapter()?.playPosition(music)
+            }
+            controller.setBinder(this@MusicActivity, it, onPlaying = { music ->
+                getMusicListAdapter()?.playPosition(music)
+            })
+            controller.onClick {
+                startActivity(MusicViewActivity::class.intent)
+            }
+        }
         getMusicListAdapter()?.clickCallback = {
             sendViewEvent(MusicModel.MusicEvent.PlayMusic(it))
         }
@@ -202,7 +205,12 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                     }
                 }
                 musicBuckets = allMusicBucket
-                getBucket(lastBucket)?.let { clickCallback?.invoke(it) }
+                getBucket(lastBucket)?.let {
+                    if (binding.musicBucketName.text != it.name) {
+                        sendViewEvent(MusicModel.MusicEvent.SetBucketCover(it.name))
+                        getMusicListAdapter()?.musicList = getCurrentMusicList(it)
+                    }
+                }
                 musicBucketEventListener = object : MusicBucketAdapter.MusicBucketEvent {
                     override fun addMusic(bucket: String, position: Int) =
                         sendViewEvent(MusicModel.MusicEvent.AddMusic(bucket))
