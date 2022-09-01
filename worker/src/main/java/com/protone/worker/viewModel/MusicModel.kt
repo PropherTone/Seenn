@@ -109,8 +109,8 @@ class MusicModel : BaseViewModel() {
     }
 
     interface OnMusicDataEvent {
-        fun onNewMusicBucket(musicBucket: MusicBucket)
-        fun onMusicBucketUpdated(musicBucket: MusicBucket)
-        fun onMusicBucketDeleted(musicBucket: MusicBucket)
+        suspend fun onNewMusicBucket(musicBucket: MusicBucket)
+        suspend fun onMusicBucketUpdated(musicBucket: MusicBucket)
+        suspend fun onMusicBucketDeleted(musicBucket: MusicBucket)
     }
 }

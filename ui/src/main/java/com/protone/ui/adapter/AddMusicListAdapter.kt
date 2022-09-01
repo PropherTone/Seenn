@@ -28,8 +28,13 @@ class AddMusicListAdapter(
 ) : SelectListAdapter<MusicListLayoutBinding, Music, Any>(context) {
 
     init {
-        multiChoose = multiSelect.also { b ->
-            if (b) Medias.musicBucket[bucket]?.let { selectList.addAll(it) }
+        multiChoose = multiSelect
+        if (multiSelect) DatabaseHelper.instance.run {
+            launch(Dispatchers.IO) {
+                musicBucketDAOBridge.getMusicBucketByName(bucket)?.let {
+                    selectList.addAll(musicWithMusicBucketDAOBridge.getMusicWithMusicBucket(it.musicBucketId))
+                }
+            }
         }
     }
 
@@ -86,10 +91,17 @@ class AddMusicListAdapter(
                     viewQueue.add(position)
                     if (selectList.contains(music)) {
                         if (!multiSelect) return@setOnClickListener
-                        DatabaseHelper
-                            .instance
-                            .musicWithMusicBucketDAOBridge
-                            .deleteMusicWithMusicBucketAsync(music.musicBaseId)
+                        launch(Dispatchers.IO) {
+                            DatabaseHelper.instance.run {
+                                musicBucketDAOBridge.getMusicBucketByName(bucket)?.let { musicBucket ->
+                                    musicWithMusicBucketDAOBridge
+                                        .deleteMusicWithMusicBucketAsync(
+                                            music.musicBaseId,
+                                            musicBucket.musicBucketId
+                                        )
+                                }
+                            }
+                        }
                         checkSelect(holder, music)
                         return@setOnClickListener
                     }

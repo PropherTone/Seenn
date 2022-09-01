@@ -60,6 +60,8 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 val index =
                     musicBuckets.indexOfFirst { it.musicBucketId == data.bucket.musicBucketId }
                 if (index != -1 && index != 0) {
+                    selectList.clear()
+                    selectList.add(data.bucket)
                     musicBuckets[index] = data.bucket
                     withContext(Dispatchers.Main) {
                         notifyItemChanged(index)

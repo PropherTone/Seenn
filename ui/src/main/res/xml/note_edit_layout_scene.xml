@@ -18,7 +18,8 @@
             app:layout_constraintBottom_toBottomOf="@id/noteEdit_icon"
             app:layout_constraintEnd_toEndOf="@id/noteEdit_icon"
             app:layout_constraintStart_toStartOf="@id/noteEdit_icon"
-            app:layout_constraintTop_toTopOf="@id/noteEdit_icon" />
+            app:layout_constraintTop_toTopOf="@id/noteEdit_icon"
+            app:visibilityMode="ignore" />
 
         <Constraint
             android:id="@+id/toolbar_action"
@@ -43,9 +44,11 @@
             android:id="@+id/noteEdit_progress"
             android:layout_width="@dimen/icon"
             android:layout_height="@dimen/icon"
-            android:layout_marginEnd="@dimen/main_margin"
+            android:layout_marginEnd="@dimen/action_icon_p"
+            android:layout_marginBottom="@dimen/main_margin"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:visibilityMode="ignore" />
 
         <Constraint
             android:id="@+id/toolbar_action"

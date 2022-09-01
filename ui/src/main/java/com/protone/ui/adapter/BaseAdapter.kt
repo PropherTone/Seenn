@@ -26,7 +26,7 @@ abstract class BaseAdapter<B : ViewDataBinding, T>(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        if (handleEvent) launch(Dispatchers.IO) {
+        if (handleEvent) launch(Dispatchers.Default) {
             adapterFlow.buffer().collect {
                 onEventIO(it)
             }

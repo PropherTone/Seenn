@@ -13,9 +13,9 @@ interface MusicWithMusicBucketDAO {
     @Insert
     fun insertMusicWithMusicBucket(musicWithMusicBucket: MusicWithMusicBucket): Long?
 
-    @Query("DELETE FROM MusicWithMusicBucket WHERE musicBaseId LIKE :musicID")
+    @Query("DELETE FROM MusicWithMusicBucket WHERE musicBaseId LIKE :musicID AND musicBucketId LIKE:musicBucketId")
     @RewriteQueriesToDropUnusedColumns
-    fun deleteMusicWithMusicBucket(musicID: Long)
+    fun deleteMusicWithMusicBucket(musicID: Long,musicBucketId: Long)
 
     @Query("SELECT * FROM MusicWithMusicBucket")
     @RewriteQueriesToDropUnusedColumns

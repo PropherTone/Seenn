@@ -122,7 +122,6 @@
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/black_gradient_right.xml" value="0.145" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/ic_baseline_check_24.xml" value="0.1545" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/ic_baseline_check_24_white.xml" value="0.1545" />
-        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/load_animation.xml" value="0.1275" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/oval_back_white.xml" value="0.134" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/oval_background.xml" value="0.145" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/oval_fore_dark.xml" value="0.134" />
@@ -152,6 +151,7 @@
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/activity_main.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/colors.xml" value="0.25364583333333335" />
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/galley_search_activity.xml" value="0.2085222121486854" />
+        <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/note_edit_activity.xml" value="0.17806484295845998" />
         <entry key="..\:/AndroidStudioProject/Seenn/richNote/src/main/res/layout/activity_connect.xml" value="0.155622060709705" />
         <entry key="..\:/AndroidStudioProject/Seenn/richNote/src/main/res/layout/activity_cut.xml" value="0.155622060709705" />
         <entry key="..\:/AndroidStudioProject/Seenn/richNote/src/main/res/layout/activity_guide.xml" value="0.155622060709705" />

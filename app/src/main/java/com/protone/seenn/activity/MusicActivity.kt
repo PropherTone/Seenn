@@ -28,15 +28,18 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
     override val viewModel: MusicModel by lazy {
         ViewModelProvider(this).get(MusicModel::class.java).apply {
             onMusicDataEvent = object : MusicModel.OnMusicDataEvent {
-                override fun onNewMusicBucket(musicBucket: MusicBucket) {
+                override suspend fun onNewMusicBucket(musicBucket: MusicBucket) {
                     getMusicBucketAdapter()?.addBucket(musicBucket)
                 }
 
-                override fun onMusicBucketUpdated(musicBucket: MusicBucket) {
+                override suspend fun onMusicBucketUpdated(musicBucket: MusicBucket) {
                     getMusicBucketAdapter()?.refreshBucket(musicBucket)
+                    if (binding.musicBucketName.text == musicBucket.name) {
+                        getMusicListAdapter()?.musicList = getCurrentMusicList(musicBucket)
+                    }
                 }
 
-                override fun onMusicBucketDeleted(musicBucket: MusicBucket) {
+                override suspend fun onMusicBucketDeleted(musicBucket: MusicBucket) {
                     getMusicBucketAdapter()?.deleteBucket(musicBucket)
                 }
 
@@ -112,7 +115,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                         )
                     ).run {
                         getBucketRefreshed(it.bucket)?.let { mb ->
-                            getMusicBucketAdapter()?.refreshBucket(mb)
+                            refreshListAndBucket(mb)
                         }
                     }
                 }
@@ -222,6 +225,13 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                         sendViewEvent(MusicModel.MusicEvent.Edit(bucket))
                 }
             }
+        }
+    }
+
+    private suspend fun MusicModel.refreshListAndBucket(musicBucket: MusicBucket) {
+        getMusicBucketAdapter()?.refreshBucket(musicBucket)
+        if (binding.musicBucketName.text == musicBucket.name) {
+            getMusicListAdapter()?.musicList = getCurrentMusicList(musicBucket)
         }
     }
 

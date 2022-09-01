@@ -369,9 +369,9 @@ class DatabaseHelper {
             }
         }
 
-        fun deleteMusicWithMusicBucketAsync(musicID: Long) {
+        fun deleteMusicWithMusicBucketAsync(musicID: Long,musicBucketId: Long) {
             execute {
-                deleteMusicWithMusicBucket(musicID)
+                deleteMusicWithMusicBucket(musicID,musicBucketId)
             }
         }
 
@@ -648,9 +648,9 @@ class DatabaseHelper {
             return musicWithMusicBucketDAO.insertMusicWithMusicBucket(musicWithMusicBucket)
         }
 
-        fun deleteMusicWithMusicBucket(musicID: Long) {
+        fun deleteMusicWithMusicBucket(musicID: Long,musicBucketId: Long) {
             offerEvent(MediaAction.OnMusicWithMusicBucketDeleted(musicID))
-            musicWithMusicBucketDAO.deleteMusicWithMusicBucket(musicID)
+            musicWithMusicBucketDAO.deleteMusicWithMusicBucket(musicID,musicBucketId)
         }
 
         fun observeAllMusicBucketWithMusic(): Flow<List<MusicWithMusicBucket>?> {
