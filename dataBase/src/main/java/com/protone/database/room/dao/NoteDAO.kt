@@ -2,12 +2,16 @@ package com.protone.database.room.dao
 
 import androidx.room.*
 import com.protone.api.entity.Note
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDAO {
 
     @Query("SELECT * FROM Note ORDER BY Note_Time DESC")
     fun getAllNote(): List<Note>?
+
+    @Query("SELECT * FROM Note ORDER BY Note_Time DESC")
+    fun observeAllNote(): Flow<List<Note>?>
 
     @Insert
     fun insertNote(note: Note): Long

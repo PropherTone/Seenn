@@ -39,7 +39,10 @@ fun Uri.toBitmap(
             bitmap.height,
             getMatrix(bitmap.height, bitmap.width, w),
             true
-        )
+        ).let {
+            bitmap.recycle()
+            it
+        }
     } catch (e: IOException) {
         null
     } finally {

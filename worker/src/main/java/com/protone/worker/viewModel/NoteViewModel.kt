@@ -1,18 +1,24 @@
 package com.protone.worker.viewModel
 
+import androidx.lifecycle.viewModelScope
+import com.protone.api.baseType.deleteFile
 import com.protone.api.baseType.getString
+import com.protone.api.context.SApplication
 import com.protone.api.entity.Note
 import com.protone.api.entity.NoteDir
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
+import com.protone.worker.database.MediaAction
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.suspendCoroutine
 
 class NoteViewModel : BaseViewModel() {
 
     sealed class NoteViewEvent {
-        object Init : ViewEvent
         object RefreshList : ViewEvent
         object AddBucket : ViewEvent
         object Refresh : ViewEvent
@@ -23,10 +29,39 @@ class NoteViewModel : BaseViewModel() {
 
     private var selected: String? = null
 
+    init {
+        DatabaseHelper.instance.noteDAOBridge.startEvent()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        DatabaseHelper.instance.noteDAOBridge.stopEvent()
+    }
+
+    fun collectNoteEvent(callBack:suspend (MediaAction) -> Unit) {
+        viewModelScope.launch(Dispatchers.Default) {
+            DatabaseHelper.instance.mediaNotifier.buffer().collect {
+                callBack.invoke(it)
+            }
+        }
+    }
+
     fun getNoteList(type: String?) = noteList[type.also { selected = it }] ?: mutableListOf()
 
-    fun deleteNote(note: Note) = DatabaseHelper.instance.noteDAOBridge.deleteNoteAsync(note)
+    fun deleteNoteCache(note: Note) {
+        viewModelScope.launch(Dispatchers.IO) {
+            note.imagePath?.deleteFile()
+            "${SApplication.app.filesDir.absolutePath}/${note.title}/".deleteFile()
+        }
+    }
 
+    fun deleteNote(note: Note) {
+        DatabaseHelper.instance.noteDAOBridge.deleteNoteAsync(note)
+    }
+
+    suspend fun getNote(title: String) = withContext(Dispatchers.IO) {
+        DatabaseHelper.instance.noteDAOBridge.getNoteByName(title)
+    }
 
     suspend fun queryAllNote() = withContext(Dispatchers.IO) {
         suspendCoroutine { co ->

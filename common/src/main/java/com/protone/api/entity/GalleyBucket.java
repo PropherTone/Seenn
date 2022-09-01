@@ -9,13 +9,13 @@ public class GalleyBucket {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "galleyBucketId")
-    Long galleyBucketId;
+    private Long galleyBucketId;
 
     @ColumnInfo(name = "type")
-    String type;
+    private String type;
 
     @ColumnInfo(name = "image")
-    boolean image;
+    private boolean image;
 
     public GalleyBucket(String type, boolean image) {
         this.type = type;

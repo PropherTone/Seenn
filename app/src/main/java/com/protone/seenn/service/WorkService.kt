@@ -13,17 +13,13 @@ import com.protone.api.TAG
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.workIntentFilter
-import com.protone.api.entity.MediaStatus
 import com.protone.api.entity.Music
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.MediaContentObserver
 import com.protone.seenn.broadcast.WorkReceiver
 import com.protone.seenn.broadcast.workLocalBroadCast
-import com.protone.worker.Medias.audioNotifier
-import com.protone.worker.Medias.galleyNotifier
 import com.protone.worker.Medias.music
 import com.protone.worker.Medias.musicBucket
-import com.protone.worker.Medias.musicBucketNotifier
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.media.*
 import kotlinx.coroutines.*
@@ -124,7 +120,6 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                 }
             }
         }
-        musicBucketNotifier.postValue(MediaStatus.Updated)
         makeToast("歌单更新完毕")
     }
 
@@ -132,7 +127,6 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
         launch(Dispatchers.IO) {
             scanAudioWithUri(uri) {
                 DatabaseHelper.instance.musicDAOBridge.insertMusicCheck(it)
-                audioNotifier.emit(arrayListOf(it))
             }
             updateMusicBucket()
         }
@@ -164,7 +158,6 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                 deleteMusicMulti(allMusic)
                 updateMusicBucket()
                 if (allMusic.size != 0) {
-                    audioNotifier.emit(allMusic as ArrayList<Music>)
                     makeToast("音乐更新完毕")
                 }
             }
@@ -180,7 +173,6 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                     .insertSignedMediaChecked(it)
             if (checkedMedia != null) {
                 Log.d(TAG, "updateGalley(uri: Uri): 相册更新完毕")
-                galleyNotifier.emit(checkedMedia)
                 makeToast("相册更新完毕")
             }
         }
@@ -198,8 +190,6 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                     }
                 }.buffer().collect {
                     deleteSignedMedia(it)
-                    it.mediaStatus = MediaStatus.Deleted
-                    galleyNotifier.emit(it)
                 }
             }
 
@@ -210,10 +200,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                     }
                 }.buffer().collect {
                     //主要耗时
-                    val checkedMedia = insertSignedMediaChecked(it)
-                    if (checkedMedia != null) {
-                        galleyNotifier.emit(it)
-                    }
+                    insertSignedMediaChecked(it)
                 }
             }
 
@@ -223,10 +210,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                         emit(galleyMedia)
                     }
                 }.buffer().collect {
-                    val checkedMedia = insertSignedMediaChecked(it)
-                    if (checkedMedia != null) {
-                        galleyNotifier.emit(it)
-                    }
+                    insertSignedMediaChecked(it)
                 }
             }
 

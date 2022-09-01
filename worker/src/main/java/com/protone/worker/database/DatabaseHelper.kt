@@ -2,7 +2,6 @@ package com.protone.worker.database
 
 import android.content.Context
 import android.net.Uri
-import androidx.lifecycle.LiveData
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.entity.*
@@ -243,7 +242,6 @@ class DatabaseHelper {
             return if (it != null) {
                 if (it == media) return null
                 updateSignedMedia(it)
-                it.mediaStatus = MediaStatus.Updated
                 it
             } else {
                 insertSignedMedia(media)
@@ -268,7 +266,12 @@ class DatabaseHelper {
     inner class NoteDAOBridge : BaseNoteDAO() {
 
         override fun startEvent() {
-
+            dataEvent = this@DatabaseHelper.execute(Dispatchers.Default) {
+                observeAllNote().buffer().collect {
+                    this@DatabaseHelper.pollEvent(getDeque())
+                }
+            }
+            dataEvent?.start()
         }
 
         fun deleteNoteAsync(note: Note) {
@@ -533,6 +536,10 @@ class DatabaseHelper {
 
         fun getAllNote(): List<Note>? {
             return noteDAO.getAllNote()
+        }
+
+        fun observeAllNote(): Flow<List<Note>?> {
+            return noteDAO.observeAllNote()
         }
 
         fun getNoteByName(name: String): Note? {

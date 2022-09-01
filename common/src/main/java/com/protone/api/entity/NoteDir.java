@@ -9,13 +9,13 @@ public class NoteDir {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "noteDirId")
-    Long noteDirId;
+    private Long noteDirId;
 
     @ColumnInfo(name = "name")
-    String name;
+    private String name;
 
     @ColumnInfo(name = "image")
-    String image;
+    private String image;
 
     public NoteDir(String name, String image) {
         this.name = name;

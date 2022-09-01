@@ -1,23 +1,16 @@
 package com.protone.worker
 
 import android.net.Uri
-import androidx.lifecycle.MutableLiveData
 import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleyMedia
-import com.protone.api.entity.MediaStatus
 import com.protone.api.entity.Music
 import com.protone.api.entity.Note
 import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
 object Medias {
-
-    val galleyNotifier = MutableSharedFlow<GalleyMedia>()
-    val audioNotifier = MutableSharedFlow<MutableList<Music>>()
-    val musicBucketNotifier = MutableLiveData<MediaStatus>()
 
     var music: MutableList<Music>
         set(value) {

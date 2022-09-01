@@ -4,10 +4,8 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import com.protone.api.context.SApplication
 import com.protone.api.isInDebug
-import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
+import java.io.*
+import java.security.MessageDigest
 
 fun Bitmap.saveToFile(fileName: String, dir: String? = null): String? {
     var fileOutputStream: FileOutputStream? = null
@@ -22,11 +20,17 @@ fun Bitmap.saveToFile(fileName: String, dir: String? = null): String? {
                 if (!dirFile.exists() && !dirFile.mkdirs()) {
                     return saveFailed(fileName)
                 }
-                "${SApplication.app.filesDir.absolutePath}/$dir/${fileName.getFileName()}.png"
-            } else "${SApplication.app.filesDir.absolutePath}/${fileName.getFileName()}.png"
+                "${SApplication.app.filesDir.absolutePath}/$dir/$fileName.png"
+            } else "${SApplication.app.filesDir.absolutePath}/$fileName.png"
         val file = File(tempPath)
         when {
-            file.exists() -> tempPath
+            file.exists() -> {
+                if (file.getSHA() == this.getSHA()) {
+                    tempPath
+                } else {
+                    saveToFile("${fileName}_new", dir)
+                }
+            }
             file.createNewFile() -> {
                 fileOutputStream = FileOutputStream(file)
                 this@saveToFile.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
@@ -46,6 +50,18 @@ fun Bitmap.saveToFile(fileName: String, dir: String? = null): String? {
         } catch (e: IOException) {
             if (isInDebug()) e.printStackTrace()
         }
+    }
+}
+
+fun Bitmap.getSHA(): String? {
+    return try {
+        MessageDigest.getInstance("SHA").let {
+            val bos = ByteArrayOutputStream()
+            this.compress(Bitmap.CompressFormat.PNG, 100, bos)
+            String(it.digest(bos.toByteArray()))
+        }
+    } catch (e: Exception) {
+        null
     }
 }
 

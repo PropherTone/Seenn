@@ -11,7 +11,6 @@ import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.onGlobalLayout
 import com.protone.api.context.root
-import com.protone.api.entity.MediaStatus
 import com.protone.api.entity.Music
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
@@ -29,8 +28,6 @@ import com.protone.worker.database.userConfig
 import com.protone.worker.viewModel.GalleyViewViewModel
 import com.protone.worker.viewModel.MainViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -120,11 +117,6 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
             }
             musicController.setLoopMode(userConfig.musicLoopMode)
             launch(Dispatchers.Default) {
-                while (isActive) {
-                    if (Medias.musicBucketNotifier.value != null && Medias.musicBucketNotifier.value == MediaStatus.Updated) {
-                        break
-                    }
-                }
                 Medias.musicBucket[userConfig.lastMusicBucket]?.let { list ->
                     musicController.setMusicList(list)
                     musicController.refresh(
@@ -133,14 +125,6 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
                         else if (list.size > 0) list[0] else getEmptyMusic(),
                         userConfig.lastMusicProgress
                     )
-                }
-            }
-        }
-
-        launch {
-            Medias.apply {
-                audioNotifier.collect {
-                    musicController.refresh()
                 }
             }
         }

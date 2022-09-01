@@ -1,7 +1,10 @@
 package com.protone.api.entity
 
 import android.net.Uri
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import com.protone.api.converters.ListTypeConverter
 import com.protone.api.converters.UriTypeConverter
 
@@ -32,8 +35,6 @@ data class GalleyMedia(
     @ColumnInfo(name = "isVideo")
     val isVideo: Boolean,
 ) {
-    @Ignore
-    var mediaStatus: MediaStatus = MediaStatus.NewInsert
 
     override fun toString(): String {
         return "GalleyMedia(name='$name', bucket='$bucket', size=$size, type='$type', cate='$cate', uri=$uri, date=$date, thumbnailUri=$thumbnailUri, duration=$duration, isVideo=$isVideo)"

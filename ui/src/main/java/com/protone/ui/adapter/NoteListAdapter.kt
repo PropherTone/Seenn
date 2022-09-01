@@ -10,15 +10,53 @@ import com.protone.api.baseType.toDateString
 import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.Note
 import com.protone.ui.databinding.NoteListAdapterLayoutBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NoteListAdapter(context: Context) :
-    BaseAdapter<NoteListAdapterLayoutBinding, Any>(context) {
+    BaseAdapter<NoteListAdapterLayoutBinding, NoteListAdapter.NoteEvent>(context, true) {
 
     private val noteList = arrayListOf<Note>()
+
+    sealed class NoteEvent {
+        data class NoteDelete(val note: Note) : NoteEvent()
+        data class NoteInsert(val note: Note) : NoteEvent()
+        data class NoteUpdate(val note: Note) : NoteEvent()
+    }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         recyclerView.setHasFixedSize(true)
         super.onAttachedToRecyclerView(recyclerView)
+    }
+
+    override suspend fun onEventIO(data: NoteEvent) {
+        when (data) {
+            is NoteEvent.NoteDelete -> {
+                val indexOf = noteList.indexOf(data.note)
+                if (indexOf != -1) {
+                    noteList.removeAt(indexOf)
+                    withContext(Dispatchers.Main) {
+                        notifyItemRemoved(indexOf)
+                    }
+                }
+            }
+            is NoteEvent.NoteInsert -> {
+                noteList.add(0,data.note)
+                withContext(Dispatchers.Main) {
+                    notifyItemInserted(0)
+                }
+            }
+            is NoteEvent.NoteUpdate -> {
+                val index = noteList.indexOf(data.note)
+                if (index != -1) {
+                    noteList[index] = data.note
+                    withContext(Dispatchers.Main) {
+                        notifyItemChanged(index)
+                    }
+                }
+            }
+        }
     }
 
     override fun onCreateViewHolder(
@@ -60,10 +98,20 @@ class NoteListAdapter(context: Context) :
     }
 
     fun deleteNote(note: Note) {
-        val indexOf = noteList.indexOf(note)
-        if (indexOf != -1) {
-            noteList.removeAt(indexOf)
-            notifyItemRemoved(indexOf)
+        launch {
+            emit(NoteEvent.NoteDelete(note))
+        }
+    }
+
+    fun insertNote(note: Note) {
+        launch {
+            emit(NoteEvent.NoteInsert(note))
+        }
+    }
+
+    fun updateNote(note: Note) {
+        launch {
+            emit(NoteEvent.NoteUpdate(note))
         }
     }
 

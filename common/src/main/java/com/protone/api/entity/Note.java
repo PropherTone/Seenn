@@ -15,28 +15,28 @@ public class Note {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "noteId")
-    public Long noteId;
+    private Long noteId;
 
     @ColumnInfo(name = "Note_Title")
-    public String title;
+    private String title;
 
     @ColumnInfo(name = "Note_Text")
-    public String text;
+    private String text;
 
     @ColumnInfo(name = "Note_TitleImage")
-    public String imagePath;
+    private String imagePath;
 
     @ColumnInfo(name = "Note_Time")
-    public Long time;
+    private Long time;
 
     @ColumnInfo(name = "Note_RichCode")
-    public int richCode;
+    private int richCode;
 
     @Ignore
     public Note() {
     }
 
-    public Note(String title, String text, String imagePath, Long time, int richCode) {
+    public Note(@NonNull String title, String text, String imagePath, Long time, int richCode) {
         this.title = title;
         this.text = text;
         this.imagePath = imagePath;

@@ -83,7 +83,6 @@ class NoteEditViewModel : BaseViewModel() {
     suspend fun insertNote(note: Note, dir: String?) = withContext(Dispatchers.IO) {
         DatabaseHelper.instance.noteDAOBridge.insertNoteRs(note).let { result ->
             if (result.first) {
-                DatabaseHelper.instance.noteDAOBridge.deleteNote(note)
                 dir?.let {
                     val noteDir = DatabaseHelper.instance.noteDirDAOBridge.getNoteDir(it)
                     if (noteDir != null) {

@@ -17,6 +17,7 @@ import com.protone.ui.R
 import com.protone.ui.adapter.NoteListAdapter
 import com.protone.ui.adapter.NoteTypeListAdapter
 import com.protone.ui.dialog.titleDialog
+import com.protone.worker.database.MediaAction
 import com.protone.worker.viewModel.NoteEditViewModel
 import com.protone.worker.viewModel.NoteViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
@@ -47,7 +48,6 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
                 override fun onDelete(note: Note) {
                     titleDialog(R.string.delete.getString(), R.string.delete.getString()) {
                         this@init.deleteNote(note)
-                        deleteNote(note)
                     }
                 }
             }
@@ -59,19 +59,32 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
             refreshNoteList(viewModel.getNoteList(type))
         }
 
+        refreshList()
+
+        collectNoteEvent {
+            when (it) {
+                is MediaAction.OnNoteDeleted -> {
+                    deleteNoteCache(it.note)
+                    getNoteListAdapter()?.deleteNote(it.note)
+                }
+                is MediaAction.OnNoteUpdated ->
+                    getNote(it.note.title)?.let { note -> getNoteListAdapter()?.updateNote(note) }
+                is MediaAction.OnNoteInserted ->
+                    getNote(it.note.title)?.let { note -> getNoteListAdapter()?.insertNote(note) }
+                is MediaAction.OnNoteDirInserted -> {}
+                is MediaAction.OnNoteDirDeleted -> {}
+                else -> Unit
+            }
+        }
+
         onViewEvent {
             when (it) {
-                NoteViewModel.NoteViewEvent.Init -> init()
                 NoteViewModel.NoteViewEvent.RefreshList -> refreshList()
                 NoteViewModel.NoteViewEvent.AddBucket -> addBucket()
                 NoteViewModel.NoteViewEvent.Refresh -> refresh()
-                NoteViewModel.NoteViewEvent.HandleBucketEvent-> handleBucketEvent()
+                NoteViewModel.NoteViewEvent.HandleBucketEvent -> handleBucketEvent()
             }
         }
-    }
-
-    override suspend fun doResume() {
-        sendViewEvent(NoteViewModel.NoteViewEvent.RefreshList)
     }
 
     private fun addBucket() {
@@ -96,7 +109,6 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     private fun refresh() {
         handleBucketEvent()
         TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
-        sendViewEvent(NoteViewModel.NoteViewEvent.Init)
         sendViewEvent(NoteViewModel.NoteViewEvent.RefreshList)
     }
 
@@ -129,21 +141,26 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
     }
 
     private fun addNoteType(it: ((String?) -> Unit)?) {
-        if (binding.noteBucketList.adapter is NoteTypeListAdapter)
-            (binding.noteBucketList.adapter as NoteTypeListAdapter).addNote = it
+        getNoteTypeAdapter()?.addNote = it
     }
 
     private fun onTypeSelected(it: ((String?) -> Unit)?) {
-        if (binding.noteBucketList.adapter is NoteTypeListAdapter)
-            (binding.noteBucketList.adapter as NoteTypeListAdapter).onTypeSelected = it
+        getNoteTypeAdapter()?.onTypeSelected = it
     }
 
     private fun refreshNoteList(list: List<Note>) {
-        (binding.noteList.adapter as NoteListAdapter?)?.setNoteList(list)
+        getNoteListAdapter()?.setNoteList(list)
     }
 
     private fun refreshNoteType(list: List<NoteDir>) {
-        if (binding.noteBucketList.adapter is NoteTypeListAdapter)
-            (binding.noteBucketList.adapter as NoteTypeListAdapter).setNoteTypeList(list)
+        getNoteTypeAdapter()?.setNoteTypeList(list)
+    }
+
+    private fun getNoteListAdapter(): NoteListAdapter? {
+        return (binding.noteList.adapter as NoteListAdapter?)
+    }
+
+    private fun getNoteTypeAdapter(): NoteTypeListAdapter? {
+        return (binding.noteBucketList.adapter as NoteTypeListAdapter?)
     }
 }

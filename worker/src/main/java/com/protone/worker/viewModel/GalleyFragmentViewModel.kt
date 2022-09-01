@@ -46,6 +46,7 @@ class GalleyFragmentViewModel : ViewModel() {
     var isBucketShowUp = true
 
     val galleyMap = mutableMapOf<String?, MutableList<GalleyMedia>>()
+    @Synchronized get
 
     fun sendEvent(fragEvent: FragEvent) {
         viewModelScope.launch {

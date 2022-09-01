@@ -211,14 +211,15 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
                 setResult(RESULT_OK)
                 finish()
             }
-        } else {
-            if (insertNote(
-                    note.apply { imagePath = saveIcon(checkedTitle, getIconByteArray()) },
-                    intent.getStringExtra(NoteEditViewModel.NOTE_DIR)
-                )
-            ) finish()
-            else R.string.failed_msg.getString().toast()
-        }
+        } else if (insertNote(
+                note.apply {
+                    getIconByteArray()?.let { imagePath = saveIcon(checkedTitle, it) }
+                },
+                intent.getStringExtra(NoteEditViewModel.NOTE_DIR)
+            )
+        ) {
+            finish()
+        } else R.string.failed_msg.getString().toast()
     }
 
     private suspend fun startGalleyPick(isPhoto: Boolean) =

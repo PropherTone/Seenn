@@ -13,10 +13,7 @@ import android.text.style.*
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.ScrollView
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.core.view.isGone
@@ -45,6 +42,7 @@ import com.protone.worker.note.spans.ISpanForEditor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
@@ -74,6 +72,8 @@ class RichNoteView @JvmOverloads constructor(
     private var curPosition = 0
 
     private var inIndex = false
+
+    private val deletedMedias by lazy { mutableListOf<String>() }
 
     init {
         orientation = VERTICAL
@@ -152,17 +152,25 @@ class RichNoteView @JvmOverloads constructor(
                             text.isEmpty()
                         ) {
                             var indexOfChild = indexOfChild(this@apply)
-                            if (indexOfChild > 0) {
-                                removeViewAt(indexOfChild)
-                                //Delete next view if it's not an edittext
-                                if (--indexOfChild > 0 && getChildAt(indexOfChild) !is EditText) {
-                                    removeView(getChildAt(indexOfChild--))
-                                    //Insert new edittext when there is no input place
-                                    if (indexOfChild >= 0 && getChildAt(indexOfChild) !is EditText || childCount <= 0) {
-                                        insertText(RichNoteStates("", arrayListOf()))
+                            //Delete next view if it's not an edittext
+                            if (--indexOfChild > 0 && getChildAt(indexOfChild) !is EditText) {
+                                removeView(getChildAt(indexOfChild))
+
+                                getChildAt(indexOfChild)?.let {
+                                    if (it is ImageView) {
+                                        if (it.tag != null && it.tag is RichPhotoStates) {
+                                            (it.tag as RichPhotoStates).path?.let { path ->
+                                                deletedMedias.add(path)
+                                            }
+                                        }
                                     }
                                 }
+                                //Insert new edittext when there is no input place
+                                if (--indexOfChild >= 0 && getChildAt(indexOfChild) !is EditText || childCount <= 0) {
+                                    insertText(RichNoteStates("", arrayListOf()))
+                                }
                             }
+
                         }
                         false
                     }
@@ -394,7 +402,7 @@ class RichNoteView @JvmOverloads constructor(
         return onResult {
             async(Dispatchers.IO) {
                 while (isActive) {
-                    taskChannel.receiveAsFlow().collect {
+                    taskChannel.receiveAsFlow().buffer().collect {
                         if (it.second < childCount) {
                             richArray[it.second] = it.first
                             count++
@@ -442,7 +450,7 @@ class RichNoteView @JvmOverloads constructor(
                             taskChannel.trySend(Pair(tag.toJson(), i))
                         } else async(Dispatchers.IO) {
                             tag.uri.saveToFile(
-                                tag.name + "_${System.currentTimeMillis()}",
+                                tag.name + "_${title}",
                                 dir = title,
                                 w = child.measuredWidth,
                                 h = child.measuredHeight
@@ -466,7 +474,7 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     /**
-     * Done the basic work for insert different type of media
+     * Do the basic work for insert different type of media
      *
      * @param func Callback used for custom
      */
