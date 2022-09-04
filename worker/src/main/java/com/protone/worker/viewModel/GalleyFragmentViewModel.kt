@@ -46,7 +46,7 @@ class GalleyFragmentViewModel : ViewModel() {
     var isBucketShowUp = true
 
     val galleyMap = mutableMapOf<String?, MutableList<GalleyMedia>>()
-    @Synchronized get
+        @Synchronized get
 
     fun sendEvent(fragEvent: FragEvent) {
         viewModelScope.launch {
@@ -133,16 +133,22 @@ class GalleyFragmentViewModel : ViewModel() {
             }
             DatabaseHelper.instance.mediaNotifier.buffer().collect {
                 when (it) {
-                    is MediaAction.OnMediaByUriDeleted ->
+                    is MediaAction.OnMediaByUriDeleted -> {
+                        if (it.media.isVideo != isVideo) return@collect
                         sortDeleteMedia(it.media, galleyMap, _fragFlow)
-                    is MediaAction.OnMediaDeleted ->
+                    }
+                    is MediaAction.OnMediaDeleted -> {
+                        if (it.media.isVideo != isVideo) return@collect
                         sortDeleteMedia(it.media, galleyMap, _fragFlow)
+                    }
                     is MediaAction.OnMediaInserted -> {
+                        if (it.media.isVideo != isVideo) return@collect
                         insertNewMedia(it.media)
                         galleyMap[allGalley]?.add(0, it.media)
                         _fragFlow.emit(FragEvent.OnMediaInserted(it.media))
                     }
                     is MediaAction.OnMediaUpdated -> {
+                        if (it.media.isVideo != isVideo) return@collect
                         galleyMap[allGalley]?.first { sortMedia -> it.media.uri == sortMedia.uri }
                             ?.let { sortedMedia ->
                                 val allIndex = galleyMap[allGalley]?.indexOf(sortedMedia)
