@@ -34,6 +34,13 @@
                 app:layout_scrollFlags="scroll|snap|exitUntilCollapsed">
 
                 <ImageView
+                    android:id="@+id/album_cover"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@string/icon"
+                    android:scaleType="fitXY" />
+
+                <ImageView
                     android:id="@+id/music_finish"
                     android:layout_width="?attr/actionBarSize"
                     android:layout_height="?attr/actionBarSize"

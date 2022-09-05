@@ -8,9 +8,11 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.protone.api.baseType.getDrawable
 import com.protone.api.baseType.getString
+import com.protone.api.baseType.toBitmap
 import com.protone.api.baseType.toast
 import com.protone.api.context.*
 import com.protone.api.entity.MusicBucket
+import com.protone.api.img.Blur
 import com.protone.seenn.R
 import com.protone.seenn.databinding.MusicActivtiyBinding
 import com.protone.seenn.viewModel.MusicControllerIMP
@@ -97,6 +99,13 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                             } else {
                                 musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
                             }
+//                            albumCover.setImageBitmap(withContext(Dispatchers.IO){
+//                                it.icon?.toBitmap()?.let { bm->
+//                                    withContext(Dispatchers.Default){
+//                                        Blur(SApplication.app).blur(bm,14,20)
+//                                    }
+//                                }
+//                            })
                             musicBucketName.text = it.name
                             musicBucketMsg.text =
                                 if (it.date != null && it.detail != null) "${it.date} ${it.detail}" else R.string.none.getString()

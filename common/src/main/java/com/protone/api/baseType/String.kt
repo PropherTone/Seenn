@@ -1,5 +1,7 @@
 package com.protone.api.baseType
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
@@ -10,6 +12,10 @@ import com.protone.api.entity.SpanStates
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+
+fun String.toBitmap(): Bitmap? {
+    return BitmapFactory.decodeFile(this)
+}
 
 fun CharSequence.indexSpan(spans: List<*>): CharSequence {
     val str = when (this) {
