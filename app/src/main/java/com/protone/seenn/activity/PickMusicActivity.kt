@@ -14,7 +14,6 @@ import com.protone.api.entity.Music
 import com.protone.seenn.R
 import com.protone.seenn.databinding.PickMusicActivityBinding
 import com.protone.ui.adapter.AddMusicListAdapter
-import com.protone.worker.Medias
 import com.protone.worker.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -77,7 +76,7 @@ class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewMo
         }
     }
 
-    private fun initSeen(bucket: String, mode: String) {
+    private suspend fun initSeen(bucket: String, mode: String) {
         binding.addMBConfirm.also {
             it.isGone = mode == PickMusicViewModel.ADD_BUCKET
             binding.addMBLeave.isGone = !it.isGone
@@ -86,7 +85,7 @@ class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewMo
             layoutManager = LinearLayoutManager(context)
             adapter =
                 AddMusicListAdapter(context, bucket, mode != PickMusicViewModel.PICK_MUSIC).apply {
-                    musicList = Medias.music
+                    musicList = viewModel.getMusics()
                 }
         }
     }

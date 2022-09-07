@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.protone.api.baseType.getString
-import com.protone.api.baseType.toByteArray
+import com.protone.api.baseType.saveToFile
 import com.protone.api.baseType.toast
 import com.protone.api.context.SApplication
 import com.protone.api.context.intent
@@ -20,7 +20,6 @@ import com.protone.ui.dialog.checkListDialog
 import com.protone.ui.dialog.loginDialog
 import com.protone.ui.dialog.regDialog
 import com.protone.ui.dialog.titleDialog
-import com.protone.worker.GalleyHelper
 import com.protone.worker.database.userConfig
 import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.GalleyViewModel
@@ -52,7 +51,8 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
                 UserConfigViewModel.UserConfigEvent.ClearCache -> viewModel.clearCache()
                 UserConfigViewModel.UserConfigEvent.Log -> startActivity(LogActivity::class.intent)
                 UserConfigViewModel.UserConfigEvent.CombineGalley -> userConfig.combineGalley = true
-                UserConfigViewModel.UserConfigEvent.DispatchGalley -> userConfig.combineGalley = false
+                UserConfigViewModel.UserConfigEvent.DispatchGalley -> userConfig.combineGalley =
+                    false
             }
         }
     }
@@ -160,10 +160,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
                 R.string.come_up_unknown_error.getString().toast()
                 return@let
             }
-            GalleyHelper.saveIconToLocal(
-                toEntity.name,
-                toEntity.uri.toByteArray()
-            ) { s ->
+            toEntity.uri.saveToFile(toEntity.name).let { s ->
                 if (!s.isNullOrEmpty()) {
                     if (userConfig.userIcon.isNotEmpty()) {
                         viewModel.deleteOldIcon(userConfig.userIcon)

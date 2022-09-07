@@ -5,6 +5,9 @@ import android.graphics.BitmapFactory
 import com.protone.api.context.SApplication
 import com.protone.api.img.Blur
 import com.protone.worker.R
+import com.protone.worker.database.DatabaseHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class MainViewModel : BaseViewModel() {
     var btnY = 0f
@@ -15,6 +18,14 @@ class MainViewModel : BaseViewModel() {
         object Music : ViewEvent
         object Note : ViewEvent
         object UserConfig : ViewEvent
+    }
+
+    suspend fun getMusics(bucketName: String) = withContext(Dispatchers.IO) {
+        DatabaseHelper.instance.run {
+            musicBucketDAOBridge.getMusicBucketByName(bucketName)?.musicBucketId?.let {
+                musicWithMusicBucketDAOBridge.getMusicWithMusicBucket(it)
+            }
+        }
     }
 
     fun loadBlurIcon(path: String): Bitmap? {

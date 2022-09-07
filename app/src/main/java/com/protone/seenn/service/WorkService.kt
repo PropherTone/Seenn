@@ -10,16 +10,12 @@ import android.provider.MediaStore
 import android.util.Log
 import com.protone.api.ActiveTimer
 import com.protone.api.TAG
-import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.workIntentFilter
 import com.protone.api.entity.Music
-import com.protone.seenn.R
 import com.protone.seenn.broadcast.MediaContentObserver
 import com.protone.seenn.broadcast.WorkReceiver
 import com.protone.seenn.broadcast.workLocalBroadCast
-import com.protone.worker.Medias.music
-import com.protone.worker.Medias.musicBucket
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.media.*
 import kotlinx.coroutines.*
@@ -96,30 +92,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
         workLocalBroadCast.registerReceiver(workReceiver, workIntentFilter)
     }
 
-    private suspend fun updateMusicBucket() {
-        DatabaseHelper.instance.run {
-            musicBucketDAOBridge.getAllMusicBucket().let { l ->
-                (l as ArrayList).filter {
-                    it.name != R.string.all_music.getString()
-                }
-            }.forEach {
-                musicBucket[it.name] =
-                    musicWithMusicBucketDAOBridge
-                        .getMusicWithMusicBucket(it.musicBucketId) as MutableList<Music>
-            }
-            music = (musicDAOBridge.getAllMusicRs()) as MutableList<Music>
-
-            musicBucket.keys.forEach {
-                musicBucketDAOBridge.getMusicBucketByName(it)?.let { mb ->
-                    musicBucket[it]?.size?.let { size ->
-                        if (mb.size != size) {
-                            mb.size = size
-                            musicBucketDAOBridge.updateMusicBucket(mb)
-                        }
-                    }
-                }
-            }
-        }
+    private fun updateMusicBucket() {
         makeToast("歌单更新完毕")
     }
 

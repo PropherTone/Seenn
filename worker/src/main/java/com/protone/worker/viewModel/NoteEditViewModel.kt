@@ -2,15 +2,13 @@ package com.protone.worker.viewModel
 
 import android.net.Uri
 import com.protone.api.baseType.getString
-import com.protone.api.baseType.toByteArray
+import com.protone.api.baseType.saveToFile
 import com.protone.api.baseType.toast
 import com.protone.api.entity.GalleriesWithNotes
 import com.protone.api.entity.GalleyMedia
 import com.protone.api.entity.Note
 import com.protone.api.entity.NoteDirWithNotes
 import com.protone.api.json.toUriJson
-import com.protone.api.onResult
-import com.protone.worker.GalleyHelper
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
@@ -40,20 +38,13 @@ class NoteEditViewModel : BaseViewModel() {
     var onEdit = false
     var medias = arrayListOf<GalleyMedia>()
 
-    suspend fun getIconByteArray() = withContext(Dispatchers.IO) { iconUri?.toByteArray() }
-
-    suspend fun saveIcon(name: String, byteArray: ByteArray?) = withContext(Dispatchers.IO) {
-        onResult { co ->
-            GalleyHelper.saveIconToLocal(
-                name,
-                byteArray
-            ) { s ->
-                if (!s.isNullOrEmpty()) {
-                    co.resumeWith(Result.success(s))
-                } else {
-                    R.string.failed_upload_image.getString().toast()
-                    co.resumeWith(Result.success(iconUri?.toUriJson()))
-                }
+    suspend fun saveIcon(name: String) = withContext(Dispatchers.IO) {
+        iconUri?.saveToFile(name, null).let {
+            if (it != null && !it.isNullOrEmpty()) {
+                it
+            } else {
+                R.string.failed_upload_image.getString().toast()
+                iconUri?.toUriJson()
             }
         }
     }

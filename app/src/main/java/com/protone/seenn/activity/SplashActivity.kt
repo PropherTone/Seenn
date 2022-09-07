@@ -10,7 +10,6 @@ import com.protone.seenn.broadcast.workLocalBroadCast
 import com.protone.seenn.databinding.SplashActivityBinding
 import com.protone.seenn.service.MusicService
 import com.protone.seenn.service.WorkService
-import com.protone.worker.GalleyHelper
 import com.protone.worker.viewModel.SplashViewModel
 
 @SuppressLint("CustomSplashScreen")
@@ -74,8 +73,6 @@ class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true
     private fun updateMedia() {
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_GALLEY))
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC))
-        GalleyHelper.updateAll {
-            sendViewEvent(SplashViewModel.SplashEvent.InitConfig)
-        }
+        sendViewEvent(SplashViewModel.SplashEvent.InitConfig)
     }
 }

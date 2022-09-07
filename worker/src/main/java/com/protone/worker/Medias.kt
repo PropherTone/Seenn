@@ -1,9 +1,7 @@
 package com.protone.worker
 
 import android.net.Uri
-import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleyMedia
-import com.protone.api.entity.Music
 import com.protone.api.entity.Note
 import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
@@ -11,14 +9,6 @@ import kotlinx.coroutines.runBlocking
 import java.util.*
 
 object Medias {
-
-    var music: MutableList<Music>
-        set(value) {
-            musicBucket[R.string.all_music.getString()] = value
-        }
-        get() = musicBucket[R.string.all_music.getString()] ?: mutableListOf()
-
-    val musicBucket = mutableMapOf<String, MutableList<Music>>()
 
     fun photoInToday(): GalleyMedia? {
         val ca = Calendar.getInstance(Locale.CHINA)

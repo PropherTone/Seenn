@@ -21,7 +21,6 @@ import com.protone.seenn.service.getEmptyMusic
 import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.ui.adapter.MainModelListAdapter
 import com.protone.ui.itemDecoration.ModelListItemDecoration
-import com.protone.worker.Medias
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.userConfig
@@ -112,17 +111,18 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
         }
 
         bindMusicService {
-            musicController.setBinder(this@MainActivity, it) {
-                userConfig.musicLoopMode = it
+            musicController.setBinder(this@MainActivity, it) { binder ->
+                userConfig.musicLoopMode = binder
             }
             musicController.setLoopMode(userConfig.musicLoopMode)
             launch(Dispatchers.Default) {
-                Medias.musicBucket[userConfig.lastMusicBucket]?.let { list ->
+                getMusics(userConfig.lastMusicBucket)?.let { list ->
+                    list as MutableList<Music>
                     musicController.setMusicList(list)
                     musicController.refresh(
                         if (userConfig.lastMusic.isNotEmpty())
                             userConfig.lastMusic.toEntity(Music::class.java)
-                        else if (list.size > 0) list[0] else getEmptyMusic(),
+                        else if (list.isNotEmpty()) list[0] else getEmptyMusic(),
                         userConfig.lastMusicProgress
                     )
                 }

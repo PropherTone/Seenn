@@ -188,10 +188,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
                 return
             }
             copyNote(inNote, note)
-            inNote.imagePath = if (iconUri != null) saveIcon(
-                checkedTitle,
-                getIconByteArray()
-            ) else inNote.imagePath
+            inNote.imagePath = if (iconUri != null) saveIcon(checkedTitle) else inNote.imagePath
             val re = updateNote(inNote)
             if (re == null && re == -1) {
                 insertNote(
@@ -212,9 +209,7 @@ class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel
                 finish()
             }
         } else if (insertNote(
-                note.apply {
-                    getIconByteArray()?.let { imagePath = saveIcon(checkedTitle, it) }
-                },
+                note.apply { saveIcon(checkedTitle)?.let { imagePath = it } },
                 intent.getStringExtra(NoteEditViewModel.NOTE_DIR)
             )
         ) {
