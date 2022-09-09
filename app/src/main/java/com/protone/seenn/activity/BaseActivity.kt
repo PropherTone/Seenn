@@ -268,6 +268,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
 
     override fun onDestroy() {
         try {
+            binding.unbind()
             cancel()
             activityOperationBroadcast.unregisterReceiver(activityOperationReceiver)
             serviceConnection?.let { unbindService(it) }

@@ -13,7 +13,9 @@ import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.ui.R
 import com.protone.ui.databinding.*
-import com.protone.worker.Medias
+import com.protone.worker.photoInToday
+import com.protone.worker.randomNote
+import com.protone.worker.videoInToday
 
 class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -45,16 +47,14 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
     }
 
     private fun loadDataBelow() {
-        Medias.apply {
-            photoInToday()?.toJson()?.let { itemList.add("photo:$it") }
-            notifyItemInserted(itemList.size - 1)
-            videoInToday()?.toJson()?.let { itemList.add("video:$it") }
-            notifyItemInserted(itemList.size - 1)
-            randomNote()?.toJson()?.let { itemList.add("tNote:$it") }
-            notifyItemInserted(itemList.size - 1)
+        photoInToday()?.toJson()?.let { itemList.add("photo:$it") }
+        notifyItemInserted(itemList.size - 1)
+        videoInToday()?.toJson()?.let { itemList.add("video:$it") }
+        notifyItemInserted(itemList.size - 1)
+        randomNote()?.toJson()?.let { itemList.add("tNote:$it") }
+        notifyItemInserted(itemList.size - 1)
 //            musicInToday().toJson().let { itemList.add("music:$it") }
 //            notifyItemInserted(itemList.size - 1)
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

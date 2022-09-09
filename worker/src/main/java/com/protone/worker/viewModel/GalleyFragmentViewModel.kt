@@ -64,8 +64,7 @@ class GalleyFragmentViewModel : ViewModel() {
 
     fun sortData() = viewModelScope.launch(Dispatchers.Default) {
         galleyMap[R.string.all_galley.getString()] = mutableListOf()
-        DatabaseHelper
-            .instance
+        DatabaseHelper.instance
             .signedGalleyDAOBridge
             .run {
                 val signedMedias =
@@ -177,7 +176,7 @@ class GalleyFragmentViewModel : ViewModel() {
         return bucket == rightGalley || rightGalley == R.string.all_galley.getString()
     }
 
-    suspend fun insertNewMedia(media: GalleyMedia) {
+    private suspend fun insertNewMedia(media: GalleyMedia) {
         if (galleyMap[media.bucket] == null) {
             galleyMap[media.bucket] = mutableListOf()
             FragEvent.OnNewBucket(

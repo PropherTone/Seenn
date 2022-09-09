@@ -8,11 +8,9 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.protone.api.baseType.getDrawable
 import com.protone.api.baseType.getString
-import com.protone.api.baseType.toBitmap
 import com.protone.api.baseType.toast
 import com.protone.api.context.*
 import com.protone.api.entity.MusicBucket
-import com.protone.api.img.Blur
 import com.protone.seenn.R
 import com.protone.seenn.databinding.MusicActivtiyBinding
 import com.protone.seenn.viewModel.MusicControllerIMP
@@ -183,8 +181,11 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
             controller.setBinder(this@MusicActivity, it, onPlaying = { music ->
                 getMusicListAdapter()?.playPosition(music)
             })
-            controller.onClick {
+            binding.mySmallMusicPlayer.coverSwitcher.setOnClickListener {
                 startActivity(MusicViewActivity::class.intent)
+            }
+            controller.onClick {
+                binding.musicShowBucket.performClick()
             }
         }
         getMusicListAdapter()?.clickCallback = {

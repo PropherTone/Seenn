@@ -136,11 +136,11 @@ class GalleyFragment(
                     }
                 }
             }
+            rightGalley = R.string.all_galley.getString()
+            isVideo = this@GalleyFragment.isVideo
+            isLock = this@GalleyFragment.isLock
+            combine = this@GalleyFragment.combine
         }
-        viewModel.rightGalley = R.string.all_galley.getString()
-        viewModel.isVideo = isVideo
-        viewModel.isLock = isLock
-        viewModel.combine = combine
     }
 
     override fun onCreateView(
@@ -257,8 +257,7 @@ class GalleyFragment(
         Pair(
             if ((viewModel.galleyMap[media.bucket]?.size ?: 0) > 0)
                 viewModel.galleyMap[media.bucket]?.get(0)?.uri ?: Uri.EMPTY
-            else
-                Uri.EMPTY,
+            else Uri.EMPTY,
             arrayOf(
                 media.bucket,
                 (viewModel.galleyMap[media.bucket]?.size ?: 0).toString()
@@ -268,8 +267,7 @@ class GalleyFragment(
         Pair(
             if ((viewModel.galleyMap[all]?.size ?: 0) > 0)
                 viewModel.galleyMap[all]?.get(0)?.uri ?: Uri.EMPTY
-            else
-                Uri.EMPTY,
+            else Uri.EMPTY,
             arrayOf(
                 all,
                 (viewModel.galleyMap[all]?.size ?: 0).toString()
