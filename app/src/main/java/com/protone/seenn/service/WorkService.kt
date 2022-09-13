@@ -166,6 +166,8 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                 }
             }
 
+            val allSignedMedia = getAllSignedMedia()
+
             val scanPicture = async(Dispatchers.IO) {
                 flow {
                     scanPicture { _, galleyMedia ->
@@ -173,7 +175,18 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                     }
                 }.buffer().collect {
                     //主要耗时
-                    insertSignedMediaChecked(it)
+                    if (allSignedMedia != null) {
+                        allSignedMedia.indexOf(it).let { index->
+                            if (index != -1) {
+                                if (allSignedMedia[index] == it) return@let
+                                updateSignedMedia(it)
+                            } else {
+                                insertSignedMedia(it)
+                            }
+                        }
+                    } else {
+                        insertSignedMedia(it)
+                    }
                 }
             }
 
@@ -183,7 +196,18 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                         emit(galleyMedia)
                     }
                 }.buffer().collect {
-                    insertSignedMediaChecked(it)
+                    if (allSignedMedia != null) {
+                        allSignedMedia.indexOf(it).let { index->
+                            if (index != -1) {
+                                if (allSignedMedia[index] == it) return@let
+                                updateSignedMedia(it)
+                            } else {
+                                insertSignedMedia(it)
+                            }
+                        }
+                    } else {
+                        insertSignedMedia(it)
+                    }
                 }
             }
 

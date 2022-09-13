@@ -9,8 +9,9 @@ import com.protone.api.onResult
 import com.protone.database.R
 import com.protone.database.room.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import java.util.concurrent.LinkedBlockingDeque
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 class DatabaseHelper {
 
@@ -55,8 +56,10 @@ class DatabaseHelper {
         }
     }
 
-    suspend fun pollEvent(queue: LinkedBlockingDeque<MediaAction>) {
-        while (queue.isNotEmpty()) queue.poll()?.let { _mediaNotifier.emit(it) }
+    fun pollEvent(mediaAction: MediaAction) {
+        execute(Dispatchers.Default) {
+            _mediaNotifier.emit(mediaAction)
+        }
     }
 
     inline fun execute(
@@ -76,13 +79,8 @@ class DatabaseHelper {
 
     inner class MusicBucketDAOBridge : BaseMusicBucketDAO() {
 
-        override fun startEvent() {
-            dataEvent = this@DatabaseHelper.execute(Dispatchers.Default) {
-                observeAllMusicBucket().buffer().collect {
-                    this@DatabaseHelper.pollEvent(getDeque())
-                }
-            }
-            dataEvent?.start()
+        override fun sendEvent(mediaAction: MediaAction) {
+            pollEvent(mediaAction)
         }
 
         fun updateMusicBucketAsync(bucket: MusicBucket) {
@@ -146,8 +144,8 @@ class DatabaseHelper {
 
     inner class MusicDAOBridge : BaseMusicDAO() {
 
-        override fun startEvent() {
-
+        override fun sendEvent(mediaAction: MediaAction) {
+            pollEvent(mediaAction)
         }
 
         fun insertMusicMultiAsync(music: List<Music>) {
@@ -210,13 +208,8 @@ class DatabaseHelper {
 
     inner class GalleyDAOBridge : BaseGalleyDAO() {
 
-        override fun startEvent() {
-            dataEvent = this@DatabaseHelper.execute(Dispatchers.Default) {
-                observeAllSignedMedia().buffer().collect {
-                    this@DatabaseHelper.pollEvent(getDeque())
-                }
-            }
-            dataEvent?.start()
+        override fun sendEvent(mediaAction: MediaAction) {
+            pollEvent(mediaAction)
         }
 
         fun deleteSignedMediaMultiAsync(list: MutableList<GalleyMedia>) {
@@ -265,13 +258,8 @@ class DatabaseHelper {
 
     inner class NoteDAOBridge : BaseNoteDAO() {
 
-        override fun startEvent() {
-            dataEvent = this@DatabaseHelper.execute(Dispatchers.Default) {
-                observeAllNote().buffer().collect {
-                    this@DatabaseHelper.pollEvent(getDeque())
-                }
-            }
-            dataEvent?.start()
+        override fun sendEvent(mediaAction: MediaAction) {
+            pollEvent(mediaAction)
         }
 
         fun deleteNoteAsync(note: Note) {
@@ -289,8 +277,8 @@ class DatabaseHelper {
 
     inner class NoteTypeDAOBridge : BaseNoteTypeDAO() {
 
-        override fun startEvent() {
-
+        override fun sendEvent(mediaAction: MediaAction) {
+            pollEvent(mediaAction)
         }
 
         suspend fun insertNoteDirRs(
@@ -321,8 +309,8 @@ class DatabaseHelper {
 
     inner class GalleyBucketDAOBridge : BaseGalleyBucketDAO() {
 
-        override fun startEvent() {
-
+        override fun sendEvent(mediaAction: MediaAction) {
+            pollEvent(mediaAction)
         }
 
         fun deleteGalleyBucketAsync(galleyBucket: GalleyBucket) {
@@ -361,12 +349,8 @@ class DatabaseHelper {
 
     inner class MusicWithMusicBucketDAOBridge : BaseMusicWithMusicBucketDAO() {
 
-        override fun startEvent() {
-            this@DatabaseHelper.execute(Dispatchers.Default) {
-                observeAllMusicBucketWithMusic().buffer().collect {
-                    this@DatabaseHelper.pollEvent(getDeque())
-                }
-            }
+        override fun sendEvent(mediaAction: MediaAction) {
+            pollEvent(mediaAction)
         }
 
         fun deleteMusicWithMusicBucketAsync(musicID: Long,musicBucketId: Long) {
@@ -409,20 +393,20 @@ class DatabaseHelper {
     }
 
     inner class GalleriesWithNotesDAOBridge : BaseGalleriesWithNotesDAO() {
-        override fun startEvent() = Unit
+        override fun sendEvent(mediaAction: MediaAction) {
+            pollEvent(mediaAction)
+        }
     }
 
     inner class NoteDirWithNoteDAOBridge : BaseNoteDirWithNoteDAO() {
-        override fun startEvent() = Unit
+        override fun sendEvent(mediaAction: MediaAction) {
+            pollEvent(mediaAction)
+        }
     }
 
     sealed class BaseMusicBucketDAO : BaseDao() {
 
         private val musicBucketDAO = getMusicBucketDAO()
-
-        fun observeAllMusicBucket(): Flow<List<MusicBucket>?> {
-            return musicBucketDAO.observeAllMusicBucket()
-        }
 
         fun getAllMusicBucket(): List<MusicBucket>? {
             return musicBucketDAO.getAllMusicBucket()
@@ -433,17 +417,17 @@ class DatabaseHelper {
         }
 
         fun addMusicBucket(musicBucket: MusicBucket) {
-            offerEvent(MediaAction.OnNewMusicBucket(musicBucket))
+            sendEvent(MediaAction.OnNewMusicBucket(musicBucket))
             musicBucketDAO.addMusicBucket(musicBucket)
         }
 
         fun updateMusicBucket(musicBucket: MusicBucket): Int {
-            offerEvent(MediaAction.OnMusicBucketUpdated(musicBucket))
+            sendEvent(MediaAction.OnMusicBucketUpdated(musicBucket))
             return musicBucketDAO.updateMusicBucket(musicBucket)
         }
 
         fun deleteMusicBucket(musicBucket: MusicBucket) {
-            offerEvent(MediaAction.OnMusicBucketDeleted(musicBucket))
+            sendEvent(MediaAction.OnMusicBucketDeleted(musicBucket))
             musicBucketDAO.deleteMusicBucket(musicBucket)
         }
 
@@ -458,17 +442,17 @@ class DatabaseHelper {
         fun getMusicByUri(uri: Uri): Music? = musicDAO.getMusicByUri(uri)
 
         fun insertMusic(music: Music) {
-            offerEvent(MediaAction.OnMusicInserted(music))
+            sendEvent(MediaAction.OnMusicInserted(music))
             musicDAO.insertMusic(music)
         }
 
         fun deleteMusic(music: Music) {
-            offerEvent(MediaAction.OnMusicDeleted(music))
+            sendEvent(MediaAction.OnMusicDeleted(music))
             musicDAO.deleteMusic(music)
         }
 
         fun updateMusic(music: Music): Int {
-            offerEvent(MediaAction.OnMusicUpdate(music))
+            sendEvent(MediaAction.OnMusicUpdate(music))
             return musicDAO.updateMusic(music)
         }
 
@@ -480,9 +464,6 @@ class DatabaseHelper {
 
         fun getAllSignedMedia(): List<GalleyMedia>? =
             signedGalleyDAO.getAllSignedMedia()
-
-        fun observeAllSignedMedia(): Flow<List<GalleyMedia>?> =
-            signedGalleyDAO.observeAllSignedMedia()
 
         fun getAllMediaByType(isVideo: Boolean): List<GalleyMedia>? =
             signedGalleyDAO.getAllMediaByType(isVideo)
@@ -510,22 +491,22 @@ class DatabaseHelper {
             signedGalleyDAO.getSignedMedia(path)
 
         fun deleteSignedMediaByUri(uri: Uri) {
-            getSignedMedia(uri)?.let { offerEvent(MediaAction.OnMediaByUriDeleted(it)) }
+            getSignedMedia(uri)?.let { sendEvent(MediaAction.OnMediaByUriDeleted(it)) }
             signedGalleyDAO.deleteSignedMediaByUri(uri)
         }
 
         fun deleteSignedMedia(media: GalleyMedia) {
-            offerEvent(MediaAction.OnMediaDeleted(media))
+            sendEvent(MediaAction.OnMediaDeleted(media))
             signedGalleyDAO.deleteSignedMedia(media)
         }
 
         fun insertSignedMedia(media: GalleyMedia): Long {
-            offerEvent(MediaAction.OnMediaInserted(media))
+            sendEvent(MediaAction.OnMediaInserted(media))
             return signedGalleyDAO.insertSignedMedia(media)
         }
 
         fun updateSignedMedia(media: GalleyMedia) {
-            offerEvent(MediaAction.OnMediaUpdated(media))
+            sendEvent(MediaAction.OnMediaUpdated(media))
             signedGalleyDAO.updateSignedMedia(media)
         }
     }
@@ -538,26 +519,22 @@ class DatabaseHelper {
             return noteDAO.getAllNote()
         }
 
-        fun observeAllNote(): Flow<List<Note>?> {
-            return noteDAO.observeAllNote()
-        }
-
         fun getNoteByName(name: String): Note? {
             return noteDAO.getNoteByName(name)
         }
 
         fun updateNote(note: Note): Int? {
-            offerEvent(MediaAction.OnNoteUpdated(note))
+            sendEvent(MediaAction.OnNoteUpdated(note))
             return noteDAO.updateNote(note)
         }
 
         fun deleteNote(note: Note) {
-            offerEvent(MediaAction.OnNoteDeleted(note))
+            sendEvent(MediaAction.OnNoteDeleted(note))
             noteDAO.deleteNote(note)
         }
 
         fun insertNote(note: Note): Long {
-            offerEvent(MediaAction.OnNoteInserted(note))
+            sendEvent(MediaAction.OnNoteInserted(note))
             return noteDAO.insertNote(note)
         }
 
@@ -572,12 +549,12 @@ class DatabaseHelper {
         fun getALLNoteDir(): List<NoteDir>? = noteTypeDAO.getALLNoteDir()
 
         fun insertNoteDir(noteDir: NoteDir) {
-            offerEvent(MediaAction.OnNoteDirInserted(noteDir))
+            sendEvent(MediaAction.OnNoteDirInserted(noteDir))
             noteTypeDAO.insertNoteDir(noteDir)
         }
 
         fun deleteNoteDir(noteDir: NoteDir) {
-            offerEvent(MediaAction.OnNoteDirDeleted(noteDir))
+            sendEvent(MediaAction.OnNoteDirDeleted(noteDir))
             noteTypeDAO.deleteNoteDir(noteDir)
         }
     }
@@ -593,12 +570,12 @@ class DatabaseHelper {
             galleyBucketDAO.getALLGalleyBucket(isVideo)
 
         fun insertGalleyBucket(galleyBucket: GalleyBucket) {
-            offerEvent(MediaAction.OnGalleyBucketInserted(galleyBucket))
+            sendEvent(MediaAction.OnGalleyBucketInserted(galleyBucket))
             galleyBucketDAO.insertGalleyBucket(galleyBucket)
         }
 
         fun deleteGalleyBucket(galleyBucket: GalleyBucket) {
-            offerEvent(MediaAction.OnGalleyBucketDeleted(galleyBucket))
+            sendEvent(MediaAction.OnGalleyBucketDeleted(galleyBucket))
             galleyBucketDAO.deleteGalleyBucket(galleyBucket)
         }
     }
@@ -608,7 +585,7 @@ class DatabaseHelper {
         private val galleriesWithNotesDAO = getGalleriesWithNotesDAO()
 
         fun insertGalleriesWithNotes(galleriesWithNotes: GalleriesWithNotes) {
-            offerEvent(MediaAction.OnGalleriesWithNotesInserted(galleriesWithNotes))
+            sendEvent(MediaAction.OnGalleriesWithNotesInserted(galleriesWithNotes))
             galleriesWithNotesDAO.insertGalleriesWithNotes(galleriesWithNotes)
         }
 
@@ -626,7 +603,7 @@ class DatabaseHelper {
         private val noteDirWithNoteDAO = getNoteDirWithNoteDAO()
 
         fun insertNoteDirWithNote(noteDirWithNotes: NoteDirWithNotes) {
-            offerEvent(MediaAction.OnNoteDirWithNoteInserted(noteDirWithNotes))
+            sendEvent(MediaAction.OnNoteDirWithNoteInserted(noteDirWithNotes))
             noteDirWithNoteDAO.insertNoteDirWithNote(noteDirWithNotes)
         }
 
@@ -644,12 +621,12 @@ class DatabaseHelper {
         private val musicWithMusicBucketDAO = getMusicWithMusicBucketDAO()
 
         fun insertMusicWithMusicBucket(musicWithMusicBucket: MusicWithMusicBucket): Long? {
-            offerEvent(MediaAction.OnMusicWithMusicBucketInserted(musicWithMusicBucket))
+            sendEvent(MediaAction.OnMusicWithMusicBucketInserted(musicWithMusicBucket))
             return musicWithMusicBucketDAO.insertMusicWithMusicBucket(musicWithMusicBucket)
         }
 
         fun deleteMusicWithMusicBucket(musicID: Long,musicBucketId: Long) {
-            offerEvent(MediaAction.OnMusicWithMusicBucketDeleted(musicID))
+            sendEvent(MediaAction.OnMusicWithMusicBucketDeleted(musicID))
             musicWithMusicBucketDAO.deleteMusicWithMusicBucket(musicID,musicBucketId)
         }
 
@@ -667,22 +644,7 @@ class DatabaseHelper {
     }
 
     abstract class BaseDao {
-
-        private val linkedBlockingDeque by lazy { LinkedBlockingDeque<MediaAction>() }
-        protected var dataEvent: Job? = null
-
-        abstract fun startEvent()
-
-        fun stopEvent() {
-            dataEvent?.cancel()
-            dataEvent = null
-        }
-
-        protected fun offerEvent(mediaAction: MediaAction) {
-            linkedBlockingDeque.offer(mediaAction)
-        }
-
-        protected fun getDeque() = linkedBlockingDeque
+        protected abstract fun sendEvent(mediaAction: MediaAction)
     }
 
 }

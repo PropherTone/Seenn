@@ -46,20 +46,18 @@ class GalleyFragmentViewModel : ViewModel() {
     var isBucketShowUp = true
 
     val galleyMap = mutableMapOf<String?, MutableList<GalleyMedia>>()
-        @Synchronized get
 
-    fun sendEvent(fragEvent: FragEvent) {
-        viewModelScope.launch {
-            _fragFlow.emit(fragEvent)
-        }
+    suspend fun sendEvent(fragEvent: FragEvent) {
+        _fragFlow.emit(fragEvent)
     }
 
-    fun sortPrivateData() = viewModelScope.launch(Dispatchers.IO) {
+    private fun sortPrivateData() = viewModelScope.launch(Dispatchers.IO) {
         (DatabaseHelper.instance.galleyBucketDAOBridge
             .getALLGalleyBucket(isVideo) as MutableList<GalleyBucket>?)?.forEach {
             sendEvent(FragEvent.OnNewBucket(Pair(Uri.EMPTY, arrayOf(it.type, "PRIVATE"))))
             galleyMap[it.type] = mutableListOf()
         }
+        observeGalley()
     }
 
     fun sortData() = viewModelScope.launch(Dispatchers.Default) {
@@ -116,9 +114,10 @@ class GalleyFragmentViewModel : ViewModel() {
                         }
                 }
             }
+        if (!isLock) sortPrivateData() else observeGalley()
     }
 
-    fun observeGalley() {
+    private fun observeGalley() {
         val allGalley = R.string.all_galley.getString()
         viewModelScope.launch(Dispatchers.Default) {
             suspend fun sortDeleteMedia(
@@ -144,7 +143,7 @@ class GalleyFragmentViewModel : ViewModel() {
                         if (it.media.isVideo != isVideo) return@collect
                         insertNewMedia(it.media)
                         galleyMap[allGalley]?.add(0, it.media)
-                        _fragFlow.emit(FragEvent.OnMediaInserted(it.media))
+                        sendEvent(FragEvent.OnMediaInserted(it.media))
                     }
                     is MediaAction.OnMediaUpdated -> {
                         if (it.media.isVideo != isVideo) return@collect
@@ -157,12 +156,12 @@ class GalleyFragmentViewModel : ViewModel() {
                                     if (sortedMedia.bucket != it.media.bucket) {
                                         galleyMap[sortedMedia.bucket]?.remove(sortedMedia)
                                         insertNewMedia(it.media)
-                                        _fragFlow.emit(FragEvent.OnMediaInserted(it.media))
+                                        sendEvent(FragEvent.OnMediaInserted(it.media))
                                         return@let
                                     } else if (index != null && index != -1) {
                                         galleyMap[sortedMedia.bucket]?.set(index, sortedMedia)
                                     }
-                                    _fragFlow.emit(FragEvent.OnMediaUpdated(it.media))
+                                    sendEvent(FragEvent.OnMediaUpdated(it.media))
                                 }
                             }
                     }
@@ -184,7 +183,7 @@ class GalleyFragmentViewModel : ViewModel() {
                     media.uri,
                     arrayOf(media.bucket, galleyMap[media.bucket]?.size.toString())
                 )
-            ).let { _fragFlow.emit(it) }
+            ).let { sendEvent(it) }
         }
         galleyMap[media.bucket]?.add(0, media)
     }

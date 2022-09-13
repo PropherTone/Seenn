@@ -36,8 +36,8 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
     abstract suspend fun VM.init()
     private var onViewEvent: (suspend (BaseViewModel.ViewEvent) -> Unit)? = null
         set(value) {
-            viewEventTask?.start()
             field = value
+            viewEventTask?.start()
         }
 
     fun onViewEvent(block: suspend (BaseViewModel.ViewEvent) -> Unit) {

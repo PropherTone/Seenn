@@ -5,14 +5,12 @@ import com.google.android.material.tabs.TabLayout
 import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleyMedia
 import com.protone.worker.R
-import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
 class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
+
     companion object {
-        @JvmStatic
-        val CUSTOM = "CustomChoose"
 
         @JvmStatic
         val CHOOSE_MODE = "ChooseData"
@@ -37,15 +35,6 @@ class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     private val mailers = arrayOfNulls<MutableSharedFlow<GalleyFragmentViewModel.FragEvent>>(2)
 
     var chooseData: MutableList<GalleyMedia>? = null
-
-    init {
-        DatabaseHelper.instance.signedGalleyDAOBridge.startEvent()
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        DatabaseHelper.instance.signedGalleyDAOBridge.stopEvent()
-    }
 
     fun setMailer(
         frag1: MutableSharedFlow<GalleyFragmentViewModel.FragEvent>? = null,

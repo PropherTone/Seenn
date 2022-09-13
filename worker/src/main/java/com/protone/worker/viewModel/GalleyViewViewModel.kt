@@ -2,6 +2,7 @@ package com.protone.worker.viewModel
 
 import android.net.Uri
 import com.protone.api.baseType.getString
+import com.protone.api.baseType.saveToFile
 import com.protone.api.entity.GalleyMedia
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
@@ -21,6 +22,7 @@ class GalleyViewViewModel : BaseViewModel() {
 
     sealed class GalleyViewEvent {
         object SetNote : ViewEvent
+        object Share : ViewEvent
     }
 
     var curPosition: Int = 0
@@ -40,8 +42,6 @@ class GalleyViewViewModel : BaseViewModel() {
     suspend fun getSignedMedia() =
         DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMediaRs(galleyMedias[curPosition].uri)
 
-    fun getCurrentMedia() = galleyMedias[curPosition]
-
     suspend fun getMediaByUri(uri: Uri) =
         DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMediaRs(uri)
 
@@ -56,6 +56,14 @@ class GalleyViewViewModel : BaseViewModel() {
                     note.title
                 }.toList() as MutableList<String>
         }
+
+    suspend fun prepareSharedMedia() = withContext(Dispatchers.IO){
+        getCurrentMedia().let {
+            it.uri.saveToFile(it.name,"SharedMedia")
+        }
+    }
+
+    fun getCurrentMedia() = galleyMedias[curPosition]
 
 
 }

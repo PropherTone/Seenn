@@ -28,6 +28,8 @@ data class GalleyMedia(
     var cate: List<String>?,
     @ColumnInfo(name = "date")
     var date: Long,
+    @ColumnInfo(name = "dateModified")
+    var dateModified: Long,
     @ColumnInfo(name = "thumbnailUri")
     val thumbnailUri: Uri?,
     @ColumnInfo(name = "duration")
@@ -35,10 +37,6 @@ data class GalleyMedia(
     @ColumnInfo(name = "isVideo")
     val isVideo: Boolean,
 ) {
-
-    override fun toString(): String {
-        return "GalleyMedia(name='$name', bucket='$bucket', size=$size, type='$type', cate='$cate', uri=$uri, date=$date, thumbnailUri=$thumbnailUri, duration=$duration, isVideo=$isVideo)"
-    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -51,6 +49,7 @@ data class GalleyMedia(
         if (size != other.size) return false
         if (uri != other.uri) return false
         if (date != other.date) return false
+        if (dateModified != other.dateModified) return false
         if (thumbnailUri != other.thumbnailUri) return false
         if (duration != other.duration) return false
         if (isVideo != other.isVideo) return false
@@ -64,10 +63,15 @@ data class GalleyMedia(
         result = 31 * result + size.hashCode()
         result = 31 * result + uri.hashCode()
         result = 31 * result + date.hashCode()
+        result = 31 * result + dateModified.hashCode()
         result = 31 * result + (thumbnailUri?.hashCode() ?: 0)
         result = 31 * result + duration.hashCode()
         result = 31 * result + isVideo.hashCode()
         return result
+    }
+
+    override fun toString(): String {
+        return "GalleyMedia(name='$name', path=$path, bucket='$bucket', size=$size, type=$type, cate=$cate, date=$date, dateModified=$dateModified, thumbnailUri=$thumbnailUri, duration=$duration, isVideo=$isVideo)"
     }
 
 

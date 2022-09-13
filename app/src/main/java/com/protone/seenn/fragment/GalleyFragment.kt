@@ -59,7 +59,6 @@ class GalleyFragment(
             field = value
         }
 
-    private lateinit var containerAnimator: ValueAnimator
     private lateinit var toolButtonAnimator: ValueAnimator
 
     override fun onAttach(context: Context) {
@@ -150,17 +149,12 @@ class GalleyFragment(
     ): View {
         binding = GalleyFragmentLayoutBinding.inflate(inflater, container, false).apply {
             root.onGlobalLayout {
-                binding.galleyBucket.height.toFloat().let {
-                    containerAnimator = AnimationHelper.translationY(
-                        binding.galleyBucketContainer,
-                        it
-                    )
-                }
+                galleyBucketContainer.botBlock = tabController.measuredHeight.toFloat()
                 toolButtonAnimator = AnimationHelper.rotation(
-                    binding.galleyToolButton,
+                    galleyToolButton,
                     45f
                 )
-                binding.galleyShowBucket.setOnStateListener(object : StatusImageView.StateListener {
+                galleyShowBucket.setOnStateListener(object : StatusImageView.StateListener {
                     override fun onActive() {
                         reverse()
                     }
@@ -178,7 +172,7 @@ class GalleyFragment(
             }
             galleyToolButton.setOnClickListener {
                 if (!viewModel.isBucketShowUp) {
-                    (binding.galleyList.adapter as GalleyListAdapter).quitSelectMod()
+                    (galleyList.adapter as GalleyListAdapter).quitSelectMod()
                     onSelectMod = false
                 } else {
                     activity?.titleDialog(R.string.user_name.getString(), "") {
@@ -190,11 +184,7 @@ class GalleyFragment(
             }
         }
         initList()
-        viewModel.apply {
-            observeGalley()
-            sortData()
-            if (!isLock) sortPrivateData()
-        }
+        viewModel.sortData()
         return binding.root
     }
 
@@ -206,14 +196,14 @@ class GalleyFragment(
     private fun start() {
         viewModel.isBucketShowUp = false
         binding.galleyToolButton.isVisible = onSelectMod
-        containerAnimator.start()
+        binding.galleyBucketContainer.hide()
         toolButtonAnimator.start()
     }
 
     private fun reverse() {
         viewModel.isBucketShowUp = true
         binding.galleyToolButton.isVisible = true
-        containerAnimator.reverse()
+        binding.galleyBucketContainer.show()
         toolButtonAnimator.reverse()
     }
 
@@ -276,7 +266,12 @@ class GalleyFragment(
     }
 
     private fun noticeListUpdate(data: MutableList<GalleyMedia>?) {
-        getListAdapter().noticeDataUpdate(data)
+        binding.galleyList.swapAdapter(GalleyListAdapter(requireContext(), true).also {
+            data?.let { medias -> it.setMedias(medias) }
+            it.multiChoose = true
+            it.setOnSelectListener(this@GalleyFragment)
+        },false)
+//        getListAdapter().noticeDataUpdate(data)
     }
 
     private fun getBucketAdapter() =
@@ -288,7 +283,9 @@ class GalleyFragment(
     override fun select(galleyMedia: GalleyMedia) = Unit
 
     override fun select(galleyMedia: MutableList<GalleyMedia>) {
-        viewModel.sendEvent(GalleyFragmentViewModel.FragEvent.OnSelect(galleyMedia))
+        launch {
+            viewModel.sendEvent(GalleyFragmentViewModel.FragEvent.OnSelect(galleyMedia))
+        }
     }
 
     override fun openView(galleyMedia: GalleyMedia) {

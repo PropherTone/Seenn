@@ -29,15 +29,6 @@ class NoteViewModel : BaseViewModel() {
 
     private var selected: String? = null
 
-    init {
-        DatabaseHelper.instance.noteDAOBridge.startEvent()
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        DatabaseHelper.instance.noteDAOBridge.stopEvent()
-    }
-
     fun collectNoteEvent(callBack:suspend (MediaAction) -> Unit) {
         viewModelScope.launch(Dispatchers.Default) {
             DatabaseHelper.instance.mediaNotifier.buffer().collect {

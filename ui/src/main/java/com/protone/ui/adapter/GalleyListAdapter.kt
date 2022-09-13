@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.animation.Animation
 import android.widget.ImageView
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -42,10 +43,6 @@ class GalleyListAdapter(
 
     private var itemLength = 0
     private var onSelectMod = false
-
-    init {
-        hasFixedSize = false
-    }
 
     @SuppressLint("NotifyDataSetChanged")
     override suspend fun onEventIO(data: GalleyListEvent) {
@@ -133,6 +130,18 @@ class GalleyListAdapter(
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         itemLength = SApplication.screenWidth / 4 - recyclerView.paddingEnd
+        recyclerView.layoutAnimationListener = object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {
+                recyclerView.suppressLayout(true)
+            }
+
+            override fun onAnimationEnd(animation: Animation?) {
+                recyclerView.suppressLayout(false)
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) = Unit
+
+        }
     }
 
     override fun onCreateViewHolder(

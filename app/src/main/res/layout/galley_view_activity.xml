@@ -62,10 +62,21 @@
                 android:layout_width="@dimen/action_icon_p"
                 android:layout_height="@dimen/action_icon_p"
                 android:contentDescription="@string/action"
-                android:onClick="@{()->activity.sendViewEvent(GalleyViewEvent.SetNote.INSTANCE)}"
+                android:onClick="@{()->activity.showPop()}"
                 android:padding="@dimen/icon_padding_mid"
                 android:src="@drawable/ic_baseline_more_horiz_24_white"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/galleyV_share"
+                android:layout_width="@dimen/action_icon_p"
+                android:layout_height="@dimen/action_icon_p"
+                android:contentDescription="@string/action"
+                android:onClick="@{()->activity.sendViewEvent(GalleyViewEvent.Share.INSTANCE)}"
+                android:padding="@dimen/icon_padding_mid"
+                android:src="@drawable/ic_baseline_share_24_white"
+                app:layout_constraintEnd_toStartOf="@id/galleyV_action"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView

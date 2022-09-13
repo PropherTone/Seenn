@@ -3,6 +3,7 @@ package com.protone.worker.viewModel
 import androidx.lifecycle.viewModelScope
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.saveToFile
+import com.protone.api.context.SApplication
 import com.protone.api.entity.MusicBucket
 import com.protone.api.todayDate
 import com.protone.worker.R
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class SplashViewModel : BaseViewModel() {
 
@@ -26,10 +28,25 @@ class SplashViewModel : BaseViewModel() {
     suspend fun firstBootWork() {
         if (userConfig.isFirstBoot) {
             DatabaseHelper.instance.run {
-                withContext(Dispatchers.IO){
+                withContext(Dispatchers.IO) {
                     musicDAOBridge.insertMusicMulti(scanAudio { _, _ -> })
                 }
+
                 val allMusicRs = musicDAOBridge.getAllMusicRs() ?: return
+
+                var launch: Job? = null
+                launch = viewModelScope.launch(Dispatchers.Default) {
+                    mediaNotifier.collect {
+                        if (it is MediaAction.OnNewMusicBucket) {
+                            musicWithMusicBucketDAOBridge.insertMusicMultiAsyncWithBucket(
+                                R.string.all_music.getString(),
+                                allMusicRs
+                            )
+                            launch?.cancel()
+                        }
+                    }
+                }
+
                 musicBucketDAOBridge.addMusicBucketAsync(
                     MusicBucket(
                         R.string.all_music.getString(),
@@ -42,19 +59,11 @@ class SplashViewModel : BaseViewModel() {
                         todayDate("yyyy/MM/dd")
                     )
                 )
-                musicBucketDAOBridge.startEvent()
-                var launch: Job? = null
-                launch = viewModelScope.launch(Dispatchers.Default) {
-                    mediaNotifier.collect {
-                        if (it is MediaAction.OnNewMusicBucket) {
-                            musicWithMusicBucketDAOBridge.insertMusicMultiAsyncWithBucket(
-                                R.string.all_music.getString(),
-                                allMusicRs
-                            )
-                            musicBucketDAOBridge.stopEvent()
-                            launch?.cancel()
-                        }
-                    }
+            }
+            withContext(Dispatchers.IO) {
+                val dir = File("${SApplication.app.filesDir.absolutePath}/SharedMedia")
+                if (!dir.exists()) {
+                    dir.mkdirs()
                 }
             }
             userConfig.apply {

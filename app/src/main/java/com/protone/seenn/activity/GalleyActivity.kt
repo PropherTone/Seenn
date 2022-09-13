@@ -52,7 +52,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
                 GalleyFragment(
                     false,
                     userConfig.lockGalley.isNotEmpty(),
-                    userConfig.combineGalley
+                    if (chooseType.isNotEmpty()) false else userConfig.combineGalley
                 ) {
                     setMailer(frag1 = it.apply { launch { collect(action) } })
                 })
@@ -95,11 +95,7 @@ class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>
             }.let { tabName ->
                 TabLayoutMediator(binding.galleyTab.apply {
                     addOnTabSelectedListener(viewModel)
-                }, it) { tab, position ->
-                    tab.setText(
-                        tabName[position]
-                    )
-                }.attach()
+                }, it) { tab, position -> tab.setText(tabName[position]) }.attach()
             }
         }
     }

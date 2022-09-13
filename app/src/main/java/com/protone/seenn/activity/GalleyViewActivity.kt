@@ -1,8 +1,10 @@
 package com.protone.seenn.activity
 
+import android.content.Intent
 import android.net.Uri
 import android.view.View
 import androidx.activity.viewModels
+import androidx.core.content.FileProvider
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -20,17 +22,18 @@ import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.json.toUri
 import com.protone.api.onResult
-import com.protone.ui.adapter.CheckListAdapter
-import com.protone.ui.databinding.ImageCateLayoutBinding
-import com.protone.ui.databinding.TextCateLayoutBinding
 import com.protone.seenn.R
 import com.protone.seenn.databinding.GalleyViewActivityBinding
 import com.protone.seenn.fragment.GalleyViewFragment
+import com.protone.ui.adapter.CheckListAdapter
+import com.protone.ui.databinding.ImageCateLayoutBinding
+import com.protone.ui.databinding.TextCateLayoutBinding
 import com.protone.worker.viewModel.GalleyViewViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class GalleyViewActivity :
     BaseMediaActivity<GalleyViewActivityBinding, GalleyViewViewModel>(true) {
@@ -79,6 +82,19 @@ class GalleyViewActivity :
         onViewEvent {
             when (it) {
                 GalleyViewViewModel.GalleyViewEvent.SetNote -> setInfo()
+                GalleyViewViewModel.GalleyViewEvent.Share -> prepareSharedMedia()?.let { path ->
+                    startActivity(Intent(Intent.ACTION_SEND).apply {
+                        putExtra(
+                            Intent.EXTRA_STREAM,
+                            FileProvider.getUriForFile(
+                                this@GalleyViewActivity,
+                                "com.protone.seenn.fileProvider",
+                                File(path)
+                            )
+                        )
+                        type = "image/*"
+                    })
+                }
                 else -> {}
             }
         }

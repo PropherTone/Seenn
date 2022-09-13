@@ -19,6 +19,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
             MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
             MediaStore.Images.Media.SIZE,
             MediaStore.Images.Media.DATE_ADDED,
+            MediaStore.Images.Media.DATE_MODIFIED,
             MediaStore.Images.Thumbnails._ID,
             MediaStore.Images.Media.DATA
         )
@@ -31,6 +32,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
             val size = it.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
             val name = it.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
             val date = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+            val dateModified = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED)
             val tn = it.getColumnIndexOrThrow(MediaStore.Images.Thumbnails._ID)
             while (it.moveToNext()) {
                 val picID = it.getLong(id)
@@ -40,6 +42,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
                 val imageSize = it.getLong(size)
                 val uri = Uri.withAppendedPath(externalContentUri, "$picID")
                 val dateTime = it.getLong(date)
+                val dateModifiedTime = it.getLong(dateModified)
                 val thumbnailUri =
                     Uri.withAppendedPath(externalContentUri, "${it.getLong(tn)}")
                 callBack.invoke(
@@ -52,6 +55,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
                         null,
                         null,
                         dateTime,
+                        dateModifiedTime,
                         thumbnailUri, 0,
                         false
                     )
@@ -66,6 +70,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
             MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
             MediaStore.Video.Media.SIZE,
             MediaStore.Video.Media.DATE_ADDED,
+            MediaStore.Video.Media.DATE_MODIFIED,
             MediaStore.Video.Thumbnails._ID,
             MediaStore.Video.Media.DURATION,
             MediaStore.Video.Media.DATA
@@ -81,6 +86,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
             val size = it.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE)
             val name = it.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
             val date = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
+            val dateModified = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED)
             val tn = it.getColumnIndexOrThrow(MediaStore.Video.Thumbnails._ID)
             val du = it.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
             while (it.moveToNext()) {
@@ -91,6 +97,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
                 val imageSize = it.getLong(size)
                 val uri = Uri.withAppendedPath(externalContentUri, "$picID")
                 val dateTime = it.getLong(date)
+                val dateModifiedTime = it.getLong(dateModified)
                 val thumbnailUri =
                     Uri.withAppendedPath(externalContentUri, "${it.getLong(tn)}")
                 val duration = it.getLong(du)
@@ -104,6 +111,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
                         null,
                         null,
                         dateTime,
+                        dateModifiedTime,
                         thumbnailUri, duration,
                         true
                     )
@@ -190,6 +198,7 @@ inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)) {
         MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
         MediaStore.Images.Media.SIZE,
         MediaStore.Images.Media.DATE_ADDED,
+        MediaStore.Images.Media.DATE_MODIFIED,
         MediaStore.Images.Thumbnails._ID,
         MediaStore.Images.Media.DATA
     )
@@ -202,7 +211,8 @@ inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)) {
         val data = it.getColumnIndex(MediaStore.Images.Media.DATA)
         val size = it.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE)
         val name = it.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
-        val date = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+        val dateAdded = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_ADDED)
+        val dateModified = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED)
         val tn = it.getColumnIndexOrThrow(MediaStore.Images.Thumbnails._ID)
         while (it.moveToNext()) {
             val picID = it.getLong(id)
@@ -211,7 +221,8 @@ inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)) {
             val bucketName = it.getString(bucket)
             val imageSize = it.getLong(size)
             val uri = Uri.withAppendedPath(externalContentUri, "$picID")
-            val dateTime = it.getLong(date)
+            val dateTime = it.getLong(dateAdded)
+            val dateModifiedTime = it.getLong(dateModified)
             val thumbnailUri =
                 Uri.withAppendedPath(externalContentUri, "${it.getLong(tn)}")
             GalleyMedia(
@@ -223,6 +234,7 @@ inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)) {
                 null,
                 null,
                 dateTime,
+                dateModifiedTime,
                 thumbnailUri, 0,
                 false
             ).let { gm ->
@@ -240,6 +252,7 @@ inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)) {
         MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
         MediaStore.Video.Media.SIZE,
         MediaStore.Video.Media.DATE_ADDED,
+        MediaStore.Video.Media.DATE_MODIFIED,
         MediaStore.Video.Thumbnails._ID,
         MediaStore.Video.Media.DURATION,
         MediaStore.Video.Media.DATA
@@ -254,6 +267,7 @@ inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)) {
         val size = it.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE)
         val name = it.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
         val date = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_ADDED)
+        val dateModified = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED)
         val tn = it.getColumnIndexOrThrow(MediaStore.Video.Thumbnails._ID)
         val du = it.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
         while (it.moveToNext()) {
@@ -264,6 +278,7 @@ inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)) {
             val imageSize = it.getLong(size)
             val uri = Uri.withAppendedPath(externalContentUri, "$picID")
             val dateTime = it.getLong(date)
+            val dateModifiedTime = it.getLong(dateModified)
             val thumbnailUri =
                 Uri.withAppendedPath(externalContentUri, "${it.getLong(tn)}")
             val duration = it.getLong(du)
@@ -276,6 +291,7 @@ inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)) {
                 null,
                 null,
                 dateTime,
+                dateModifiedTime,
                 thumbnailUri, duration,
                 true
             ).let { gm ->
