@@ -38,11 +38,6 @@ class MusicModel : BaseViewModel() {
     var onMusicDataEvent: OnMusicDataEvent? = null
 
     init {
-        DatabaseHelper.instance.apply {
-            musicBucketDAOBridge.startEvent()
-            musicDAOBridge.startEvent()
-            musicWithMusicBucketDAOBridge.startEvent()
-        }
         viewModelScope.launch(Dispatchers.Default) {
             DatabaseHelper.instance.mediaNotifier.buffer().collect {
                 when (it) {
@@ -56,15 +51,6 @@ class MusicModel : BaseViewModel() {
                 }
             }
         }
-    }
-
-    override fun onCleared() {
-        DatabaseHelper.instance.apply {
-            musicBucketDAOBridge.stopEvent()
-            musicDAOBridge.stopEvent()
-            musicWithMusicBucketDAOBridge.stopEvent()
-        }
-        super.onCleared()
     }
 
     suspend fun getCurrentMusicList(bucket: MusicBucket): MutableList<Music> = withContext(Dispatchers.IO) {

@@ -266,12 +266,14 @@ class GalleyFragment(
     }
 
     private fun noticeListUpdate(data: MutableList<GalleyMedia>?) {
-        binding.galleyList.swapAdapter(GalleyListAdapter(requireContext(), true).also {
-            data?.let { medias -> it.setMedias(medias) }
-            it.multiChoose = true
-            it.setOnSelectListener(this@GalleyFragment)
-        },false)
+        launch {
+            binding.galleyList.swapAdapter(GalleyListAdapter(requireContext(), true).also {
+                data?.let { medias -> it.setMedias(medias) }
+                it.multiChoose = true
+                it.setOnSelectListener(this@GalleyFragment)
+            }, false)
 //        getListAdapter().noticeDataUpdate(data)
+        }
     }
 
     private fun getBucketAdapter() =
