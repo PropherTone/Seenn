@@ -1,4 +1,4 @@
-package com.protone.worker.note.spans
+package com.protone.ui.customView.richText.note.spans
 
 interface ISpanForUse : ISpan {
     fun setSize()

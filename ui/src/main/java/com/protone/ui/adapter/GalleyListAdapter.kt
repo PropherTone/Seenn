@@ -26,6 +26,12 @@ class GalleyListAdapter(
 ) {
     private val medias: MutableList<GalleyMedia> = mutableListOf()
 
+    enum class MediaStatus{
+        UPDATED,
+        INSERTED,
+        DELETED
+    }
+
     sealed class GalleyListEvent {
         object SelectAll : GalleyListEvent()
         object QuiteSelectAll : GalleyListEvent()

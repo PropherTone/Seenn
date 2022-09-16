@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -17,10 +18,10 @@ abstract class BaseAdapter<B : ViewDataBinding, T>(
 ) : RecyclerView.Adapter<BaseAdapter.Holder<B>>(),
     CoroutineScope by CoroutineScope(Dispatchers.Main) {
 
-    class Holder<B : ViewDataBinding>(val binding: B) : RecyclerView.ViewHolder(binding.root)
+    open class Holder<B : ViewDataBinding>(val binding: B) : RecyclerView.ViewHolder(binding.root)
 
     private val _adapterFlow = MutableSharedFlow<T>()
-    private val adapterFlow get() = _adapterFlow
+    private val adapterFlow get() = _adapterFlow.asSharedFlow()
 
     open suspend fun onEventIO(data: T) {}
 
@@ -35,7 +36,7 @@ abstract class BaseAdapter<B : ViewDataBinding, T>(
 
     protected fun emit(value: T) {
         launch {
-            adapterFlow.emit(value)
+            _adapterFlow.emit(value)
         }
     }
 

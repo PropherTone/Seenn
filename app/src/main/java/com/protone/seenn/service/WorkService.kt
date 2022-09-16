@@ -175,7 +175,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                     }
                 }.buffer().collect {
                     //主要耗时
-                    if (allSignedMedia != null) {
+                    if (allSignedMedia != null && allSignedMedia.isNotEmpty()) {
                         allSignedMedia.indexOf(it).let { index->
                             if (index != -1) {
                                 if (allSignedMedia[index] == it) return@let
@@ -196,7 +196,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                         emit(galleyMedia)
                     }
                 }.buffer().collect {
-                    if (allSignedMedia != null) {
+                    if (allSignedMedia != null && allSignedMedia.isNotEmpty()) {
                         allSignedMedia.indexOf(it).let { index->
                             if (index != -1) {
                                 if (allSignedMedia[index] == it) return@let

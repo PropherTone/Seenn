@@ -40,6 +40,10 @@ fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO {
     return SeennDataBase.database.getMusicWithMusicBucketDAO()
 }
 
+fun shutdownDataBase(){
+    SeennDataBase.database.close()
+}
+
 fun showRoomDB(context: Context){
     RoomExplorer.show(context,SeennDataBase::class.java,"SeennDB")
 }

@@ -10,11 +10,9 @@ import com.protone.api.animation.AnimationHelper
 import com.protone.api.baseType.getDrawable
 import com.protone.api.baseType.toStringMinuteTime
 import com.protone.api.context.newLayoutInflater
-import com.protone.api.context.onUiThread
 import com.protone.api.entity.Music
 import com.protone.ui.R
 import com.protone.ui.databinding.MusicListLayoutBinding
-import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,17 +21,14 @@ import java.util.*
 class AddMusicListAdapter(
     context: Context,
     private val bucket: String,
-    private val multiSelect: Boolean
+    private val multiSelect: Boolean,
+    private val adapterDataBaseProxy: AddMusicListAdapterDataProxy
 ) : SelectListAdapter<MusicListLayoutBinding, Music, Any>(context) {
 
     init {
         multiChoose = multiSelect
-        if (multiSelect) DatabaseHelper.instance.run {
-            launch(Dispatchers.IO) {
-                musicBucketDAOBridge.getMusicBucketByName(bucket)?.let {
-                    selectList.addAll(musicWithMusicBucketDAOBridge.getMusicWithMusicBucket(it.musicBucketId))
-                }
-            }
+        if (multiSelect) launch {
+            selectList.addAll(adapterDataBaseProxy.getMusicWithMusicBucket(bucket))
         }
     }
 
@@ -44,6 +39,8 @@ class AddMusicListAdapter(
         }
 
     private val viewQueue = PriorityQueue<Int>()
+
+    private var onBusy = false
 
     override val select: (holder: Holder<MusicListLayoutBinding>, isSelect: Boolean) -> Unit =
         { holder, isSelect ->
@@ -87,33 +84,32 @@ class AddMusicListAdapter(
                 setSelect(holder, selectList.contains(music))
 
                 musicListContainer.setOnClickListener {
-                    viewQueue.add(position)
-                    if (selectList.contains(music)) {
-                        if (!multiSelect) return@setOnClickListener
-                        launch(Dispatchers.IO) {
-                            DatabaseHelper.instance.run {
-                                musicBucketDAOBridge.getMusicBucketByName(bucket)?.let { musicBucket ->
-                                    musicWithMusicBucketDAOBridge
-                                        .deleteMusicWithMusicBucketAsync(
-                                            music.musicBaseId,
-                                            musicBucket.musicBucketId
-                                        )
-                                }
+                    if (onBusy) return@setOnClickListener
+                    onBusy = true
+                    launch(Dispatchers.Default) {
+                        viewQueue.add(position)
+                        if (selectList.contains(music)) {
+                            if (!multiSelect) return@launch
+                            adapterDataBaseProxy.deleteMusicWithMusicBucket(
+                                music.musicBaseId,
+                                bucket
+                            )
+                            withContext(Dispatchers.Main) {
+                                checkSelect(holder, music)
                             }
+                            return@launch
                         }
-                        checkSelect(holder, music)
-                        return@setOnClickListener
-                    }
-                    checkSelect(holder, music)
-                    musicListPlayState.drawable.let { d ->
-                        when (d) {
-                            is Animatable -> {
-                                d.start()
-                                if (multiSelect) {
-                                    launch(Dispatchers.IO) {
-                                        val re = DatabaseHelper
-                                            .instance
-                                            .musicWithMusicBucketDAOBridge
+                        withContext(Dispatchers.Main) {
+                            checkSelect(holder, music)
+                        }
+                        musicListPlayState.drawable.let { d ->
+                            when (d) {
+                                is Animatable -> {
+                                    withContext(Dispatchers.Main) {
+                                        d.start()
+                                    }
+                                    if (multiSelect) {
+                                        val re = adapterDataBaseProxy
                                             .insertMusicWithMusicBucket(music.musicBaseId, bucket)
                                         if (re != -1L) {
                                             changeIconAni(musicListPlayState)
@@ -121,19 +117,18 @@ class AddMusicListAdapter(
                                             selectList.remove(music)
                                             notifyItemChanged()
                                         }
+                                    } else {
+                                        changeIconAni(musicListPlayState)
                                     }
-                                } else {
-                                    changeIconAni(musicListPlayState)
+                                    d.stop()
                                 }
-                                d.stop()
-                            }
-                            else -> {
-                                launch(Dispatchers.Default) {
+                                else -> {
                                     selectList.remove(music)
                                     notifyItemChanged()
                                 }
                             }
                         }
+                        onBusy = false
                     }
                 }
 
@@ -157,15 +152,16 @@ class AddMusicListAdapter(
         }
     }
 
-    private fun changeIconAni(view: ImageView) = context.onUiThread {
-        AnimationHelper.apply {
-            animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
-                view.setImageDrawable(R.drawable.ic_baseline_check_24_white.getDrawable())
-                animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true)
-            }, play = true)
+    private suspend fun changeIconAni(view: ImageView) {
+        withContext(Dispatchers.Main) {
+            AnimationHelper.apply {
+                animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
+                    view.setImageDrawable(R.drawable.ic_baseline_check_24_white.getDrawable())
+                    animatorSet(scaleX(view, 1f), scaleY(view, 1f), play = true)
+                }, play = true)
+            }
         }
     }
-
 
     @SuppressLint("NotifyDataSetChanged")
     fun noticeDataUpdate(list: MutableList<Music>) {
@@ -179,4 +175,10 @@ class AddMusicListAdapter(
     }
 
     override fun getItemCount(): Int = musicList.size
+
+    interface AddMusicListAdapterDataProxy {
+        suspend fun getMusicWithMusicBucket(bucket: String): Collection<Music>
+        suspend fun insertMusicWithMusicBucket(musicBaseId: Long, bucket: String): Long
+        fun deleteMusicWithMusicBucket(musicBaseId: Long, musicBucket: String)
+    }
 }

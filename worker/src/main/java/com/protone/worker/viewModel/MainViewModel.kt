@@ -4,8 +4,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.protone.api.context.SApplication
 import com.protone.api.img.Blur
+import com.protone.api.json.toJson
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
+import com.protone.worker.photoInToday
+import com.protone.worker.randomNote
+import com.protone.worker.videoInToday
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -39,4 +43,17 @@ class MainViewModel : BaseViewModel() {
             null
         }
     }
+
+    fun photoInTodayJson(): String? {
+        return photoInToday()?.toJson()
+    }
+
+    fun videoInTodayJson(): String? {
+        return videoInToday()?.toJson()
+    }
+
+    fun randomNoteJson(): String? {
+        return randomNote()?.toJson()
+    }
+
 }

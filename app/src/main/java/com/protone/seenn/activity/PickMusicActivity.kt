@@ -83,10 +83,28 @@ class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewMo
         }
         binding.addMBList.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter =
-                AddMusicListAdapter(context, bucket, mode != PickMusicViewModel.PICK_MUSIC).apply {
-                    musicList = viewModel.getMusics()
+            adapter = AddMusicListAdapter(
+                context,
+                bucket,
+                mode != PickMusicViewModel.PICK_MUSIC,
+                object : AddMusicListAdapter.AddMusicListAdapterDataProxy {
+                    override suspend fun getMusicWithMusicBucket(bucket: String): Collection<Music> =
+                        viewModel.getMusicWithMusicBucket(bucket)
+
+                    override fun deleteMusicWithMusicBucket(
+                        musicBaseId: Long,
+                        musicBucket: String
+                    ) = viewModel.deleteMusicWithMusicBucket(musicBaseId, musicBucket)
+
+                    override suspend fun insertMusicWithMusicBucket(
+                        musicBaseId: Long,
+                        bucket: String
+                    ): Long = viewModel.insertMusicWithMusicBucket(musicBaseId, bucket)
+
                 }
+            ).apply {
+                musicList = viewModel.getMusics()
+            }
         }
     }
 

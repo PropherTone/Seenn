@@ -11,10 +11,12 @@ import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.MediaAction
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GalleyFragmentViewModel : ViewModel() {
 
@@ -25,11 +27,10 @@ class GalleyFragmentViewModel : ViewModel() {
         object SelectAll : FragEvent()
         object OnActionBtn : FragEvent()
         object IntoBox : FragEvent()
-        object OnGetAllGalley : FragEvent()
 
         data class AddBucket(val name: String, val list: MutableList<GalleyMedia>) : FragEvent()
         data class OnNewBucket(val pairs: Pair<Uri, Array<String>>) : FragEvent()
-        data class OnListUpdate(val data: MutableList<GalleyMedia>?) : FragEvent()
+
         data class OnSelect(val galleyMedia: MutableList<GalleyMedia>) : FragEvent()
 
         data class OnMediaDeleted(val galleyMedia: GalleyMedia) : FragEvent()
@@ -37,34 +38,32 @@ class GalleyFragmentViewModel : ViewModel() {
         data class OnMediaUpdated(val galleyMedia: GalleyMedia) : FragEvent()
     }
 
-    lateinit var rightGalley: String
+    var rightGalley: String = ""
 
     var isVideo: Boolean = false
+
     var isLock: Boolean = false
-    var combine: Boolean = false
-
     var isBucketShowUp = true
+    private var isDataSorted = false
 
-    val galleyMap = mutableMapOf<String?, MutableList<GalleyMedia>>()
+    private val galleyMap = mutableMapOf<String?, MutableList<GalleyMedia>>()
 
-    suspend fun sendEvent(fragEvent: FragEvent) {
-        _fragFlow.emit(fragEvent)
+    fun getGalley(galley: String) = galleyMap[galley]
+
+    fun getGalleyName() = if (rightGalley == "") {
+        R.string.all_galley.getString()
+    } else rightGalley
+
+    fun onTargetGalley(bucket: String): Boolean {
+        return bucket == rightGalley || rightGalley == R.string.all_galley.getString()
     }
 
-    private fun sortPrivateData() = viewModelScope.launch(Dispatchers.IO) {
-        (DatabaseHelper.instance.galleyBucketDAOBridge
-            .getALLGalleyBucket(isVideo) as MutableList<GalleyBucket>?)?.forEach {
-            sendEvent(FragEvent.OnNewBucket(Pair(Uri.EMPTY, arrayOf(it.type, "PRIVATE"))))
-            galleyMap[it.type] = mutableListOf()
-        }
-        observeGalley()
-    }
-
-    fun sortData() = viewModelScope.launch(Dispatchers.Default) {
+    fun sortData(combine: Boolean) = viewModelScope.launch(Dispatchers.Default) {
         galleyMap[R.string.all_galley.getString()] = mutableListOf()
         DatabaseHelper.instance
             .signedGalleyDAOBridge
             .run {
+                observeGalley()
                 val signedMedias =
                     (if (combine) getAllSignedMediaRs() else getAllMediaByTypeRs(isVideo)) as MutableList<GalleyMedia>?
                 if (signedMedias == null) {
@@ -84,17 +83,6 @@ class GalleyFragmentViewModel : ViewModel() {
                             )
                         )
                     )
-                    sendEvent(FragEvent.OnGetAllGalley)
-                }
-                if (!isLock) launch(Dispatchers.Default) {
-                    signedMedias.forEach {
-                        it.type?.forEach { type ->
-                            if (galleyMap[type] == null) {
-                                galleyMap[type] = mutableListOf()
-                            }
-                            galleyMap[type]?.add(it)
-                        }
-                    }
                 }
                 (if (combine) getAllGalley() else getAllGalley(isVideo))?.forEach {
                     galleyMap[it] =
@@ -113,9 +101,57 @@ class GalleyFragmentViewModel : ViewModel() {
                             )
                         }
                 }
+                if (!isLock) sortPrivateData(signedMedias) else isDataSorted = true
             }
-        if (!isLock) sortPrivateData() else observeGalley()
     }
+
+    fun addBucket(name: String) {
+        DatabaseHelper
+            .instance
+            .galleyBucketDAOBridge
+            .insertGalleyBucketCB(GalleyBucket(name, isVideo)) { re, reName ->
+                if (re) {
+                    if (!isLock) {
+                        sendEvent(
+                            FragEvent.OnNewBucket((Pair(Uri.EMPTY, arrayOf(reName, "PRIVATE"))))
+                        )
+                        galleyMap[reName] = mutableListOf()
+                    } else {
+                        R.string.locked.getString().toast()
+                    }
+                } else {
+                    R.string.failed_msg.getString().toast()
+                }
+            }
+    }
+
+    fun deleteGalleyBucket(bucket: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseHelper.instance.galleyBucketDAOBridge.run {
+                getGalleyBucketRs(bucket)?.let { deleteGalleyBucketAsync(it) }
+            }
+        }
+    }
+
+    private fun sortPrivateData(signedMedias: MutableList<GalleyMedia>) =
+        viewModelScope.launch(Dispatchers.IO) {
+            launch(Dispatchers.Default) {
+                signedMedias.forEach {
+                    it.type?.forEach { type ->
+                        if (galleyMap[type] == null) {
+                            galleyMap[type] = mutableListOf()
+                        }
+                        galleyMap[type]?.add(it)
+                    }
+                }
+            }
+            (DatabaseHelper.instance.galleyBucketDAOBridge
+                .getALLGalleyBucket(isVideo) as MutableList<GalleyBucket>?)?.forEach {
+                sendEvent(FragEvent.OnNewBucket(Pair(Uri.EMPTY, arrayOf(it.type, "PRIVATE"))))
+                galleyMap[it.type] = mutableListOf()
+            }
+            isDataSorted = true
+        }
 
     private fun observeGalley() {
         val allGalley = R.string.all_galley.getString()
@@ -130,6 +166,7 @@ class GalleyFragmentViewModel : ViewModel() {
                 flow.emit(FragEvent.OnMediaDeleted(media))
             }
             DatabaseHelper.instance.mediaNotifier.buffer().collect {
+                while (!isDataSorted) delay(50)
                 when (it) {
                     is MediaAction.OnMediaByUriDeleted -> {
                         if (it.media.isVideo != isVideo) return@collect
@@ -171,10 +208,6 @@ class GalleyFragmentViewModel : ViewModel() {
         }
     }
 
-    fun onTargetGalley(bucket: String): Boolean {
-        return bucket == rightGalley || rightGalley == R.string.all_galley.getString()
-    }
-
     private suspend fun insertNewMedia(media: GalleyMedia) {
         if (galleyMap[media.bucket] == null) {
             galleyMap[media.bucket] = mutableListOf()
@@ -185,27 +218,21 @@ class GalleyFragmentViewModel : ViewModel() {
                 )
             ).let { sendEvent(it) }
         }
-        galleyMap[media.bucket]?.add(0, media)
+        galleyMap[media.bucket]?.add(media)
     }
 
-    fun addBucket(name: String) {
-        DatabaseHelper
-            .instance
-            .galleyBucketDAOBridge
-            .insertGalleyBucketCB(GalleyBucket(name, isVideo)) { re, reName ->
-                if (re) {
-                    if (!isLock) {
-                        sendEvent(
-                            FragEvent.OnNewBucket((Pair(Uri.EMPTY, arrayOf(reName, "PRIVATE"))))
-                        )
-                        galleyMap[reName] = mutableListOf()
-                    } else {
-                        R.string.locked.getString().toast()
-                    }
-                } else {
-                    R.string.failed_msg.getString().toast()
-                }
-            }
+    suspend fun sendEvent(fragEvent: FragEvent) {
+        _fragFlow.emit(fragEvent)
     }
+
+    suspend fun insertNewMedias(galley: String, list: MutableList<GalleyMedia>) =
+        withContext(Dispatchers.Default) {
+            if (!isLock) {
+                if (galleyMap[galley] == null) {
+                    galleyMap[galley] = mutableListOf()
+                }
+                galleyMap[galley]?.addAll(list)
+            }
+        }
 
 }

@@ -29,7 +29,7 @@ class NoteViewModel : BaseViewModel() {
 
     private var selected: String? = null
 
-    fun collectNoteEvent(callBack:suspend (MediaAction) -> Unit) {
+    fun collectNoteEvent(callBack: suspend (MediaAction) -> Unit) {
         viewModelScope.launch(Dispatchers.Default) {
             DatabaseHelper.instance.mediaNotifier.buffer().collect {
                 callBack.invoke(it)
@@ -48,6 +48,12 @@ class NoteViewModel : BaseViewModel() {
 
     fun deleteNote(note: Note) {
         DatabaseHelper.instance.noteDAOBridge.deleteNoteAsync(note)
+    }
+
+    fun deleteNoteDir(noteType: NoteDir) {
+        viewModelScope.launch(Dispatchers.IO) {
+            DatabaseHelper.instance.noteDirDAOBridge.doDeleteNoteDirRs(noteType)
+        }
     }
 
     suspend fun getNote(title: String) = withContext(Dispatchers.IO) {

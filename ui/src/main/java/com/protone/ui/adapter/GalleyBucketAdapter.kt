@@ -3,32 +3,27 @@ package com.protone.ui.adapter
 import android.app.AlertDialog
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
-import com.protone.api.TAG
 import com.protone.api.baseType.getString
 import com.protone.api.context.SApplication
 import com.protone.api.context.newLayoutInflater
 import com.protone.ui.R
 import com.protone.ui.databinding.GalleyBucketListLayoutBinding
-import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.streams.toList
 
 class GalleyBucketAdapter(
     context: Context,
-    val selectBucket: (String) -> Unit
+    private val galleyBucketAdapterDataProxy: GalleyBucketAdapterDataProxy,
+    private val selectBucket: (String) -> Unit
 ) : SelectListAdapter<GalleyBucketListLayoutBinding, Pair<Uri, Array<String>>, GalleyBucketAdapter.GalleyBucketEvent>(
     context, true
 ) {
 
     sealed class GalleyBucketEvent {
-        object PerformSelect : GalleyBucketEvent()
         data class DeleteBucket(val bucket: Pair<Uri, Array<String>>) : GalleyBucketEvent()
         data class RefreshBucket(val bucket: Pair<Uri, Array<String>>) : GalleyBucketEvent()
         data class InsertBucket(val bucket: Pair<Uri, Array<String>>) : GalleyBucketEvent()
@@ -37,23 +32,7 @@ class GalleyBucketAdapter(
     private var galleries: MutableList<Pair<Uri, Array<String>>> = mutableListOf()
 
     override suspend fun onEventIO(data: GalleyBucketEvent) {
-        Log.d(TAG, "GalleyBucketAdapter onEventIO: $data")
         when (data) {
-            is GalleyBucketEvent.PerformSelect -> {
-                var index = -1
-                galleries.stream()
-                    .filter { it.second[0] == R.string.all_galley.getString() }
-                    .toList()
-                    .let {
-                        if (it.isNotEmpty()) {
-                            selectList.add(it[0])
-                            index = galleries.indexOf(it[0])
-                        }
-                    }
-                withContext(Dispatchers.Main) {
-                    if (index != -1) notifyItemChanged(0)
-                }
-            }
             is GalleyBucketEvent.DeleteBucket -> {
                 galleries.first { it.second[0] == data.bucket.second[0] }.let {
                     val index = galleries.indexOf(it)
@@ -100,9 +79,7 @@ class GalleyBucketAdapter(
     }
 
     override val select: (holder: Holder<GalleyBucketListLayoutBinding>, isSelect: Boolean) -> Unit =
-        { holder, isSelect ->
-            holder.binding.bucketCheck.isChecked = isSelect
-        }
+        { holder, isSelect -> holder.binding.bucketCheck.isChecked = isSelect }
 
     override fun itemIndex(path: Pair<Uri, Array<String>>): Int {
         return galleries.indexOf(path)
@@ -114,9 +91,7 @@ class GalleyBucketAdapter(
     ): Holder<GalleyBucketListLayoutBinding> {
         return Holder(
             GalleyBucketListLayoutBinding.inflate(context.newLayoutInflater, parent, false).apply {
-                root.updateLayoutParams {
-                    height = SApplication.screenHeight / 10
-                }
+                root.updateLayoutParams { height = SApplication.screenHeight / 10 }
                 bucketThumb.scaleType = ImageView.ScaleType.CENTER_CROP
             })
     }
@@ -126,30 +101,17 @@ class GalleyBucketAdapter(
             setSelect(holder, selectList.contains(data))
             holder.binding.apply {
                 root.setOnLongClickListener {
-                    launch {
-                        val galley = withContext(Dispatchers.IO) {
-                            DatabaseHelper
-                                .instance
-                                .galleyBucketDAOBridge
-                                .getGalleyBucketRs(galleries[position].second[0])
-                        }
-                        if (galley != null) {
-                            AlertDialog.Builder(context)
-                                .setTitle(R.string.delete.getString())
-                                .setPositiveButton(
-                                    R.string.confirm
-                                ) { dialog, _ ->
-                                    DatabaseHelper
-                                        .instance
-                                        .galleyBucketDAOBridge
-                                        .deleteGalleyBucketAsync(galley)
-                                    deleteBucket(galleries[position])
-                                    dialog.dismiss()
-                                }.setNegativeButton(R.string.cancel) { dialog, _ ->
-                                    dialog.dismiss()
-                                }.create().show()
-                        }
-                    }
+                    AlertDialog.Builder(context)
+                        .setTitle(R.string.delete.getString())
+                        .setPositiveButton(
+                            R.string.confirm
+                        ) { dialog, _ ->
+                            galleyBucketAdapterDataProxy.deleteGalleyBucket(galleries[position].second[0])
+                            deleteBucket(galleries[position])
+                            dialog.dismiss()
+                        }.setNegativeButton(R.string.cancel) { dialog, _ ->
+                            dialog.dismiss()
+                        }.create().show()
                     false
                 }
                 bucketThumb.let { thumb ->
@@ -180,10 +142,6 @@ class GalleyBucketAdapter(
         setSelect(holder, true)
     }
 
-    fun performSelect() {
-        emit(GalleyBucketEvent.PerformSelect)
-    }
-
     private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
         emit(GalleyBucketEvent.DeleteBucket(bucket))
     }
@@ -198,5 +156,9 @@ class GalleyBucketAdapter(
 
     override fun getItemCount(): Int {
         return galleries.size
+    }
+
+    interface GalleyBucketAdapterDataProxy {
+        fun deleteGalleyBucket(bucket: String)
     }
 }

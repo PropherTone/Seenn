@@ -33,7 +33,7 @@
 
             <TextView
                 android:id="@+id/galleyV_title"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="@dimen/action_icon_p"
                 android:background="@color/foreDark_1"
                 android:ellipsize="marquee"
@@ -44,6 +44,8 @@
                 android:paddingEnd="@dimen/action_icon_p"
                 android:textColor="@color/white"
                 android:textSize="@dimen/title_text"
+                app:layout_constraintEnd_toStartOf="@+id/galleyV_share"
+                app:layout_constraintStart_toEndOf="@+id/galleyV_back"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView

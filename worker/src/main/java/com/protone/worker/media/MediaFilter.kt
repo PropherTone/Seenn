@@ -309,7 +309,7 @@ fun isUriExist(uri: Uri): Boolean {
         queryArray,
         MediaStore.MediaColumns.SIZE + ">0",
         null,
-        MediaStore.MediaColumns.DATE_ADDED + " DESC"
+        MediaStore.MediaColumns.DATE_MODIFIED + " DESC"
     )?.let {
         exist = it.moveToNext()
         it.close()
@@ -398,7 +398,7 @@ inline fun scan(
         projection,
         MediaStore.MediaColumns.SIZE + ">0",
         null,
-        MediaStore.MediaColumns.DATE_ADDED + " DESC"
+        MediaStore.MediaColumns.DATE_MODIFIED + " DESC"
     )?.let {
         block(it)
         it.close()

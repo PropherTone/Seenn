@@ -1,4 +1,4 @@
-package com.protone.worker.note
+package com.protone.ui.customView.richText.note
 
 import android.text.Editable
 import android.text.TextWatcher

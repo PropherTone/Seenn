@@ -135,7 +135,12 @@ class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
             }
             noteBucketList.also {
                 it.layoutManager = LinearLayoutManager(this@NoteActivity)
-                it.adapter = NoteTypeListAdapter(this@NoteActivity)
+                it.adapter = NoteTypeListAdapter(this@NoteActivity,
+                    object : NoteTypeListAdapter.NoteTypeListAdapterDataProxy {
+                        override fun deleteNoteDir(noteType: NoteDir) {
+                            viewModel.deleteNoteDir(noteType)
+                        }
+                    })
             }
         }
     }

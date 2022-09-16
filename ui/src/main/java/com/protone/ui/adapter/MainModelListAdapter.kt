@@ -2,6 +2,7 @@ package com.protone.ui.adapter
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.protone.api.baseType.toDateString
@@ -13,11 +14,14 @@ import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.ui.R
 import com.protone.ui.databinding.*
-import com.protone.worker.photoInToday
-import com.protone.worker.randomNote
-import com.protone.worker.videoInToday
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MainModelListAdapter(
+    context: Context,
+    private val mainModelListAdapterDataProxy: MainModelListAdapterDataProxy
+) : BaseAdapter<ViewDataBinding, RecyclerView.ViewHolder>(context, false) {
 
     private val itemList = mutableListOf<String>()
 
@@ -43,80 +47,79 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        loadDataBelow()
-    }
-
-    private fun loadDataBelow() {
-        photoInToday()?.toJson()?.let { itemList.add("photo:$it") }
-        notifyItemInserted(itemList.size - 1)
-        videoInToday()?.toJson()?.let { itemList.add("video:$it") }
-        notifyItemInserted(itemList.size - 1)
-        randomNote()?.toJson()?.let { itemList.add("tNote:$it") }
-        notifyItemInserted(itemList.size - 1)
-//            musicInToday().toJson().let { itemList.add("music:$it") }
-//            notifyItemInserted(itemList.size - 1)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        when (viewType) {
-            MUSIC -> return MusicPlayerViewHolder(
-                MusicCardBinding.inflate(
-                    context.newLayoutInflater,
-                    parent,
-                    false
-                )
-            )
-            NOTE -> return NoteCardViewHolder(
-                NoteCardBinding.inflate(
-                    context.newLayoutInflater,
-                    parent,
-                    false
-                )
-            )
-            VIDEO -> return VideoPlayerViewHolder(
-                VideoCardBinding.inflate(
-                    context.newLayoutInflater,
-                    parent,
-                    false
-                )
-            )
-            PHOTO -> return PhotoCardViewHolder(
-                PhotoCardBinding.inflate(
-                    context.newLayoutInflater,
-                    parent,
-                    false
-                )
-            )
-            TIME -> return DateViewHolder(
-                DateLayoutBinding.inflate(
-                    context.newLayoutInflater,
-                    parent,
-                    false
-                )
-            )
-            else -> return DateViewHolder(
-                DateLayoutBinding.inflate(
-                    context.newLayoutInflater,
-                    parent,
-                    false
-                )
-            ).apply { binding.modelTime.text = context.getString(R.string.bruh) }
+        launch(Dispatchers.Default) {
+            loadDataBelow()
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) {
-            is MusicPlayerViewHolder -> {
+    private suspend fun loadDataBelow() {
+        mainModelListAdapterDataProxy.run {
+            photoInTodayJson()?.let { itemList.add("photo:${it}") }
+            withContext(Dispatchers.Main) {
+                notifyItemInserted(itemList.size - 1)
+            }
+            videoInTodayJson()?.let { itemList.add("video:${it}") }
+            withContext(Dispatchers.Main) {
+                notifyItemInserted(itemList.size - 1)
+            }
+            randomNoteJson()?.let { itemList.add("tNote:${it}") }
+            withContext(Dispatchers.Main) {
+                notifyItemInserted(itemList.size - 1)
+            }
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder<ViewDataBinding> {
+        return Holder(
+            when (viewType) {
+                MUSIC -> MusicCardBinding.inflate(
+                    context.newLayoutInflater,
+                    parent,
+                    false
+                )
+                NOTE -> NoteCardBinding.inflate(
+                    context.newLayoutInflater,
+                    parent,
+                    false
+                )
+                VIDEO -> VideoCardBinding.inflate(
+                    context.newLayoutInflater,
+                    parent,
+                    false
+                )
+                PHOTO -> PhotoCardBinding.inflate(
+                    context.newLayoutInflater,
+                    parent,
+                    false
+                )
+                TIME -> DateLayoutBinding.inflate(
+                    context.newLayoutInflater,
+                    parent,
+                    false
+                )
+                else -> DateLayoutBinding.inflate(
+                    context.newLayoutInflater,
+                    parent,
+                    false
+                ).apply { modelTime.text = context.getString(R.string.bruh) }
+            }
+        )
+    }
+
+    override fun onBindViewHolder(holder: Holder<ViewDataBinding>, position: Int) {
+        when (holder.binding) {
+            is MusicCardBinding -> {
                 val music = itemList[position].substring(6).toEntity(Music::class.java)
             }
-            is NoteCardViewHolder -> {
+            is NoteCardBinding -> {
                 val note = itemList[position].substring(6).toEntity(Note::class.java)
                 Glide.with(context).asDrawable().load(note.imagePath)
                     .into(holder.binding.modelNoteIcon)
                 holder.binding.modelNoteTitle.text = note.title
             }
-            is PhotoCardViewHolder -> {
-                val media = itemList[position].substring(6).toEntity(GalleyMedia::class.java)
+            is PhotoCardBinding -> {
+                val media =
+                    itemList[position].substring(6).toEntity(GalleyMedia::class.java)
                 holder.binding.photoCard.apply {
                     title = media.date.toDateString("yyyy/MM/dd E").toString()
                     photo.let {
@@ -127,8 +130,9 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
                     }
                 }
             }
-            is VideoPlayerViewHolder -> {
-                val media = itemList[position].substring(6).toEntity(GalleyMedia::class.java)
+            is VideoCardBinding -> {
+                val media =
+                    itemList[position].substring(6).toEntity(GalleyMedia::class.java)
                 holder.binding.videoPlayer.apply {
                     setVideoPath(media.uri)
                     setFullScreen {
@@ -138,7 +142,8 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
                 holder.binding.videoCardTitle.text =
                     media.date.toDateString("yyyy/MM/dd E").toString()
             }
-            is DateViewHolder -> holder.binding.modelTime.text = itemList[position].substring(6)
+            is DateLayoutBinding -> holder.binding.modelTime.text =
+                itemList[position].substring(6)
         }
     }
 
@@ -153,18 +158,10 @@ class MainModelListAdapter(val context: Context) : RecyclerView.Adapter<Recycler
 
     override fun getItemCount(): Int = itemList.size
 
-    class MusicPlayerViewHolder(val binding: MusicCardBinding) :
-        RecyclerView.ViewHolder(binding.root)
+    interface MainModelListAdapterDataProxy {
+        suspend fun photoInTodayJson(): String?
+        suspend fun videoInTodayJson(): String?
+        suspend fun randomNoteJson(): String?
+    }
 
-    class NoteCardViewHolder(val binding: NoteCardBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
-    class PhotoCardViewHolder(val binding: PhotoCardBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
-    class VideoPlayerViewHolder(val binding: VideoCardBinding) :
-        RecyclerView.ViewHolder(binding.root)
-
-    class DateViewHolder(val binding: DateLayoutBinding) :
-        RecyclerView.ViewHolder(binding.root)
 }

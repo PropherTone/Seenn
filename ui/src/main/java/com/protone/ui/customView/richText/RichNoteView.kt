@@ -34,11 +34,11 @@ import com.protone.api.onBackground
 import com.protone.api.onResult
 import com.protone.ui.R
 import com.protone.ui.customView.musicPlayer.BaseMusicPlayer
+import com.protone.ui.customView.richText.note.MyTextWatcher
+import com.protone.ui.customView.richText.note.spans.ISpanForEditor
 import com.protone.ui.databinding.RichMusicLayoutBinding
 import com.protone.ui.databinding.RichPhotoLayoutBinding
 import com.protone.ui.databinding.VideoCardBinding
-import com.protone.worker.note.MyTextWatcher
-import com.protone.worker.note.spans.ISpanForEditor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -432,7 +432,7 @@ class RichNoteView @JvmOverloads constructor(
                 when (val tag = getChildAt(i).tag) {
                     is RichNoteStates -> {
                         richStates = richStates * 10 + TEXT
-                        taskChannel.trySend(
+                        taskChannel.offer(
                             Pair(
                                 RichNoteSer(
                                     getEdittext(i)?.text.toString(),
@@ -443,13 +443,13 @@ class RichNoteView @JvmOverloads constructor(
                     }
                     is RichVideoStates -> {
                         richStates = richStates * 10 + VIDEO
-                        taskChannel.trySend(Pair(tag.toJson(), i))
+                        taskChannel.offer(Pair(tag.toJson(), i))
                     }
                     is RichPhotoStates -> {
                         richStates = richStates * 10 + PHOTO
                         val child = getChildAt(i)
                         if (tag.path != null) {
-                            taskChannel.trySend(Pair(tag.toJson(), i))
+                            taskChannel.offer(Pair(tag.toJson(), i))
                         } else async(Dispatchers.IO) {
                             tag.uri.saveToFile(
                                 tag.name + "_${title}",
@@ -463,12 +463,12 @@ class RichNoteView @JvmOverloads constructor(
                                     reList.add(tag.uri)
                                 }
                             }
-                            taskChannel.trySend(Pair(tag.toJson(), i))
+                            taskChannel.offer(Pair(tag.toJson(), i))
                         }.start()
                     }
                     is RichMusicStates -> {
                         richStates = richStates * 10 + MUSIC
-                        taskChannel.trySend(Pair(tag.toJson(), i))
+                        taskChannel.offer(Pair(tag.toJson(), i))
                     }
                 }
             }

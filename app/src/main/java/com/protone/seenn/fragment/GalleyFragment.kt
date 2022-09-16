@@ -71,12 +71,7 @@ class GalleyFragment(
                 fragFlow.buffer().collect {
                     when (it) {
                         is GalleyFragmentViewModel.FragEvent.AddBucket -> {
-                            if (!isLock) {
-                                if (galleyMap[it.name] == null) {
-                                    galleyMap[it.name] = mutableListOf()
-                                }
-                                galleyMap[it.name]?.addAll(it.list)
-                            }
+                            insertNewMedias(it.name, it.list)
                         }
                         is GalleyFragmentViewModel.FragEvent.SelectAll -> {
                             getListAdapter().selectAll()
@@ -90,8 +85,8 @@ class GalleyFragment(
                                 (if (getListAdapter().selectList.size > 0) {
                                     getListAdapter().selectList
                                 } else {
-                                    galleyMap[rightGalley]
-                                        ?: galleyMap[R.string.all_galley.getString()]
+                                    getGalley(getGalleyName())
+                                        ?: getGalley(R.string.all_galley.getString())
                                 })
                             )
                             startActivity(PictureBoxActivity::class.intent)
@@ -99,46 +94,46 @@ class GalleyFragment(
                         is GalleyFragmentViewModel.FragEvent.OnNewBucket -> {
                             insertBucket(it.pairs)
                         }
-                        is GalleyFragmentViewModel.FragEvent.OnListUpdate -> {
-                            getBucketAdapter().performSelect()
-                            noticeListUpdate(it.data)
-                        }
-                        is GalleyFragmentViewModel.FragEvent.OnGetAllGalley -> {
-                            getBucketAdapter().performSelect()
-                            noticeListUpdate(viewModel.galleyMap[R.string.all_galley.getString()])
-                        }
+//                        is GalleyFragmentViewModel.FragEvent.OnListUpdate -> {
+//                            getBucketAdapter().performSelect()
+//                            noticeListUpdate(it.data)
+//                        }
+//                        is GalleyFragmentViewModel.FragEvent.OnGetAllGalley -> {
+//                            getBucketAdapter().performSelect()
+//                            noticeListUpdate(viewModel.galleyMap[R.string.all_galley.getString()])
+//                        }
                         is GalleyFragmentViewModel.FragEvent.OnMediaDeleted -> {
-                            if (!isLock) {
-                                it.galleyMedia.type?.onEach { type ->
-                                    if (galleyMap[type]?.remove(it.galleyMedia) == true) {
-                                        getListAdapter().removeMedia(it.galleyMedia)
-                                    }
-                                }
-                            }
                             refreshBucket(it.galleyMedia)
                             if (onTargetGalley(it.galleyMedia.bucket)) {
-                                getListAdapter().noticeListItemDelete(it.galleyMedia)
+                                noticeListUpdate(
+                                    it.galleyMedia,
+                                    GalleyListAdapter.MediaStatus.DELETED
+                                )
                             }
                         }
                         is GalleyFragmentViewModel.FragEvent.OnMediaInserted -> {
                             refreshBucket(it.galleyMedia)
                             if (onTargetGalley(it.galleyMedia.bucket)) {
-                                getListAdapter().noticeListItemInsert(it.galleyMedia)
+                                noticeListUpdate(
+                                    it.galleyMedia,
+                                    GalleyListAdapter.MediaStatus.INSERTED
+                                )
                             }
                         }
                         is GalleyFragmentViewModel.FragEvent.OnMediaUpdated -> {
                             if (onTargetGalley(it.galleyMedia.bucket)) {
-                                getListAdapter().noticeListItemUpdate(it.galleyMedia)
+                                noticeListUpdate(
+                                    it.galleyMedia,
+                                    GalleyListAdapter.MediaStatus.UPDATED
+                                )
                             }
                         }
                         else -> Unit
                     }
                 }
             }
-            rightGalley = R.string.all_galley.getString()
             isVideo = this@GalleyFragment.isVideo
             isLock = this@GalleyFragment.isLock
-            combine = this@GalleyFragment.combine
         }
     }
 
@@ -150,24 +145,31 @@ class GalleyFragment(
         binding = GalleyFragmentLayoutBinding.inflate(inflater, container, false).apply {
             root.onGlobalLayout {
                 galleyBucketContainer.botBlock = tabController.measuredHeight.toFloat()
-                toolButtonAnimator = AnimationHelper.rotation(
-                    galleyToolButton,
-                    45f
-                )
+                toolButtonAnimator = AnimationHelper.rotation(galleyToolButton, 45f)
                 galleyShowBucket.setOnStateListener(object : StatusImageView.StateListener {
                     override fun onActive() {
-                        reverse()
+                        viewModel.isBucketShowUp = true
+                        galleyToolButton.isVisible = true
+                        galleyBucketContainer.show()
+                        toolButtonAnimator.reverse()
                     }
 
                     override fun onNegative() {
-                        start()
+                        if (viewModel.rightGalley == "") {
+                            noticeListUpdate(viewModel.getGalley(viewModel.getGalleyName()))
+                        }
+                        viewModel.isBucketShowUp = false
+                        galleyToolButton.isVisible = onSelectMod
+                        galleyBucketContainer.hide()
+                        toolButtonAnimator.start()
                     }
                 })
             }
             galleySearch.setOnClickListener {
-                IntentDataHolder.put(viewModel.galleyMap[viewModel.rightGalley])
+                val galley = viewModel.getGalleyName()
+                IntentDataHolder.put(viewModel.getGalley(galley))
                 startActivity(GalleySearchActivity::class.intent.also { intent ->
-                    intent.putExtra("GALLEY", viewModel.rightGalley)
+                    intent.putExtra("GALLEY", galley)
                 })
             }
             galleyToolButton.setOnClickListener {
@@ -176,35 +178,20 @@ class GalleyFragment(
                     onSelectMod = false
                 } else {
                     activity?.titleDialog(R.string.user_name.getString(), "") {
-                        if (it.isNotEmpty()) {
-                            viewModel.addBucket(it)
-                        } else R.string.enter.getString().toast()
+                        if (it.isNotEmpty()) viewModel.addBucket(it)
+                        else R.string.enter.getString().toast()
                     }
                 }
             }
         }
         initList()
-        viewModel.sortData()
+        viewModel.sortData(combine)
         return binding.root
     }
 
     override fun onDestroy() {
         cancel()
         super.onDestroy()
-    }
-
-    private fun start() {
-        viewModel.isBucketShowUp = false
-        binding.galleyToolButton.isVisible = onSelectMod
-        binding.galleyBucketContainer.hide()
-        toolButtonAnimator.start()
-    }
-
-    private fun reverse() {
-        viewModel.isBucketShowUp = true
-        binding.galleyToolButton.isVisible = true
-        binding.galleyBucketContainer.show()
-        toolButtonAnimator.reverse()
     }
 
     private fun initList() = binding.run {
@@ -218,10 +205,17 @@ class GalleyFragment(
         }
         galleyBucket.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = GalleyBucketAdapter(context) {
-                noticeListUpdate(viewModel.galleyMap[it])
+            adapter = GalleyBucketAdapter(
+                context,
+                object : GalleyBucketAdapter.GalleyBucketAdapterDataProxy {
+                    override fun deleteGalleyBucket(bucket: String) {
+                        viewModel.deleteGalleyBucket(bucket)
+                    }
+                }
+            ) {
                 binding.galleyShowBucket.negative()
                 viewModel.rightGalley = it
+                noticeListUpdate(viewModel.getGalley(it))
             }
             addItemDecoration(object : RecyclerView.ItemDecoration() {
                 override fun getItemOffsets(
@@ -230,10 +224,10 @@ class GalleyFragment(
                     parent: RecyclerView,
                     state: RecyclerView.State
                 ) {
-                    super.getItemOffsets(outRect, view, parent, state)
                     if (parent.getChildLayoutPosition(view) != 0) {
                         outRect.top = resources.getDimension(R.dimen.icon_padding).toInt() shr 1
                     }
+                    super.getItemOffsets(outRect, view, parent, state)
                 }
             })
         }
@@ -243,36 +237,53 @@ class GalleyFragment(
         getBucketAdapter().insertBucket(pairs)
     }
 
-    private fun refreshBucket(media: GalleyMedia) {
+    private fun refreshBucket(media: GalleyMedia): Unit = viewModel.run {
         Pair(
-            if ((viewModel.galleyMap[media.bucket]?.size ?: 0) > 0)
-                viewModel.galleyMap[media.bucket]?.get(0)?.uri ?: Uri.EMPTY
-            else Uri.EMPTY,
+            if ((getGalley(media.bucket)?.size ?: 0) > 0) {
+                getGalley(media.bucket)?.get(0)?.uri ?: Uri.EMPTY
+            } else Uri.EMPTY,
             arrayOf(
                 media.bucket,
-                (viewModel.galleyMap[media.bucket]?.size ?: 0).toString()
+                (getGalley(media.bucket)?.size ?: 0).toString()
             )
         ).apply { getBucketAdapter().refreshBucket(this) }
         val all = R.string.all_galley.getString()
         Pair(
-            if ((viewModel.galleyMap[all]?.size ?: 0) > 0)
-                viewModel.galleyMap[all]?.get(0)?.uri ?: Uri.EMPTY
-            else Uri.EMPTY,
+            if ((getGalley(all)?.size ?: 0) > 0) {
+                getGalley(all)?.get(0)?.uri ?: Uri.EMPTY
+            } else Uri.EMPTY,
             arrayOf(
                 all,
-                (viewModel.galleyMap[all]?.size ?: 0).toString()
+                (getGalley(all)?.size ?: 0).toString()
             )
         ).apply { getBucketAdapter().refreshBucket(this) }
     }
 
+    private fun noticeListUpdate(media: GalleyMedia, status: GalleyListAdapter.MediaStatus) {
+        if (viewModel.isBucketShowUp) return
+        launch {
+            when (status) {
+                GalleyListAdapter.MediaStatus.INSERTED -> {
+                    getListAdapter().noticeListItemInsert(media)
+                }
+                GalleyListAdapter.MediaStatus.DELETED -> {
+                    getListAdapter().noticeListItemDelete(media)
+                }
+                GalleyListAdapter.MediaStatus.UPDATED -> {
+                    getListAdapter().noticeListItemUpdate(media)
+                }
+            }
+        }
+    }
+
     private fun noticeListUpdate(data: MutableList<GalleyMedia>?) {
+        if (viewModel.isBucketShowUp) return
         launch {
             binding.galleyList.swapAdapter(GalleyListAdapter(requireContext(), true).also {
                 data?.let { medias -> it.setMedias(medias) }
                 it.multiChoose = true
                 it.setOnSelectListener(this@GalleyFragment)
             }, false)
-//        getListAdapter().noticeDataUpdate(data)
         }
     }
 
@@ -294,7 +305,7 @@ class GalleyFragment(
         startActivity(GalleyViewActivity::class.intent.apply {
             putExtra(GalleyViewViewModel.MEDIA, galleyMedia.toJson())
             putExtra(GalleyViewViewModel.TYPE, galleyMedia.isVideo)
-            putExtra(GalleyViewViewModel.GALLEY, viewModel.rightGalley)
+            putExtra(GalleyViewViewModel.GALLEY, viewModel.getGalleyName())
         })
     }
 

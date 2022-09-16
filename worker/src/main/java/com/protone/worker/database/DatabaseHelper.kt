@@ -54,6 +54,7 @@ class DatabaseHelper {
         if (executorService.isActive) {
             executorService.cancel()
         }
+        shutdownDataBase()
     }
 
     fun pollEvent(mediaAction: MediaAction) {

@@ -1,4 +1,4 @@
-package com.protone.worker.note.spans
+package com.protone.ui.customView.richText.note.spans
 
 import com.protone.api.entity.RichMusicStates
 import com.protone.api.entity.RichPhotoStates

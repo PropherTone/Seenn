@@ -9,10 +9,10 @@ import com.protone.api.baseType.getString
 import com.protone.api.entity.NoteDir
 import com.protone.ui.R
 import com.protone.ui.databinding.NoteTpyeListAdapterBinding
-import com.protone.worker.database.DatabaseHelper
 
 class NoteTypeListAdapter(
     context: Context,
+    private val noteTypeListAdapterDataProxy: NoteTypeListAdapterDataProxy
 ) : BaseAdapter<NoteTpyeListAdapterBinding, Any>(context) {
 
     private val noteDirList = arrayListOf<NoteDir>()
@@ -43,9 +43,7 @@ class NoteTypeListAdapter(
                     context.getString(R.string.confirm)
                 ) { dialog, _ ->
                     val noteType = noteDirList[position]
-                    DatabaseHelper.instance.execute {
-                        DatabaseHelper.instance.noteDirDAOBridge.doDeleteNoteDirRs(noteType)
-                    }
+                    noteTypeListAdapterDataProxy.deleteNoteDir(noteType)
                     notifyItemRemoved(position)
                     dialog.dismiss()
                 }.setNegativeButton(R.string.cancel.getString()) { dialog, _ ->
@@ -81,4 +79,7 @@ class NoteTypeListAdapter(
         notifyDataSetChanged()
     }
 
+    interface NoteTypeListAdapterDataProxy{
+        fun deleteNoteDir(noteType: NoteDir)
+    }
 }

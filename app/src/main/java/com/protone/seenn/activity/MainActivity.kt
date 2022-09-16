@@ -162,7 +162,22 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
     private fun refreshModelList() {
         binding.modelList.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = MainModelListAdapter(context).apply {
+            adapter = MainModelListAdapter(
+                context,
+                object : MainModelListAdapter.MainModelListAdapterDataProxy {
+                    override suspend fun photoInTodayJson(): String? {
+                        return viewModel.photoInTodayJson()
+                    }
+
+                    override suspend fun videoInTodayJson(): String? {
+                        return viewModel.videoInTodayJson()
+                    }
+
+                    override suspend fun randomNoteJson(): String? {
+                        return viewModel.randomNoteJson()
+                    }
+                }
+            ).apply {
                 modelClkListener = this@MainActivity
             }
             addItemDecoration(ModelListItemDecoration(0))

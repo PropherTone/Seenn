@@ -175,12 +175,12 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
 
     override fun onDestroy() {
         cancel()
-        activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
         finishMusic()
         unregisterReceiver(receiver)
         unregisterReceiver(appReceiver)
         musicBroadCastManager.unregisterReceiver(receiver)
         notificationManager?.cancelAll()
+        activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
         super.onDestroy()
         val activityManager =
             SApplication.app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager

@@ -30,7 +30,7 @@ import com.protone.api.json.listToJson
 import com.protone.api.json.toJson
 import com.protone.ui.customView.InRecyclerView
 import com.protone.ui.databinding.*
-import com.protone.worker.note.spans.ISpanForEditor
+import com.protone.ui.customView.richText.note.spans.ISpanForEditor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
