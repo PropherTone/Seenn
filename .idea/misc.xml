@@ -297,6 +297,11 @@
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/menu/galley_toolbar.xml" value="0.22" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.291" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.291" />
+        <entry key="..\:/AndroidStudioProject/Seenn/ui/src/main/res/layout/note_card.xml" value="0.36614583333333334" />
+        <entry key="..\:/AndroidStudioProject/Seenn/ui/src/main/res/layout/photo_card.xml" value="0.36614583333333334" />
+        <entry key="..\:/AndroidStudioProject/Seenn/ui/src/main/res/layout/photo_card_layout.xml" value="0.36614583333333334" />
+        <entry key="..\:/AndroidStudioProject/Seenn/ui/src/main/res/layout/picture_box_adapter_video_layout.xml" value="0.17806484295845998" />
+        <entry key="..\:/AndroidStudioProject/Seenn/ui/src/main/res/layout/video_card.xml" value="0.36614583333333334" />
       </map>
     </option>
   </component>

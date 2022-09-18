@@ -100,7 +100,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
             }
 
         }
-        refreshModelList()
+
         return binding.root
     }
 
@@ -110,7 +110,9 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
             startActivity(MusicViewActivity::class.intent)
         }
 
+        refreshModelList()
         bindMusicService {
+            (binding.modelList.adapter as MainModelListAdapter).loadDataBelow()
             musicController.setBinder(this@MainActivity, it) { binder ->
                 userConfig.musicLoopMode = binder
             }
@@ -128,6 +130,7 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
                 }
             }
         }
+
 
         onFinish = {
             DatabaseHelper.instance.shutdownNow()
@@ -165,15 +168,15 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
             adapter = MainModelListAdapter(
                 context,
                 object : MainModelListAdapter.MainModelListAdapterDataProxy {
-                    override suspend fun photoInTodayJson(): String? {
+                    override fun photoInTodayJson(): String? {
                         return viewModel.photoInTodayJson()
                     }
 
-                    override suspend fun videoInTodayJson(): String? {
+                    override fun videoInTodayJson(): String? {
                         return viewModel.videoInTodayJson()
                     }
 
-                    override suspend fun randomNoteJson(): String? {
+                    override fun randomNoteJson(): String? {
                         return viewModel.randomNoteJson()
                     }
                 }

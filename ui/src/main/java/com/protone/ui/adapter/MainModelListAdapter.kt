@@ -45,26 +45,25 @@ class MainModelListAdapter(
         }
     }
 
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        launch(Dispatchers.Default) {
-            loadDataBelow()
-        }
-    }
-
-    private suspend fun loadDataBelow() {
+    suspend fun loadDataBelow() {
         mainModelListAdapterDataProxy.run {
-            photoInTodayJson()?.let { itemList.add("photo:${it}") }
-            withContext(Dispatchers.Main) {
-                notifyItemInserted(itemList.size - 1)
+            photoInTodayJson()?.let {
+                itemList.add("photo:${it}")
+                withContext(Dispatchers.Main) {
+                    notifyItemInserted(itemList.size - 1)
+                }
             }
-            videoInTodayJson()?.let { itemList.add("video:${it}") }
-            withContext(Dispatchers.Main) {
-                notifyItemInserted(itemList.size - 1)
+            videoInTodayJson()?.let {
+                itemList.add("video:${it}")
+                withContext(Dispatchers.Main) {
+                    notifyItemInserted(itemList.size - 1)
+                }
             }
-            randomNoteJson()?.let { itemList.add("tNote:${it}") }
-            withContext(Dispatchers.Main) {
-                notifyItemInserted(itemList.size - 1)
+            randomNoteJson()?.let {
+                itemList.add("tNote:${it}")
+                withContext(Dispatchers.Main) {
+                    notifyItemInserted(itemList.size - 1)
+                }
             }
         }
     }
@@ -159,9 +158,9 @@ class MainModelListAdapter(
     override fun getItemCount(): Int = itemList.size
 
     interface MainModelListAdapterDataProxy {
-        suspend fun photoInTodayJson(): String?
-        suspend fun videoInTodayJson(): String?
-        suspend fun randomNoteJson(): String?
+        fun photoInTodayJson(): String?
+        fun videoInTodayJson(): String?
+        fun randomNoteJson(): String?
     }
 
 }

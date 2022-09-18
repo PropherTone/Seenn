@@ -1,6 +1,7 @@
 package com.protone.worker.viewModel
 
 import android.net.Uri
+import com.protone.api.baseType.deleteFile
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.saveToFile
 import com.protone.api.entity.GalleyMedia
@@ -57,10 +58,15 @@ class GalleyViewViewModel : BaseViewModel() {
                 }.toList() as MutableList<String>
         }
 
-    suspend fun prepareSharedMedia() = withContext(Dispatchers.IO){
+    suspend fun prepareSharedMedia() = withContext(Dispatchers.IO) {
         getCurrentMedia().let {
-            it.uri.saveToFile(it.name,"SharedMedia")
+            it.uri.saveToFile(it.name, "SharedMedia")
         }
+    }
+
+
+    suspend fun deleteSharedMedia(path: String) = withContext(Dispatchers.IO) {
+        path.deleteFile()
     }
 
     fun getCurrentMedia() = galleyMedias[curPosition]

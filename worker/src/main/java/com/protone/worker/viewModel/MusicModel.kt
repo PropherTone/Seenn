@@ -53,9 +53,10 @@ class MusicModel : BaseViewModel() {
         }
     }
 
-    suspend fun getCurrentMusicList(bucket: MusicBucket): MutableList<Music> = withContext(Dispatchers.IO) {
-        DatabaseHelper.instance.musicWithMusicBucketDAOBridge.getMusicWithMusicBucket(bucket.musicBucketId) as MutableList<Music>
-    }
+    suspend fun getCurrentMusicList(bucket: MusicBucket): MutableList<Music> =
+        withContext(Dispatchers.IO) {
+            DatabaseHelper.instance.musicWithMusicBucketDAOBridge.getMusicWithMusicBucket(bucket.musicBucketId) as MutableList<Music>
+        }
 
     suspend fun getBucketRefreshed(name: String) = withContext(Dispatchers.IO) {
         getBucket(name)?.let {
@@ -74,9 +75,17 @@ class MusicModel : BaseViewModel() {
                 .let { if (it.isNotEmpty()) it[0] else MusicBucket() }
         }
 
-    suspend fun getMusicBuckets(): MutableList<MusicBucket> {
-        return DatabaseHelper.instance.musicBucketDAOBridge.getAllMusicBucketRs() as MutableList<MusicBucket>?
-            ?: mutableListOf()
+    suspend fun getMusicBuckets(): MutableList<MusicBucket> = withContext(Dispatchers.IO) {
+        DatabaseHelper.instance.run {
+            ((musicBucketDAOBridge.getAllMusicBucketRs() as MutableList<MusicBucket>?)
+                ?: mutableListOf()).let { list ->
+                list.forEach {
+                    it.size = musicWithMusicBucketDAOBridge
+                        .getMusicWithMusicBucket(it.musicBucketId).size
+                }
+                list
+            }
+        }
     }
 
     suspend fun tryDeleteMusicBucket(name: String): MusicBucket? {

@@ -83,7 +83,7 @@ class GalleyViewActivity :
             when (it) {
                 GalleyViewViewModel.GalleyViewEvent.SetNote -> setInfo()
                 GalleyViewViewModel.GalleyViewEvent.Share -> prepareSharedMedia()?.let { path ->
-                    startActivity(Intent(Intent.ACTION_SEND).apply {
+                    startActivityForResult(Intent(Intent.ACTION_SEND).apply {
                         putExtra(
                             Intent.EXTRA_STREAM,
                             FileProvider.getUriForFile(
@@ -93,7 +93,9 @@ class GalleyViewActivity :
                             )
                         )
                         type = "image/*"
-                    })
+                    }).let {
+                        deleteSharedMedia(path)
+                    }
                 }
                 else -> {}
             }

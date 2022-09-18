@@ -2,6 +2,6 @@
 <paths>
     <!-- 物理路径为Context.getCacheDir() + /files/* -->
     <external-cache-path path="CrashLog/" name="cache" />
-    <external-cache-path path="SharedMedia/" name="share" />
+    <files-path path="SharedMedia/" name="share" />
 
 </paths>

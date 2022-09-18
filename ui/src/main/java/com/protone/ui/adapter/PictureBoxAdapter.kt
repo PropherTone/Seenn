@@ -85,13 +85,13 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galley
                image.setImageResource(picUri[position].uri)
             }
             is PictureBoxAdapterVideoLayoutBinding -> holder.binding.apply {
+                videoPlayer.setVideoPath(picUri[position].uri)
+                videoPlayer.doOnCompletion {
+                    videoPlayer.release()
+                    start.isGone = false
+                }
                 start.setOnClickListener {
                     start.isGone = true
-                    videoPlayer.setVideoPath(picUri[position].uri)
-                    videoPlayer.doOnCompletion {
-                        videoPlayer.release()
-                        start.isGone = false
-                    }
                 }
             }
         }

@@ -8,7 +8,7 @@
         <com.protone.ui.customView.video.MyVideoPlayer
             android:id="@+id/videoPlayer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent" />
 
         <ImageView
             android:id="@+id/start"
