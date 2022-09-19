@@ -24,7 +24,8 @@ import com.protone.worker.viewModel.NoteViewViewModel
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-class NoteActivity : BaseActivity<NoteActivityBinding, NoteViewModel>(true) {
+class NoteActivity :
+    BaseActivity<NoteActivityBinding, NoteViewModel, NoteViewModel.NoteViewEvent>(true) {
     override val viewModel: NoteViewModel by viewModels()
 
     override fun createView(): View {

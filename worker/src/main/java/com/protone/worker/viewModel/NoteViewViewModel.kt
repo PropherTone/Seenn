@@ -10,9 +10,9 @@ import java.util.stream.Collectors
 
 class NoteViewViewModel : BaseViewModel() {
 
-    sealed class NoteViewEvent {
-        object Next : ViewEvent
-        object Edit : ViewEvent
+    sealed class NoteViewEvent : ViewEvent {
+        object Next : NoteViewEvent()
+        object Edit : NoteViewEvent()
     }
 
     companion object {

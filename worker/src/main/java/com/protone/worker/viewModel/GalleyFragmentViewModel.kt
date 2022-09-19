@@ -128,21 +128,19 @@ class GalleyFragmentViewModel : ViewModel() {
     fun deleteGalleyBucket(bucket: String) {
         viewModelScope.launch(Dispatchers.IO) {
             DatabaseHelper.instance.galleyBucketDAOBridge.run {
-                getGalleyBucketRs(bucket)?.let { deleteGalleyBucketAsync(it) }
+                getGalleyBucket(bucket)?.let { deleteGalleyBucketAsync(it) }
             }
         }
     }
 
-    private fun sortPrivateData(signedMedias: MutableList<GalleyMedia>) =
-        viewModelScope.launch(Dispatchers.IO) {
-            launch(Dispatchers.Default) {
-                signedMedias.forEach {
-                    it.type?.forEach { type ->
-                        if (galleyMap[type] == null) {
-                            galleyMap[type] = mutableListOf()
-                        }
-                        galleyMap[type]?.add(it)
+    private fun sortPrivateData(signedMedias: MutableList<GalleyMedia>) {
+        viewModelScope.launch(Dispatchers.Default) {
+            signedMedias.forEach {
+                it.type?.forEach { type ->
+                    if (galleyMap[type] == null) {
+                        galleyMap[type] = mutableListOf()
                     }
+                    galleyMap[type]?.add(it)
                 }
             }
             (DatabaseHelper.instance.galleyBucketDAOBridge
@@ -152,6 +150,7 @@ class GalleyFragmentViewModel : ViewModel() {
             }
             isDataSorted = true
         }
+    }
 
     private fun observeGalley() {
         val allGalley = R.string.all_galley.getString()

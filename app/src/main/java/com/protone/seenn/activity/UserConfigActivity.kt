@@ -21,13 +21,15 @@ import com.protone.ui.dialog.loginDialog
 import com.protone.ui.dialog.regDialog
 import com.protone.ui.dialog.titleDialog
 import com.protone.worker.database.userConfig
-import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.GalleyViewModel
 import com.protone.worker.viewModel.UserConfigViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigViewModel>(true) {
+class UserConfigActivity : BaseActivity<
+        UserConfigActivityBinding,
+        UserConfigViewModel,
+        UserConfigViewModel.UserConfigEvent>(true) {
     override val viewModel: UserConfigViewModel by viewModels()
 
     override fun createView(): View {
@@ -132,7 +134,7 @@ class UserConfigActivity : BaseActivity<UserConfigActivityBinding, UserConfigVie
 
     private fun initModeView(
         name: String,
-        onClick: (UserConfigItemLayoutBinding) -> BaseViewModel.ViewEvent
+        onClick: (UserConfigItemLayoutBinding) -> UserConfigViewModel.UserConfigEvent
     ) =
         UserConfigItemLayoutBinding.inflate(layoutInflater, root, false)
             .apply {

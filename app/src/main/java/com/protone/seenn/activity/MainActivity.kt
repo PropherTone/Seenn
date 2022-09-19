@@ -30,7 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : BaseActivity<MainActivityBinding, MainViewModel>(true),
+class MainActivity : BaseActivity<MainActivityBinding, MainViewModel,MainViewModel.MainViewEvent>(true),
     MainModelListAdapter.ModelClk {
     override val viewModel: MainViewModel by viewModels()
 

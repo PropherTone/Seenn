@@ -17,12 +17,12 @@ import kotlin.streams.toList
 
 class NoteEditViewModel : BaseViewModel() {
 
-    sealed class NoteEvent {
-        object Confirm : ViewEvent
-        object PickImage : ViewEvent
-        object PickVideo : ViewEvent
-        object PickMusic : ViewEvent
-        object PickIcon : ViewEvent
+    sealed class NoteEvent : ViewEvent {
+        object Confirm : NoteEvent()
+        object PickImage : NoteEvent()
+        object PickVideo : NoteEvent()
+        object PickMusic : NoteEvent()
+        object PickIcon : NoteEvent()
     }
 
     companion object {
@@ -71,7 +71,7 @@ class NoteEditViewModel : BaseViewModel() {
         DatabaseHelper.instance.noteDAOBridge.updateNote(note)
     }
 
-    suspend fun insertNote(note: Note, dir: String?) = withContext(Dispatchers.IO) {
+    suspend fun insertNote(note: Note, dir: String?) = withContext(Dispatchers.Default) {
         DatabaseHelper.instance.noteDAOBridge.insertNoteRs(note).let { result ->
             if (result.first) {
                 dir?.let {

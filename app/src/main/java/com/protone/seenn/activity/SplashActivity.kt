@@ -13,7 +13,8 @@ import com.protone.seenn.service.WorkService
 import com.protone.worker.viewModel.SplashViewModel
 
 @SuppressLint("CustomSplashScreen")
-class SplashActivity : BaseActivity<SplashActivityBinding, SplashViewModel>(true) {
+class SplashActivity :
+    BaseActivity<SplashActivityBinding, SplashViewModel, SplashViewModel.SplashEvent>(true) {
 
     override val viewModel: SplashViewModel by viewModels()
 

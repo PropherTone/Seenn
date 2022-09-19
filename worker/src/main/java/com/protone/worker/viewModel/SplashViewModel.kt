@@ -20,9 +20,9 @@ import java.io.File
 
 class SplashViewModel : BaseViewModel() {
 
-    sealed class SplashEvent {
-        object InitConfig : ViewEvent
-        object UpdateMedia : ViewEvent
+    sealed class SplashEvent : ViewEvent {
+        object InitConfig : SplashEvent()
+        object UpdateMedia : SplashEvent()
     }
 
     suspend fun firstBootWork() {
@@ -32,7 +32,7 @@ class SplashViewModel : BaseViewModel() {
                     musicDAOBridge.insertMusicMulti(scanAudio { _, _ -> })
                 }
 
-                val allMusicRs = musicDAOBridge.getAllMusicRs() ?: return
+                val allMusicRs = musicDAOBridge.getAllMusic() ?: return
 
                 var launch: Job? = null
                 launch = viewModelScope.launch(Dispatchers.Default) {

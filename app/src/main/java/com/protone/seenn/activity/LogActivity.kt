@@ -12,18 +12,19 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.root
+import com.protone.seenn.R
+import com.protone.seenn.databinding.LogActivityBinding
 import com.protone.ui.adapter.LogListAdapter
 import com.protone.ui.dialog.titleDialog
-import com.protone.seenn.R
 import com.protone.worker.database.DatabaseHelper
-import com.protone.seenn.databinding.LogActivityBinding
+import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.LogViewModel
 import com.protone.worker.viewModel.NoteEditViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
-class LogActivity : BaseActivity<LogActivityBinding, LogViewModel>(false) {
+class LogActivity : BaseActivity<LogActivityBinding, LogViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: LogViewModel by viewModels()
 
     override fun createView(): View {
@@ -70,13 +71,13 @@ class LogActivity : BaseActivity<LogActivityBinding, LogViewModel>(false) {
         viewModel.initLogList()
     }
 
-    fun action(){
+    fun action() {
         val randomCode = (0..10000).random().toString()
         Log.d(TAG, "--=====<randomCode here: $randomCode>=====--")
-        titleDialog(R.string.password.getString(),""){
+        titleDialog(R.string.password.getString(), "") {
             if (it == randomCode) {
                 DatabaseHelper.instance.showDataBase(this)
-            }else{
+            } else {
                 R.string.wrong_password.getString().toast()
             }
         }

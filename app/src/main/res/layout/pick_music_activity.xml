@@ -19,9 +19,10 @@
             android:id="@+id/addMB_search"
             android:layout_width="match_parent"
             android:layout_height="@dimen/action_icon"
-            android:background="@color/transparent"
+            android:background="@color/foreDark_2"
             android:drawableStart="@drawable/ic_baseline_search_24_white"
-            android:hint="@string/search"
+            android:drawablePadding="@dimen/icon_padding"
+            android:hint="@string/search_music"
             android:importantForAutofill="no"
             android:inputType="textNoSuggestions"
             android:paddingStart="@dimen/icon_padding_mid"
@@ -39,44 +40,42 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:overScrollMode="never"
-            app:layout_constraintBottom_toTopOf="@id/addMB_leave"
+            app:layout_constraintBottom_toTopOf="@id/action_btn_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/addMB_search" />
 
-        <ImageView
-            android:id="@+id/addMB_leave"
+        <FrameLayout
+            android:id="@+id/action_btn_container"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/action_icon_p"
-            android:background="@drawable/background_ripple_blue"
-            android:contentDescription="@string/action"
-            android:onClick="@{()-> activity.finish()}"
-            android:padding="@dimen/icon_padding_lite"
-            android:src="@drawable/ic_round_keyboard_backspace_24_white"
-            android:visibility="gone"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent">
 
-        <ImageView
-            android:id="@+id/addMB_confirm"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/action_icon_p"
-            android:background="@drawable/background_ripple_blue"
-            android:contentDescription="@string/action"
-            android:onClick="@{()-> activity.confirm()}"
-            android:padding="@dimen/icon_padding_lite"
-            android:src="@drawable/ic_baseline_check_24_white"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            <ImageView
+                android:id="@+id/addMB_leave"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/action_icon_p"
+                android:background="@drawable/trans_dark_ripple"
+                android:contentDescription="@string/action"
+                android:onClick="@{()-> activity.finish()}"
+                android:padding="@dimen/icon_padding_lite"
+                android:src="@drawable/ic_round_keyboard_backspace_24_white"
+                android:visibility="gone" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/small_elevation"
-            android:background="@color/red_2"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            <ImageView
+                android:id="@+id/addMB_confirm"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/action_icon_p"
+                android:background="@drawable/trans_dark_ripple"
+                android:contentDescription="@string/action"
+                android:onClick="@{()-> activity.confirm()}"
+                android:padding="@dimen/icon_padding_lite"
+                android:src="@drawable/ic_baseline_check_24_white"
+                android:visibility="gone" />
+
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

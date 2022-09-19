@@ -15,19 +15,19 @@ import java.io.File
 
 class UserConfigViewModel : BaseViewModel() {
 
-    sealed class UserConfigEvent {
-        object Login : ViewEvent
-        object Icon : ViewEvent
-        object Name : ViewEvent
-        object PassWord : ViewEvent
-        object Share : ViewEvent
-        object Lock : ViewEvent
-        object Unlock : ViewEvent
-        object Refresh : ViewEvent
-        object ClearCache : ViewEvent
-        object Log : ViewEvent
-        object CombineGalley : ViewEvent
-        object DispatchGalley : ViewEvent
+    sealed class UserConfigEvent : ViewEvent {
+        object Login : UserConfigEvent()
+        object Icon : UserConfigEvent()
+        object Name : UserConfigEvent()
+        object PassWord : UserConfigEvent()
+        object Share : UserConfigEvent()
+        object Lock : UserConfigEvent()
+        object Unlock : UserConfigEvent()
+        object Refresh : UserConfigEvent()
+        object ClearCache : UserConfigEvent()
+        object Log : UserConfigEvent()
+        object CombineGalley : UserConfigEvent()
+        object DispatchGalley : UserConfigEvent()
     }
 
     enum class DisplayMode {

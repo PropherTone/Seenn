@@ -143,7 +143,7 @@ class RichNoteView @JvmOverloads constructor(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
-                    textSize = context.resources.getDimension(R.dimen.sub_text)
+                    textSize = context.resources.getDimension(R.dimen.subContent_text)
                     background = null
                     setText(note.text)
                     setOnKeyListener { _, keyCode, event ->
@@ -214,7 +214,7 @@ class RichNoteView @JvmOverloads constructor(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-                textSize = context.resources.getDimension(R.dimen.sub_text)
+                textSize = context.resources.getDimension(R.dimen.subContent_text )
                 text = note.text
             }
         }).run {

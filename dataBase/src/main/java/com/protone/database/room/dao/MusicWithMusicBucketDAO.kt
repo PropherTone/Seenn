@@ -4,7 +4,6 @@ import androidx.room.*
 import com.protone.api.entity.Music
 import com.protone.api.entity.MusicBucket
 import com.protone.api.entity.MusicWithMusicBucket
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
@@ -16,10 +15,6 @@ interface MusicWithMusicBucketDAO {
     @Query("DELETE FROM MusicWithMusicBucket WHERE musicBaseId LIKE :musicID AND musicBucketId LIKE:musicBucketId")
     @RewriteQueriesToDropUnusedColumns
     fun deleteMusicWithMusicBucket(musicID: Long,musicBucketId: Long)
-
-    @Query("SELECT * FROM MusicWithMusicBucket")
-    @RewriteQueriesToDropUnusedColumns
-    fun observeAllMusicBucketWithMusic() : Flow<List<MusicWithMusicBucket>?>
 
     @Query("SELECT * FROM Music INNER JOIN MusicWithMusicBucket ON Music.musicBaseId = MusicWithMusicBucket.musicBaseId WHERE MusicWithMusicBucket.musicBucketId LIKE:musicBucketId")
     @RewriteQueriesToDropUnusedColumns

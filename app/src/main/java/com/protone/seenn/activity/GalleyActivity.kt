@@ -15,6 +15,7 @@ import com.protone.seenn.fragment.GalleyFragment
 import com.protone.ui.R
 import com.protone.ui.adapter.MyFragmentStateAdapter
 import com.protone.worker.database.userConfig
+import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.GalleyFragmentViewModel
 import com.protone.worker.viewModel.GalleyViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class GalleyActivity : BaseMediaActivity<GalleyActivityBinding, GalleyViewModel>(false) {
+class GalleyActivity :
+    BaseMediaActivity<GalleyActivityBinding, GalleyViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: GalleyViewModel by viewModels()
 
     override fun createView(): View {

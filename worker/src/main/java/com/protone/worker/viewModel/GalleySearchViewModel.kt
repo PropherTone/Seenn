@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.streams.toList
 
 class GalleySearchViewModel : BaseViewModel() {
 
@@ -31,39 +30,30 @@ class GalleySearchViewModel : BaseViewModel() {
             val lowercase = input.lowercase(Locale.getDefault())
             val uppercase = input.uppercase(Locale.getDefault())
             launch(Dispatchers.Default) {
-                data.stream().filter {
+                data.filter {
                     it.name.contains(input, true)
-                }.toList().let { nameFilterList ->
+                }.let { nameFilterList ->
                     onQueryListener?.onGalleyResult(nameFilterList as MutableList<GalleyMedia>)
                     cancel()
                 }
             }
             launch(Dispatchers.Default) {
-                data.stream().filter {
-                    it.cate?.contains(input) == true
-                            || it.cate?.contains(lowercase) == true
-                            || it.cate?.contains(uppercase) == true
-                            || it.cate?.stream()
-                        ?.anyMatch { name -> name.contains(input, true) } == true
-                }.toList().let { catoFilterList ->
+                data.filter {
+                    it.cate?.any { name -> name.contains(input, true) } == true
+                }.let { catoFilterList ->
                     onQueryListener?.onCatoResult(catoFilterList as MutableList<GalleyMedia>)
                     cancel()
                 }
             }
             launch(Dispatchers.Default) {
-                data.stream().filter {
+                data.filter {
                     val notesWithGalley =
-                        DatabaseHelper.instance
+                        DatabaseHelper
+                            .instance
                             .galleriesWithNotesDAOBridge.getNotesWithGalley(it.uri)
-                            .stream().map { note ->
-                                note.title
-                            }.toList()
-                    notesWithGalley.contains(input)
-                            || notesWithGalley.contains(lowercase)
-                            || notesWithGalley.contains(uppercase)
-                            || notesWithGalley.stream()
-                        .anyMatch { name -> name.contains(input, true) }
-                }.toList().let { noteFilterList ->
+                            .map { note -> note.title }
+                    notesWithGalley.any { name -> name.contains(input, true) }
+                }.let { noteFilterList ->
                     onQueryListener?.onNoteResult(noteFilterList as MutableList<GalleyMedia>)
                     cancel()
                 }

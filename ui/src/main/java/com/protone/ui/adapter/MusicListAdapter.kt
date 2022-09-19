@@ -2,17 +2,14 @@ package com.protone.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import com.protone.api.TAG
 import com.protone.api.baseType.toStringMinuteTime
 import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.Music
 import com.protone.ui.R
 import com.protone.ui.databinding.MusicListLayoutBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -25,9 +22,6 @@ class MusicListAdapter(context: Context) :
             field.clear()
             field.addAll(value)
             if (selectList.size >= 1) playPosition = field.indexOf(selectList[0])
-            launch {
-                notifyDataSetChanged()
-            }
         }
 
     var clickCallback: ((Music) -> Unit?)? = null
@@ -71,7 +65,9 @@ class MusicListAdapter(context: Context) :
             musicList[position].let { music ->
                 setSelect(holder, selectList.contains(music))
                 musicListContainer.setOnClickListener {
+                    if (selectList.contains(music)) return@setOnClickListener
                     if (playPosition == holder.layoutPosition) return@setOnClickListener
+                    clearSelected()
                     itemClickChange(
                         R.color.blue_2,
                         R.color.white,
@@ -85,14 +81,6 @@ class MusicListAdapter(context: Context) :
                         true
                     )
                     clickCallback?.invoke(music)
-                    launch(Dispatchers.Default) {
-                        delay(1000)
-                        if (!selectList.contains(music)) {
-                            withContext(Dispatchers.Main) {
-                                setSelect(holder, false)
-                            }
-                        }
-                    }
                 }
                 musicListName.text = music.title
                 if (music.artist != null && music.album != null) {
@@ -109,11 +97,6 @@ class MusicListAdapter(context: Context) :
         launch(Dispatchers.Default) {
             if (musicList.size <= 0) return@launch
             if (musicList.contains(music)) {
-                selectList.clear()
-                selectList.add(music)
-                withContext(Dispatchers.Main) {
-                    notifyItemChanged(playPosition)
-                }
                 playPosition = musicList.indexOf(music)
                 withContext(Dispatchers.Main) {
                     notifyItemChanged(playPosition)
@@ -131,5 +114,25 @@ class MusicListAdapter(context: Context) :
             }
         }
     }
+
+    fun getPlayingPosition(): Int {
+        if (musicList.size <= 0) return -1
+        return musicList.indexOf(selectList.getOrNull(0) ?: musicList[0])
+    }
+
+    fun insertMusics(musics: Collection<Music>) {
+        launch(Dispatchers.Default) {
+            musics.forEach {
+                musicList.add(it)
+                withContext(Dispatchers.Main) {
+                    notifyItemInserted(musicList.size - 1)
+                }
+            }
+        }
+    }
+
+    fun getPlayingMusic(): Music? = selectList.getOrNull(0)
+
+    fun getPlayList() = musicList.toList()
 
 }

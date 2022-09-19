@@ -35,8 +35,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class GalleyViewActivity :
-    BaseMediaActivity<GalleyViewActivityBinding, GalleyViewViewModel>(true) {
+class GalleyViewActivity : BaseMediaActivity<
+            GalleyViewActivityBinding,
+            GalleyViewViewModel,
+            GalleyViewViewModel.GalleyViewEvent>(true) {
     override val viewModel: GalleyViewViewModel by viewModels()
 
     override fun createView(): View {

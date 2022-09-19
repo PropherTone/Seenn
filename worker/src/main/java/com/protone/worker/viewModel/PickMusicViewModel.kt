@@ -19,12 +19,13 @@ class PickMusicViewModel : BaseViewModel() {
 
         const val ADD_BUCKET = "ADD"
         const val PICK_MUSIC = "PICK"
+        const val SEARCH_MUSIC = "SEARCH"
     }
 
     val data: MutableList<Music> = mutableListOf()
 
     suspend fun getMusics() =
-        DatabaseHelper.instance.musicDAOBridge.getAllMusicRs() as MutableList<Music>
+        DatabaseHelper.instance.musicDAOBridge.getAllMusic() as MutableList<Music>
 
     suspend fun filterData(input: String) = data.asFlow().filter {
         it.displayName?.contains(input, true) == true || it.album?.contains(

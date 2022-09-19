@@ -80,7 +80,7 @@
                     android:layout_width="@dimen/user_icon"
                     android:layout_height="@dimen/user_icon"
                     android:layout_marginTop="@dimen/main_margin"
-                    android:background="@drawable/main_background"
+                    android:background="@drawable/transparent_card"
                     android:contentDescription="@string/icon"
                     android:elevation="@dimen/small_elevation"
                     android:scaleType="centerCrop"

@@ -20,14 +20,14 @@ import java.util.*
 
 class AddMusicListAdapter(
     context: Context,
-    private val bucket: String,
-    private val multiSelect: Boolean,
-    private val adapterDataBaseProxy: AddMusicListAdapterDataProxy
+    val bucket: String,
+    val mode: String,
+    val adapterDataBaseProxy: AddMusicListAdapterDataProxy
 ) : SelectListAdapter<MusicListLayoutBinding, Music, Any>(context) {
 
     init {
-        multiChoose = multiSelect
-        if (multiSelect) launch {
+        multiChoose = mode == "PICK"
+        if (multiChoose) launch {
             selectList.addAll(adapterDataBaseProxy.getMusicWithMusicBucket(bucket))
         }
     }
@@ -82,14 +82,21 @@ class AddMusicListAdapter(
         holder.binding.apply {
             musicList[position].also { music ->
                 setSelect(holder, selectList.contains(music))
-
                 musicListContainer.setOnClickListener {
                     if (onBusy) return@setOnClickListener
                     onBusy = true
                     launch(Dispatchers.Default) {
+                        if (mode == "SEARCH") {
+                            adapterDataBaseProxy.play(music)
+                            withContext(Dispatchers.Main){
+                                checkSelect(holder,music)
+                            }
+                            onBusy = false
+                            return@launch
+                        }
                         viewQueue.add(position)
                         if (selectList.contains(music)) {
-                            if (!multiSelect) return@launch
+                            if (!multiChoose) return@launch
                             adapterDataBaseProxy.deleteMusicWithMusicBucket(
                                 music.musicBaseId,
                                 bucket
@@ -108,7 +115,7 @@ class AddMusicListAdapter(
                                     withContext(Dispatchers.Main) {
                                         d.start()
                                     }
-                                    if (multiSelect) {
+                                    if (multiChoose) {
                                         val re = adapterDataBaseProxy
                                             .insertMusicWithMusicBucket(music.musicBaseId, bucket)
                                         if (re != -1L) {
@@ -163,22 +170,12 @@ class AddMusicListAdapter(
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun noticeDataUpdate(list: MutableList<Music>) {
-        launch(Dispatchers.IO) {
-            musicList.clear()
-            musicList.addAll(list)
-            withContext(Dispatchers.Main) {
-                notifyDataSetChanged()
-            }
-        }
-    }
-
     override fun getItemCount(): Int = musicList.size
 
     interface AddMusicListAdapterDataProxy {
         suspend fun getMusicWithMusicBucket(bucket: String): Collection<Music>
         suspend fun insertMusicWithMusicBucket(musicBaseId: Long, bucket: String): Long
         fun deleteMusicWithMusicBucket(musicBaseId: Long, musicBucket: String)
+        fun play(music: Music)
     }
 }

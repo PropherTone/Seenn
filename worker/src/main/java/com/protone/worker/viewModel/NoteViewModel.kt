@@ -14,15 +14,14 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.suspendCoroutine
 
 class NoteViewModel : BaseViewModel() {
 
-    sealed class NoteViewEvent {
-        object RefreshList : ViewEvent
-        object AddBucket : ViewEvent
-        object Refresh : ViewEvent
-        object HandleBucketEvent : ViewEvent
+    sealed class NoteViewEvent : ViewEvent {
+        object RefreshList : NoteViewEvent()
+        object AddBucket : NoteViewEvent()
+        object Refresh : NoteViewEvent()
+        object HandleBucketEvent : NoteViewEvent()
     }
 
     private val noteList = mutableMapOf<String, MutableList<Note>>()
@@ -61,36 +60,29 @@ class NoteViewModel : BaseViewModel() {
     }
 
     suspend fun queryAllNote() = withContext(Dispatchers.IO) {
-        suspendCoroutine { co ->
-            DatabaseHelper.instance.noteDirDAOBridge.getALLNoteDir()?.let {
-                noteList[R.string.all.getString().also { s ->
-                    selected = s
-                }] = mutableListOf<Note>().apply {
-                    addAll(DatabaseHelper.instance.noteDAOBridge.getAllNote() ?: mutableListOf())
-                }
-                it.forEach { noteDir ->
-                    noteList[noteDir.name] =
-                        DatabaseHelper
-                            .instance
-                            .noteDirWithNoteDAOBridge
-                            .getNotesWithNoteDir(noteDir.noteDirId) as MutableList<Note>
-                }
-                co.resumeWith(Result.success(noteList[selected] ?: mutableListOf()))
+        DatabaseHelper.instance.noteDirDAOBridge.getALLNoteDir()?.let {
+            noteList[R.string.all.getString().also { s ->
+                selected = s
+            }] = mutableListOf<Note>().apply {
+                addAll(DatabaseHelper.instance.noteDAOBridge.getAllNote() ?: mutableListOf())
             }
-        }
+            it.forEach { noteDir ->
+                noteList[noteDir.name] =
+                    DatabaseHelper
+                        .instance
+                        .noteDirWithNoteDAOBridge
+                        .getNotesWithNoteDir(noteDir.noteDirId) as MutableList<Note>
+            }
+            noteList[selected]
+        } ?: mutableListOf()
     }
 
     suspend fun queryAllNoteType() = withContext(Dispatchers.IO) {
-        suspendCoroutine { co ->
-            co.resumeWith(
-                Result.success(
-                    (DatabaseHelper
-                        .instance
-                        .noteDirDAOBridge
-                        .getALLNoteDir() ?: mutableListOf()) as MutableList<NoteDir>
-                )
-            )
-        }
+        (DatabaseHelper
+            .instance
+            .noteDirDAOBridge
+            .getALLNoteDir()
+            ?: mutableListOf()) as MutableList<NoteDir>
     }
 
     suspend fun insertNoteDir(type: String?, image: String?) =

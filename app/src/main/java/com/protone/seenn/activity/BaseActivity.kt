@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import java.util.concurrent.atomic.AtomicInteger
 
-abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEvent: Boolean) :
+abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel,T : BaseViewModel.ViewEvent>(handleEvent: Boolean) :
     AppCompatActivity(),
     CoroutineScope by MainScope() {
     protected abstract val viewModel: VM
@@ -34,17 +34,17 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
 
     abstract fun createView(): View
     abstract suspend fun VM.init()
-    private var onViewEvent: (suspend (BaseViewModel.ViewEvent) -> Unit)? = null
+    private var onViewEvent: (suspend (T) -> Unit)? = null
         set(value) {
             field = value
             viewEventTask?.start()
         }
 
-    fun onViewEvent(block: suspend (BaseViewModel.ViewEvent) -> Unit) {
+    fun onViewEvent(block: suspend (T) -> Unit) {
         onViewEvent = block
     }
 
-    private var viewEvent: Channel<BaseViewModel.ViewEvent>? = null
+    private var viewEvent: Channel<T>? = null
     private var viewEventTask: Job? = null
     protected var onFinish: (suspend () -> Unit)? = null
     protected var onResume: (suspend () -> Unit)? = null
@@ -143,7 +143,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEven
         }.launch(intent)
     }
 
-    fun sendViewEvent(event: BaseViewModel.ViewEvent) {
+    fun sendViewEvent(event: T) {
         viewEvent?.trySend(event)
     }
 

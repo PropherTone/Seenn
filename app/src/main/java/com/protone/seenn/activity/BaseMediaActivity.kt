@@ -23,8 +23,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.streams.toList
 
-abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel>(handleEvent: Boolean) :
-    BaseActivity<VB, VM>(handleEvent),
+abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent>(
+    handleEvent: Boolean
+) : BaseActivity<VB, VM, T>(handleEvent),
     View.OnClickListener {
 
     var popLayout: GalleyOptionPopBinding? = null

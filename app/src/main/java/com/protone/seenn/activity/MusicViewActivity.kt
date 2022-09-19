@@ -14,9 +14,11 @@ import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.ui.adapter.TransparentPlayListAdapter
 import com.protone.ui.itemDecoration.GalleyItemDecoration
 import com.protone.worker.database.userConfig
+import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.MusicViewModel
 
-class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>(false) {
+class MusicViewActivity :
+    BaseActivity<MusicViewActivityBinding, MusicViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: MusicViewModel by viewModels()
 
     override fun createView(): View {
@@ -29,7 +31,7 @@ class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>
 
     override suspend fun MusicViewModel.init() {
         val musicController = MusicControllerIMP(binding.musicPlayer)
-        bindMusicService { binder->
+        bindMusicService { binder ->
             musicController.setBinder(this@MusicViewActivity, binder) {
                 userConfig.musicLoopMode = it
             }
@@ -42,7 +44,7 @@ class MusicViewActivity : BaseActivity<MusicViewActivityBinding, MusicViewModel>
                         musicController.play(music)
                     }
                 })
-            musicController.binder?.onMusicPlaying()?.observe(this@MusicViewActivity){
+            musicController.binder?.onMusicPlaying()?.observe(this@MusicViewActivity) {
                 (binding.playList.adapter as TransparentPlayListAdapter).setOnPlay(it)
             }
         }

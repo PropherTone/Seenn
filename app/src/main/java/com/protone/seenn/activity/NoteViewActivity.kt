@@ -20,7 +20,8 @@ import com.protone.worker.viewModel.NoteEditViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
 import kotlinx.coroutines.launch
 
-class NoteViewActivity : BaseActivity<NoteViewActivityBinding, NoteViewViewModel>(true) {
+class NoteViewActivity :
+    BaseActivity<NoteViewActivityBinding, NoteViewViewModel, NoteViewViewModel.NoteViewEvent>(true) {
     override val viewModel: NoteViewViewModel by viewModels()
 
     private var binder: MusicService.MusicBinder? = null

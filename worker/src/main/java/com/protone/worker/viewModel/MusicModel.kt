@@ -16,16 +16,18 @@ import kotlin.streams.toList
 
 class MusicModel : BaseViewModel() {
 
-    sealed class MusicEvent {
-        data class PlayMusic(val music: Music) : ViewEvent
-        data class SetBucketCover(val name: String) : ViewEvent
-        data class AddMusic(val bucket: String) : ViewEvent
-        data class Edit(val bucket: String) : ViewEvent
-        data class Delete(val bucket: String) : ViewEvent
-        data class RefreshBucket(val newName: String) : ViewEvent
-        data class AddBucket(val bucket: String) : ViewEvent
-        data class DeleteBucket(val bucket: String) : ViewEvent
-        object AddMusicBucket : ViewEvent
+    sealed class MusicEvent : ViewEvent {
+        data class PlayMusic(val music: Music) : MusicEvent()
+        data class SetBucketCover(val name: String) : MusicEvent()
+        data class AddMusic(val bucket: String) : MusicEvent()
+        data class Edit(val bucket: String) : MusicEvent()
+        data class Delete(val bucket: String) : MusicEvent()
+        data class RefreshBucket(val newName: String) : MusicEvent()
+        data class AddBucket(val bucket: String) : MusicEvent()
+        data class DeleteBucket(val bucket: String) : MusicEvent()
+        object AddMusicBucket : MusicEvent()
+        object Locate : MusicEvent()
+        object Search : MusicEvent()
     }
 
     var lastBucket: String = userConfig.lastMusicBucket
@@ -67,7 +69,7 @@ class MusicModel : BaseViewModel() {
     }
 
     suspend fun getBucket(name: String) =
-        DatabaseHelper.instance.musicBucketDAOBridge.getMusicBucketByNameRs(name)
+        DatabaseHelper.instance.musicBucketDAOBridge.getMusicBucketByName(name)
 
     suspend fun getLastMusicBucket(list: MutableList<MusicBucket>): MusicBucket =
         withContext(Dispatchers.Default) {
@@ -77,7 +79,7 @@ class MusicModel : BaseViewModel() {
 
     suspend fun getMusicBuckets(): MutableList<MusicBucket> = withContext(Dispatchers.IO) {
         DatabaseHelper.instance.run {
-            ((musicBucketDAOBridge.getAllMusicBucketRs() as MutableList<MusicBucket>?)
+            ((musicBucketDAOBridge.getAllMusicBucket() as MutableList<MusicBucket>?)
                 ?: mutableListOf()).let { list ->
                 list.forEach {
                     it.size = musicWithMusicBucketDAOBridge
@@ -90,7 +92,7 @@ class MusicModel : BaseViewModel() {
 
     suspend fun tryDeleteMusicBucket(name: String): MusicBucket? {
         return DatabaseHelper.instance.musicBucketDAOBridge.let {
-            val musicBucketByName = it.getMusicBucketByNameRs(name)
+            val musicBucketByName = it.getMusicBucketByName(name)
             if (musicBucketByName != null) {
                 if (it.deleteMusicBucketRs(musicBucketByName)) {
                     musicBucketByName.icon?.let { path ->
@@ -100,6 +102,15 @@ class MusicModel : BaseViewModel() {
                 }
                 musicBucketByName
             } else null
+        }
+    }
+
+    suspend fun doSearch(playList: List<Music>, text: String) = withContext(Dispatchers.Default) {
+        playList.filter {
+            it.displayName?.contains(text, true) == true
+                    || it.album?.contains(text, true) == true
+                    || it.title.contains(text, true)
+                    || it.artist?.contains(text, true) == true
         }
     }
 

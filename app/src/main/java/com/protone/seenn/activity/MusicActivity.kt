@@ -23,7 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
+class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.MusicEvent>(true),
     StatusImageView.StateListener {
     override val viewModel: MusicModel by lazy {
         ViewModelProvider(this).get(MusicModel::class.java).apply {
@@ -33,10 +33,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                 }
 
                 override suspend fun onMusicBucketUpdated(musicBucket: MusicBucket) {
-                    getMusicBucketAdapter()?.refreshBucket(musicBucket)
-                    if (binding.musicBucketName.text == musicBucket.name) {
-                        getMusicListAdapter()?.musicList = getCurrentMusicList(musicBucket)
-                    }
+                    refreshListAndBucket(musicBucket)
                 }
 
                 override suspend fun onMusicBucketDeleted(musicBucket: MusicBucket) {
@@ -61,8 +58,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                 }
             }
             appToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-                binding.toolbar.progress =
-                    -verticalOffset / appBarLayout.totalScrollRange.toFloat()
+                toolbar.progress = -verticalOffset / appBarLayout.totalScrollRange.toFloat()
             }
         }
         return binding.root
@@ -97,13 +93,6 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                             } else {
                                 musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
                             }
-//                            albumCover.setImageBitmap(withContext(Dispatchers.IO){
-//                                it.icon?.toBitmap()?.let { bm->
-//                                    withContext(Dispatchers.Default){
-//                                        Blur(SApplication.app).blur(bm,14,20)
-//                                    }
-//                                }
-//                            })
                             musicBucketName.text = it.name
                             musicBucketMsg.text =
                                 if (it.date != null && it.detail != null) "${it.date} ${it.detail}" else R.string.none.getString()
@@ -169,6 +158,13 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                     getBucket(it.bucket)?.let { mb -> getMusicBucketAdapter()?.addBucket(mb) }
                 is MusicModel.MusicEvent.DeleteBucket ->
                     getBucket(it.bucket)?.let { mb -> getMusicBucketAdapter()?.deleteBucket(mb) }
+                is MusicModel.MusicEvent.Locate -> getMusicListAdapter()?.getPlayingPosition()
+                    ?.let { position ->
+                        if (position != -1) binding.musicMusicList.smoothScrollToPosition(position)
+                    }
+                is MusicModel.MusicEvent.Search -> {
+
+                }
             }
         }
 
@@ -213,7 +209,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
                         hideBucket()
                         if (binding.musicBucketName.text != it.name) {
                             sendViewEvent(MusicModel.MusicEvent.SetBucketCover(it.name))
-                            getMusicListAdapter()?.musicList = getCurrentMusicList(it)
+                            switchMusicBucket(it)
                         }
                     }
                 }
@@ -241,18 +237,23 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel>(true),
     private suspend fun MusicModel.refreshListAndBucket(musicBucket: MusicBucket) {
         getMusicBucketAdapter()?.refreshBucket(musicBucket)
         if (binding.musicBucketName.text == musicBucket.name) {
-            getMusicListAdapter()?.musicList = getCurrentMusicList(musicBucket)
+            getMusicListAdapter()?.insertMusics(getCurrentMusicList(musicBucket))
         }
+    }
+
+    private suspend fun MusicModel.switchMusicBucket(musicBucket: MusicBucket) {
+        binding.musicMusicList.swapAdapter(MusicListAdapter(this@MusicActivity).apply {
+            getMusicListAdapter()?.getPlayingMusic()?.let { selectList.add(it) }
+            musicList = getCurrentMusicList(musicBucket)
+        }, true)
     }
 
     private fun getMusicBucketAdapter() = (binding.musicBucket.adapter as MusicBucketAdapter?)
 
     private fun getMusicListAdapter() = (binding.musicMusicList.adapter as MusicListAdapter?)
 
-    private fun hideBucket() {
-        launch {
-            binding.musicShowBucket.negative()
-        }
+    private suspend fun hideBucket() = withContext(Dispatchers.Main) {
+        binding.musicShowBucket.negative()
     }
 
     fun sendEdit() {

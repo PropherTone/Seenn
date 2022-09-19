@@ -18,9 +18,9 @@ import com.protone.api.json.toJson
 import com.protone.api.json.toUri
 import com.protone.seenn.R
 import com.protone.seenn.databinding.NoteEditActivityBinding
+import com.protone.ui.customView.richText.note.spans.ISpanForUse
 import com.protone.ui.dialog.imageListDialog
 import com.protone.ui.popWindows.ColorfulPopWindow
-import com.protone.ui.customView.richText.note.spans.ISpanForUse
 import com.protone.worker.viewModel.GalleyViewModel
 import com.protone.worker.viewModel.NoteEditViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
@@ -29,7 +29,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class NoteEditActivity : BaseActivity<NoteEditActivityBinding, NoteEditViewModel>(true),
+class NoteEditActivity :
+    BaseActivity<NoteEditActivityBinding, NoteEditViewModel, NoteEditViewModel.NoteEvent>(true),
     ISpanForUse {
     override val viewModel: NoteEditViewModel by viewModels()
 

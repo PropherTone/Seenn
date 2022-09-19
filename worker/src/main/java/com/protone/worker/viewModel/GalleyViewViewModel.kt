@@ -21,9 +21,9 @@ class GalleyViewViewModel : BaseViewModel() {
         const val GALLEY = "GalleyViewActivity:Galley"
     }
 
-    sealed class GalleyViewEvent {
-        object SetNote : ViewEvent
-        object Share : ViewEvent
+    sealed class GalleyViewEvent : ViewEvent {
+        object SetNote : GalleyViewEvent()
+        object Share : GalleyViewEvent()
     }
 
     var curPosition: Int = 0

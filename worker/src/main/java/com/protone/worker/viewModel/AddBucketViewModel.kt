@@ -15,10 +15,10 @@ class AddBucketViewModel : BaseViewModel() {
         val BUCKET_NAME = "BUCKET_NAME"
     }
 
-    sealed class AddBucketEvent {
-        object Confirm : ViewEvent
-        object ChooseIcon : ViewEvent
-        object Cancel : ViewEvent
+    sealed class AddBucketEvent : ViewEvent {
+        object Confirm : AddBucketEvent()
+        object ChooseIcon : AddBucketEvent()
+        object Cancel : AddBucketEvent()
     }
 
     var editName: String? = null
@@ -46,7 +46,7 @@ class AddBucketViewModel : BaseViewModel() {
 
     suspend fun updateMusicBucket(
         musicBucket: MusicBucket, name: String, uri: Uri?, detail: String
-    ) = DatabaseHelper.instance.musicBucketDAOBridge.updateMusicBucketRs(
+    ) = DatabaseHelper.instance.musicBucketDAOBridge.updateMusicBucket(
         musicBucket.also { mb ->
             if (mb.name != name) mb.name = name
             val toFile = uri?.saveToFile(name, R.string.music_bucket.getString())
@@ -57,6 +57,6 @@ class AddBucketViewModel : BaseViewModel() {
     )
 
     suspend fun getMusicBucketByName(name: String) =
-        DatabaseHelper.instance.musicBucketDAOBridge.getMusicBucketByNameRs(name)
+        DatabaseHelper.instance.musicBucketDAOBridge.getMusicBucketByName(name)
 
 }

@@ -8,18 +8,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.SearchModel
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
+import com.protone.api.context.MUSIC_PLAY
 import com.protone.api.context.linkInput
 import com.protone.api.context.root
 import com.protone.api.entity.Music
 import com.protone.seenn.R
+import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.seenn.databinding.PickMusicActivityBinding
 import com.protone.ui.adapter.AddMusicListAdapter
+import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewModel>(true) {
+class PickMusicActivity :
+    BaseActivity<PickMusicActivityBinding, PickMusicViewModel, BaseViewModel.ViewEvent>(true) {
     override val viewModel: PickMusicViewModel by viewModels()
 
     override fun createView(): View {
@@ -68,10 +71,17 @@ class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewMo
         }
     }
 
-    private suspend fun refreshList(list: MutableList<Music>) = withContext(Dispatchers.Main) {
+    private fun refreshList(list: MutableList<Music>) {
         binding.addMBList.adapter.let {
             if (it is AddMusicListAdapter) {
-                it.noticeDataUpdate(list)
+                binding.addMBList.swapAdapter(
+                    newAdapter(
+                        it.bucket,
+                        it.mode,
+                        it.adapterDataBaseProxy,
+                        list
+                    ), true
+                )
             }
         }
     }
@@ -83,10 +93,9 @@ class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewMo
         }
         binding.addMBList.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = AddMusicListAdapter(
-                context,
+            adapter = newAdapter(
                 bucket,
-                mode != PickMusicViewModel.PICK_MUSIC,
+                mode,
                 object : AddMusicListAdapter.AddMusicListAdapterDataProxy {
                     override suspend fun getMusicWithMusicBucket(bucket: String): Collection<Music> =
                         viewModel.getMusicWithMusicBucket(bucket)
@@ -96,17 +105,31 @@ class PickMusicActivity : BaseActivity<PickMusicActivityBinding, PickMusicViewMo
                         musicBucket: String
                     ) = viewModel.deleteMusicWithMusicBucket(musicBaseId, musicBucket)
 
+                    override fun play(music: Music) {
+                        musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY))
+                    }
+
                     override suspend fun insertMusicWithMusicBucket(
                         musicBaseId: Long,
                         bucket: String
                     ): Long = viewModel.insertMusicWithMusicBucket(musicBaseId, bucket)
-
-                }
-            ).apply {
-                musicList = viewModel.getMusics()
-            }
+                },
+                viewModel.getMusics()
+            )
         }
     }
+
+    private fun newAdapter(
+        bucket: String,
+        mode: String,
+        proxy: AddMusicListAdapter.AddMusicListAdapterDataProxy,
+        musics: MutableList<Music>
+    ) = AddMusicListAdapter(
+        this,
+        bucket,
+        mode,
+        proxy
+    ).apply { musicList = musics }
 
     private fun getList(): MutableList<Music>? = binding.addMBList.adapter.let {
         if (it is AddMusicListAdapter) {

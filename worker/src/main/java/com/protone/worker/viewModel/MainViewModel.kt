@@ -17,11 +17,11 @@ class MainViewModel : BaseViewModel() {
     var btnY = 0f
     val btnH = SApplication.app.resources.getDimensionPixelSize(R.dimen.action_icon_p)
 
-    sealed class MainViewEvent {
-        object Galley : ViewEvent
-        object Music : ViewEvent
-        object Note : ViewEvent
-        object UserConfig : ViewEvent
+    sealed class MainViewEvent : ViewEvent{
+        object Galley : MainViewEvent()
+        object Music : MainViewEvent()
+        object Note : MainViewEvent()
+        object UserConfig : MainViewEvent()
     }
 
     suspend fun getMusics(bucketName: String) = withContext(Dispatchers.IO) {

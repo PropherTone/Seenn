@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 abstract class SelectListAdapter<V : ViewDataBinding, T, D>(
     context: Context,
     handleEvent: Boolean = false
-) : BaseAdapter<V, D>(context,handleEvent) {
+) : BaseAdapter<V, D>(context, handleEvent) {
 
     var selectList = mutableListOf<T>()
     var multiChoose = false
@@ -74,12 +74,16 @@ abstract class SelectListAdapter<V : ViewDataBinding, T, D>(
         container: ViewGroup?,
         visible: View?,
         vararg texts: TextView,
-        dispatch: Boolean = true
+        dispatch: Boolean = true,
+        backgroundColor: Int = R.color.white,
+        backgroundColorPressed: Int = R.color.blue_1,
+        textsColor: Int = R.color.black,
+        textsColorPressed: Int = R.color.white
     ) {
         background?.setBackgroundColor(
             ContextCompat.getColor(
                 context,
-                if (pressed) R.color.blue_1 else R.color.white
+                if (pressed) backgroundColorPressed else backgroundColor
             )
         )
         visible?.visibility = if (pressed) View.VISIBLE else View.GONE
@@ -87,13 +91,13 @@ abstract class SelectListAdapter<V : ViewDataBinding, T, D>(
             it.setTextColor(
                 ContextCompat.getColor(
                     context,
-                    if (pressed) R.color.white else R.color.black
+                    if (pressed) textsColorPressed else textsColor
                 )
             )
         }
         itemClickChange(
-            if (pressed) R.color.blue_1 else R.color.white,
-            if (pressed) R.color.white else R.color.black,
+            if (pressed) backgroundColorPressed else backgroundColor,
+            if (pressed) textsColorPressed else textsColor,
             background, container, texts, pressed && dispatch
         )
     }

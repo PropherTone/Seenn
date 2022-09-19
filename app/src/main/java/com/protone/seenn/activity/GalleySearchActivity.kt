@@ -14,17 +14,18 @@ import com.protone.api.context.linkInput
 import com.protone.api.context.root
 import com.protone.api.entity.GalleyMedia
 import com.protone.api.json.toJson
-import com.protone.ui.adapter.GalleyListAdapter
-import com.protone.ui.itemDecoration.GalleyItemDecoration
 import com.protone.seenn.R
 import com.protone.seenn.databinding.GalleySearchActivityBinding
+import com.protone.ui.adapter.GalleyListAdapter
+import com.protone.ui.itemDecoration.GalleyItemDecoration
+import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.GalleySearchViewModel
 import com.protone.worker.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class GalleySearchActivity :
-    BaseMediaActivity<GalleySearchActivityBinding, GalleySearchViewModel>(false),
+    BaseMediaActivity<GalleySearchActivityBinding, GalleySearchViewModel,BaseViewModel.ViewEvent>(false),
     GalleyListAdapter.OnSelect, GalleySearchViewModel.OnQuery {
     override val viewModel: GalleySearchViewModel by viewModels()
 
