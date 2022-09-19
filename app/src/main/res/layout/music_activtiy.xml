@@ -182,8 +182,7 @@
             android:clickable="false"
             android:elevation="2dp"
             android:focusable="false"
-            android:orientation="vertical"
-            android:visibility="invisible">
+            android:orientation="vertical">
 
             <com.protone.ui.customView.StatusImageView
                 android:id="@+id/music_showBucket"

@@ -1,6 +1,7 @@
 package com.protone.seenn.activity
 
 import android.view.View
+import androidx.core.view.marginBottom
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -19,6 +20,7 @@ import com.protone.ui.adapter.MusicListAdapter
 import com.protone.ui.customView.StatusImageView
 import com.protone.worker.viewModel.AddBucketViewModel
 import com.protone.worker.viewModel.MusicModel
+import com.protone.worker.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -49,6 +51,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
             activity = this@MusicActivity
             fitStatuesBar(musicBucketContainer)
             root.onGlobalLayout {
+                actionBtnContainer.marginBottom(mySmallMusicPlayer.height + search.marginBottom)
                 appToolbar.paddingTop(appToolbar.paddingTop + statuesBarHeight)
                 musicBucketContainer.botBlock = mySmallMusicPlayer.measuredHeight.toFloat()
                 musicShowBucket.setOnStateListener(this@MusicActivity)
@@ -106,7 +109,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                     }
                     startActivityForResult(
                         PickMusicActivity::class.intent.putExtra(
-                            "BUCKET",
+                            PickMusicViewModel.BUCKET_NAME,
                             it.bucket
                         )
                     ).run {
@@ -184,15 +187,16 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 binding.musicShowBucket.performClick()
             }
         }
-        getMusicListAdapter()?.clickCallback = {
-            sendViewEvent(MusicModel.MusicEvent.PlayMusic(it))
-        }
     }
 
     private fun initMusicList() {
         binding.musicMusicList.apply {
             layoutManager = LinearLayoutManager(this@MusicActivity)
-            adapter = MusicListAdapter(this@MusicActivity)
+            adapter = MusicListAdapter(this@MusicActivity).apply {
+                clickCallback = {
+                    sendViewEvent(MusicModel.MusicEvent.PlayMusic(it))
+                }
+            }
         }
     }
 
@@ -245,6 +249,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
         binding.musicMusicList.swapAdapter(MusicListAdapter(this@MusicActivity).apply {
             getMusicListAdapter()?.getPlayingMusic()?.let { selectList.add(it) }
             musicList = getCurrentMusicList(musicBucket)
+            clickCallback = getMusicListAdapter()?.clickCallback
         }, true)
     }
 

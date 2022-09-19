@@ -218,18 +218,6 @@ class DatabaseHelper {
             }
         }
 
-        suspend fun getAllSignedMediaRs(): List<GalleyMedia>? {
-            return getAllSignedMedia()
-        }
-
-        suspend fun getAllMediaByTypeRs(isVideo: Boolean): List<GalleyMedia>? {
-            return getAllMediaByType(isVideo)
-        }
-
-        suspend fun getSignedMediaRs(uri: Uri): GalleyMedia? {
-            return getSignedMedia(uri)
-        }
-
     }
 
     inner class NoteDAOBridge : BaseNoteDAO() {

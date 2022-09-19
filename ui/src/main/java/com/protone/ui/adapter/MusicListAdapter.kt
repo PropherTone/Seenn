@@ -97,6 +97,8 @@ class MusicListAdapter(context: Context) :
         launch(Dispatchers.Default) {
             if (musicList.size <= 0) return@launch
             if (musicList.contains(music)) {
+                selectList.clear()
+                selectList.add(music)
                 playPosition = musicList.indexOf(music)
                 withContext(Dispatchers.Main) {
                     notifyItemChanged(playPosition)
@@ -123,9 +125,12 @@ class MusicListAdapter(context: Context) :
     fun insertMusics(musics: Collection<Music>) {
         launch(Dispatchers.Default) {
             musics.forEach {
-                musicList.add(it)
-                withContext(Dispatchers.Main) {
-                    notifyItemInserted(musicList.size - 1)
+                if (!musicList.contains(it)){
+                    musicList.add(it)
+                    val index = musicList.indexOf(it)
+                    if (index != -1) withContext(Dispatchers.Main) {
+                        notifyItemInserted(index)
+                    }
                 }
             }
         }

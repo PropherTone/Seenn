@@ -5,9 +5,10 @@ import androidx.activity.viewModels
 import com.protone.api.context.root
 import com.protone.seenn.activity.BaseActivity
 import com.protone.seenn.databinding.ActivityTestBinding
+import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.TestViewModel
 
-class TestActivity : BaseActivity<ActivityTestBinding, TestViewModel>(false) {
+class TestActivity : BaseActivity<ActivityTestBinding, TestViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: TestViewModel by viewModels()
 
     override fun createView(): View {

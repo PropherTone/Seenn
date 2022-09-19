@@ -65,7 +65,7 @@ class GalleyFragmentViewModel : ViewModel() {
             .run {
                 observeGalley()
                 val signedMedias =
-                    (if (combine) getAllSignedMediaRs() else getAllMediaByTypeRs(isVideo)) as MutableList<GalleyMedia>?
+                    (if (combine) getAllSignedMedia() else getAllMediaByType(isVideo)) as MutableList<GalleyMedia>?
                 if (signedMedias == null) {
                     R.string.none.getString().toast()
                     return@launch

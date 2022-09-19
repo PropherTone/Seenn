@@ -31,7 +31,7 @@ class GalleyViewViewModel : BaseViewModel() {
 
     suspend fun initGalleyData(galley: String, isVideo: Boolean) = withContext(Dispatchers.IO) {
         var allMedia = (DatabaseHelper.instance.signedGalleyDAOBridge.let {
-            if (userConfig.combineGalley) it.getAllSignedMediaRs() else it.getAllMediaByType(isVideo)
+            if (userConfig.combineGalley) it.getAllSignedMedia() else it.getAllMediaByType(isVideo)
         } ?: mutableListOf()) as MutableList<GalleyMedia>
         if (galley != R.string.all_galley.getString()) allMedia =
             allMedia.stream().filter {
@@ -41,10 +41,10 @@ class GalleyViewViewModel : BaseViewModel() {
     }
 
     suspend fun getSignedMedia() =
-        DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMediaRs(galleyMedias[curPosition].uri)
+        DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMedia(galleyMedias[curPosition].uri)
 
     suspend fun getMediaByUri(uri: Uri) =
-        DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMediaRs(uri)
+        DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMedia(uri)
 
     suspend fun getNotesWithGalley(mediaUri: Uri): MutableList<String> =
         withContext(Dispatchers.IO) {

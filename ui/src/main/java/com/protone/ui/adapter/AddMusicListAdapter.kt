@@ -26,9 +26,14 @@ class AddMusicListAdapter(
 ) : SelectListAdapter<MusicListLayoutBinding, Music, Any>(context) {
 
     init {
-        multiChoose = mode == "PICK"
-        if (multiChoose) launch {
+        multiChoose = mode == "ADD"
+        if (multiChoose) launch(Dispatchers.Default) {
             selectList.addAll(adapterDataBaseProxy.getMusicWithMusicBucket(bucket))
+            selectList.forEach {
+                musicList.indexOf(it).let { index ->
+                    if (index != -1) withContext(Dispatchers.Main) { notifyItemChanged(index) }
+                }
+            }
         }
     }
 
@@ -52,7 +57,10 @@ class AddMusicListAdapter(
                     musicListPlayState,
                     musicListName,
                     musicListTime,
-                    musicListDetail
+                    musicListDetail,
+                    backgroundColor = R.color.transparent_black1,
+                    backgroundColorPressed = R.color.transparent_black,
+                    textsColor = R.color.white
                 )
                 if (isSelect) {
                     musicListPlayState.setImageDrawable(R.drawable.load_animation.getDrawable())
@@ -88,8 +96,8 @@ class AddMusicListAdapter(
                     launch(Dispatchers.Default) {
                         if (mode == "SEARCH") {
                             adapterDataBaseProxy.play(music)
-                            withContext(Dispatchers.Main){
-                                checkSelect(holder,music)
+                            withContext(Dispatchers.Main) {
+                                checkSelect(holder, music)
                             }
                             onBusy = false
                             return@launch
@@ -104,6 +112,7 @@ class AddMusicListAdapter(
                             withContext(Dispatchers.Main) {
                                 checkSelect(holder, music)
                             }
+                            onBusy = false
                             return@launch
                         }
                         withContext(Dispatchers.Main) {

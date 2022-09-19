@@ -20,6 +20,7 @@ import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PickMusicActivity :
     BaseActivity<PickMusicActivityBinding, PickMusicViewModel, BaseViewModel.ViewEvent>(true) {
@@ -71,7 +72,7 @@ class PickMusicActivity :
         }
     }
 
-    private fun refreshList(list: MutableList<Music>) {
+    private suspend fun refreshList(list: MutableList<Music>) = withContext(Dispatchers.Main) {
         binding.addMBList.adapter.let {
             if (it is AddMusicListAdapter) {
                 binding.addMBList.swapAdapter(

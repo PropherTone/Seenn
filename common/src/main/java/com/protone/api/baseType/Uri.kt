@@ -10,6 +10,7 @@ import com.protone.api.isInDebug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
 
@@ -56,13 +57,17 @@ suspend fun Uri.toByteArray(): ByteArray? = withContext(Dispatchers.IO) {
 
 fun Uri.toMediaBitmapByteArray(): ByteArray? {
     var byteArray: ByteArray? = null
-    var ois = SApplication.app.contentResolver.openInputStream(this) ?: return byteArray
+    var ois = try {
+        SApplication.app.contentResolver.openInputStream(this)
+    } catch (e: FileNotFoundException) {
+        return byteArray
+    }
     val os = ByteArrayOutputStream()
     try {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         BitmapFactory.decodeStream(ois, null, options)
-        ois.close()
+        ois?.close()
         val dimensionPixelSize =
             SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
         options.inSampleSize = calculateInSampleSize(
@@ -72,7 +77,11 @@ fun Uri.toMediaBitmapByteArray(): ByteArray? {
             dimensionPixelSize
         )
         options.inJustDecodeBounds = false
-        ois = SApplication.app.contentResolver.openInputStream(this) ?: return byteArray
+        ois = try {
+            SApplication.app.contentResolver.openInputStream(this)
+        } catch (e: FileNotFoundException) {
+            return byteArray
+        }
         BitmapFactory.decodeStream(ois, null, options)
             ?.compress(Bitmap.CompressFormat.PNG, 100, os)
         byteArray = os.toByteArray().let {
@@ -82,7 +91,7 @@ fun Uri.toMediaBitmapByteArray(): ByteArray? {
     } catch (e: IOException) {
         if (isInDebug()) e.printStackTrace()
     } finally {
-        ois.close()
+        ois?.close()
         os.close()
     }
     return byteArray
@@ -98,9 +107,9 @@ fun Uri.toBitmapByteArray(): ByteArray? {
         if (isInDebug()) e.printStackTrace()
     } catch (e: SecurityException) {
         if (isInDebug()) e.printStackTrace()
-    } catch (e:RuntimeException){
+    } catch (e: RuntimeException) {
         if (isInDebug()) e.printStackTrace()
-    }finally {
+    } finally {
         mediaMetadataRetriever.release()
     }
     return embeddedPicture

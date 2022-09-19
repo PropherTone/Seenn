@@ -19,7 +19,7 @@
             android:id="@+id/addMB_search"
             android:layout_width="match_parent"
             android:layout_height="@dimen/action_icon"
-            android:background="@color/foreDark_2"
+            android:background="@color/foreDark"
             android:drawableStart="@drawable/ic_baseline_search_24_white"
             android:drawablePadding="@dimen/icon_padding"
             android:hint="@string/search_music"
@@ -29,7 +29,7 @@
             android:paddingEnd="0dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
-            android:textSize="@dimen/title_text"
+            android:textSize="@dimen/sub_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -60,7 +60,7 @@
                 android:background="@drawable/trans_dark_ripple"
                 android:contentDescription="@string/action"
                 android:onClick="@{()-> activity.finish()}"
-                android:padding="@dimen/icon_padding_lite"
+                android:padding="@dimen/icon_padding_mid"
                 android:src="@drawable/ic_round_keyboard_backspace_24_white"
                 android:visibility="gone" />
 
@@ -71,7 +71,7 @@
                 android:background="@drawable/trans_dark_ripple"
                 android:contentDescription="@string/action"
                 android:onClick="@{()-> activity.confirm()}"
-                android:padding="@dimen/icon_padding_lite"
+                android:padding="@dimen/icon_padding_mid"
                 android:src="@drawable/ic_baseline_check_24_white"
                 android:visibility="gone" />
 

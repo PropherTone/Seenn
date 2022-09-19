@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
@@ -75,10 +76,10 @@ abstract class SelectListAdapter<V : ViewDataBinding, T, D>(
         visible: View?,
         vararg texts: TextView,
         dispatch: Boolean = true,
-        backgroundColor: Int = R.color.white,
-        backgroundColorPressed: Int = R.color.blue_1,
-        textsColor: Int = R.color.black,
-        textsColorPressed: Int = R.color.white
+        @ColorRes backgroundColor: Int = R.color.white,
+        @ColorRes backgroundColorPressed: Int = R.color.blue_1,
+        @ColorRes textsColor: Int = R.color.black,
+        @ColorRes textsColorPressed: Int = R.color.white
     ) {
         background?.setBackgroundColor(
             ContextCompat.getColor(
