@@ -63,7 +63,7 @@ class GalleyListAdapter(
             }
             is GalleyListEvent.SelectAll -> {
                 medias.onEach {
-                    if (!selectList.contains(it)) {
+                    if (it !in selectList) {
                         selectList.add(it)
                         withContext(Dispatchers.Main) { notifyItemChanged(medias.indexOf(it)) }
                     }
@@ -172,7 +172,7 @@ class GalleyListAdapter(
     }
 
     override fun onBindViewHolder(holder: Holder<GalleyListAdapterLayoutBinding>, position: Int) {
-        setSelect(holder, selectList.contains(medias[position]))
+        setSelect(holder,medias[position] in selectList)
         holder.binding.videoIcon.isGone = !medias[position].isVideo && !combine
         holder.binding.imageView.let { image ->
             Glide.with(context).load(medias[position].thumbnailUri).into(image)

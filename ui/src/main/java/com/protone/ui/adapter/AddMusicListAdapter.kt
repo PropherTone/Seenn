@@ -89,7 +89,7 @@ class AddMusicListAdapter(
     override fun onBindViewHolder(holder: Holder<MusicListLayoutBinding>, position: Int) {
         holder.binding.apply {
             musicList[position].also { music ->
-                setSelect(holder, selectList.contains(music))
+                setSelect(holder, music in selectList)
                 musicListContainer.setOnClickListener {
                     if (onBusy) return@setOnClickListener
                     onBusy = true

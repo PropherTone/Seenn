@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.streams.toList
 
 class MusicModel : BaseViewModel() {
 
@@ -73,8 +72,7 @@ class MusicModel : BaseViewModel() {
 
     suspend fun getLastMusicBucket(list: MutableList<MusicBucket>): MusicBucket =
         withContext(Dispatchers.Default) {
-            list.stream().filter { it.name == lastBucket }.toList()
-                .let { if (it.isNotEmpty()) it[0] else MusicBucket() }
+            list.find { it.name == lastBucket } ?: MusicBucket()
         }
 
     suspend fun getMusicBuckets(): MutableList<MusicBucket> = withContext(Dispatchers.IO) {

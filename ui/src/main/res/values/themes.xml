@@ -15,14 +15,14 @@
         <!--设置全屏-->
         <!--        <item name="android:windowTranslucentNavigation">true</item>-->
         <!--        <item name="android:windowTranslucentStatus">true</item>-->
-        <!-- 设置statusBarColor 为透明-->
+        <!-- 设置statusBarColor -->
         <item name="android:statusBarColor">@color/zima_blue</item>
         <item name="android:navigationBarColor">@color/blue_5</item>
         <item name="android:windowDisablePreview">false</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="MyCheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+    <style name="MyRoundCheckBox" parent="Widget.AppCompat.CompoundButton.RadioButton">
         <item name="colorControlActivated">@color/blue_1</item>
         <item name="colorButtonNormal">@color/black</item>
     </style>

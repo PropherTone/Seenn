@@ -48,7 +48,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/controller"
                 app:layout_constraintTop_toTopOf="@+id/controller"
-                app:layout_constraintVertical_bias="0.25"
+                app:layout_constraintVertical_bias="0.24"
                 app:layout_constraintWidth_percent="0.6" />
 
             <ViewSwitcher
@@ -82,51 +82,51 @@
                     app:shapeAppearance="@style/ovalImage" />
             </ViewSwitcher>
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:background="@drawable/round_background_fore_dark"
-                app:layout_constraintBottom_toBottomOf="@id/music_detail"
-                app:layout_constraintEnd_toEndOf="@id/music_detail"
-                app:layout_constraintStart_toStartOf="@id/music_detail"
-                app:layout_constraintTop_toTopOf="@id/music_name" />
-
-            <TextView
-                android:id="@+id/music_name"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:ellipsize="marquee"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
                 android:gravity="center"
-                android:letterSpacing="0.06"
-                android:lines="1"
-                android:text="@string/model_music"
-                android:textColor="@color/white"
-                android:textSize="@dimen/title_text"
-                android:textStyle="bold"
+                android:padding="@dimen/main_padding"
+                android:background="@drawable/round_background_fore_dark"
+                android:orientation="vertical"
                 app:layout_constraintBottom_toTopOf="@id/music_progress"
                 app:layout_constraintEnd_toEndOf="@+id/controller"
                 app:layout_constraintStart_toStartOf="@+id/controller"
                 app:layout_constraintTop_toBottomOf="@id/music_cover_back"
-                app:layout_constraintVertical_bias="0.04"
-                app:layout_constraintWidth_percent="0.46" />
+                app:layout_constraintVertical_bias="0.12">
 
-            <TextView
-                android:id="@+id/music_detail"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:ellipsize="marquee"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:gravity="center"
-                android:lines="1"
-                android:text="@string/music_bucket_name"
-                android:textColor="@color/white"
-                app:layout_constraintEnd_toEndOf="@id/music_name"
-                app:layout_constraintStart_toStartOf="@id/music_name"
-                app:layout_constraintTop_toBottomOf="@id/music_name"
-                app:layout_constraintWidth_percent="0.5" />
+                <TextView
+                    android:id="@+id/music_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:gravity="center"
+                    android:letterSpacing="0.06"
+                    android:lines="1"
+                    android:text="@string/model_music"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/title_text"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/music_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:text="@string/music_bucket_name"
+                    android:textColor="@color/white"
+                    app:layout_constraintEnd_toEndOf="@id/music_name"
+                    app:layout_constraintStart_toStartOf="@id/music_name"
+                    app:layout_constraintTop_toBottomOf="@id/music_name"
+                    app:layout_constraintWidth_percent="0.5" />
+
+            </LinearLayout>
 
             <com.protone.ui.customView.ColorfulProgressBar
                 android:id="@+id/music_progress"

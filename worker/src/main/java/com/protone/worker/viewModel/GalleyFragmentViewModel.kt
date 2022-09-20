@@ -153,32 +153,48 @@ class GalleyFragmentViewModel : ViewModel() {
     }
 
     private fun observeGalley() {
-        val allGalley = R.string.all_galley.getString()
         viewModelScope.launch(Dispatchers.Default) {
+            val allGalley = R.string.all_galley.getString()
             suspend fun sortDeleteMedia(
                 media: GalleyMedia,
                 map: MutableMap<String?, MutableList<GalleyMedia>>,
                 flow: MutableSharedFlow<FragEvent>
             ) {
-                map[media.bucket]?.remove(media)
+                if (map[media.bucket]?.remove(media) == true
+                    && (map[media.bucket]?.size ?: 0) <= 0
+                ) {
+                    map.remove(media.bucket)
+                }
                 map[allGalley]?.remove(media)
                 flow.emit(FragEvent.OnMediaDeleted(media))
             }
+
+            suspend fun insertNewMedia(
+                map: MutableMap<String?, MutableList<GalleyMedia>>,
+                media: GalleyMedia
+            ) {
+                if (map[media.bucket] == null) {
+                    map[media.bucket] = mutableListOf<GalleyMedia>().also { it.add(media) }
+                    FragEvent.OnNewBucket(
+                        Pair(
+                            media.uri,
+                            arrayOf(media.bucket, map[media.bucket]?.size.toString())
+                        )
+                    ).let { sendEvent(it) }
+                } else map[media.bucket]?.add(media)
+            }
+
             DatabaseHelper.instance.mediaNotifier.buffer().collect {
-                while (!isDataSorted) delay(50)
+                while (!isDataSorted) delay(200)
                 when (it) {
-                    is MediaAction.OnMediaByUriDeleted -> {
-                        if (it.media.isVideo != isVideo) return@collect
-                        sortDeleteMedia(it.media, galleyMap, _fragFlow)
-                    }
                     is MediaAction.OnMediaDeleted -> {
                         if (it.media.isVideo != isVideo) return@collect
                         sortDeleteMedia(it.media, galleyMap, _fragFlow)
                     }
                     is MediaAction.OnMediaInserted -> {
                         if (it.media.isVideo != isVideo) return@collect
-                        insertNewMedia(it.media)
-                        galleyMap[allGalley]?.add(0, it.media)
+                        insertNewMedia(galleyMap, it.media)
+                        galleyMap[allGalley]?.add(it.media)
                         sendEvent(FragEvent.OnMediaInserted(it.media))
                     }
                     is MediaAction.OnMediaUpdated -> {
@@ -191,7 +207,7 @@ class GalleyFragmentViewModel : ViewModel() {
                                     val index = galleyMap[sortedMedia.bucket]?.indexOf(sortedMedia)
                                     if (sortedMedia.bucket != it.media.bucket) {
                                         galleyMap[sortedMedia.bucket]?.remove(sortedMedia)
-                                        insertNewMedia(it.media)
+                                        insertNewMedia(galleyMap, it.media)
                                         sendEvent(FragEvent.OnMediaInserted(it.media))
                                         return@let
                                     } else if (index != null && index != -1) {
@@ -205,19 +221,6 @@ class GalleyFragmentViewModel : ViewModel() {
                 }
             }
         }
-    }
-
-    private suspend fun insertNewMedia(media: GalleyMedia) {
-        if (galleyMap[media.bucket] == null) {
-            galleyMap[media.bucket] = mutableListOf()
-            FragEvent.OnNewBucket(
-                Pair(
-                    media.uri,
-                    arrayOf(media.bucket, galleyMap[media.bucket]?.size.toString())
-                )
-            ).let { sendEvent(it) }
-        }
-        galleyMap[media.bucket]?.add(media)
     }
 
     suspend fun sendEvent(fragEvent: FragEvent) {

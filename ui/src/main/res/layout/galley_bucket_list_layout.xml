@@ -43,7 +43,7 @@
             android:focusable="false"
             android:clickable="false"
             android:id="@+id/bucket_check"
-            android:theme="@style/MyCheckBox"
+            android:theme="@style/MyRoundCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/main_padding"

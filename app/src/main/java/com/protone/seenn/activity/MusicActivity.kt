@@ -74,7 +74,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
             when (it) {
                 is MusicModel.MusicEvent.PlayMusic -> withContext(Dispatchers.Default) {
                     if (lastBucket != binding.musicBucketName.text) {
-                        getMusicListAdapter()?.musicList?.let { list ->
+                        getMusicListAdapter()?.getPlayList()?.let { list ->
                             lastBucket = binding.musicBucketName.text.toString()
                             controller.setMusicList(list)
                         }
@@ -161,13 +161,18 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                     getBucket(it.bucket)?.let { mb -> getMusicBucketAdapter()?.addBucket(mb) }
                 is MusicModel.MusicEvent.DeleteBucket ->
                     getBucket(it.bucket)?.let { mb -> getMusicBucketAdapter()?.deleteBucket(mb) }
-                is MusicModel.MusicEvent.Locate -> getMusicListAdapter()?.getPlayingPosition()
-                    ?.let { position ->
-                        if (position != -1) binding.musicMusicList.smoothScrollToPosition(position)
-                    }
-                is MusicModel.MusicEvent.Search -> {
-
-                }
+                is MusicModel.MusicEvent.Locate ->
+                    getMusicListAdapter()?.getPlayingPosition()
+                        ?.let { position ->
+                            if (position != -1)
+                                binding.musicMusicList.smoothScrollToPosition(position)
+                        }
+                is MusicModel.MusicEvent.Search ->
+                    startActivity(
+                        PickMusicActivity::class.intent
+                            .putExtra(PickMusicViewModel.BUCKET_NAME, lastBucket)
+                            .putExtra(PickMusicViewModel.MODE, PickMusicViewModel.SEARCH_MUSIC)
+                    )
             }
         }
 
@@ -192,10 +197,8 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
     private fun initMusicList() {
         binding.musicMusicList.apply {
             layoutManager = LinearLayoutManager(this@MusicActivity)
-            adapter = MusicListAdapter(this@MusicActivity).apply {
-                clickCallback = {
-                    sendViewEvent(MusicModel.MusicEvent.PlayMusic(it))
-                }
+            adapter = MusicListAdapter(this@MusicActivity, mutableListOf()).apply {
+                clickCallback = { sendViewEvent(MusicModel.MusicEvent.PlayMusic(it)) }
             }
         }
     }
@@ -221,7 +224,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 getBucket(lastBucket)?.let {
                     if (binding.musicBucketName.text != it.name) {
                         sendViewEvent(MusicModel.MusicEvent.SetBucketCover(it.name))
-                        getMusicListAdapter()?.musicList = getCurrentMusicList(it)
+                        getMusicListAdapter()?.insertMusics(getCurrentMusicList(it))
                     }
                 }
                 musicBucketEventListener = object : MusicBucketAdapter.MusicBucketEvent {
@@ -246,11 +249,15 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
     }
 
     private suspend fun MusicModel.switchMusicBucket(musicBucket: MusicBucket) {
-        binding.musicMusicList.swapAdapter(MusicListAdapter(this@MusicActivity).apply {
-            getMusicListAdapter()?.getPlayingMusic()?.let { selectList.add(it) }
-            musicList = getCurrentMusicList(musicBucket)
-            clickCallback = getMusicListAdapter()?.clickCallback
-        }, true)
+        binding.musicMusicList.swapAdapter(
+            MusicListAdapter(
+                this@MusicActivity,
+                getCurrentMusicList(musicBucket)
+            ).apply {
+                getMusicListAdapter()?.getPlayingMusic()?.let { selectList.add(it) }
+                clickCallback = getMusicListAdapter()?.clickCallback
+            }, true
+        )
     }
 
     private fun getMusicBucketAdapter() = (binding.musicBucket.adapter as MusicBucketAdapter?)

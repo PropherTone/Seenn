@@ -453,7 +453,7 @@ class DatabaseHelper {
         }
 
         suspend fun deleteSignedMediaByUri(uri: Uri) = withContext(Dispatchers.IO) {
-            getSignedMedia(uri)?.let { sendEvent(MediaAction.OnMediaByUriDeleted(it)) }
+            getSignedMedia(uri)?.let { sendEvent(MediaAction.OnMediaDeleted(it)) }
             signedGalleyDAO.deleteSignedMediaByUri(uri)
         }
 

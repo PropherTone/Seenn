@@ -15,7 +15,7 @@
         android:id="@+id/musicList_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/transparent_white1"
+        android:background="@color/transparent"
         android:paddingTop="@dimen/texts_padding"
         android:paddingBottom="@dimen/texts_padding">
 

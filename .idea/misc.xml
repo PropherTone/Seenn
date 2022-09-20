@@ -10,12 +10,12 @@
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/galley_view_activity.xml" value="0.176" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/log_activity.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/main_activity.xml" value="0.1" />
-        <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/music_activtiy.xml" value="0.10747663551401869" />
+        <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/music_activtiy.xml" value="0.1" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/music_view_activity.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/note_activity.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/note_edit_activity.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/note_view_activity.xml" value="0.19794784095767423" />
-        <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/pick_music_activity.xml" value="0.19794784095767423" />
+        <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/pick_music_activity.xml" value="0.1" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/picture_box_activity.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/splash_activity.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/user_config_activity.xml" value="0.19794784095767423" />
@@ -117,6 +117,8 @@
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/video_controller.xml" value="0.136" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/layout/video_player_layout.xml" value="0.20820863616930313" />
         <entry key="..\:/AndroidProject/Seenn/seen/src/main/res/xml/note_bucket_layout_scene.xml" value="0.25364583333333335" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/background_ripple_blue.xml" value="0.1235" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/background_ripple_red.xml" value="0.1235" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/background_ripple_transparent_white.xml" value="0.137" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/black_gradient_left.xml" value="0.145" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/black_gradient_right.xml" value="0.145" />
@@ -127,17 +129,23 @@
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/oval_background.xml" value="0.145" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/oval_fore_dark.xml" value="0.134" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/round_background_fore_dark.xml" value="0.145" />
-        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/auto_music_player_layout_full.xml" value="0.19794784095767423" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/round_background_trans_white.xml" value="0.1235" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/trans_dark_ripple.xml" value="0.1235" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/trans_ripple.xml" value="0.1235" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/transparent_card.xml" value="0.1235" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/auto_music_player_layout_full.xml" value="0.18628359592215013" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/auto_music_player_layout_lite.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/auto_music_player_layout_mid.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/colorful_bar_child_layout.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/date_layout.xml" value="0.19794784095767423" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/galley_bucket_list_layout.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/galley_fragment_layout.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/galley_list_adapter_layout.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/galley_vp2_adapter_layout.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/list_pop_windows_layout.xml" value="0.264" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/log_list_layout.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/music_card.xml" value="0.19794784095767423" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/music_list_layout.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/note_card.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/photo_card.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/picture_box_adapter_gif_layout.xml" value="0.19794784095767423" />
@@ -160,7 +168,6 @@
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/galley_search_activity.xml" value="0.2085222121486854" />
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/music_activtiy.xml" value="0.1" />
         <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/note_edit_activity.xml" value="0.17806484295845998" />
-        <entry key="..\:/AndroidStudioProject/Seenn/app/src/main/res/layout/pick_music_activity.xml" value="0.17806484295845998" />
         <entry key="..\:/AndroidStudioProject/Seenn/richNote/src/main/res/layout/activity_connect.xml" value="0.155622060709705" />
         <entry key="..\:/AndroidStudioProject/Seenn/richNote/src/main/res/layout/activity_cut.xml" value="0.155622060709705" />
         <entry key="..\:/AndroidStudioProject/Seenn/richNote/src/main/res/layout/activity_guide.xml" value="0.155622060709705" />
@@ -298,12 +305,6 @@
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/menu/galley_toolbar.xml" value="0.22" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.291" />
         <entry key="..\:/AndroidStudioProject/Seenn/seen/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.291" />
-        <entry key="..\:/AndroidStudioProject/Seenn/ui/src/main/res/layout/music_list_layout.xml" value="0.36614583333333334" />
-        <entry key="..\:/AndroidStudioProject/Seenn/ui/src/main/res/layout/note_card.xml" value="0.36614583333333334" />
-        <entry key="..\:/AndroidStudioProject/Seenn/ui/src/main/res/layout/photo_card.xml" value="0.36614583333333334" />
-        <entry key="..\:/AndroidStudioProject/Seenn/ui/src/main/res/layout/photo_card_layout.xml" value="0.36614583333333334" />
-        <entry key="..\:/AndroidStudioProject/Seenn/ui/src/main/res/layout/picture_box_adapter_video_layout.xml" value="0.17806484295845998" />
-        <entry key="..\:/AndroidStudioProject/Seenn/ui/src/main/res/layout/video_card.xml" value="0.36614583333333334" />
       </map>
     </option>
   </component>

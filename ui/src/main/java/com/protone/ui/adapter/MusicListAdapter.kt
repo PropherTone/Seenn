@@ -13,16 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MusicListAdapter(context: Context) :
+class MusicListAdapter(context: Context,private val musicList: MutableList<Music>) :
     SelectListAdapter<MusicListLayoutBinding, Music, Any>(context) {
-
-    var musicList: MutableList<Music> = mutableListOf()
-        @SuppressLint("NotifyDataSetChanged")
-        set(value) {
-            field.clear()
-            field.addAll(value)
-            if (selectList.size >= 1) playPosition = field.indexOf(selectList[0])
-        }
 
     var clickCallback: ((Music) -> Unit?)? = null
 
@@ -138,6 +130,6 @@ class MusicListAdapter(context: Context) :
 
     fun getPlayingMusic(): Music? = selectList.getOrNull(0)
 
-    fun getPlayList() = musicList.toList()
+    fun getPlayList() = musicList.toMutableList()
 
 }

@@ -34,7 +34,7 @@ class GalleyBucketAdapter(
     override suspend fun onEventIO(data: GalleyBucketEvent) {
         when (data) {
             is GalleyBucketEvent.DeleteBucket -> {
-                galleries.first { it.second[0] == data.bucket.second[0] }.let {
+                galleries.find { it.second[0] == data.bucket.second[0] }?.let {
                     val index = galleries.indexOf(it)
                     galleries.removeAt(index)
                     selectList.remove(it)
@@ -98,7 +98,7 @@ class GalleyBucketAdapter(
 
     override fun onBindViewHolder(holder: Holder<GalleyBucketListLayoutBinding>, position: Int) {
         galleries[position].let { data ->
-            setSelect(holder, selectList.contains(data))
+            setSelect(holder, data in selectList)
             holder.binding.apply {
                 root.setOnLongClickListener {
                     AlertDialog.Builder(context)

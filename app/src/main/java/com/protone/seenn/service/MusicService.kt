@@ -265,7 +265,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
                     return@launch
                 }
                 if (music != null) {
-                    if (!playList.contains(music)) {
+                    if (music !in playList) {
                         playList.add(music)
                     }
                     val index = playList.indexOf(music)

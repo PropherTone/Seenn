@@ -12,7 +12,6 @@ sealed class MediaAction {
     data class OnMusicDeleted(val music: Music) : MediaAction()
     data class OnMusicUpdate(val music: Music) : MediaAction()
 
-    data class OnMediaByUriDeleted(val media: GalleyMedia) : MediaAction()
     data class OnMediaDeleted(val media: GalleyMedia) : MediaAction()
     data class OnMediaInserted(val media: GalleyMedia) : MediaAction()
     data class OnMediaUpdated(val media: GalleyMedia) : MediaAction()

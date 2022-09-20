@@ -44,7 +44,7 @@ class CheckListAdapter(
         Holder(CheckListAdapterLayoutBinding.inflate(context.newLayoutInflater, parent, false))
 
     override fun onBindViewHolder(holder: Holder<CheckListAdapterLayoutBinding>, position: Int) {
-        setSelect(holder, selectList.contains(dataList[position]))
+        setSelect(holder,dataList[position] in selectList)
         holder.binding.apply {
             clCheck.isGone = !check
             root.setOnClickListener {

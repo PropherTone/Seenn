@@ -50,8 +50,11 @@ class PickMusicActivity :
         }
 
         getList()?.let { data.addAll(it) }
-        SearchModel(binding.addMBSearch) {
+        val searchModel = SearchModel(binding.addMBSearch) {
             viewModel.query(getInput())
+        }
+        onFinish = {
+            searchModel.destroy()
         }
     }
 
@@ -66,7 +69,6 @@ class PickMusicActivity :
     }
 
     private fun PickMusicViewModel.query(input: String) {
-        if (input.isEmpty()) return
         launch(Dispatchers.Default) {
             refreshList(filterData(input))
         }

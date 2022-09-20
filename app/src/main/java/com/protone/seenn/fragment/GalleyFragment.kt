@@ -25,9 +25,11 @@ import com.protone.seenn.R
 import com.protone.seenn.activity.GalleySearchActivity
 import com.protone.seenn.activity.GalleyViewActivity
 import com.protone.seenn.activity.PictureBoxActivity
+import com.protone.ui.adapter.BaseAdapter
 import com.protone.ui.adapter.GalleyBucketAdapter
 import com.protone.ui.adapter.GalleyListAdapter
 import com.protone.ui.customView.StatusImageView
+import com.protone.ui.databinding.GalleyBucketListLayoutBinding
 import com.protone.ui.databinding.GalleyFragmentLayoutBinding
 import com.protone.ui.dialog.titleDialog
 import com.protone.ui.itemDecoration.GalleyItemDecoration
@@ -94,14 +96,6 @@ class GalleyFragment(
                         is GalleyFragmentViewModel.FragEvent.OnNewBucket -> {
                             insertBucket(it.pairs)
                         }
-//                        is GalleyFragmentViewModel.FragEvent.OnListUpdate -> {
-//                            getBucketAdapter().performSelect()
-//                            noticeListUpdate(it.data)
-//                        }
-//                        is GalleyFragmentViewModel.FragEvent.OnGetAllGalley -> {
-//                            getBucketAdapter().performSelect()
-//                            noticeListUpdate(viewModel.galleyMap[R.string.all_galley.getString()])
-//                        }
                         is GalleyFragmentViewModel.FragEvent.OnMediaDeleted -> {
                             refreshBucket(it.galleyMedia)
                             if (onTargetGalley(it.galleyMedia.bucket)) {
@@ -156,7 +150,12 @@ class GalleyFragment(
 
                     override fun onNegative() {
                         if (viewModel.rightGalley == "") {
-                            noticeListUpdate(viewModel.getGalley(viewModel.getGalleyName()))
+                            binding.galleyBucket.findViewHolderForLayoutPosition(0)?.let {
+                                if (it is BaseAdapter.Holder<*> && it.binding is GalleyBucketListLayoutBinding) {
+                                    (it.binding as GalleyBucketListLayoutBinding).bucket.performClick()
+                                    return
+                                }
+                            }
                         }
                         viewModel.isBucketShowUp = false
                         galleyToolButton.isVisible = onSelectMod
@@ -247,6 +246,7 @@ class GalleyFragment(
                 (getGalley(media.bucket)?.size ?: 0).toString()
             )
         ).apply { getBucketAdapter().refreshBucket(this) }
+
         val all = R.string.all_galley.getString()
         Pair(
             if ((getGalley(all)?.size ?: 0) > 0) {

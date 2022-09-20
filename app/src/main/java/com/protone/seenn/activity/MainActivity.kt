@@ -30,7 +30,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : BaseActivity<MainActivityBinding, MainViewModel,MainViewModel.MainViewEvent>(true),
+class MainActivity :
+    BaseActivity<MainActivityBinding, MainViewModel, MainViewModel.MainViewEvent>(true),
     MainModelListAdapter.ModelClk {
     override val viewModel: MainViewModel by viewModels()
 
@@ -78,17 +79,13 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel,MainViewMod
                 }
                 toolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
                     binding.toolMotion.progress =
-                        -verticalOffset / appBarLayout.totalScrollRange.toFloat().also {
+                        (-verticalOffset / appBarLayout.totalScrollRange.toFloat()).also {
                             binding.musicPlayer.isVisible = it > 0.7f
-                            binding.actionBtnContainer.also { btn ->
-                                btn.y =
-                                    viewModel.btnY - (viewModel.btnH * binding.toolMotion.progress) * 2
-                            }
+                            binding.actionBtnContainer.y =
+                                viewModel.btnY - (viewModel.btnH * it) * 2
                         }
                 }
-            }
-            musicPlayer.apply {
-                duration
+                musicPlayer.duration = userConfig.lastMusicProgress
             }
             modelList.apply {
                 setPadding(
@@ -113,8 +110,8 @@ class MainActivity : BaseActivity<MainActivityBinding, MainViewModel,MainViewMod
         refreshModelList()
         bindMusicService {
             (binding.modelList.adapter as MainModelListAdapter).loadDataBelow()
-            musicController.setBinder(this@MainActivity, it) { binder ->
-                userConfig.musicLoopMode = binder
+            musicController.setBinder(this@MainActivity, it) { loopMode ->
+                userConfig.musicLoopMode = loopMode
             }
             musicController.setLoopMode(userConfig.musicLoopMode)
             launch(Dispatchers.Default) {
