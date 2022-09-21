@@ -68,9 +68,9 @@ class GalleyFragment(
         val model: GalleyFragmentViewModel by viewModels()
         viewModel = model
         viewModel.apply {
-            onAttach.invoke(fragFlow)
+            attachFragEvent(onAttach)
             launch(Dispatchers.Default) {
-                fragFlow.buffer().collect {
+                fragEvent.buffer().collect {
                     when (it) {
                         is GalleyFragmentViewModel.FragEvent.AddBucket -> {
                             insertNewMedias(it.name, it.list)
@@ -237,26 +237,10 @@ class GalleyFragment(
     }
 
     private fun refreshBucket(media: GalleyMedia): Unit = viewModel.run {
-        Pair(
-            if ((getGalley(media.bucket)?.size ?: 0) > 0) {
-                getGalley(media.bucket)?.get(0)?.uri ?: Uri.EMPTY
-            } else Uri.EMPTY,
-            arrayOf(
-                media.bucket,
-                (getGalley(media.bucket)?.size ?: 0).toString()
-            )
-        ).apply { getBucketAdapter().refreshBucket(this) }
-
-        val all = R.string.all_galley.getString()
-        Pair(
-            if ((getGalley(all)?.size ?: 0) > 0) {
-                getGalley(all)?.get(0)?.uri ?: Uri.EMPTY
-            } else Uri.EMPTY,
-            arrayOf(
-                all,
-                (getGalley(all)?.size ?: 0).toString()
-            )
-        ).apply { getBucketAdapter().refreshBucket(this) }
+        getBucketAdapter().run {
+            refreshBucket(getBucket(media.bucket))
+            refreshBucket(getBucket(R.string.all_galley.getString()))
+        }
     }
 
     private fun noticeListUpdate(media: GalleyMedia, status: GalleyListAdapter.MediaStatus) {

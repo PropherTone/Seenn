@@ -1,7 +1,6 @@
 package com.protone.seenn.activity
 
 import android.content.Intent
-import android.view.View
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,12 +25,12 @@ class PickMusicActivity :
     BaseActivity<PickMusicActivityBinding, PickMusicViewModel, BaseViewModel.ViewEvent>(true) {
     override val viewModel: PickMusicViewModel by viewModels()
 
-    override fun createView(): View {
-        binding = PickMusicActivityBinding.inflate(layoutInflater, root, false)
-        binding.activity = this
-        fitStatuesBar(binding.root)
-        linkInput(binding.addMBList, binding.addMBSearch)
-        return binding.root
+    override fun createView(): PickMusicActivityBinding {
+        return PickMusicActivityBinding.inflate(layoutInflater, root, false).apply {
+            binding.activity = this@PickMusicActivity
+            fitStatuesBar(binding.root)
+            linkInput(binding.addMBList, binding.addMBSearch)
+        }
     }
 
     override suspend fun PickMusicViewModel.init() {

@@ -26,13 +26,16 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import java.util.concurrent.atomic.AtomicInteger
 
-abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel,T : BaseViewModel.ViewEvent>(handleEvent: Boolean) :
+abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent>(
+    handleEvent: Boolean
+) :
     AppCompatActivity(),
     CoroutineScope by MainScope() {
     protected abstract val viewModel: VM
     protected lateinit var binding: VB
+        private set
 
-    abstract fun createView(): View
+    abstract fun createView(): VB
     abstract suspend fun VM.init()
     private var onViewEvent: (suspend (T) -> Unit)? = null
         set(value) {
@@ -97,7 +100,8 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel,T : BaseVie
             activityOperationReceiver,
             IntentFilter(ACTIVITY_FINISH)
         )
-        setContentView(createView())
+        binding = createView()
+        setContentView(binding.root)
         lifecycleScope.launchWhenStarted {
             viewModel.init()
         }
@@ -154,7 +158,7 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel,T : BaseVie
         viewEvent = null
     }
 
-    fun bindMusicService(block:suspend (MusicService.MusicBinder) -> Unit) {
+    fun bindMusicService(block: suspend (MusicService.MusicBinder) -> Unit) {
         serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
                 launch {

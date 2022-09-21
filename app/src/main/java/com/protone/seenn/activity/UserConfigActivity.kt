@@ -32,10 +32,10 @@ class UserConfigActivity : BaseActivity<
         UserConfigViewModel.UserConfigEvent>(true) {
     override val viewModel: UserConfigViewModel by viewModels()
 
-    override fun createView(): View {
-        binding = UserConfigActivityBinding.inflate(layoutInflater, root, false)
-        binding.activity = this
-        return binding.root
+    override fun createView(): UserConfigActivityBinding {
+        return UserConfigActivityBinding.inflate(layoutInflater, root, false).apply {
+            activity = this@UserConfigActivity
+        }
     }
 
     override suspend fun UserConfigViewModel.init() {

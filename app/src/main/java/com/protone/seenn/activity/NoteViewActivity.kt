@@ -26,10 +26,10 @@ class NoteViewActivity :
 
     private var binder: MusicService.MusicBinder? = null
 
-    override fun createView(): View {
-        binding = NoteViewActivityBinding.inflate(layoutInflater, root, false)
-        binding.activity = this
-        return binding.root
+    override fun createView(): NoteViewActivityBinding {
+        return NoteViewActivityBinding.inflate(layoutInflater, root, false).apply {
+            activity = this@NoteViewActivity
+        }
     }
 
     override suspend fun NoteViewViewModel.init() {

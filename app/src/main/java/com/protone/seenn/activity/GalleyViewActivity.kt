@@ -36,35 +36,35 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class GalleyViewActivity : BaseMediaActivity<
-            GalleyViewActivityBinding,
-            GalleyViewViewModel,
-            GalleyViewViewModel.GalleyViewEvent>(true) {
+        GalleyViewActivityBinding,
+        GalleyViewViewModel,
+        GalleyViewViewModel.GalleyViewEvent>(true) {
     override val viewModel: GalleyViewViewModel by viewModels()
 
-    override fun createView(): View {
-        binding = GalleyViewActivityBinding.inflate(layoutInflater, root, false)
-        binding.activity = this
-        fitStatuesBarUsePadding(binding.galleyVCover)
-        initPop()
-        popLayout?.galleyIntoBox?.isGone = true
-        popLayout?.galleySelectAll?.isGone = true
-        binding.next.setOnClickListener {
-            binding.galleyVView.setCurrentItem(1 + binding.galleyVView.currentItem, true)
-        }
-        binding.previous.setOnClickListener {
-            binding.galleyVView.setCurrentItem(binding.galleyVView.currentItem - 1, true)
-        }
-        binding.galleyVLinks.apply {
-            adapter = CheckListAdapter(this@GalleyViewActivity, check = false).also {
-                it.startNote = {
-                    startActivity(NoteViewActivity::class.intent.apply {
-                        putExtra(NoteViewViewModel.NOTE_NAME, it)
-                    })
-                }
+    override fun createView(): GalleyViewActivityBinding {
+        return GalleyViewActivityBinding.inflate(layoutInflater, root, false).apply {
+            activity = this@GalleyViewActivity
+            fitStatuesBarUsePadding(galleyVCover)
+            initPop()
+            popLayout?.galleyIntoBox?.isGone = true
+            popLayout?.galleySelectAll?.isGone = true
+            next.setOnClickListener {
+                galleyVView.setCurrentItem(1 + galleyVView.currentItem, true)
             }
-            layoutManager = LinearLayoutManager(context)
+            previous.setOnClickListener {
+                galleyVView.setCurrentItem(galleyVView.currentItem - 1, true)
+            }
+            galleyVLinks.apply {
+                adapter = CheckListAdapter(this@GalleyViewActivity, check = false).also {
+                    it.startNote = {
+                        startActivity(NoteViewActivity::class.intent.apply {
+                            putExtra(NoteViewViewModel.NOTE_NAME, it)
+                        })
+                    }
+                }
+                layoutManager = LinearLayoutManager(context)
+            }
         }
-        return binding.root
     }
 
     override suspend fun GalleyViewViewModel.init() {
@@ -104,46 +104,39 @@ class GalleyViewActivity : BaseMediaActivity<
         }
     }
 
-    private suspend fun GalleyViewViewModel.setInfo() {
+    private suspend fun GalleyViewViewModel.setInfo() = withContext(Dispatchers.Default) {
         val galleyMedia = getSignedMedia()
         removeCato()
         galleyMedia?.cate?.onEach {
-            withContext(Dispatchers.Default) {
-                if (it.contains("content://")) {
-                    val mediaByUri = getMediaByUri(it.toUri())
-                    addCato(
-                        withContext(Dispatchers.Main) {
-                            ImageCateLayoutBinding.inflate(
-                                layoutInflater,
-                                root,
-                                false
-                            ).apply {
-                                Glide.with(this@GalleyViewActivity).asDrawable().load(it.toUri())
-                                    .into(catoBack)
-                                catoName.text = mediaByUri?.name
-                                root.setOnClickListener {
-                                    startActivity(GalleyViewActivity::class.intent.apply {
-                                        putExtra(GalleyViewViewModel.MEDIA, mediaByUri?.toJson())
-                                        putExtra(GalleyViewViewModel.TYPE, mediaByUri?.isVideo)
-                                    })
-                                }
-                            }.root
+            if (it.contains("content://")) {
+                val mediaByUri = getMediaByUri(it.toUri())
+                addCato(withContext(Dispatchers.Main) {
+                    ImageCateLayoutBinding.inflate(
+                        layoutInflater,
+                        root,
+                        false
+                    ).apply {
+                        Glide.with(this@GalleyViewActivity).asDrawable().load(mediaByUri?.uri)
+                            .into(catoBack)
+                        catoName.text = mediaByUri?.name
+                        root.setOnClickListener {
+                            startActivity(GalleyViewActivity::class.intent.apply {
+                                putExtra(GalleyViewViewModel.MEDIA, mediaByUri?.toJson())
+                                putExtra(GalleyViewViewModel.TYPE, mediaByUri?.isVideo)
+                            })
                         }
-
-                    )
-                } else {
-                    addCato(
-                        withContext(Dispatchers.Main) {
-                            TextCateLayoutBinding.inflate(
-                                layoutInflater,
-                                root,
-                                false
-                            ).apply {
-                                cato.text = it
-                            }.root
-                        }
-                    )
-                }
+                    }.root
+                })
+            } else {
+                addCato(withContext(Dispatchers.Main) {
+                    TextCateLayoutBinding.inflate(
+                        layoutInflater,
+                        root,
+                        false
+                    ).apply {
+                        cato.text = it
+                    }.root
+                })
             }
         }
         setNotes(getNotesWithGalley(galleyMedia?.uri ?: Uri.EMPTY))

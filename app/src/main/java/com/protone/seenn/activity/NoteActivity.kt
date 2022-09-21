@@ -2,7 +2,6 @@ package com.protone.seenn.activity
 
 import android.animation.ValueAnimator
 import android.transition.TransitionManager
-import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,11 +27,11 @@ class NoteActivity :
     BaseActivity<NoteActivityBinding, NoteViewModel, NoteViewModel.NoteViewEvent>(true) {
     override val viewModel: NoteViewModel by viewModels()
 
-    override fun createView(): View {
-        binding = NoteActivityBinding.inflate(layoutInflater, root, false)
-        fitStatuesBar(binding.root)
-        binding.activity = this
-        return binding.root
+    override fun createView(): NoteActivityBinding {
+        return NoteActivityBinding.inflate(layoutInflater, root, false).apply {
+            fitStatuesBar(root)
+            activity = this@NoteActivity
+        }
     }
 
     override suspend fun NoteViewModel.init() {

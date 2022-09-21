@@ -1,6 +1,5 @@
 package com.protone.seenn.activity
 
-import android.view.View
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -69,8 +68,8 @@ class MainActivity :
             field = value
         }
 
-    override fun createView(): View {
-        binding = MainActivityBinding.inflate(layoutInflater, root, false).apply {
+    override fun createView(): MainActivityBinding {
+        return MainActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MainActivity
             root.onGlobalLayout {
                 actionBtnContainer.also {
@@ -97,8 +96,6 @@ class MainActivity :
             }
 
         }
-
-        return binding.root
     }
 
     override suspend fun MainViewModel.init() {

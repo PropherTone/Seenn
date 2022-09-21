@@ -3,7 +3,6 @@ package com.protone.seenn.activity
 import android.content.Intent
 import android.graphics.drawable.Animatable
 import android.net.Uri
-import android.view.View
 import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
@@ -44,25 +43,25 @@ class NoteEditActivity :
         }
         get() = binding.noteEditTitle.text.toString()
 
-    override fun createView(): View {
-        binding = NoteEditActivityBinding.inflate(layoutInflater, root, false)
-        binding.activity = this
-        binding.noteEditToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-            binding.toolbar.progress =
-                -verticalOffset / appBarLayout.totalScrollRange.toFloat()
-        }
-        setSoftInputStatusListener { height, isShow ->
-            if (isShow) {
-                binding.root.marginBottom(height)
-            } else {
-                binding.root.marginBottom(0)
+    override fun createView(): NoteEditActivityBinding {
+        return NoteEditActivityBinding.inflate(layoutInflater, root, false).apply {
+            activity = this@NoteEditActivity
+            noteEditToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+                toolbar.progress =
+                    -verticalOffset / appBarLayout.totalScrollRange.toFloat()
+            }
+            setSoftInputStatusListener { height, isShow ->
+                if (isShow) {
+                    root.marginBottom(height)
+                } else {
+                    root.marginBottom(0)
+                }
+            }
+            noteEditRichNote.apply {
+                isEditable = true
+                setRichList(listOf(RichNoteStates("", arrayListOf())))
             }
         }
-        binding.noteEditRichNote.apply {
-            isEditable = true
-            setRichList(listOf(RichNoteStates("", arrayListOf())))
-        }
-        return binding.root
     }
 
     override suspend fun NoteEditViewModel.init() {

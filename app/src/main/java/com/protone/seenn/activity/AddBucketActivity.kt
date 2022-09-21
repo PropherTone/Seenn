@@ -2,7 +2,6 @@ package com.protone.seenn.activity
 
 import android.content.Intent
 import android.net.Uri
-import android.view.View
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
 import com.protone.api.baseType.toast
@@ -43,18 +42,18 @@ class AddBucketActivity : BaseActivity<
             field = value
         }
 
-    override fun createView(): View {
-        binding = AddBucketActivityBinding.inflate(layoutInflater, root, false)
-        fitStatuesBarUsePadding(binding.root)
-        binding.activity = this
-        setSoftInputStatusListener { i, b ->
-            if (b) {
-                binding.root.marginBottom(i)
-            } else {
-                binding.root.marginBottom(0)
+    override fun createView(): AddBucketActivityBinding {
+        return AddBucketActivityBinding.inflate(layoutInflater, root, false).apply {
+            fitStatuesBarUsePadding(root)
+            activity = this@AddBucketActivity
+            setSoftInputStatusListener { i, b ->
+                if (b) {
+                    root.marginBottom(i)
+                } else {
+                    root.marginBottom(0)
+                }
             }
         }
-        return binding.root
     }
 
     override suspend fun AddBucketViewModel.init() {

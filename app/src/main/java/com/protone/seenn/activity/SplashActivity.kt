@@ -3,7 +3,6 @@ package com.protone.seenn.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.view.View
 import androidx.activity.viewModels
 import com.protone.api.context.*
 import com.protone.seenn.broadcast.workLocalBroadCast
@@ -18,17 +17,17 @@ class SplashActivity :
 
     override val viewModel: SplashViewModel by viewModels()
 
-    override fun createView(): View {
-        binding = SplashActivityBinding.inflate(layoutInflater, root, false)
-        binding.root.apply {
-            onGlobalLayout {
-                SApplication.apply {
-                    screenHeight = measuredHeight
-                    screenWidth = measuredWidth
+    override fun createView(): SplashActivityBinding {
+        return SplashActivityBinding.inflate(layoutInflater, root, false).apply {
+            root.apply {
+                onGlobalLayout {
+                    SApplication.apply {
+                        screenHeight = measuredHeight
+                        screenWidth = measuredWidth
+                    }
                 }
             }
         }
-        return binding.root
     }
 
     override suspend fun SplashViewModel.init() {

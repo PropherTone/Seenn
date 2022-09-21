@@ -1,7 +1,6 @@
 package com.protone.seenn.activity
 
 import android.transition.TransitionManager
-import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.core.view.isGone
@@ -21,12 +20,11 @@ class MusicViewActivity :
     BaseActivity<MusicViewActivityBinding, MusicViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: MusicViewModel by viewModels()
 
-    override fun createView(): View {
-        binding = MusicViewActivityBinding.inflate(layoutInflater, root, false)
-        binding.activity = this
-        binding.toolBar.layoutParams =
-            binding.toolBar.layoutParams.apply { height = statuesBarHeight }
-        return binding.root
+    override fun createView(): MusicViewActivityBinding {
+        return MusicViewActivityBinding.inflate(layoutInflater, root, false).apply {
+            activity = this@MusicViewActivity
+            toolBar.layoutParams = toolBar.layoutParams.apply { height = statuesBarHeight }
+        }
     }
 
     override suspend fun MusicViewModel.init() {

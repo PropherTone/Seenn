@@ -2,7 +2,6 @@ package com.protone.seenn.activity
 
 import android.content.Intent
 import android.util.Log
-import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,11 +26,11 @@ import java.io.File
 class LogActivity : BaseActivity<LogActivityBinding, LogViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: LogViewModel by viewModels()
 
-    override fun createView(): View {
-        binding = LogActivityBinding.inflate(layoutInflater, root, false)
-        binding.activity = this
-        fitStatuesBar(binding.root)
-        return binding.root
+    override fun createView(): LogActivityBinding {
+        return LogActivityBinding.inflate(layoutInflater, root, false).apply {
+            activity = this@LogActivity
+            fitStatuesBar(binding.root)
+        }
     }
 
     override suspend fun LogViewModel.init() {

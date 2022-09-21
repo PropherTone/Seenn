@@ -1,6 +1,5 @@
 package com.protone.seenn.activity
 
-import android.view.View
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,9 +19,8 @@ class PictureBoxActivity :
     BaseActivity<PictureBoxActivityBinding, PictureBoxViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: PictureBoxViewModel by viewModels()
 
-    override fun createView(): View {
-        binding = PictureBoxActivityBinding.inflate(layoutInflater, root, false)
-        return binding.root
+    override fun createView(): PictureBoxActivityBinding {
+        return PictureBoxActivityBinding.inflate(layoutInflater, root, false)
     }
 
     override suspend fun PictureBoxViewModel.init() {

@@ -24,17 +24,19 @@ import com.protone.worker.viewModel.GalleyViewViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class GalleySearchActivity :
-    BaseMediaActivity<GalleySearchActivityBinding, GalleySearchViewModel,BaseViewModel.ViewEvent>(false),
+class GalleySearchActivity : BaseMediaActivity<
+        GalleySearchActivityBinding,
+        GalleySearchViewModel,
+        BaseViewModel.ViewEvent>(false),
     GalleyListAdapter.OnSelect, GalleySearchViewModel.OnQuery {
     override val viewModel: GalleySearchViewModel by viewModels()
 
-    override fun createView(): View {
-        binding = GalleySearchActivityBinding.inflate(layoutInflater, root, false)
-        binding.activity = this
-        fitStatuesBar(binding.root)
-        initPop()
-        return binding.root
+    override fun createView(): GalleySearchActivityBinding {
+        return GalleySearchActivityBinding.inflate(layoutInflater, root, false).apply {
+            binding.activity = this@GalleySearchActivity
+            fitStatuesBar(binding.root)
+            initPop()
+        }
     }
 
     override suspend fun GalleySearchViewModel.init() {
@@ -56,7 +58,7 @@ class GalleySearchActivity :
     }
 
     private fun newAdapter(list: MutableList<GalleyMedia>) = GalleyListAdapter(
-        this@GalleySearchActivity,true
+        this@GalleySearchActivity, true
     ).also {
         it.setMedias(list)
         it.multiChoose = true

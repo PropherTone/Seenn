@@ -40,11 +40,13 @@ class GalleyViewViewModel : BaseViewModel() {
         galleyMedias = allMedia
     }
 
-    suspend fun getSignedMedia() =
+    suspend fun getSignedMedia() = withContext(Dispatchers.IO) {
         DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMedia(galleyMedias[curPosition].uri)
+    }
 
-    suspend fun getMediaByUri(uri: Uri) =
+    suspend fun getMediaByUri(uri: Uri) = withContext(Dispatchers.IO) {
         DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMedia(uri)
+    }
 
     suspend fun getNotesWithGalley(mediaUri: Uri): MutableList<String> =
         withContext(Dispatchers.IO) {

@@ -13,6 +13,7 @@ import com.protone.worker.database.MediaAction
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -21,7 +22,7 @@ import kotlinx.coroutines.withContext
 class GalleyFragmentViewModel : ViewModel() {
 
     private val _fragFlow = MutableSharedFlow<FragEvent>()
-    val fragFlow get() = _fragFlow
+    val fragEvent get() = _fragFlow.asSharedFlow()
 
     sealed class FragEvent {
         object SelectAll : FragEvent()
@@ -53,6 +54,13 @@ class GalleyFragmentViewModel : ViewModel() {
     fun getGalleyName() = if (rightGalley == "") {
         R.string.all_galley.getString()
     } else rightGalley
+
+    fun getBucket(bucket: String) = Pair(
+        if ((getGalley(bucket)?.size ?: 0) > 0) {
+            getGalley(bucket)?.get(0)?.uri ?: Uri.EMPTY
+        } else Uri.EMPTY,
+        arrayOf(bucket, (getGalley(bucket)?.size ?: 0).toString())
+    )
 
     fun onTargetGalley(bucket: String): Boolean {
         return bucket == rightGalley || rightGalley == R.string.all_galley.getString()
@@ -131,6 +139,10 @@ class GalleyFragmentViewModel : ViewModel() {
                 getGalleyBucket(bucket)?.let { deleteGalleyBucketAsync(it) }
             }
         }
+    }
+
+    fun attachFragEvent(onAttach: (MutableSharedFlow<GalleyFragmentViewModel.FragEvent>) -> Unit){
+        onAttach.invoke(_fragFlow)
     }
 
     private fun sortPrivateData(signedMedias: MutableList<GalleyMedia>) {

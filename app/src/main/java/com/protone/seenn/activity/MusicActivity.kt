@@ -1,6 +1,5 @@
 package com.protone.seenn.activity
 
-import android.view.View
 import androidx.core.view.marginBottom
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -46,8 +45,8 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
         }
     }
 
-    override fun createView(): View {
-        binding = MusicActivtiyBinding.inflate(layoutInflater, root, false).apply {
+    override fun createView(): MusicActivtiyBinding {
+        return MusicActivtiyBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MusicActivity
             fitStatuesBar(musicBucketContainer)
             root.onGlobalLayout {
@@ -64,7 +63,6 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 toolbar.progress = -verticalOffset / appBarLayout.totalScrollRange.toFloat()
             }
         }
-        return binding.root
     }
 
     override suspend fun MusicModel.init() {
