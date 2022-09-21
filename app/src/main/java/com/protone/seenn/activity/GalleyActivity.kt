@@ -28,7 +28,7 @@ class GalleyActivity :
     override fun createView(): GalleyActivityBinding {
         return GalleyActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@GalleyActivity
-            fitStatuesBar(binding.root)
+            fitStatuesBar(root)
             initPop()
         }
     }

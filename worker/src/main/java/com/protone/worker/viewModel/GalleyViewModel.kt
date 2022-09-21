@@ -35,10 +35,10 @@ class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
         viewModelScope.launch(Dispatchers.Default) {
             if (frag1 != null) {
                 mailers[0] = frag1
-                mailers[0]?.buffer()?.collect(onAction())
+                mailers[0]?.collect(onAction())
             } else if (frag2 != null) {
                 mailers[1] = frag2
-                mailers[1]?.buffer()?.collect(onAction())
+                mailers[1]?.collect(onAction())
             }
         }
     }

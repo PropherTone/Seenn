@@ -85,6 +85,7 @@ class MusicListAdapter(context: Context,private val musicList: MutableList<Music
 
     override fun getItemCount(): Int = musicList.size
 
+    //TODO 使用消息通知
     fun playPosition(music: Music) {
         launch(Dispatchers.Default) {
             if (musicList.size <= 0) return@launch
@@ -94,16 +95,6 @@ class MusicListAdapter(context: Context,private val musicList: MutableList<Music
                 playPosition = musicList.indexOf(music)
                 withContext(Dispatchers.Main) {
                     notifyItemChanged(playPosition)
-                }
-            } else {
-                playPosition = -1
-                val iterator = selectList.iterator()
-                while (iterator.hasNext()) {
-                    val index = selectList.indexOf(iterator.next())
-                    iterator.remove()
-                    withContext(Dispatchers.Main) {
-                        notifyItemChanged(index)
-                    }
                 }
             }
         }

@@ -11,11 +11,11 @@ import com.protone.worker.viewModel.TestViewModel
 class TestActivity : BaseActivity<ActivityTestBinding, TestViewModel, BaseViewModel.ViewEvent>(false) {
     override val viewModel: TestViewModel by viewModels()
 
-    override fun createView(): View {
-        binding = ActivityTestBinding.inflate(layoutInflater, root, false)
-        binding.activity = this
-        fitStatuesBar(binding.root)
-        return binding.root
+    override fun createView(): ActivityTestBinding {
+        return ActivityTestBinding.inflate(layoutInflater, root, false).apply {
+            binding.activity = this@TestActivity
+            fitStatuesBar(binding.root)
+        }
     }
 
     override suspend fun TestViewModel.init() {

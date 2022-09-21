@@ -79,7 +79,6 @@ class MainActivity :
                 toolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
                     binding.toolMotion.progress =
                         (-verticalOffset / appBarLayout.totalScrollRange.toFloat()).also {
-                            binding.musicPlayer.isVisible = it > 0.7f
                             binding.actionBtnContainer.y =
                                 viewModel.btnY - (viewModel.btnH * it) * 2
                         }

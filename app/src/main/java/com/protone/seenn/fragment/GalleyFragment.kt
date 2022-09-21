@@ -153,6 +153,7 @@ class GalleyFragment(
                             binding.galleyBucket.findViewHolderForLayoutPosition(0)?.let {
                                 if (it is BaseAdapter.Holder<*> && it.binding is GalleyBucketListLayoutBinding) {
                                     (it.binding as GalleyBucketListLayoutBinding).bucket.performClick()
+                                    viewModel.rightGalley = R.string.all_galley.getString()
                                     return
                                 }
                             }
