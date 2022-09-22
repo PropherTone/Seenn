@@ -159,12 +159,12 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                     getBucket(it.bucket)?.let { mb -> getMusicBucketAdapter()?.addBucket(mb) }
                 is MusicModel.MusicEvent.DeleteBucket ->
                     getBucket(it.bucket)?.let { mb -> getMusicBucketAdapter()?.deleteBucket(mb) }
-                is MusicModel.MusicEvent.Locate ->
-                    getMusicListAdapter()?.getPlayingPosition()
-                        ?.let { position ->
-                            if (position != -1)
-                                binding.musicMusicList.smoothScrollToPosition(position)
-                        }
+                is MusicModel.MusicEvent.Locate -> {
+                    binding.appToolbar.setExpanded(false, false)
+                    getMusicListAdapter()?.getPlayingPosition()?.let { position ->
+                        if (position != -1) binding.musicMusicList.smoothScrollToPosition(position)
+                    }
+                }
                 is MusicModel.MusicEvent.Search ->
                     startActivity(
                         PickMusicActivity::class.intent

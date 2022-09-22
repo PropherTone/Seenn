@@ -2,8 +2,10 @@ package com.protone.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.ViewGroup
 import androidx.core.view.isGone
+import com.protone.api.TAG
 import com.protone.api.baseType.toStringMinuteTime
 import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.Music
@@ -52,19 +54,17 @@ class MusicListAdapter(context: Context, private val musicList: MutableList<Musi
                     selectList.add(data.music)
                     playPosition = musicList.indexOf(data.music)
                     withContext(Dispatchers.Main) {
+                        Log.d(TAG, "onEventIO PlayPosition: $playPosition")
                         notifyItemChanged(playPosition)
                     }
                 }
             }
             is MusicListEvent.InsertMusics -> {
-                data.musics.forEach {
-                    if (!musicList.contains(it)) {
-                        musicList.add(it)
-                        val index = musicList.indexOf(it)
-                        if (index != -1) withContext(Dispatchers.Main) {
-                            notifyItemInserted(index)
-                        }
-                    }
+                if (data.musics.isEmpty()) return
+                val oldSize = musicList.size - 1
+                musicList.addAll(data.musics)
+                withContext(Dispatchers.Main){
+                    notifyItemRangeInserted(oldSize,musicList.size -1)
                 }
             }
         }

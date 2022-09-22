@@ -108,7 +108,7 @@ class MainModelListAdapter(
     override fun onBindViewHolder(holder: Holder<ViewDataBinding>, position: Int) {
         when (holder.binding) {
             is MusicCardBinding -> {
-                val music = itemList[position].substring(6).toEntity(Music::class.java)
+//                val music = itemList[position].substring(6).toEntity(Music::class.java)
             }
             is NoteCardBinding -> {
                 val note = itemList[position].substring(6).toEntity(Note::class.java)

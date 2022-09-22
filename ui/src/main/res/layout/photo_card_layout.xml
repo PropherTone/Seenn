@@ -11,6 +11,8 @@
             android:id="@+id/photoCard_photo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/main_background"
+            android:elevation="@dimen/small_elevation"
             android:contentDescription="@string/photo"
             android:scaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
@@ -30,13 +32,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/photoCard_photo"
             tools:layout_editor_absoluteX="10dp" />
-
-        <View
-            app:layout_constraintHeight_percent="0.008"
-            android:background="@color/blue_1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="@+id/photoCard_title" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

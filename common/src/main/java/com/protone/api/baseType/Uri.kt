@@ -98,6 +98,7 @@ fun Uri.toMediaBitmapByteArray(): ByteArray? {
 }
 
 fun Uri.toBitmapByteArray(): ByteArray? {
+    if (this == Uri.EMPTY) return null
     val mediaMetadataRetriever = MediaMetadataRetriever()
     var embeddedPicture: ByteArray? = null
     try {
