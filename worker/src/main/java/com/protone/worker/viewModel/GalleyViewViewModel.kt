@@ -44,10 +44,6 @@ class GalleyViewViewModel : BaseViewModel() {
         DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMedia(galleyMedias[curPosition].uri)
     }
 
-    suspend fun getMediaByUri(uri: Uri) = withContext(Dispatchers.IO) {
-        DatabaseHelper.instance.signedGalleyDAOBridge.getSignedMedia(uri)
-    }
-
     suspend fun getNotesWithGalley(mediaUri: Uri): MutableList<String> =
         withContext(Dispatchers.IO) {
             DatabaseHelper
@@ -65,7 +61,6 @@ class GalleyViewViewModel : BaseViewModel() {
             it.uri.saveToFile(it.name, "SharedMedia")
         }
     }
-
 
     suspend fun deleteSharedMedia(path: String) = withContext(Dispatchers.IO) {
         path.deleteFile()

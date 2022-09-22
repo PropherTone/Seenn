@@ -2,7 +2,6 @@ package com.protone.seenn.activity
 
 import android.content.Intent
 import android.net.Uri
-import android.view.View
 import androidx.activity.viewModels
 import androidx.core.content.FileProvider
 import androidx.core.view.isGone
@@ -11,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.bumptech.glide.Glide
 import com.protone.api.baseType.getStorageSize
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toDateString
@@ -19,15 +17,12 @@ import com.protone.api.context.intent
 import com.protone.api.context.root
 import com.protone.api.entity.GalleyMedia
 import com.protone.api.json.toEntity
-import com.protone.api.json.toJson
-import com.protone.api.json.toUri
 import com.protone.api.onResult
 import com.protone.seenn.R
 import com.protone.seenn.databinding.GalleyViewActivityBinding
 import com.protone.seenn.fragment.GalleyViewFragment
+import com.protone.ui.adapter.CatoListAdapter
 import com.protone.ui.adapter.CheckListAdapter
-import com.protone.ui.databinding.ImageCateLayoutBinding
-import com.protone.ui.databinding.TextCateLayoutBinding
 import com.protone.worker.viewModel.GalleyViewViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
 import kotlinx.coroutines.Dispatchers
@@ -64,6 +59,17 @@ class GalleyViewActivity : BaseMediaActivity<
                 }
                 layoutManager = LinearLayoutManager(context)
             }
+            galleyVCatoContainer.apply {
+                adapter = CatoListAdapter(this@GalleyViewActivity,
+                    object : CatoListAdapter.CatoListDataProxy {
+                        override fun getMedia(): GalleyMedia {
+                            return viewModel.getCurrentMedia()
+                        }
+                    })
+                layoutManager = LinearLayoutManager(context).also {
+                    it.orientation = LinearLayoutManager.HORIZONTAL
+                }
+            }
         }
     }
 
@@ -99,7 +105,6 @@ class GalleyViewActivity : BaseMediaActivity<
                         deleteSharedMedia(path)
                     }
                 }
-                else -> {}
             }
         }
     }
@@ -108,36 +113,7 @@ class GalleyViewActivity : BaseMediaActivity<
         val galleyMedia = getSignedMedia()
         removeCato()
         galleyMedia?.cate?.onEach {
-            if (it.contains("content://")) {
-                val mediaByUri = getMediaByUri(it.toUri())
-                addCato(withContext(Dispatchers.Main) {
-                    ImageCateLayoutBinding.inflate(
-                        layoutInflater,
-                        root,
-                        false
-                    ).apply {
-                        Glide.with(this@GalleyViewActivity).asDrawable().load(mediaByUri?.uri)
-                            .into(catoBack)
-                        catoName.text = mediaByUri?.name
-                        root.setOnClickListener {
-                            startActivity(GalleyViewActivity::class.intent.apply {
-                                putExtra(GalleyViewViewModel.MEDIA, mediaByUri?.toJson())
-                                putExtra(GalleyViewViewModel.TYPE, mediaByUri?.isVideo)
-                            })
-                        }
-                    }.root
-                })
-            } else {
-                addCato(withContext(Dispatchers.Main) {
-                    TextCateLayoutBinding.inflate(
-                        layoutInflater,
-                        root,
-                        false
-                    ).apply {
-                        cato.text = it
-                    }.root
-                })
-            }
+
         }
         setNotes(getNotesWithGalley(galleyMedia?.uri ?: Uri.EMPTY))
     }
@@ -171,6 +147,7 @@ class GalleyViewActivity : BaseMediaActivity<
             }
             adapter = object : FragmentStateAdapter(this@GalleyViewActivity) {
                 override fun getItemCount(): Int = data.size
+                override fun getItemViewType(position: Int): Int = position
                 override fun createFragment(position: Int): Fragment =
                     GalleyViewFragment(data[position], onSingleClick)
             }
@@ -213,10 +190,6 @@ class GalleyViewActivity : BaseMediaActivity<
         binding.galleyVLinks.isGone = notes.isEmpty()
         if (binding.galleyVLinks.adapter is CheckListAdapter)
             (binding.galleyVLinks.adapter as CheckListAdapter).dataList = notes
-    }
-
-    private suspend fun addCato(view: View) = withContext(Dispatchers.Main) {
-        binding.galleyVCatoContainer.addView(view)
     }
 
     private suspend fun removeCato() = withContext(Dispatchers.Main) {

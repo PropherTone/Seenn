@@ -10,11 +10,18 @@ import com.protone.api.entity.Music
 import com.protone.ui.R
 import com.protone.ui.databinding.MusicListLayoutBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MusicListAdapter(context: Context,private val musicList: MutableList<Music>) :
-    SelectListAdapter<MusicListLayoutBinding, Music, Any>(context) {
+class MusicListAdapter(context: Context, private val musicList: MutableList<Music>) :
+    SelectListAdapter<MusicListLayoutBinding, Music, MusicListAdapter.MusicListEvent>(
+        context,
+        true
+    ) {
+
+    sealed class MusicListEvent {
+        data class PlayPosition(val music: Music) : MusicListEvent()
+        data class InsertMusics(val musics: Collection<Music>) : MusicListEvent()
+    }
 
     var clickCallback: ((Music) -> Unit?)? = null
 
@@ -35,6 +42,33 @@ class MusicListAdapter(context: Context,private val musicList: MutableList<Music
                 )
             }
         }
+
+    override suspend fun onEventIO(data: MusicListEvent) {
+        when (data) {
+            is MusicListEvent.PlayPosition -> {
+                if (musicList.size <= 0) return
+                if (musicList.contains(data.music)) {
+                    selectList.clear()
+                    selectList.add(data.music)
+                    playPosition = musicList.indexOf(data.music)
+                    withContext(Dispatchers.Main) {
+                        notifyItemChanged(playPosition)
+                    }
+                }
+            }
+            is MusicListEvent.InsertMusics -> {
+                data.musics.forEach {
+                    if (!musicList.contains(it)) {
+                        musicList.add(it)
+                        val index = musicList.indexOf(it)
+                        if (index != -1) withContext(Dispatchers.Main) {
+                            notifyItemInserted(index)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     override fun itemIndex(path: Music): Int = musicList.indexOf(path)
 
@@ -85,42 +119,21 @@ class MusicListAdapter(context: Context,private val musicList: MutableList<Music
 
     override fun getItemCount(): Int = musicList.size
 
-    //TODO 使用消息通知
-    fun playPosition(music: Music) {
-        launch(Dispatchers.Default) {
-            if (musicList.size <= 0) return@launch
-            if (musicList.contains(music)) {
-                selectList.clear()
-                selectList.add(music)
-                playPosition = musicList.indexOf(music)
-                withContext(Dispatchers.Main) {
-                    notifyItemChanged(playPosition)
-                }
-            }
-        }
-    }
-
     fun getPlayingPosition(): Int {
         if (musicList.size <= 0) return -1
         return musicList.indexOf(selectList.getOrNull(0) ?: musicList[0])
     }
 
-    fun insertMusics(musics: Collection<Music>) {
-        launch(Dispatchers.Default) {
-            musics.forEach {
-                if (!musicList.contains(it)){
-                    musicList.add(it)
-                    val index = musicList.indexOf(it)
-                    if (index != -1) withContext(Dispatchers.Main) {
-                        notifyItemInserted(index)
-                    }
-                }
-            }
-        }
-    }
-
     fun getPlayingMusic(): Music? = selectList.getOrNull(0)
 
     fun getPlayList() = musicList.toMutableList()
+
+    fun playPosition(music: Music) {
+        emit(MusicListEvent.PlayPosition(music))
+    }
+
+    fun insertMusics(musics: Collection<Music>) {
+        emit(MusicListEvent.InsertMusics(musics))
+    }
 
 }

@@ -153,7 +153,6 @@ class GalleyFragment(
                             binding.galleyBucket.findViewHolderForLayoutPosition(0)?.let {
                                 if (it is BaseAdapter.Holder<*> && it.binding is GalleyBucketListLayoutBinding) {
                                     (it.binding as GalleyBucketListLayoutBinding).bucket.performClick()
-                                    viewModel.rightGalley = R.string.all_galley.getString()
                                     return
                                 }
                             }
@@ -213,8 +212,8 @@ class GalleyFragment(
                     }
                 }
             ) {
-                binding.galleyShowBucket.negative()
                 viewModel.rightGalley = it
+                binding.galleyShowBucket.negative()
                 noticeListUpdate(viewModel.getGalley(it))
             }
             addItemDecoration(object : RecyclerView.ItemDecoration() {

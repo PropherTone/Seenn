@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="80dp">
 
-        <com.protone.ui.customView.RoundImageView
+        <ImageView
             android:id="@+id/bucket_thumb"
             android:layout_width="80dp"
             android:layout_height="80dp"
@@ -40,13 +40,13 @@
         </LinearLayout>
 
         <CheckBox
-            android:focusable="false"
-            android:clickable="false"
             android:id="@+id/bucket_check"
-            android:theme="@style/MyRoundCheckBox"
+            style="@style/MyRoundCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/main_padding"
+            android:clickable="false"
+            android:focusable="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

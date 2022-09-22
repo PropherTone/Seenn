@@ -150,6 +150,7 @@ class MyVideoPlayer @JvmOverloads constructor(
         try {
             mediaPlayer?.apply {
                 stop()
+                videoController.complete()
                 release()
                 isPrepared = false
             }

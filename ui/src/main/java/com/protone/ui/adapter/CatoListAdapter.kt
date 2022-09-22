@@ -8,7 +8,6 @@ import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.GalleyMedia
 import com.protone.ui.databinding.ImageCateLayoutBinding
 import com.protone.ui.databinding.TextCateLayoutBinding
-import kotlinx.coroutines.launch
 
 class CatoListAdapter(context: Context, val catoListDataProxy: CatoListDataProxy) :
     BaseAdapter<ViewDataBinding, String>(context) {
@@ -33,13 +32,11 @@ class CatoListAdapter(context: Context, val catoListDataProxy: CatoListDataProxy
         holder.binding.apply {
             when (this) {
                 is ImageCateLayoutBinding -> {
-                    launch {
-                        val media = catoListDataProxy.getMediaByUri(catoList[position])
-                        Glide.with(context).asDrawable().load(media.uri).into(catoBack)
-                        catoName.text = media.name
-                        root.setOnClickListener {
-                            itemClick?.invoke(catoList[position])
-                        }
+                    val media = catoListDataProxy.getMedia()
+                    Glide.with(context).asDrawable().load(media.uri).into(catoBack)
+                    catoName.text = media.name
+                    root.setOnClickListener {
+                        itemClick?.invoke(catoList[position])
                     }
                 }
                 is TextCateLayoutBinding -> {
@@ -56,7 +53,7 @@ class CatoListAdapter(context: Context, val catoListDataProxy: CatoListDataProxy
     }
 
     interface CatoListDataProxy {
-       suspend fun getMediaByUri(uri: String): GalleyMedia
+        fun getMedia(): GalleyMedia
     }
 
 }
