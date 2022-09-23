@@ -3,7 +3,6 @@ package com.protone.seenn.service
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
@@ -13,7 +12,7 @@ import android.os.IBinder
 import android.widget.RemoteViews
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.protone.api.baseType.toByteArray
+import com.protone.api.baseType.toBitmap
 import com.protone.api.context.*
 import com.protone.api.entity.Music
 import com.protone.seenn.R
@@ -133,15 +132,8 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
                                 R.id.notify_music_name,
                                 playList[playPosition.get()].title
                             )
-                            playList[playPosition.get()].uri.toByteArray()?.let { ba ->
-                                remoteViews?.setImageViewBitmap(
-                                    R.id.notify_music_icon,
-                                    BitmapFactory.decodeByteArray(
-                                        ba,
-                                        0,
-                                        ba.size
-                                    )
-                                )
+                            playList[playPosition.get()].uri.toBitmap()?.let { ba ->
+                                remoteViews?.setImageViewBitmap(R.id.notify_music_icon, ba)
                             }
                         }
                     }

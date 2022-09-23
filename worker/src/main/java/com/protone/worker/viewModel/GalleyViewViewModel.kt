@@ -3,7 +3,7 @@ package com.protone.worker.viewModel
 import android.net.Uri
 import com.protone.api.baseType.deleteFile
 import com.protone.api.baseType.getString
-import com.protone.api.baseType.saveToFile
+import com.protone.api.baseType.imageSaveToDisk
 import com.protone.api.entity.GalleyMedia
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
@@ -58,7 +58,7 @@ class GalleyViewViewModel : BaseViewModel() {
 
     suspend fun prepareSharedMedia() = withContext(Dispatchers.IO) {
         getCurrentMedia().let {
-            it.uri.saveToFile(it.name, "SharedMedia")
+            it.uri.imageSaveToDisk(it.name, "SharedMedia")
         }
     }
 

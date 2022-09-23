@@ -1,18 +1,14 @@
 package com.protone.ui.customView.musicPlayer
 
 import android.content.Context
-import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
 import android.widget.ViewSwitcher
-import com.protone.api.baseType.toByteArray
 import com.protone.api.context.newLayoutInflater
 import com.protone.ui.R
 import com.protone.ui.customView.ColorfulProgressBar
 import com.protone.ui.databinding.AutoMusicPlayerLayoutLiteBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MusicPlayerViewLite @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -34,13 +30,6 @@ class MusicPlayerViewLite @JvmOverloads constructor(
     override var looper: ImageView? = null
     override val root: View = binding.musicBack
 
-    override var cover: Uri = Uri.EMPTY
-        set(value) {
-            launch(Dispatchers.Main) {
-                loadAlbum(value.toByteArray())
-            }
-            field = value
-        }
     override var duration: Long? = 0L
 
     override fun onPlay() {

@@ -57,16 +57,14 @@ class NoteEditActivity :
                     root.marginBottom(0)
                 }
             }
-            noteEditRichNote.apply {
-                isEditable = true
-                setRichList(listOf(RichNoteStates("", arrayListOf())))
-            }
+            noteEditRichNote.isEditable = true
         }
     }
 
     override suspend fun NoteEditViewModel.init() {
+        binding.noteEditRichNote.setRichList(listOf(RichNoteStates("", arrayListOf())))
         val contentTitle = intent.getStringExtra(NoteEditViewModel.CONTENT_TITLE)
-        noteName = intent.getStringExtra(NoteEditViewModel.NOTE)
+        val noteName = intent.getStringExtra(NoteEditViewModel.NOTE)
         if (contentTitle != null) {
             title = contentTitle
             initEditor(
@@ -96,7 +94,7 @@ class NoteEditActivity :
                         }
                     }
                     title = n.title
-                    initEditor(n.getRichCode(), n.getText())
+                    initEditor(n.richCode, n.text)
                     onEdit = true
                     n
                 }
@@ -121,6 +119,9 @@ class NoteEditActivity :
 
     private suspend fun NoteEditViewModel.pickIcon() {
         startGalleyPick(true)?.let { re ->
+            if (noteByName != null) {
+                noteByName?.imagePath?.deleteFile()
+            }
             iconUri = re.uri
             setNoteIcon(re.uri)
         }
@@ -246,7 +247,8 @@ class NoteEditActivity :
         }.startNumberPickerPopup(binding.noteEditTool) { binding.noteEditRichNote.setSize(it) }
     }
 
-    private fun insertImage(photo: RichPhotoStates) = binding.noteEditRichNote.insertImage(photo)
+    private suspend fun insertImage(photo: RichPhotoStates) =
+        binding.noteEditRichNote.insertImage(photo, photo.uri.toBitmap())
 
     private fun insertVideo(uri: Uri) {
         binding.noteEditRichNote.insertVideo(RichVideoStates(uri, null, name = ""))

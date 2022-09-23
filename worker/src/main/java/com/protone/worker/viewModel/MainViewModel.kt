@@ -1,7 +1,7 @@
 package com.protone.worker.viewModel
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import com.protone.api.baseType.toBitmap
 import com.protone.api.context.SApplication
 import com.protone.api.img.Blur
 import com.protone.api.json.toJson
@@ -35,7 +35,7 @@ class MainViewModel : BaseViewModel() {
     fun loadBlurIcon(path: String): Bitmap? {
         return try {
             Blur(SApplication.app).blur(
-                BitmapFactory.decodeFile(path),
+                path.toBitmap(),
                 radius = 10,
                 sampling = 10
             )

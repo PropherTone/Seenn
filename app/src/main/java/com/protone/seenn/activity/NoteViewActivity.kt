@@ -1,7 +1,6 @@
 package com.protone.seenn.activity
 
 import android.net.Uri
-import android.view.View
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -118,7 +117,7 @@ class NoteViewActivity :
         }
     }
 
-    private fun initNote(note: Note, listener: RichNoteView.IRichListener) {
+    private suspend fun initNote(note: Note, listener: RichNoteView.IRichListener) {
         binding.apply {
             noteEditTitle.text = note.title
             Glide.with(this@NoteViewActivity)

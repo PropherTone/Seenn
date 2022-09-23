@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.protone.api.baseType.getString
-import com.protone.api.baseType.saveToFile
+import com.protone.api.baseType.imageSaveToDisk
 import com.protone.api.baseType.toast
 import com.protone.api.context.SApplication
 import com.protone.api.context.intent
@@ -162,7 +162,7 @@ class UserConfigActivity : BaseActivity<
                 R.string.come_up_unknown_error.getString().toast()
                 return@let
             }
-            toEntity.uri.saveToFile(toEntity.name).let { s ->
+            toEntity.uri.imageSaveToDisk(toEntity.name).let { s ->
                 if (!s.isNullOrEmpty()) {
                     if (userConfig.userIcon.isNotEmpty()) {
                         viewModel.deleteOldIcon(userConfig.userIcon)

@@ -4,65 +4,40 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import com.protone.api.context.SApplication
 import com.protone.api.isInDebug
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
 import java.security.MessageDigest
 
 fun Bitmap.saveToFile(fileName: String, dir: String? = null): String? {
-    var fileOutputStream: FileOutputStream? = null
-    fun saveFailed(fileName: String): String? {
-        "图片${fileName}.png保存失败!".toast()
-        return null
-    }
-    return try {
-        val tempPath =
-            if (dir != null) {
-                val dirFile = File("${SApplication.app.filesDir.absolutePath}/$dir/")
-                if (!dirFile.exists() && !dirFile.mkdirs()) {
-                    return saveFailed(fileName)
-                }
-                "${SApplication.app.filesDir.absolutePath}/$dir/$fileName.png"
-            } else "${SApplication.app.filesDir.absolutePath}/$fileName.png"
-        val file = File(tempPath)
-        when {
-            file.exists() -> {
-                if (file.getSHA() == this.getSHA()) {
-                    tempPath
-                } else {
-                    saveToFile("${fileName}_new", dir)
-                }
+    return SApplication.app.filesDir.absolutePath.useAsParentDirToSaveFile(fileName, dir,
+        onExists = { file ->
+            if (file.getSHA() == this.getSHA()) {
+                file.path
+            } else {
+                saveToFile("${fileName}_new.png", dir)
             }
-            file.createNewFile() -> {
+            true
+        },
+        onNewFile = { file ->
+            var fileOutputStream: FileOutputStream? = null
+            try {
                 fileOutputStream = FileOutputStream(file)
                 this@saveToFile.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
-                tempPath
+                true
+            } catch (e: IOException) {
+                false
+            } catch (e: FileNotFoundException) {
+                false
+            } finally {
+                try {
+                    fileOutputStream?.close()
+                } catch (e: IOException) {
+                    if (isInDebug()) e.printStackTrace()
+                }
             }
-            else -> {
-                saveFailed(fileName)
-            }
-        }
-    } catch (e: IOException) {
-        saveFailed(fileName)
-    } catch (e: FileNotFoundException) {
-        saveFailed(fileName)
-    } finally {
-        try {
-            fileOutputStream?.close()
-        } catch (e: IOException) {
-            if (isInDebug()) e.printStackTrace()
-        }
-    }
-}
-
-fun Bitmap.getSHA(): String? {
-    return try {
-        MessageDigest.getInstance("SHA").let {
-            val bos = ByteArrayOutputStream()
-            this.compress(Bitmap.CompressFormat.PNG, 100, bos)
-            String(it.digest(bos.toByteArray()))
-        }
-    } catch (e: Exception) {
-        null
-    }
+        })
 }
 
 fun getMatrix(h: Int, w: Int, output: Int): Matrix {

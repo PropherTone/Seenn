@@ -13,8 +13,8 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 
-fun String.toBitmap(): Bitmap? {
-    return BitmapFactory.decodeFile(this)
+fun String.toBitmap(option: BitmapFactory.Options? = null): Bitmap {
+    return BitmapFactory.decodeFile(this, option)
 }
 
 fun CharSequence.indexSpan(spans: List<*>): CharSequence {
@@ -50,6 +50,7 @@ fun String.getFileMimeType(): String {
 }
 
 fun String.deleteFile(): Boolean {
+    if (this.isEmpty()) return true
     try {
         val file = File(this)
         if (file.exists()) {
@@ -65,6 +66,53 @@ fun String.deleteFile(): Boolean {
         return false
     }
     return false
+}
+
+fun String.useAsParentDirToSaveFile(
+    fileName: String,
+    dir: String? = null,
+    onExists: (File) -> Boolean,
+    onNewFile: (File) -> Boolean
+): String? {
+    fun saveFailed(fileName: String): String? {
+        "文件${fileName}保存失败!".toast()
+        return null
+    }
+    return try {
+        val tempPath =
+            if (dir != null) {
+                val dirFile = File("$this/$dir/")
+                if (!dirFile.exists() && !dirFile.mkdirs()) {
+                    return saveFailed(fileName)
+                }
+                "$this/$dir/$fileName"
+            } else "$this/$fileName"
+        val file = File(tempPath)
+        when {
+            file.exists() -> {
+                if (onExists.invoke(file)) {
+                    tempPath
+                } else {
+                    saveFailed(fileName)
+                }
+            }
+            file.createNewFile() -> {
+                if (onNewFile.invoke(file)) {
+                    tempPath
+                } else {
+                    file.deleteOnExit()
+                    saveFailed(fileName)
+                }
+            }
+            else -> {
+                saveFailed(fileName)
+            }
+        }
+    } catch (e: IOException) {
+        saveFailed(fileName)
+    } catch (e: FileNotFoundException) {
+        saveFailed(fileName)
+    }
 }
 
 fun String.getParentPath(): String {

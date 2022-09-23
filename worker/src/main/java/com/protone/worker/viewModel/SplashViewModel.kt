@@ -2,7 +2,7 @@ package com.protone.worker.viewModel
 
 import androidx.lifecycle.viewModelScope
 import com.protone.api.baseType.getString
-import com.protone.api.baseType.saveToFile
+import com.protone.api.baseType.imageSaveToFile
 import com.protone.api.context.SApplication
 import com.protone.api.entity.MusicBucket
 import com.protone.api.todayDate
@@ -50,7 +50,7 @@ class SplashViewModel : BaseViewModel() {
                 musicBucketDAOBridge.addMusicBucketAsync(
                     MusicBucket(
                         R.string.all_music.getString(),
-                        if (allMusicRs.isNotEmpty()) allMusicRs[0].uri.saveToFile(
+                        if (allMusicRs.isNotEmpty()) allMusicRs[0].uri.imageSaveToFile(
                             R.string.all_music.getString(),
                             R.string.music_bucket.getString()
                         ) else null,

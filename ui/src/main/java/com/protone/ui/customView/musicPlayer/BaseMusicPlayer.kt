@@ -2,21 +2,18 @@ package com.protone.ui.customView.musicPlayer
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ViewSwitcher
+import com.protone.api.baseType.toBitmap
 import com.protone.api.img.Blur
 import com.protone.api.isInDebug
 import com.protone.ui.R
 import com.protone.ui.customView.ColorfulProgressBar
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 abstract class BaseMusicPlayer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
@@ -26,7 +23,6 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
     abstract val control: ImageView
     abstract val previous: ImageView?
     abstract val progress: ColorfulProgressBar?
-    abstract var cover: Uri
     abstract var duration: Long?
     abstract var background1: ImageView
     abstract var background2: ImageView
@@ -36,52 +32,63 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
     abstract var coverSwitcher: ViewSwitcher
     abstract var looper: ImageView?
     abstract val root: View
+
+    var cover: Uri = Uri.EMPTY
+        set(value) {
+            loadAlbum(value)
+            field = value
+        }
+
     var isPlay = false
         set(value) {
             if (value) onPlay() else onPause()
             field = value
         }
 
+    var interceptAlbumCover = false
+
+    private var onBlurAlbumCover: ((Bitmap) -> Unit)? = null
+    fun onBlurAlbumCover(block: (Bitmap) -> Unit) {
+        this.onBlurAlbumCover = block
+    }
+
     abstract fun onPlay()
     abstract fun onPause()
     abstract fun setName(name: String)
     abstract fun setDetail(detail: String)
 
-    private var albumBitmap: Bitmap? = null
-
-    suspend fun loadAlbum(embeddedPicture: ByteArray?) {
-        if (embeddedPicture == null) {
-            withContext(Dispatchers.Main) {
+    private fun loadAlbum(albumUri: Uri?) {
+        launch {
+            val albumBitmap = albumUri?.toBitmap()
+            if (albumBitmap == null) {
                 (coverSwitcher.nextView as ImageView).setImageResource(R.drawable.ic_baseline_music_note_24)
                 coverSwitcher.showNext()
-            }
-            albumBitmap = null
-        } else withContext(Dispatchers.IO) {
-            try {
-                albumBitmap =
-                    BitmapFactory.decodeByteArray(embeddedPicture, 0, embeddedPicture.size)
-                loadBlurCover()
-                withContext(Dispatchers.Main) {
+            } else {
+                try {
+                    loadBlurCover(albumBitmap)
                     (coverSwitcher.nextView as ImageView).setImageBitmap(albumBitmap)
                     coverSwitcher.showNext()
+                } catch (e: Exception) {
+                    if (isInDebug()) e.printStackTrace()
+                    (coverSwitcher.nextView as ImageView).setImageResource(R.drawable.ic_baseline_music_note_24)
+                    coverSwitcher.showNext()
                 }
-            } catch (e: Exception) {
-                if (isInDebug()) e.printStackTrace()
-                (coverSwitcher.nextView as ImageView).setImageResource(R.drawable.ic_baseline_music_note_24)
-                coverSwitcher.showNext()
             }
         }
     }
 
-    private suspend fun loadBlurCover() {
-        if (albumBitmap != null) {
+    private fun loadBlurCover(albumBitmap: Bitmap) {
+        launch(Dispatchers.Default) {
             try {
-                val blur =
-                    Blur(context).blur(
-                        albumBitmap!!,
-                        radius = 30,
-                        sampling = 10
-                    )
+                val blur = Blur(context).blur(albumBitmap, radius = 30, sampling = 10)
+                if (interceptAlbumCover && blur != null) {
+                    withContext(Dispatchers.Main) {
+                        onBlurAlbumCover?.invoke(blur)
+                        (switcher.nextView as ImageView).setImageResource(R.drawable.main_background)
+                        switcher.showNext()
+                    }
+                    return@launch
+                }
                 withContext(Dispatchers.Main) {
                     (switcher.nextView as ImageView).setImageBitmap(blur)
                     switcher.showNext()
@@ -92,11 +99,6 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
                     (switcher.nextView as ImageView).setImageResource(R.drawable.main_background)
                     switcher.showNext()
                 }
-            }
-        } else {
-            withContext(Dispatchers.Main) {
-                (switcher.nextView as ImageView).setImageResource(R.drawable.main_background)
-                switcher.showNext()
             }
         }
     }

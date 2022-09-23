@@ -2,7 +2,7 @@ package com.protone.worker.viewModel
 
 import android.net.Uri
 import com.protone.api.baseType.getString
-import com.protone.api.baseType.saveToFile
+import com.protone.api.baseType.imageSaveToDisk
 import com.protone.api.entity.MusicBucket
 import com.protone.api.todayDate
 import com.protone.worker.R
@@ -24,7 +24,7 @@ class AddBucketViewModel : BaseViewModel() {
     var editName: String? = null
     var musicBucket: MusicBucket? = null
 
-    fun addMusicBucket(
+    suspend fun addMusicBucket(
         name: String,
         uri: Uri?,
         detail: String,
@@ -34,7 +34,7 @@ class AddBucketViewModel : BaseViewModel() {
             .musicBucketDAOBridge.addMusicBucketWithCallBack(
                 MusicBucket(
                     name,
-                    uri?.saveToFile(name, R.string.music_bucket.getString()),
+                    uri?.imageSaveToDisk(name, R.string.music_bucket.getString()),
                     0,
                     detail,
                     todayDate("yyyy/MM/dd")
@@ -49,7 +49,7 @@ class AddBucketViewModel : BaseViewModel() {
     ) = DatabaseHelper.instance.musicBucketDAOBridge.updateMusicBucket(
         musicBucket.also { mb ->
             if (mb.name != name) mb.name = name
-            val toFile = uri?.saveToFile(name, R.string.music_bucket.getString())
+            val toFile = uri?.imageSaveToDisk(name, R.string.music_bucket.getString())
             if (mb.icon?.equals(toFile) == false) mb.icon = toFile
             if (mb.detail != detail) mb.detail = detail
             todayDate("yyyy/MM/dd")

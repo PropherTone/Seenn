@@ -1,17 +1,18 @@
 package com.protone.seenn.viewModel
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import com.protone.api.baseType.getString
 import com.protone.api.context.*
 import com.protone.api.entity.Music
+import com.protone.seenn.broadcast.musicBroadCastManager
+import com.protone.seenn.service.MusicService
 import com.protone.ui.R
 import com.protone.ui.customView.Bubble
 import com.protone.ui.customView.ColorfulProgressBar
 import com.protone.ui.customView.musicPlayer.BaseMusicPlayer
-import com.protone.seenn.broadcast.musicBroadCastManager
-import com.protone.seenn.service.MusicService
 
 class MusicControllerIMP(private val controller: BaseMusicPlayer) {
     var binder: MusicService.MusicBinder? = null
@@ -71,15 +72,6 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
                     onPlaying?.invoke(it)
                 }
             }
-        }
-    }
-
-    private fun setDetail(it: Music) {
-        controller.apply {
-            cover = it.uri
-            duration = it.duration
-            setName(it.title)
-            setDetail("${it.artist ?: "ARTIST"}·${it.album ?: "NONE"}")
         }
     }
 
@@ -152,6 +144,23 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
     fun getPlayingMusic() = binder?.onMusicPlaying()?.value
 
     fun getProgress() = controller.progress?.barDuration
+
+    fun setInterceptAlbumCover(intercept: Boolean) {
+        controller.interceptAlbumCover = intercept
+    }
+
+    fun setOnBlurAlbumCover(block: (Bitmap) -> Unit) {
+        controller.onBlurAlbumCover(block)
+    }
+
+    private fun setDetail(it: Music) {
+        controller.apply {
+            cover = it.uri
+            duration = it.duration
+            setName(it.title)
+            setDetail("${it.artist ?: "ARTIST"}·${it.album ?: "NONE"}")
+        }
+    }
 
     private fun showToast(target: View?, msg: CharSequence) {
         if (target == null) return

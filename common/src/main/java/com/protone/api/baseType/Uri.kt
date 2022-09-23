@@ -7,111 +7,158 @@ import android.net.Uri
 import com.protone.api.R
 import com.protone.api.context.SApplication
 import com.protone.api.isInDebug
+import com.protone.api.onResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.io.IOException
-import java.io.InputStream
 
-fun Uri.saveToFile(
+suspend fun Uri.imageSaveToFile(
     fileName: String,
     dir: String? = null,
     w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
     h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
-) = toBitmap(w, h)?.saveToFile(fileName, dir)
-
-fun Uri.toBitmap(
-    w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
-    h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
-): Bitmap? {
-    var ois: InputStream? = null
-    return try {
-        ois = SApplication.app.contentResolver.openInputStream(this)
-        val bitmap = BitmapFactory.decodeStream(ois, null, null) ?: (toMediaBitmapByteArray()
-            ?: toBitmapByteArray())?.let {
-            BitmapFactory.decodeByteArray(it, 0, it.size, null)
-        } ?: return null
-        return Bitmap.createBitmap(
-            bitmap,
-            0,
-            0,
-            bitmap.width,
-            bitmap.height,
-            getMatrix(bitmap.height, bitmap.width, w),
-            true
-        ).let {
-            bitmap.recycle()
-            it
+) = withContext(Dispatchers.IO) {
+    toBitmap(w, h)?.let {
+        try {
+            it.saveToFile("$fileName.png", dir)
+        } finally {
+            if (!it.isRecycled) {
+                it.recycle()
+            }
         }
-    } catch (e: IOException) {
-        null
-    } finally {
-        ois?.close()
     }
 }
 
-suspend fun Uri.toByteArray(): ByteArray? = withContext(Dispatchers.IO) {
-    toMediaBitmapByteArray() ?: toBitmapByteArray()
+
+suspend fun Uri.imageSaveToDisk(
+    fileName: String,
+    dir: String? = null,
+    w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
+    h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
+): String? {
+    var exists = false
+    var hasBytes = true
+    return onResult {
+        val bytes = SApplication.app.contentResolver.openInputStream(this@imageSaveToDisk)
+            ?.use { inputStream -> inputStream.readBytes() } ?: toBitmapByteArray()
+        it.resumeWith(Result.success(if (bytes == null) {
+            hasBytes = false
+            null
+        } else SApplication.app.filesDir.absolutePath.useAsParentDirToSaveFile(
+            fileName,
+            dir,
+            onExists = { file ->
+                if (file.getSHA() == bytes.getSHA()) {
+                    true
+                } else {
+                    exists = true
+                    false
+                }
+            },
+            onNewFile = { file ->
+                FileOutputStream(file).use { outputStream -> outputStream.write(bytes) }
+                true
+            }
+        )))
+    }.let {
+        if (it == null && exists) {
+            this@imageSaveToDisk.imageSaveToDisk("${fileName}_new.png", dir, w, h)
+        } else if (hasBytes) {
+            imageSaveToFile(fileName, dir, w, h)
+        } else null
+    }
 }
 
-fun Uri.toMediaBitmapByteArray(): ByteArray? {
-    var byteArray: ByteArray? = null
+suspend fun Uri.toBitmap(
+    w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
+    h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
+): Bitmap? = onResult {
+    val mediaBitmap = toMediaBitmap(w, h)
+    it.resumeWith(Result.success(if (mediaBitmap == null) {
+        var bitmap: Bitmap? = null
+        try {
+            bitmap = toBitmapByteArray()?.let { byteArray ->
+                BitmapFactory.decodeByteArray(
+                    byteArray,
+                    0,
+                    byteArray.size,
+                    null
+                )
+            }
+            if (bitmap != null) {
+                Bitmap.createBitmap(
+                    bitmap,
+                    0,
+                    0,
+                    bitmap.width,
+                    bitmap.height,
+                    getMatrix(bitmap.height, bitmap.width, w),
+                    true
+                ).let { bm ->
+                    bitmap.recycle()
+                    bm
+                }
+            } else null
+        } catch (e: IOException) {
+            null
+        } finally {
+            bitmap?.recycle()
+        }
+    } else {
+        mediaBitmap
+    }))
+}
+
+fun Uri.toMediaBitmap(w: Int, h: Int): Bitmap? {
     var ois = try {
         SApplication.app.contentResolver.openInputStream(this)
     } catch (e: FileNotFoundException) {
-        return byteArray
+        return null
     }
     val os = ByteArrayOutputStream()
-    try {
+    return try {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         BitmapFactory.decodeStream(ois, null, options)
         ois?.close()
-        val dimensionPixelSize =
-            SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
-        options.inSampleSize = calculateInSampleSize(
-            options.outWidth,
-            options.outHeight,
-            dimensionPixelSize,
-            dimensionPixelSize
-        )
+        options.inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight, w, h)
         options.inJustDecodeBounds = false
         ois = try {
             SApplication.app.contentResolver.openInputStream(this)
         } catch (e: FileNotFoundException) {
-            return byteArray
+            return null
         }
         BitmapFactory.decodeStream(ois, null, options)
-            ?.compress(Bitmap.CompressFormat.PNG, 100, os)
-        byteArray = os.toByteArray().let {
-            if (it.isEmpty()) return null
-            it
-        }
     } catch (e: IOException) {
         if (isInDebug()) e.printStackTrace()
+        null
     } finally {
         ois?.close()
         os.close()
     }
-    return byteArray
 }
 
 fun Uri.toBitmapByteArray(): ByteArray? {
     if (this == Uri.EMPTY) return null
     val mediaMetadataRetriever = MediaMetadataRetriever()
-    var embeddedPicture: ByteArray? = null
-    try {
-        mediaMetadataRetriever.setDataSource(SApplication.app, this)
-        embeddedPicture = mediaMetadataRetriever.embeddedPicture
+    return try {
+        mediaMetadataRetriever.run {
+            setDataSource(SApplication.app, this@toBitmapByteArray)
+            embeddedPicture
+        }
     } catch (e: IllegalArgumentException) {
         if (isInDebug()) e.printStackTrace()
+        null
     } catch (e: SecurityException) {
         if (isInDebug()) e.printStackTrace()
+        null
     } catch (e: RuntimeException) {
         if (isInDebug()) e.printStackTrace()
+        null
     } finally {
         mediaMetadataRetriever.release()
     }
-    return embeddedPicture
 }

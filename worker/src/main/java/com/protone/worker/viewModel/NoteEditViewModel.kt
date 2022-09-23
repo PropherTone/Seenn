@@ -2,7 +2,7 @@ package com.protone.worker.viewModel
 
 import android.net.Uri
 import com.protone.api.baseType.getString
-import com.protone.api.baseType.saveToFile
+import com.protone.api.baseType.imageSaveToDisk
 import com.protone.api.baseType.toast
 import com.protone.api.entity.GalleriesWithNotes
 import com.protone.api.entity.GalleyMedia
@@ -33,14 +33,13 @@ class NoteEditViewModel : BaseViewModel() {
 
     var iconUri: Uri? = null
     var noteByName: Note? = null
-    var noteName: String? = null
     var allNote: MutableList<String>? = null
     var onEdit = false
     var medias = arrayListOf<GalleyMedia>()
 
     suspend fun saveIcon(name: String) = withContext(Dispatchers.IO) {
-        iconUri?.saveToFile(name, null).let {
-            if (it != null && !it.isNullOrEmpty()) {
+        iconUri?.imageSaveToDisk(name, null).let {
+            if (!it.isNullOrEmpty()) {
                 it
             } else {
                 R.string.failed_upload_image.getString().toast()

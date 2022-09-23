@@ -1,7 +1,6 @@
 package com.protone.seenn.activity
 
 import androidx.activity.viewModels
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -99,6 +98,9 @@ class MainActivity :
 
     override suspend fun MainViewModel.init() {
         val musicController = MusicControllerIMP(binding.musicPlayer)
+        musicController.setOnBlurAlbumCover {
+            binding.userBack.setImageBitmap(it)
+        }
         musicController.onClick {
             startActivity(MusicViewActivity::class.intent)
         }
@@ -124,6 +126,12 @@ class MainActivity :
             }
         }
 
+        onResume = {
+            userName = userConfig.userName
+            userIcon = userConfig.userIcon.also {
+                musicController.setInterceptAlbumCover(it.isEmpty())
+            }
+        }
 
         onFinish = {
             DatabaseHelper.instance.shutdownNow()
@@ -148,11 +156,6 @@ class MainActivity :
                     startActivity(UserConfigActivity::class.intent)
             }
         }
-    }
-
-    override suspend fun doResume() {
-        userName = userConfig.userName
-        userIcon = userConfig.userIcon
     }
 
     private fun refreshModelList() {
