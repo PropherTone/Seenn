@@ -122,9 +122,10 @@ fun Uri.toMediaBitmap(w: Int, h: Int): Bitmap? {
     return try {
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
-        BitmapFactory.decodeStream(ois, null, options)
+        val bitmap = BitmapFactory.decodeStream(ois, null, options)
         ois?.close()
         options.inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight, w, h)
+        bitmap?.recycle()
         options.inJustDecodeBounds = false
         ois = try {
             SApplication.app.contentResolver.openInputStream(this)

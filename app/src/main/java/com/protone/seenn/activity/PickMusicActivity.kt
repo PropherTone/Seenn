@@ -27,9 +27,9 @@ class PickMusicActivity :
 
     override fun createView(): PickMusicActivityBinding {
         return PickMusicActivityBinding.inflate(layoutInflater, root, false).apply {
-            binding.activity = this@PickMusicActivity
-            fitStatuesBar(binding.root)
-            linkInput(binding.addMBList, binding.addMBSearch)
+            activity = this@PickMusicActivity
+            fitStatuesBar(root)
+            linkInput(addMBList, addMBSearch)
         }
     }
 

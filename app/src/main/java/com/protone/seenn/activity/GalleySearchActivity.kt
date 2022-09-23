@@ -33,8 +33,8 @@ class GalleySearchActivity : BaseMediaActivity<
 
     override fun createView(): GalleySearchActivityBinding {
         return GalleySearchActivityBinding.inflate(layoutInflater, root, false).apply {
-            binding.activity = this@GalleySearchActivity
-            fitStatuesBar(binding.root)
+            activity = this@GalleySearchActivity
+            fitStatuesBar(root)
             initPop()
         }
     }

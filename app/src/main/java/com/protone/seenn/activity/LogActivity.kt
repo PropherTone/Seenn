@@ -29,7 +29,7 @@ class LogActivity : BaseActivity<LogActivityBinding, LogViewModel, BaseViewModel
     override fun createView(): LogActivityBinding {
         return LogActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@LogActivity
-            fitStatuesBar(binding.root)
+            fitStatuesBar(root)
         }
     }
 

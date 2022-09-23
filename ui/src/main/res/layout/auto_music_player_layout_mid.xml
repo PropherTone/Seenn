@@ -26,11 +26,11 @@
                 android:id="@+id/music_back_2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/main_background"
                 android:contentDescription="@string/icon"
                 android:scaleType="centerCrop"
                 app:layout_constraintHeight_percent="1"
                 app:layout_constraintWidth_percent="1" />
+
         </ViewSwitcher>
 
         <ImageView

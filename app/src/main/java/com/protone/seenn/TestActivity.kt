@@ -13,8 +13,8 @@ class TestActivity : BaseActivity<ActivityTestBinding, TestViewModel, BaseViewMo
 
     override fun createView(): ActivityTestBinding {
         return ActivityTestBinding.inflate(layoutInflater, root, false).apply {
-            binding.activity = this@TestActivity
-            fitStatuesBar(binding.root)
+            activity = this@TestActivity
+            fitStatuesBar(root)
         }
     }
 

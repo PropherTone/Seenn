@@ -17,7 +17,7 @@ import kotlinx.coroutines.*
 
 abstract class BaseMusicPlayer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
-) : FrameLayout(context, attrs), CoroutineScope by CoroutineScope(Dispatchers.IO) {
+) : FrameLayout(context, attrs), CoroutineScope by CoroutineScope(Dispatchers.Main) {
 
     abstract val next: ImageView?
     abstract val control: ImageView
@@ -84,7 +84,7 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
                 if (interceptAlbumCover && blur != null) {
                     withContext(Dispatchers.Main) {
                         onBlurAlbumCover?.invoke(blur)
-                        (switcher.nextView as ImageView).setImageResource(R.drawable.main_background)
+                        (switcher.nextView as ImageView).setImageBitmap(null)
                         switcher.showNext()
                     }
                     return@launch
@@ -96,7 +96,7 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
             } catch (e: Exception) {
                 if (isInDebug()) e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    (switcher.nextView as ImageView).setImageResource(R.drawable.main_background)
+                    (switcher.nextView as ImageView).setImageBitmap(null)
                     switcher.showNext()
                 }
             }
