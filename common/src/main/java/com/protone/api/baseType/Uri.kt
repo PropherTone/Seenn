@@ -76,11 +76,9 @@ suspend fun Uri.toBitmap(
     w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
     h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
 ): Bitmap? = onResult {
-    val mediaBitmap = toMediaBitmap(w, h)
-    it.resumeWith(Result.success(if (mediaBitmap == null) {
-        var bitmap: Bitmap? = null
-        try {
-            bitmap = toBitmapByteArray()?.let { byteArray ->
+    it.resumeWith(Result.success(
+        toMediaBitmap(w, h) ?: try {
+            toBitmapByteArray()?.let { byteArray ->
                 BitmapFactory.decodeByteArray(
                     byteArray,
                     0,
@@ -88,28 +86,9 @@ suspend fun Uri.toBitmap(
                     null
                 )
             }
-            if (bitmap != null) {
-                Bitmap.createBitmap(
-                    bitmap,
-                    0,
-                    0,
-                    bitmap.width,
-                    bitmap.height,
-                    getMatrix(bitmap.height, bitmap.width, w),
-                    true
-                ).let { bm ->
-                    bitmap.recycle()
-                    bm
-                }
-            } else null
         } catch (e: IOException) {
             null
-        } finally {
-            bitmap?.recycle()
-        }
-    } else {
-        mediaBitmap
-    }))
+        }))
 }
 
 fun Uri.toMediaBitmap(w: Int, h: Int): Bitmap? {

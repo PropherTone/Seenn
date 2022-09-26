@@ -4,10 +4,10 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
-import android.widget.ViewSwitcher
 import com.protone.api.context.newLayoutInflater
 import com.protone.ui.R
 import com.protone.ui.customView.ColorfulProgressBar
+import com.protone.ui.customView.SwitchImageView
 import com.protone.ui.databinding.AutoMusicPlayerLayoutFullBinding
 
 class MusicPlayerViewFull @JvmOverloads constructor(
@@ -21,12 +21,8 @@ class MusicPlayerViewFull @JvmOverloads constructor(
     override val control: ImageView = binding.musicControl
     override val previous: ImageView = binding.musicPrevious
     override val progress: ColorfulProgressBar = binding.musicProgress
-    override var background1: ImageView = binding.musicBack1
-    override var background2: ImageView = binding.musicBack2
-    override var switcher: ViewSwitcher = binding.musicBack
-    override var cover1: ImageView = binding.musicCover1
-    override var cover2: ImageView = binding.musicCover2
-    override var coverSwitcher: ViewSwitcher = binding.musicCover
+    override var switcher: SwitchImageView = binding.musicBack
+    override var coverSwitcher: SwitchImageView = binding.musicCover
     override var looper: ImageView? = binding.loopMode
     override val root: View = binding.controller
 

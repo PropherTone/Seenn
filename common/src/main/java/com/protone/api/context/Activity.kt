@@ -17,7 +17,6 @@ import com.protone.api.R
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.isInDebug
-import kotlinx.coroutines.delay
 
 val activityOperationBroadcast: LocalBroadcastManager =
     LocalBroadcastManager.getInstance(SApplication.app)
@@ -113,30 +112,11 @@ suspend fun Activity.deleteMedia(uri: Uri): Boolean {
             null,
             null
         )
-        delay(200)
         true
     } catch (e: Exception) {
         false
     }
 
-}
-
-fun Activity.multiDeleteMedia(uri: Uri): Boolean {
-    return try {
-        grantUriPermission(
-            packageName,
-            uri,
-            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        )
-        contentResolver.delete(
-            uri,
-            null,
-            null
-        )
-        true
-    } catch (e: Exception) {
-        false
-    }
 }
 
 fun Activity.showFailedToast() = runOnUiThread {

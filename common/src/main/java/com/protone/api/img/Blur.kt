@@ -9,6 +9,7 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
+@Suppress("DEPRECATION")
 class Blur(context: Context) {
     private val contextRef = WeakReference(context)
     private val defaultBlurRadius: Int

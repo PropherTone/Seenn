@@ -12,6 +12,7 @@ import com.protone.api.ActiveTimer
 import com.protone.api.TAG
 import com.protone.api.baseType.toast
 import com.protone.api.context.workIntentFilter
+import com.protone.api.entity.GalleyMedia
 import com.protone.api.entity.Music
 import com.protone.seenn.broadcast.MediaContentObserver
 import com.protone.seenn.broadcast.WorkReceiver
@@ -153,7 +154,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
 
     private fun updateGalley() = DatabaseHelper.instance.signedGalleyDAOBridge.run {
         launch(Dispatchers.IO) {
-            val sortMedias = async(Dispatchers.IO) {
+            val sortMedias = async(Dispatchers.Default) {
                 val allSignedMedia = getAllSignedMedia() as MutableList
                 flow {
                     allSignedMedia.forEach {
@@ -168,46 +169,42 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
 
             val allSignedMedia = getAllSignedMedia()
 
-            val scanPicture = async(Dispatchers.IO) {
+            suspend fun sortMedia(
+                dao: DatabaseHelper.GalleyDAOBridge,
+                allSignedMedia: List<GalleyMedia>?,
+                it: GalleyMedia
+            ) {
+                if (allSignedMedia != null && allSignedMedia.isNotEmpty()) {
+                    allSignedMedia.indexOf(it).let { index ->
+                        if (index != -1) {
+                            if (allSignedMedia[index] == it) return@let
+                            dao.updateSignedMedia(it)
+                        } else {
+                            dao.insertSignedMedia(it)
+                        }
+                    }
+                } else {
+                    dao.insertSignedMedia(it)
+                }
+            }
+
+            val scanPicture = async(Dispatchers.Default) {
                 flow {
                     scanPicture { _, galleyMedia ->
                         emit(galleyMedia)
                     }
                 }.buffer().collect {
-                    //主要耗时
-                    if (allSignedMedia != null && allSignedMedia.isNotEmpty()) {
-                        allSignedMedia.indexOf(it).let { index->
-                            if (index != -1) {
-                                if (allSignedMedia[index] == it) return@let
-                                updateSignedMedia(it)
-                            } else {
-                                insertSignedMedia(it)
-                            }
-                        }
-                    } else {
-                        insertSignedMedia(it)
-                    }
+                    sortMedia(this@run, allSignedMedia, it)
                 }
             }
 
-            val scanVideo = async(Dispatchers.IO) {
+            val scanVideo = async(Dispatchers.Default) {
                 flow {
                     scanVideo { _, galleyMedia ->
                         emit(galleyMedia)
                     }
                 }.buffer().collect {
-                    if (allSignedMedia != null && allSignedMedia.isNotEmpty()) {
-                        allSignedMedia.indexOf(it).let { index->
-                            if (index != -1) {
-                                if (allSignedMedia[index] == it) return@let
-                                updateSignedMedia(it)
-                            } else {
-                                insertSignedMedia(it)
-                            }
-                        }
-                    } else {
-                        insertSignedMedia(it)
-                    }
+                    sortMedia(this@run, allSignedMedia, it)
                 }
             }
 

@@ -6,33 +6,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ViewSwitcher
+        <com.protone.ui.customView.SwitchImageView
             android:id="@+id/music_back"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/main_background"
             app:layout_constraintHeight_percent="1"
-            app:layout_constraintWidth_percent="1">
-
-            <ImageView
-                android:id="@+id/music_back_1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/main_background"
-                android:contentDescription="@string/icon"
-                android:scaleType="centerCrop"
-                app:layout_constraintHeight_percent="1"
-                app:layout_constraintWidth_percent="1" />
-
-            <ImageView
-                android:id="@+id/music_back_2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/main_background"
-                android:contentDescription="@string/icon"
-                android:scaleType="centerCrop"
-                app:layout_constraintHeight_percent="1"
-                app:layout_constraintWidth_percent="1" />
-        </ViewSwitcher>
+            app:layout_constraintWidth_percent="1" />
 
         <ImageView
             android:id="@+id/music_cover_back"
@@ -49,7 +29,7 @@
             app:layout_constraintWidth_percent="0.13" />
 
 
-        <ViewSwitcher
+        <com.protone.ui.customView.SwitchImageView
             android:id="@+id/music_cover"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -61,24 +41,7 @@
             app:layout_constraintEnd_toEndOf="@id/music_cover_back"
             app:layout_constraintStart_toStartOf="@id/music_cover_back"
             app:layout_constraintTop_toTopOf="@id/music_cover_back"
-            app:layout_constraintWidth_percent="0.11">
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/music_cover1"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/icon"
-                android:scaleType="centerCrop"
-                app:shapeAppearance="@style/ovalImage" />
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/music_cover2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/icon"
-                android:scaleType="centerCrop"
-                app:shapeAppearance="@style/ovalImage" />
-        </ViewSwitcher>
+            app:layout_constraintWidth_percent="0.11"/>
 
         <View
             android:layout_width="0dp"

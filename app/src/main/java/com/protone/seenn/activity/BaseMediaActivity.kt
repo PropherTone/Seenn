@@ -153,7 +153,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         launch(Dispatchers.IO) {
             val reList = arrayListOf<GalleyMedia>()
             gm.forEach {
-                val result = multiDeleteMedia(it.uri)
+                val result = deleteMedia(it.uri)
                 if (result) {
                     DatabaseHelper.instance.signedGalleyDAOBridge.deleteSignedMedia(it)
                 } else {

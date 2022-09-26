@@ -7,12 +7,12 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.ViewSwitcher
 import com.protone.api.baseType.toBitmap
 import com.protone.api.img.Blur
 import com.protone.api.isInDebug
 import com.protone.ui.R
 import com.protone.ui.customView.ColorfulProgressBar
+import com.protone.ui.customView.SwitchImageView
 import kotlinx.coroutines.*
 
 abstract class BaseMusicPlayer @JvmOverloads constructor(
@@ -24,12 +24,8 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
     abstract val previous: ImageView?
     abstract val progress: ColorfulProgressBar?
     abstract var duration: Long?
-    abstract var background1: ImageView
-    abstract var background2: ImageView
-    abstract var switcher: ViewSwitcher
-    abstract var cover1: ImageView
-    abstract var cover2: ImageView
-    abstract var coverSwitcher: ViewSwitcher
+    abstract var switcher: SwitchImageView
+    abstract var coverSwitcher: SwitchImageView
     abstract var looper: ImageView?
     abstract val root: View
 
@@ -61,17 +57,14 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
         launch {
             val albumBitmap = albumUri?.toBitmap()
             if (albumBitmap == null) {
-                (coverSwitcher.nextView as ImageView).setImageResource(R.drawable.ic_baseline_music_note_24)
-                coverSwitcher.showNext()
+                coverSwitcher.setImageResource(R.drawable.ic_baseline_music_note_24)
             } else {
                 try {
                     loadBlurCover(albumBitmap)
-                    (coverSwitcher.nextView as ImageView).setImageBitmap(albumBitmap)
-                    coverSwitcher.showNext()
+                    coverSwitcher.setImageBitmap(albumBitmap)
                 } catch (e: Exception) {
                     if (isInDebug()) e.printStackTrace()
-                    (coverSwitcher.nextView as ImageView).setImageResource(R.drawable.ic_baseline_music_note_24)
-                    coverSwitcher.showNext()
+                    coverSwitcher.setImageResource(R.drawable.ic_baseline_music_note_24)
                 }
             }
         }
@@ -84,20 +77,17 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
                 if (interceptAlbumCover && blur != null) {
                     withContext(Dispatchers.Main) {
                         onBlurAlbumCover?.invoke(blur)
-                        (switcher.nextView as ImageView).setImageBitmap(null)
-                        switcher.showNext()
+                        switcher.setImageBitmap(null)
                     }
                     return@launch
                 }
                 withContext(Dispatchers.Main) {
-                    (switcher.nextView as ImageView).setImageBitmap(blur)
-                    switcher.showNext()
+                    switcher.setImageBitmap(blur)
                 }
             } catch (e: Exception) {
                 if (isInDebug()) e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    (switcher.nextView as ImageView).setImageBitmap(null)
-                    switcher.showNext()
+                    switcher.setImageBitmap(null)
                 }
             }
         }

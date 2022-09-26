@@ -141,7 +141,7 @@ class GalleyFragmentViewModel : ViewModel() {
         }
     }
 
-    fun attachFragEvent(onAttach: (MutableSharedFlow<GalleyFragmentViewModel.FragEvent>) -> Unit){
+    fun attachFragEvent(onAttach: (MutableSharedFlow<GalleyFragmentViewModel.FragEvent>) -> Unit) {
         onAttach.invoke(_fragFlow)
     }
 
