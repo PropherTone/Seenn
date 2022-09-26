@@ -34,14 +34,12 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@drawable/music_cover_back_round"
-            android:inAnimation="@anim/image_switch_in"
-            android:outAnimation="@anim/image_switch_out"
             app:layout_constraintBottom_toBottomOf="@id/music_cover_back"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="@id/music_cover_back"
             app:layout_constraintStart_toStartOf="@id/music_cover_back"
             app:layout_constraintTop_toTopOf="@id/music_cover_back"
-            app:layout_constraintWidth_percent="0.11"/>
+            app:layout_constraintWidth_percent="0.11" />
 
         <View
             android:layout_width="0dp"
@@ -56,12 +54,14 @@
             android:id="@+id/music_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:clickable="true"
             android:ellipsize="marquee"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="center"
             android:letterSpacing="0.06"
             android:lines="1"
+            android:marqueeRepeatLimit="1"
             android:text="@string/model_music"
             android:textColor="@color/white"
             android:textSize="@dimen/subContent_text"

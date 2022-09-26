@@ -9,6 +9,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ViewSwitcher
 import androidx.annotation.DrawableRes
+import androidx.core.view.children
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.protone.ui.R
@@ -19,8 +20,23 @@ class SwitchImageView @JvmOverloads constructor(
 
     private val switcher: ViewSwitcher = ViewSwitcher(context, attrs)
 
+    var enableShapeAppearance: Boolean = false
+        set(value) {
+            if (value) {
+                switcher.children.forEach {
+                    (it as ShapeableImageView).shapeAppearanceModel =
+                        ShapeAppearanceModel
+                            .builder(context, R.style.ovalImage, R.style.ovalImage)
+                            .build()
+                }
+            }
+            field = value
+        }
+
     init {
         addView(switcher)
+        switcher.setInAnimation(context, R.anim.image_switch_in)
+        switcher.setOutAnimation(context,R.anim.image_switch_out)
         repeat(2) {
             switcher.addView(ShapeableImageView(context).apply {
                 layoutParams = LayoutParams(
@@ -28,7 +44,7 @@ class SwitchImageView @JvmOverloads constructor(
                     LayoutParams.MATCH_PARENT,
                     Gravity.CENTER
                 )
-                shapeAppearanceModel = ShapeAppearanceModel.builder(context, R.style.ovalImage,R.style.ovalImage).build()
+                scaleType = ImageView.ScaleType.CENTER_CROP
             })
         }
     }

@@ -1,6 +1,7 @@
 package com.protone.seenn.activity
 
 import androidx.activity.viewModels
+import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -45,6 +46,7 @@ class MainActivity :
 
     private var userIcon: String? = null
         set(value) {
+            binding.userIcon.isGone = value == null || value.isEmpty()
             if (value == null) return
             if (field == value) return
             if (value.isNotEmpty()) {
@@ -56,11 +58,7 @@ class MainActivity :
                 launch(Dispatchers.IO) {
                     val loadBlurIcon = viewModel.loadBlurIcon(value)
                     withContext(Dispatchers.Main) {
-                        Glide.with(this@MainActivity)
-                            .asDrawable()
-                            .load(loadBlurIcon)
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .into(binding.userBack)
+                        binding.userBack.setImageBitmap(loadBlurIcon)
                     }
                 }
             }

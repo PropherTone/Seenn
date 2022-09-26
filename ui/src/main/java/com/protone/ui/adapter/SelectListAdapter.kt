@@ -59,14 +59,14 @@ abstract class SelectListAdapter<V : ViewDataBinding, T, D>(
         }
     }
 
-    suspend fun clearAllSelected() {
-        selectList.forEach {
-            val itemIndex = itemIndex(it)
-            if (itemIndex != -1) withContext(Dispatchers.Main) {
-                notifyItemChanged(itemIndex)
-            }
-        }
+    fun clearAllSelected() {
+        val list = selectList.map {
+            itemIndex(it)
+        }.toList()
         selectList.clear()
+        list.forEach {
+            if (it != -1) notifyItemChanged(it)
+        }
     }
 
     fun clickAnimation(

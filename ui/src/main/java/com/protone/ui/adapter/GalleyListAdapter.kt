@@ -56,8 +56,8 @@ class GalleyListAdapter(
             is GalleyListEvent.QuiteSelectAll -> {
                 if (!onSelectMod) return
                 onSelectMod = false
+                clearAllSelected()
                 withContext(Dispatchers.Main) {
-                    clearAllSelected()
                     onSelectListener?.select(selectList)
                 }
             }

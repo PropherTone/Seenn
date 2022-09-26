@@ -223,10 +223,8 @@ class GalleyFragment(
                     parent: RecyclerView,
                     state: RecyclerView.State
                 ) {
-                    if (parent.getChildLayoutPosition(view) != 0) {
-                        outRect.top = resources.getDimension(R.dimen.icon_padding).toInt() shr 1
-                    }
                     super.getItemOffsets(outRect, view, parent, state)
+                    outRect.top = resources.getDimension(R.dimen.icon_padding).toInt()
                 }
             })
         }

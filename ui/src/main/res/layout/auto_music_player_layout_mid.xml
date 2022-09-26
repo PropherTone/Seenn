@@ -11,7 +11,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintHeight_percent="1"
-            app:layout_constraintWidth_percent="1"/>
+            app:layout_constraintWidth_percent="1" />
 
         <ImageView
             android:id="@+id/music_cover_back"
@@ -39,7 +39,7 @@
             app:layout_constraintEnd_toEndOf="@id/music_cover_back"
             app:layout_constraintStart_toStartOf="@id/music_cover_back"
             app:layout_constraintTop_toTopOf="@id/music_cover_back"
-            app:layout_constraintWidth_percent="0.18"/>
+            app:layout_constraintWidth_percent="0.18" />
 
         <View
             android:layout_width="0dp"
@@ -54,12 +54,14 @@
             android:id="@+id/music_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:clickable="true"
             android:ellipsize="marquee"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="center"
             android:letterSpacing="0.06"
             android:lines="1"
+            android:marqueeRepeatLimit="1"
             android:text="@string/model_music"
             android:textColor="@color/white"
             android:textStyle="bold"

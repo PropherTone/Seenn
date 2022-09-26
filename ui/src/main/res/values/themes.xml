@@ -22,7 +22,7 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="MyRoundCheckBox" parent="Widget.AppCompat.CompoundButton.RadioButton">
+    <style name="MyRoundCheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
         <item name="colorControlActivated">@color/blue_1</item>
         <item name="colorButtonNormal">@color/black</item>
     </style>

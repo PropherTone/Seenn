@@ -42,13 +42,11 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
+                <com.protone.ui.customView.SwitchImageView
                     android:id="@+id/userBack"
-                    android:src="@drawable/main_background"
+                    android:background="@drawable/main_background"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="@string/icon"
-                    android:scaleType="centerCrop" />
+                    android:layout_height="match_parent" />
 
                 <TextView
                     android:id="@+id/user_welcome"

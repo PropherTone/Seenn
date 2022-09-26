@@ -50,11 +50,10 @@ class MusicListAdapter(context: Context, private val musicList: MutableList<Musi
             is MusicListEvent.PlayPosition -> {
                 if (musicList.size <= 0) return
                 if (musicList.contains(data.music)) {
-                    selectList.clear()
+                    clearAllSelected()
                     selectList.add(data.music)
                     playPosition = musicList.indexOf(data.music)
                     withContext(Dispatchers.Main) {
-                        Log.d(TAG, "onEventIO PlayPosition: $playPosition")
                         notifyItemChanged(playPosition)
                     }
                 }
@@ -93,7 +92,7 @@ class MusicListAdapter(context: Context, private val musicList: MutableList<Musi
                 musicListContainer.setOnClickListener {
                     if (selectList.contains(music)) return@setOnClickListener
                     if (playPosition == holder.layoutPosition) return@setOnClickListener
-                    clearSelected()
+                    clearAllSelected()
                     itemClickChange(
                         R.color.blue_2,
                         R.color.white,

@@ -21,8 +21,8 @@ class MusicPlayerViewMid @JvmOverloads constructor(
     override val control: ImageView = binding.musicControl
     override val previous: ImageView = binding.musicPrevious
     override val progress: ColorfulProgressBar = binding.musicProgress
-    override var switcher: SwitchImageView = binding.musicBack
-    override var coverSwitcher: SwitchImageView = binding.musicCover
+    override val switcher: SwitchImageView = binding.musicBack
+    override val coverSwitcher: SwitchImageView = binding.musicCover
     override var looper: ImageView? = binding.loopMode
     override val root: View = binding.musicBack
 
@@ -47,5 +47,9 @@ class MusicPlayerViewMid @JvmOverloads constructor(
     }
 
     override fun setDetail(detail: String) {}
+
+    init {
+        coverSwitcher.enableShapeAppearance = true
+    }
 
 }
