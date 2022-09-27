@@ -41,18 +41,11 @@
             app:layout_constraintTop_toTopOf="@id/music_cover_back"
             app:layout_constraintWidth_percent="0.11" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/round_background_fore_dark"
-            app:layout_constraintBottom_toBottomOf="@id/music_name"
-            app:layout_constraintEnd_toEndOf="@id/music_name"
-            app:layout_constraintStart_toStartOf="@id/music_name"
-            app:layout_constraintTop_toTopOf="@id/music_name" />
-
         <TextView
             android:id="@+id/music_name"
             android:layout_width="0dp"
+            android:background="@drawable/round_background_fore_dark"
+            android:padding="@dimen/texts_padding"
             android:layout_height="wrap_content"
             android:clickable="true"
             android:ellipsize="marquee"

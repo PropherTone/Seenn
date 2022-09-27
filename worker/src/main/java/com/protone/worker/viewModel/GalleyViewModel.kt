@@ -7,7 +7,6 @@ import com.protone.api.entity.GalleyMedia
 import com.protone.worker.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -34,11 +33,14 @@ class GalleyViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
     ) {
         viewModelScope.launch(Dispatchers.Default) {
             if (frag1 != null) {
-                mailers[0] = frag1
-                mailers[0]?.collect(onAction())
-            } else if (frag2 != null) {
-                mailers[1] = frag2
-                mailers[1]?.collect(onAction())
+                mailers[0] = frag1.also {
+                    it.collect(onAction())
+                }
+            }
+            if (frag2 != null) {
+                mailers[1] = frag2.also {
+                    it.collect(onAction())
+                }
             }
         }
     }

@@ -26,7 +26,7 @@ class GalleyListAdapter(
 ) {
     private val medias: MutableList<GalleyMedia> = mutableListOf()
 
-    enum class MediaStatus{
+    enum class MediaStatus {
         UPDATED,
         INSERTED,
         DELETED
@@ -62,11 +62,9 @@ class GalleyListAdapter(
                 }
             }
             is GalleyListEvent.SelectAll -> {
-                medias.onEach {
-                    if (it !in selectList) {
-                        selectList.add(it)
-                        withContext(Dispatchers.Main) { notifyItemChanged(medias.indexOf(it)) }
-                    }
+                for (i in 0..medias.size) {
+                    selectList.add(medias[i])
+                    withContext(Dispatchers.Main) { notifyItemChanged(i) }
                 }
             }
             is GalleyListEvent.NoticeDataUpdate -> {
@@ -172,7 +170,7 @@ class GalleyListAdapter(
     }
 
     override fun onBindViewHolder(holder: Holder<GalleyListAdapterLayoutBinding>, position: Int) {
-        setSelect(holder,medias[position] in selectList)
+        setSelect(holder, medias[position] in selectList)
         holder.binding.videoIcon.isGone = !medias[position].isVideo && !combine
         holder.binding.imageView.let { image ->
             Glide.with(context).load(medias[position].thumbnailUri).into(image)
