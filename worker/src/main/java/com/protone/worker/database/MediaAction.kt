@@ -12,9 +12,10 @@ sealed class MediaAction {
     data class OnMusicDeleted(val music: Music) : MediaAction()
     data class OnMusicUpdate(val music: Music) : MediaAction()
 
-    data class OnMediaDeleted(val media: GalleyMedia) : MediaAction()
-    data class OnMediaInserted(val media: GalleyMedia) : MediaAction()
-    data class OnMediaUpdated(val media: GalleyMedia) : MediaAction()
+    data class OnMediaDeleted(val media: GalleryMedia) : MediaAction()
+    data class OnMediaInserted(val media: GalleryMedia) : MediaAction()
+    data class OnMediaUpdated(val media: GalleryMedia) : MediaAction()
+    data class OnGalleryDeleted(val gallery: String) : MediaAction()
 
     data class OnNoteUpdated(val note: Note) : MediaAction()
     data class OnNoteDeleted(val note: Note) : MediaAction()
@@ -23,8 +24,8 @@ sealed class MediaAction {
     data class OnNoteDirInserted(val noteDir: NoteDir) : MediaAction()
     data class OnNoteDirDeleted(val noteDir: NoteDir) : MediaAction()
 
-    data class OnGalleyBucketInserted(val galleyBucket: GalleyBucket) : MediaAction()
-    data class OnGalleyBucketDeleted(val galleyBucket: GalleyBucket) : MediaAction()
+    data class OnGalleryBucketInserted(val galleryBucket: GalleryBucket) : MediaAction()
+    data class OnGalleryBucketDeleted(val galleryBucket: GalleryBucket) : MediaAction()
 
     data class OnGalleriesWithNotesInserted(val galleriesWithNotes: GalleriesWithNotes) :
         MediaAction()
@@ -46,7 +47,7 @@ sealed class MediaAction {
 //
 //}
 //
-//sealed class GalleyAction {
+//sealed class galleryAction {
 //
 //}
 //
@@ -58,7 +59,7 @@ sealed class MediaAction {
 //
 //}
 //
-//sealed class GalleyBucketAction {
+//sealed class galleryBucketAction {
 //
 //}
 //

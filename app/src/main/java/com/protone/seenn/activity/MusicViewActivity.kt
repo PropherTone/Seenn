@@ -11,7 +11,7 @@ import com.protone.api.entity.Music
 import com.protone.seenn.databinding.MusicViewActivityBinding
 import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.ui.adapter.TransparentPlayListAdapter
-import com.protone.ui.itemDecoration.GalleyItemDecoration
+import com.protone.ui.itemDecoration.GalleryItemDecoration
 import com.protone.worker.database.userConfig
 import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.MusicViewModel
@@ -57,7 +57,7 @@ class MusicViewActivity :
             adapter = TransparentPlayListAdapter(context, onPlay, playList).also {
                 it.onPlayListClkListener = listener
             }
-            addItemDecoration(GalleyItemDecoration(paddingEnd))
+            addItemDecoration(GalleryItemDecoration(paddingEnd))
         }
     }
 

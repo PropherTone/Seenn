@@ -7,17 +7,17 @@ import com.protone.api.baseType.getFileMimeType
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.*
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.seenn.R
-import com.protone.ui.databinding.GalleyOptionPopBinding
+import com.protone.ui.databinding.GalleryOptionPopBinding
 import com.protone.ui.dialog.cateDialog
 import com.protone.ui.dialog.checkListDialog
 import com.protone.ui.dialog.titleDialog
 import com.protone.ui.popWindows.ColorfulPopWindow
-import com.protone.ui.popWindows.GalleyOptionPop
+import com.protone.ui.popWindows.GalleryOptionPop
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.viewModel.BaseViewModel
-import com.protone.worker.viewModel.GalleyViewModel
+import com.protone.worker.viewModel.GalleryViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -28,9 +28,9 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
 ) : BaseActivity<VB, VM, T>(handleEvent),
     View.OnClickListener {
 
-    var popLayout: GalleyOptionPopBinding? = null
+    var popLayout: GalleryOptionPopBinding? = null
 
-    private var pop: GalleyOptionPop? = null
+    private var pop: GalleryOptionPop? = null
 
     abstract fun popDelete()
     abstract fun popMoveTo()
@@ -41,24 +41,24 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
 
     fun initPop() {
         if (pop == null) {
-            popLayout = GalleyOptionPopBinding.inflate(layoutInflater, root, false).apply {
-                pop = GalleyOptionPop(this@BaseMediaActivity, root)
-                galleyDelete.setOnClickListener(this@BaseMediaActivity)
-                galleyMoveTo.setOnClickListener(this@BaseMediaActivity)
-                galleyRename.setOnClickListener(this@BaseMediaActivity)
-                galleySelectAll.setOnClickListener(this@BaseMediaActivity)
-                galleySetCate.setOnClickListener(this@BaseMediaActivity)
-                galleyIntoBox.setOnClickListener(this@BaseMediaActivity)
+            popLayout = GalleryOptionPopBinding.inflate(layoutInflater, root, false).apply {
+                pop = GalleryOptionPop(this@BaseMediaActivity, root)
+                galleryDelete.setOnClickListener(this@BaseMediaActivity)
+                galleryMoveTo.setOnClickListener(this@BaseMediaActivity)
+                galleryRename.setOnClickListener(this@BaseMediaActivity)
+                gallerySelectAll.setOnClickListener(this@BaseMediaActivity)
+                gallerySetCate.setOnClickListener(this@BaseMediaActivity)
+                galleryIntoBox.setOnClickListener(this@BaseMediaActivity)
             }
         }
     }
 
     fun showPop(anchor: View, onSelect: Boolean) {
         popLayout?.apply {
-            galleyDelete.isGone = onSelect
-            galleyMoveTo.isGone = onSelect
-            galleyRename.isGone = onSelect
-            galleySetCate.isGone = onSelect
+            galleryDelete.isGone = onSelect
+            galleryMoveTo.isGone = onSelect
+            galleryRename.isGone = onSelect
+            gallerySetCate.isGone = onSelect
         }
         pop?.showPop(anchor)
     }
@@ -66,18 +66,18 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
     override fun onClick(v: View?) {
         popLayout?.apply {
             when (v) {
-                galleyDelete -> popDelete()
-                galleyMoveTo -> popMoveTo()
-                galleyRename -> popRename()
-                galleySelectAll -> popSelectAll()
-                galleySetCate -> popSetCate()
-                galleyIntoBox -> popIntoBox()
+                galleryDelete -> popDelete()
+                galleryMoveTo -> popMoveTo()
+                galleryRename -> popRename()
+                gallerySelectAll -> popSelectAll()
+                gallerySetCate -> popSetCate()
+                galleryIntoBox -> popIntoBox()
             }
         }
         pop?.dismiss()
     }
 
-    fun tryRename(gm: List<GalleyMedia>) {
+    fun tryRename(gm: List<GalleryMedia>) {
         when {
             gm.size == 1 -> rename(gm[0])
             gm.size > 1 -> renameMulti(gm)
@@ -85,8 +85,8 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
     }
 
     fun tryDelete(
-        gm: List<GalleyMedia>,
-        callBack: (List<GalleyMedia>) -> Unit
+        gm: List<GalleryMedia>,
+        callBack: (List<GalleryMedia>) -> Unit
     ) {
         when {
             gm.size == 1 -> delete(gm[0], callBack)
@@ -94,7 +94,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         }
     }
 
-    private fun rename(gm: GalleyMedia) {
+    private fun rename(gm: GalleryMedia) {
         val mimeType = gm.name.getFileMimeType()
         titleDialog(
             getString(R.string.rename),
@@ -107,7 +107,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         }
     }
 
-    private fun renameMulti(gm: List<GalleyMedia>) {
+    private fun renameMulti(gm: List<GalleryMedia>) {
         val reList = arrayListOf<String>()
         titleDialog(
             getString(R.string.rename),
@@ -133,13 +133,13 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
     }
 
     private fun delete(
-        gm: GalleyMedia,
-        callBack: (List<GalleyMedia>) -> Unit
+        gm: GalleryMedia,
+        callBack: (List<GalleryMedia>) -> Unit
     ) {
         launch(Dispatchers.IO) {
             val result = deleteMedia(gm.uri)
             if (result) {
-                DatabaseHelper.instance.signedGalleyDAOBridge.deleteSignedMedia(gm)
+                DatabaseHelper.instance.signedGalleryDAOBridge.deleteSignedMedia(gm)
                 callBack.invoke(mutableListOf(gm))
                 R.string.success.getString().toast()
             } else R.string.not_supported.getString().toast()
@@ -147,15 +147,15 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
     }
 
     private fun deleteMulti(
-        gm: List<GalleyMedia>,
-        callBack: (List<GalleyMedia>) -> Unit
+        gm: List<GalleryMedia>,
+        callBack: (List<GalleryMedia>) -> Unit
     ) {
         launch(Dispatchers.IO) {
-            val reList = arrayListOf<GalleyMedia>()
+            val reList = arrayListOf<GalleryMedia>()
             gm.forEach {
                 val result = deleteMedia(it.uri)
                 if (result) {
-                    DatabaseHelper.instance.signedGalleyDAOBridge.deleteSignedMedia(it)
+                    DatabaseHelper.instance.signedGalleryDAOBridge.deleteSignedMedia(it)
                 } else {
                     reList.add(it)
                 }
@@ -174,7 +174,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         }
     }
 
-    fun addCate(gms: MutableList<GalleyMedia>) {
+    fun addCate(gms: MutableList<GalleryMedia>) {
         cateDialog({
             titleDialog(R.string.addCate.getString(), "") { re ->
                 if (re.isEmpty()) {
@@ -186,14 +186,14 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         }) {
             launch(Dispatchers.IO) {
                 startActivityForResult(
-                    GalleyActivity::class.intent.also { intent ->
+                    GalleryActivity::class.intent.also { intent ->
                         intent.putExtra(
-                            GalleyViewModel.CHOOSE_MODE,
-                            GalleyViewModel.CHOOSE_PHOTO
+                            GalleryViewModel.CHOOSE_MODE,
+                            GalleryViewModel.CHOOSE_PHOTO
                         )
                     }
                 ).let { result ->
-                    val uri = result?.data?.getStringExtra(GalleyViewModel.URI)
+                    val uri = result?.data?.getStringExtra(GalleryViewModel.URI)
                     if (uri != null) {
                         addCate(uri, gms)
                     } else showFailedToast()
@@ -202,7 +202,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         }
     }
 
-    private fun addCate(cate: String, gms: MutableList<GalleyMedia>) {
+    private fun addCate(cate: String, gms: MutableList<GalleryMedia>) {
         gms.let { list ->
             list.forEach { gm ->
                 gm.also { g ->
@@ -210,22 +210,22 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                     (g.cate as MutableList).add(cate)
                 }
             }
-            DatabaseHelper.instance.signedGalleyDAOBridge.updateMediaMultiAsync(list)
+            DatabaseHelper.instance.signedGalleryDAOBridge.updateMediaMultiAsync(list)
         }
     }
 
     fun moveTo(
         anchor: View,
         isVideo: Boolean,
-        gms: MutableList<GalleyMedia>,
-        callback: (String, MutableList<GalleyMedia>) -> Unit
+        gms: MutableList<GalleryMedia>,
+        callback: (String, MutableList<GalleryMedia>) -> Unit
     ) = launch(Dispatchers.Main) {
         val pop = ColorfulPopWindow(this@BaseMediaActivity)
         pop.startListPopup(
             anchor = anchor,
             dataList = withContext(Dispatchers.IO) {
                 val list = mutableListOf<String>()
-                DatabaseHelper.instance.galleyBucketDAOBridge.getALLGalleyBucket(isVideo)
+                DatabaseHelper.instance.galleryBucketDAOBridge.getAllGalleryBucket(isVideo)
                     ?.forEach {
                         list.add(it.type)
                     }
@@ -239,7 +239,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                             (it.type as MutableList<String>).add(re)
                         else "${it.name}已存在${it.type}中".toast()
                     }
-                    DatabaseHelper.instance.signedGalleyDAOBridge.updateMediaMultiAsync(list)
+                    DatabaseHelper.instance.signedGalleryDAOBridge.updateMediaMultiAsync(list)
                     callback.invoke(re, list)
                 }
             } else R.string.none.getString().toast()

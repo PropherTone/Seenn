@@ -10,7 +10,7 @@ import com.protone.api.converters.UriTypeConverter
 
 @Entity
 @TypeConverters(UriTypeConverter::class, ListTypeConverter::class)
-data class GalleyMedia(
+data class GalleryMedia(
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "media_uri")
     val uri: Uri,
@@ -42,7 +42,7 @@ data class GalleyMedia(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as GalleyMedia
+        other as GalleryMedia
 
         if (name != other.name) return false
         if (bucket != other.bucket) return false
@@ -71,7 +71,7 @@ data class GalleyMedia(
     }
 
     override fun toString(): String {
-        return "GalleyMedia(name='$name', path=$path, bucket='$bucket', size=$size, type=$type, cate=$cate, date=$date, dateModified=$dateModified, thumbnailUri=$thumbnailUri, duration=$duration, isVideo=$isVideo)"
+        return "GalleryMedia(name='$name', path=$path, bucket='$bucket', size=$size, type=$type, cate=$cate, date=$date, dateModified=$dateModified, thumbnailUri=$thumbnailUri, duration=$duration, isVideo=$isVideo)"
     }
 
 

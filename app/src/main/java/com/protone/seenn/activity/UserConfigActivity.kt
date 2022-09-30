@@ -11,7 +11,7 @@ import com.protone.api.baseType.toast
 import com.protone.api.context.SApplication
 import com.protone.api.context.intent
 import com.protone.api.context.root
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.api.json.toEntity
 import com.protone.seenn.R
 import com.protone.seenn.databinding.UserConfigActivityBinding
@@ -21,7 +21,7 @@ import com.protone.ui.dialog.loginDialog
 import com.protone.ui.dialog.regDialog
 import com.protone.ui.dialog.titleDialog
 import com.protone.worker.database.userConfig
-import com.protone.worker.viewModel.GalleyViewModel
+import com.protone.worker.viewModel.GalleryViewModel
 import com.protone.worker.viewModel.UserConfigViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -52,8 +52,8 @@ class UserConfigActivity : BaseActivity<
                 UserConfigViewModel.UserConfigEvent.Refresh -> refreshLayout()
                 UserConfigViewModel.UserConfigEvent.ClearCache -> viewModel.clearCache()
                 UserConfigViewModel.UserConfigEvent.Log -> startActivity(LogActivity::class.intent)
-                UserConfigViewModel.UserConfigEvent.CombineGalley -> userConfig.combineGalley = true
-                UserConfigViewModel.UserConfigEvent.DispatchGalley -> userConfig.combineGalley =
+                UserConfigViewModel.UserConfigEvent.CombineGallery -> userConfig.combineGallery = true
+                UserConfigViewModel.UserConfigEvent.DispatchGallery -> userConfig.combineGallery =
                     false
             }
         }
@@ -66,7 +66,7 @@ class UserConfigActivity : BaseActivity<
     private fun chooseMode(
         loginMode: UserConfigViewModel.DisplayMode,
         lockMode: UserConfigViewModel.DisplayMode,
-        galleyMode: UserConfigViewModel.DisplayMode
+        galleryMode: UserConfigViewModel.DisplayMode
     ) {
         val logView = initModeView(R.string.log.getString()) {
             UserConfigViewModel.UserConfigEvent.Log
@@ -107,15 +107,15 @@ class UserConfigActivity : BaseActivity<
                     UserConfigViewModel.UserConfigEvent.Lock else UserConfigViewModel.UserConfigEvent.Unlock
             },
             initModeView(
-                if (galleyMode == UserConfigViewModel.DisplayMode.CombineGalley)
-                    R.string.dispatch_galley.getString() else R.string.combine_galley.getString()
+                if (galleryMode == UserConfigViewModel.DisplayMode.CombineGallery)
+                    R.string.dispatch_gallery.getString() else R.string.combine_gallery.getString()
             ) {
-                if (it.itemName.text.equals(R.string.dispatch_galley.getString())) {
-                    it.itemName.text = R.string.combine_galley.getString()
-                    UserConfigViewModel.UserConfigEvent.DispatchGalley
+                if (it.itemName.text.equals(R.string.dispatch_gallery.getString())) {
+                    it.itemName.text = R.string.combine_gallery.getString()
+                    UserConfigViewModel.UserConfigEvent.DispatchGallery
                 } else {
-                    it.itemName.text = R.string.dispatch_galley.getString()
-                    UserConfigViewModel.UserConfigEvent.CombineGalley
+                    it.itemName.text = R.string.dispatch_gallery.getString()
+                    UserConfigViewModel.UserConfigEvent.CombineGallery
                 }
             },
             initModeView(
@@ -146,18 +146,18 @@ class UserConfigActivity : BaseActivity<
 
     private suspend fun startIconPick() {
         startActivityForResult(
-            GalleyActivity::class.intent.apply {
+            GalleryActivity::class.intent.apply {
                 putExtra(
-                    GalleyViewModel.CHOOSE_MODE,
-                    GalleyViewModel.CHOOSE_PHOTO
+                    GalleryViewModel.CHOOSE_MODE,
+                    GalleryViewModel.CHOOSE_PHOTO
                 )
             }).let { re ->
             if (re == null) {
                 R.string.come_up_unknown_error.getString().toast()
                 return@let
             }
-            val toEntity = re.data?.getStringExtra(GalleyViewModel.GALLEY_DATA)
-                ?.toEntity(GalleyMedia::class.java)
+            val toEntity = re.data?.getStringExtra(GalleryViewModel.Gallery_DATA)
+                ?.toEntity(GalleryMedia::class.java)
             if (toEntity == null) {
                 R.string.come_up_unknown_error.getString().toast()
                 return@let
@@ -226,11 +226,11 @@ class UserConfigActivity : BaseActivity<
             if (!userConfig.isLogin) {
                 UserConfigViewModel.DisplayMode.UnRegis
             } else UserConfigViewModel.DisplayMode.Normal,
-            if (userConfig.lockGalley != "" || userConfig.lockNote != "" || userConfig.lockMusic != "") {
+            if (userConfig.lockGallery != "" || userConfig.lockNote != "" || userConfig.lockMusic != "") {
                 UserConfigViewModel.DisplayMode.Locked
             } else UserConfigViewModel.DisplayMode.Normal,
-            if (userConfig.combineGalley) {
-                UserConfigViewModel.DisplayMode.CombineGalley
+            if (userConfig.combineGallery) {
+                UserConfigViewModel.DisplayMode.CombineGallery
             } else UserConfigViewModel.DisplayMode.Normal
         )
     }
@@ -241,7 +241,7 @@ class UserConfigActivity : BaseActivity<
             mutableListOf(
                 R.string.model_noteBook.getString(),
                 R.string.model_music.getString(),
-                R.string.model_Galley.getString()
+                R.string.model_gallery.getString()
             )
         ) {
             if (!it.isNullOrEmpty()) {
@@ -253,7 +253,7 @@ class UserConfigActivity : BaseActivity<
                     when (it) {
                         R.string.model_noteBook.getString() -> userConfig.lockNote = lock
                         R.string.model_music.getString() -> userConfig.lockNote = lock
-                        else -> userConfig.lockGalley = lock
+                        else -> userConfig.lockGallery = lock
                     }
                 }
             } else {
@@ -268,7 +268,7 @@ class UserConfigActivity : BaseActivity<
             mutableListOf(
                 R.string.model_noteBook.getString(),
                 R.string.model_music.getString(),
-                R.string.model_Galley.getString()
+                R.string.model_gallery.getString()
             )
         ) {
             if (!it.isNullOrEmpty()) {
@@ -291,8 +291,8 @@ class UserConfigActivity : BaseActivity<
                                 } else false
                             }
                             else -> {
-                                if (userConfig.lockGalley == lock) {
-                                    userConfig.lockGalley = ""
+                                if (userConfig.lockGallery == lock) {
+                                    userConfig.lockGallery = ""
                                     true
                                 } else false
                             }

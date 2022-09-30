@@ -10,12 +10,12 @@ import java.lang.ref.WeakReference
 
 @Database(
     entities = [
-        GalleyMedia::class,
+        GalleryMedia::class,
         Note::class,
         NoteDir::class,
         MusicBucket::class,
         Music::class,
-        GalleyBucket::class,
+        GalleryBucket::class,
         GalleriesWithNotes::class,
         NoteDirWithNotes::class,
         MusicWithMusicBucket::class
@@ -24,12 +24,12 @@ import java.lang.ref.WeakReference
     exportSchema = false
 )
 internal abstract class SeennDataBase : RoomDatabase() {
-    internal abstract fun getGalleyDAO(): SignedGalleyDAO
+    internal abstract fun getGalleryDAO(): SignedGalleryDAO
     internal abstract fun getNoteDAO(): NoteDAO
     internal abstract fun getNoteTypeDAO(): NoteTypeDAO
     internal abstract fun getMusicBucketDAO(): MusicBucketDAO
     internal abstract fun getMusicDAO(): MusicDAO
-    internal abstract fun getGalleyBucketDAO(): GalleyBucketDAO
+    internal abstract fun getGalleryBucketDAO(): GalleryBucketDAO
     internal abstract fun getGalleriesWithNotesDAO(): GalleriesWithNotesDAO
     internal abstract fun getNoteDirWithNoteDAO(): NoteDirWithNoteDAO
     internal abstract fun getMusicWithMusicBucketDAO(): MusicWithMusicBucketDAO

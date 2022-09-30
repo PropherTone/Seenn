@@ -4,7 +4,7 @@ import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
-class GalleyItemDecoration(private val interval: Int) : RecyclerView.ItemDecoration() {
+class GalleryItemDecoration(private val interval: Int) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(
         outRect: Rect,

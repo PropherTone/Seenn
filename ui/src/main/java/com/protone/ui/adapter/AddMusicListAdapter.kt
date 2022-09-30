@@ -31,7 +31,7 @@ class AddMusicListAdapter(
             selectList.addAll(adapterDataBaseProxy.getMusicWithMusicBucket(bucket))
             selectList.forEach {
                 musicList.indexOf(it).let { index ->
-                    if (index != -1) withContext(Dispatchers.Main) { notifyItemChanged(index) }
+                    if (index != -1) notifyItemChangedCO(index)
                 }
             }
         }
@@ -161,9 +161,7 @@ class AddMusicListAdapter(
         while (!viewQueue.isEmpty()) {
             val poll = viewQueue.poll()
             if (poll != null) {
-                withContext(Dispatchers.Main) {
-                    notifyItemChanged(poll)
-                }
+                 notifyItemChangedCO(poll)
             }
         }
     }

@@ -23,7 +23,7 @@ import com.protone.ui.itemDecoration.ModelListItemDecoration
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.userConfig
-import com.protone.worker.viewModel.GalleyViewViewModel
+import com.protone.worker.viewModel.GalleryViewViewModel
 import com.protone.worker.viewModel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -132,16 +132,16 @@ class MainActivity :
         }
 
         onFinish = {
-            DatabaseHelper.instance.shutdownNow()
-            stopService(WorkService::class.intent)
             userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
             userConfig.lastMusic = musicController.getPlayingMusic()?.toJson() ?: ""
+            DatabaseHelper.instance.shutdownNow()
+            stopService(WorkService::class.intent)
         }
 
         onViewEvent {
             when (it) {
-                MainViewModel.MainViewEvent.Galley ->
-                    startActivity(GalleyActivity::class.intent)
+                MainViewModel.MainViewEvent.Gallery ->
+                    startActivity(GalleryActivity::class.intent)
                 MainViewModel.MainViewEvent.Note ->
                     if (userConfig.lockNote == "")
                         startActivity(NoteActivity::class.intent)
@@ -182,10 +182,10 @@ class MainActivity :
     }
 
     override fun onPhoto(json: String) {
-        startActivity(GalleyViewActivity::class.intent.apply {
-            putExtra(GalleyViewViewModel.MEDIA, json)
-            putExtra(GalleyViewViewModel.TYPE, false)
-            putExtra(GalleyViewViewModel.GALLEY, R.string.all_galley.getString())
+        startActivity(GalleryViewActivity::class.intent.apply {
+            putExtra(GalleryViewViewModel.MEDIA, json)
+            putExtra(GalleryViewViewModel.TYPE, false)
+            putExtra(GalleryViewViewModel.GALLERY, R.string.all_gallery.getString())
         })
     }
 

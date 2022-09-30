@@ -1,16 +1,14 @@
 package com.protone.ui.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 abstract class BaseAdapter<B : ViewDataBinding, T>(
     val context: Context,
@@ -44,4 +42,41 @@ abstract class BaseAdapter<B : ViewDataBinding, T>(
         super.onDetachedFromRecyclerView(recyclerView)
         cancel()
     }
+
+    suspend fun notifyItemChangedCO(position: Int): Unit = withContext(Dispatchers.Main) {
+        notifyItemChanged(position)
+    }
+
+    suspend fun notifyItemInsertedCO(position: Int): Unit = withContext(Dispatchers.Main) {
+        notifyItemInserted(position)
+    }
+
+    suspend fun notifyItemRemovedCO(position: Int): Unit = withContext(Dispatchers.Main) {
+        notifyItemRemoved(position)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    suspend fun notifyDataSetChangedCO(): Unit = withContext(Dispatchers.Main) {
+        notifyDataSetChanged()
+    }
+
+    suspend fun notifyItemRangeInsertedCO(positionStart: Int, itemCount: Int): Unit =
+        withContext(Dispatchers.Main) {
+            notifyItemRangeInserted(positionStart, itemCount)
+        }
+
+    suspend fun notifyItemRangeRemovedCO(positionStart: Int, itemCount: Int): Unit =
+        withContext(Dispatchers.Main) {
+            notifyItemRangeRemoved(positionStart, itemCount)
+        }
+
+    suspend fun notifyItemRangeChangedCO(positionStart: Int, itemCount: Int): Unit =
+        withContext(Dispatchers.Main) {
+            notifyItemRangeChanged(positionStart, itemCount)
+        }
+
+    suspend fun notifyItemRangeChangedCO(positionStart: Int, itemCount: Int, paylod: Any?): Unit =
+        withContext(Dispatchers.Main) {
+            notifyItemRangeChanged(positionStart, itemCount, paylod)
+        }
 }

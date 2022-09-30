@@ -10,9 +10,7 @@ import com.protone.api.baseType.toDateString
 import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.Note
 import com.protone.ui.databinding.NoteListAdapterLayoutBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class NoteListAdapter(context: Context) :
     BaseAdapter<NoteListAdapterLayoutBinding, NoteListAdapter.NoteEvent>(context, true) {
@@ -36,24 +34,18 @@ class NoteListAdapter(context: Context) :
                 val indexOf = noteList.indexOf(data.note)
                 if (indexOf != -1) {
                     noteList.removeAt(indexOf)
-                    withContext(Dispatchers.Main) {
-                        notifyItemRemoved(indexOf)
-                    }
+                    notifyItemRemovedCO(indexOf)
                 }
             }
             is NoteEvent.NoteInsert -> {
-                noteList.add(0,data.note)
-                withContext(Dispatchers.Main) {
-                    notifyItemInserted(0)
-                }
+                noteList.add(0, data.note)
+                notifyItemInsertedCO(0)
             }
             is NoteEvent.NoteUpdate -> {
                 val index = noteList.indexOf(data.note)
                 if (index != -1) {
                     noteList[index] = data.note
-                    withContext(Dispatchers.Main) {
-                        notifyItemChanged(index)
-                    }
+                    notifyItemChangedCO(index)
                 }
             }
         }

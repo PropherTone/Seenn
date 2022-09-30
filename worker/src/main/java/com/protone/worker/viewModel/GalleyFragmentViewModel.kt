@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
-import com.protone.api.entity.GalleyBucket
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryBucket
+import com.protone.api.entity.GalleryMedia
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.MediaAction
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class GalleyFragmentViewModel : ViewModel() {
+class GalleryFragmentViewModel : ViewModel() {
 
     private val _fragFlow = MutableSharedFlow<FragEvent>()
     val fragEvent get() = _fragFlow.asSharedFlow()
@@ -29,17 +29,17 @@ class GalleyFragmentViewModel : ViewModel() {
         object OnActionBtn : FragEvent()
         object IntoBox : FragEvent()
 
-        data class AddBucket(val name: String, val list: MutableList<GalleyMedia>) : FragEvent()
+        data class AddBucket(val name: String, val list: MutableList<GalleryMedia>) : FragEvent()
         data class OnNewBucket(val pairs: Pair<Uri, Array<String>>) : FragEvent()
 
-        data class OnSelect(val galleyMedia: MutableList<GalleyMedia>) : FragEvent()
+        data class OnSelect(val galleryMedia: MutableList<GalleryMedia>) : FragEvent()
 
-        data class OnMediaDeleted(val galleyMedia: GalleyMedia) : FragEvent()
-        data class OnMediaInserted(val galleyMedia: GalleyMedia) : FragEvent()
-        data class OnMediaUpdated(val galleyMedia: GalleyMedia) : FragEvent()
+        data class OnMediaDeleted(val galleryMedia: GalleryMedia) : FragEvent()
+        data class OnMediaInserted(val galleryMedia: GalleryMedia) : FragEvent()
+        data class OnMediaUpdated(val galleryMedia: GalleryMedia) : FragEvent()
     }
 
-    var rightGalley: String = ""
+    var rightGallery: String = ""
 
     var isVideo: Boolean = false
 
@@ -47,58 +47,58 @@ class GalleyFragmentViewModel : ViewModel() {
     var isBucketShowUp = true
     private var isDataSorted = false
 
-    private val galleyMap = mutableMapOf<String?, MutableList<GalleyMedia>>()
+    private val galleryMap = mutableMapOf<String?, MutableList<GalleryMedia>>()
 
-    fun getGalley(galley: String) = galleyMap[galley]
+    fun getGallery(gallery: String) = galleryMap[gallery]
 
-    fun getGalleyName() = if (rightGalley == "") {
-        R.string.all_galley.getString()
-    } else rightGalley
+    fun getGalleryName() = if (rightGallery == "") {
+        R.string.all_gallery.getString()
+    } else rightGallery
 
     fun getBucket(bucket: String) = Pair(
-        if ((getGalley(bucket)?.size ?: 0) > 0) {
-            getGalley(bucket)?.get(0)?.uri ?: Uri.EMPTY
+        if ((getGallery(bucket)?.size ?: 0) > 0) {
+            getGallery(bucket)?.get(0)?.uri ?: Uri.EMPTY
         } else Uri.EMPTY,
-        arrayOf(bucket, (getGalley(bucket)?.size ?: 0).toString())
+        arrayOf(bucket, (getGallery(bucket)?.size ?: 0).toString())
     )
 
-    fun onTargetGalley(bucket: String): Boolean {
-        return bucket == rightGalley || rightGalley == R.string.all_galley.getString()
+    fun onTargetGallery(bucket: String): Boolean {
+        return bucket == rightGallery || rightGallery == R.string.all_gallery.getString()
     }
 
     fun sortData(combine: Boolean) = viewModelScope.launch(Dispatchers.Default) {
-        galleyMap[R.string.all_galley.getString()] = mutableListOf()
+        galleryMap[R.string.all_gallery.getString()] = mutableListOf()
         DatabaseHelper.instance
-            .signedGalleyDAOBridge
+            .signedGalleryDAOBridge
             .run {
-                observeGalley()
+                observegallery()
                 val signedMedias =
-                    (if (combine) getAllSignedMedia() else getAllMediaByType(isVideo)) as MutableList<GalleyMedia>?
+                    (if (combine) getAllSignedMedia() else getAllMediaByType(isVideo)) as MutableList<GalleryMedia>?
                 if (signedMedias == null) {
                     R.string.none.getString().toast()
                     return@launch
                 }
                 signedMedias.let {
-                    galleyMap[R.string.all_galley.getString()] = it
+                    galleryMap[R.string.all_gallery.getString()] = it
                     sendEvent(
                         FragEvent.OnNewBucket(
                             Pair(
                                 if (signedMedias.size > 0) signedMedias[0].uri else Uri.EMPTY,
                                 arrayOf(
-                                    R.string.all_galley.getString(),
+                                    R.string.all_gallery.getString(),
                                     signedMedias.size.toString()
                                 )
                             )
                         )
                     )
                 }
-                (if (combine) getAllGalley() else getAllGalley(isVideo))?.forEach {
-                    galleyMap[it] =
-                        ((if (combine) getAllMediaByGalley(it)
-                        else getAllMediaByGalley(
+                (if (combine) getAllGallery() else getAllGallery(isVideo))?.forEach {
+                    galleryMap[it] =
+                        ((if (combine) getAllMediaByGallery(it)
+                        else getAllMediaByGallery(
                             it,
                             isVideo
-                        )) as MutableList<GalleyMedia>).also { list ->
+                        )) as MutableList<GalleryMedia>).also { list ->
                             sendEvent(
                                 FragEvent.OnNewBucket(
                                     Pair(
@@ -116,14 +116,19 @@ class GalleyFragmentViewModel : ViewModel() {
     fun addBucket(name: String) {
         DatabaseHelper
             .instance
-            .galleyBucketDAOBridge
-            .insertGalleyBucketCB(GalleyBucket(name, isVideo)) { re, reName ->
+            .galleryBucketDAOBridge
+            .insertGalleryBucketCB(
+                GalleryBucket(
+                    name,
+                    isVideo
+                )
+            ) { re, reName ->
                 if (re) {
                     if (!isLock) {
                         sendEvent(
                             FragEvent.OnNewBucket((Pair(Uri.EMPTY, arrayOf(reName, "PRIVATE"))))
                         )
-                        galleyMap[reName] = mutableListOf()
+                        galleryMap[reName] = mutableListOf()
                     } else {
                         R.string.locked.getString().toast()
                     }
@@ -133,43 +138,43 @@ class GalleyFragmentViewModel : ViewModel() {
             }
     }
 
-    fun deleteGalleyBucket(bucket: String) {
+    fun deletegalleryBucket(bucket: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            DatabaseHelper.instance.galleyBucketDAOBridge.run {
-                getGalleyBucket(bucket)?.let { deleteGalleyBucketAsync(it) }
+            DatabaseHelper.instance.galleryBucketDAOBridge.run {
+                getGalleryBucket(bucket)?.let { deleteGalleryBucketAsync(it) }
             }
         }
     }
 
-    fun attachFragEvent(onAttach: (MutableSharedFlow<GalleyFragmentViewModel.FragEvent>) -> Unit) {
+    fun attachFragEvent(onAttach: (MutableSharedFlow<FragEvent>) -> Unit) {
         onAttach.invoke(_fragFlow)
     }
 
-    private fun sortPrivateData(signedMedias: MutableList<GalleyMedia>) {
+    private fun sortPrivateData(signedMedias: MutableList<GalleryMedia>) {
         viewModelScope.launch(Dispatchers.Default) {
             signedMedias.forEach {
                 it.type?.forEach { type ->
-                    if (galleyMap[type] == null) {
-                        galleyMap[type] = mutableListOf()
+                    if (galleryMap[type] == null) {
+                        galleryMap[type] = mutableListOf()
                     }
-                    galleyMap[type]?.add(it)
+                    galleryMap[type]?.add(it)
                 }
             }
-            (DatabaseHelper.instance.galleyBucketDAOBridge
-                .getALLGalleyBucket(isVideo) as MutableList<GalleyBucket>?)?.forEach {
+            (DatabaseHelper.instance.galleryBucketDAOBridge
+                .getAllGalleryBucket(isVideo) as MutableList<GalleryBucket>?)?.forEach {
                 sendEvent(FragEvent.OnNewBucket(Pair(Uri.EMPTY, arrayOf(it.type, "PRIVATE"))))
-                galleyMap[it.type] = mutableListOf()
+                galleryMap[it.type] = mutableListOf()
             }
             isDataSorted = true
         }
     }
 
-    private fun observeGalley() {
+    private fun observegallery() {
         viewModelScope.launch(Dispatchers.Default) {
-            val allGalley = R.string.all_galley.getString()
+            val allgallery = R.string.all_gallery.getString()
             suspend fun sortDeleteMedia(
-                media: GalleyMedia,
-                map: MutableMap<String?, MutableList<GalleyMedia>>,
+                media: GalleryMedia,
+                map: MutableMap<String?, MutableList<GalleryMedia>>,
                 flow: MutableSharedFlow<FragEvent>
             ) {
                 if (map[media.bucket]?.remove(media) == true
@@ -177,16 +182,16 @@ class GalleyFragmentViewModel : ViewModel() {
                 ) {
                     map.remove(media.bucket)
                 }
-                map[allGalley]?.remove(media)
+                map[allgallery]?.remove(media)
                 flow.emit(FragEvent.OnMediaDeleted(media))
             }
 
             suspend fun insertNewMedia(
-                map: MutableMap<String?, MutableList<GalleyMedia>>,
-                media: GalleyMedia
+                map: MutableMap<String?, MutableList<GalleryMedia>>,
+                media: GalleryMedia
             ) {
                 if (map[media.bucket] == null) {
-                    map[media.bucket] = mutableListOf<GalleyMedia>().also { it.add(media) }
+                    map[media.bucket] = mutableListOf<GalleryMedia>().also { it.add(media) }
                     FragEvent.OnNewBucket(
                         Pair(
                             media.uri,
@@ -201,29 +206,29 @@ class GalleyFragmentViewModel : ViewModel() {
                 when (it) {
                     is MediaAction.OnMediaDeleted -> {
                         if (it.media.isVideo != isVideo) return@collect
-                        sortDeleteMedia(it.media, galleyMap, _fragFlow)
+                        sortDeleteMedia(it.media, galleryMap, _fragFlow)
                     }
                     is MediaAction.OnMediaInserted -> {
                         if (it.media.isVideo != isVideo) return@collect
-                        insertNewMedia(galleyMap, it.media)
-                        galleyMap[allGalley]?.add(it.media)
+                        insertNewMedia(galleryMap, it.media)
+                        galleryMap[allgallery]?.add(it.media)
                         sendEvent(FragEvent.OnMediaInserted(it.media))
                     }
                     is MediaAction.OnMediaUpdated -> {
                         if (it.media.isVideo != isVideo) return@collect
-                        galleyMap[allGalley]?.first { sortMedia -> it.media.uri == sortMedia.uri }
+                        galleryMap[allgallery]?.first { sortMedia -> it.media.uri == sortMedia.uri }
                             ?.let { sortedMedia ->
-                                val allIndex = galleyMap[allGalley]?.indexOf(sortedMedia)
+                                val allIndex = galleryMap[allgallery]?.indexOf(sortedMedia)
                                 if (allIndex != null && allIndex != -1) {
-                                    galleyMap[allGalley]?.set(allIndex, it.media)
-                                    val index = galleyMap[sortedMedia.bucket]?.indexOf(sortedMedia)
+                                    galleryMap[allgallery]?.set(allIndex, it.media)
+                                    val index = galleryMap[sortedMedia.bucket]?.indexOf(sortedMedia)
                                     if (sortedMedia.bucket != it.media.bucket) {
-                                        galleyMap[sortedMedia.bucket]?.remove(sortedMedia)
-                                        insertNewMedia(galleyMap, it.media)
+                                        galleryMap[sortedMedia.bucket]?.remove(sortedMedia)
+                                        insertNewMedia(galleryMap, it.media)
                                         sendEvent(FragEvent.OnMediaInserted(it.media))
                                         return@let
                                     } else if (index != null && index != -1) {
-                                        galleyMap[sortedMedia.bucket]?.set(index, sortedMedia)
+                                        galleryMap[sortedMedia.bucket]?.set(index, sortedMedia)
                                     }
                                     sendEvent(FragEvent.OnMediaUpdated(it.media))
                                 }
@@ -239,13 +244,13 @@ class GalleyFragmentViewModel : ViewModel() {
         _fragFlow.emit(fragEvent)
     }
 
-    suspend fun insertNewMedias(galley: String, list: MutableList<GalleyMedia>) =
+    suspend fun insertNewMedias(gallery: String, list: MutableList<GalleryMedia>) =
         withContext(Dispatchers.Default) {
             if (!isLock) {
-                if (galleyMap[galley] == null) {
-                    galleyMap[galley] = mutableListOf()
+                if (galleryMap[gallery] == null) {
+                    galleryMap[gallery] = mutableListOf()
                 }
-                galleyMap[galley]?.addAll(list)
+                galleryMap[gallery]?.addAll(list)
             }
         }
 

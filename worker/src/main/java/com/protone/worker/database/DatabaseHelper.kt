@@ -36,10 +36,10 @@ class DatabaseHelper {
 
     val musicBucketDAOBridge by lazy { MusicBucketDAOBridge() }
     val musicDAOBridge by lazy { MusicDAOBridge() }
-    val signedGalleyDAOBridge by lazy { GalleyDAOBridge() }
+    val signedGalleryDAOBridge by lazy { GalleryDAOBridge() }
     val noteDAOBridge by lazy { NoteDAOBridge() }
     val noteDirDAOBridge by lazy { NoteTypeDAOBridge() }
-    val galleyBucketDAOBridge by lazy { GalleyBucketDAOBridge() }
+    val galleryBucketDAOBridge by lazy { GalleryBucketDAOBridge() }
     val galleriesWithNotesDAOBridge by lazy { GalleriesWithNotesDAOBridge() }
     val noteDirWithNoteDAOBridge by lazy { NoteDirWithNoteDAOBridge() }
     val musicWithMusicBucketDAOBridge by lazy { MusicWithMusicBucketDAOBridge() }
@@ -182,13 +182,13 @@ class DatabaseHelper {
 
     }
 
-    inner class GalleyDAOBridge : BaseGalleyDAO() {
+    inner class GalleryDAOBridge : BaseGalleryDAO() {
 
         override fun sendEvent(mediaAction: MediaAction) {
             pollEvent(mediaAction)
         }
 
-        fun deleteSignedMediaMultiAsync(list: MutableList<GalleyMedia>) {
+        fun deleteSignedMediaMultiAsync(list: MutableList<GalleryMedia>) {
             execute {
                 list.forEach {
                     deleteSignedMediaByUri(it.uri)
@@ -196,17 +196,17 @@ class DatabaseHelper {
             }
         }
 
-        fun deleteSignedMediaAsync(media: GalleyMedia) {
+        fun deleteSignedMediaAsync(media: GalleryMedia) {
             execute {
                 deleteSignedMedia(media)
             }
         }
 
-        fun updateMediaMultiAsync(list: MutableList<GalleyMedia>) {
+        fun updateMediaMultiAsync(list: MutableList<GalleryMedia>) {
             execute { list.forEach { updateSignedMedia(it) } }
         }
 
-        suspend fun insertSignedMediaChecked(media: GalleyMedia): GalleyMedia? {
+        suspend fun insertSignedMediaChecked(media: GalleryMedia): GalleryMedia? {
             val it = getSignedMedia(media.uri)
             return if (it != null) {
                 if (it == media) return null
@@ -270,37 +270,37 @@ class DatabaseHelper {
 
     }
 
-    inner class GalleyBucketDAOBridge : BaseGalleyBucketDAO() {
+    inner class GalleryBucketDAOBridge : BaseGalleryBucketDAO() {
 
         override fun sendEvent(mediaAction: MediaAction) {
             pollEvent(mediaAction)
         }
 
-        fun deleteGalleyBucketAsync(galleyBucket: GalleyBucket) {
+        fun deleteGalleryBucketAsync(galleryBucket: GalleryBucket) {
             execute {
-                deleteGalleyBucket(galleyBucket)
+                deleteGalleryBucket(galleryBucket)
             }
         }
 
-        inline fun insertGalleyBucketCB(
-            galleyBucket: GalleyBucket,
+        inline fun insertGalleryBucketCB(
+            galleryBucket: GalleryBucket,
             crossinline callBack: suspend (Boolean, String) -> Unit
         ) {
             execute {
                 var count = 0
-                val tempName = galleyBucket.type
+                val tempName = galleryBucket.type
                 val names = mutableMapOf<String, Int>()
-                getALLGalleyBucket(galleyBucket.isImage)?.forEach {
+                getAllGalleryBucket(galleryBucket.isImage)?.forEach {
                     names[it.type] = 1
-                    if (it.type == galleyBucket.type) {
-                        galleyBucket.type = "${tempName}(${++count})"
+                    if (it.type == galleryBucket.type) {
+                        galleryBucket.type = "${tempName}(${++count})"
                     }
                 }
-                while (names[galleyBucket.type] != null) {
-                    galleyBucket.type = "${tempName}(${++count})"
+                while (names[galleryBucket.type] != null) {
+                    galleryBucket.type = "${tempName}(${++count})"
                 }
-                insertGalleyBucket(galleyBucket)
-                callBack.invoke(getGalleyBucket(galleyBucket.type) != null, galleyBucket.type)
+                insertGalleryBucket(galleryBucket)
+                callBack.invoke(getGalleryBucket(galleryBucket.type) != null, galleryBucket.type)
             }
         }
 
@@ -413,63 +413,68 @@ class DatabaseHelper {
 
     }
 
-    sealed class BaseGalleyDAO : BaseDao() {
+    sealed class BaseGalleryDAO : BaseDao() {
 
-        private val signedGalleyDAO = getGalleyDAO()
+        private val signedGalleryDAO = getGalleryDAO()
 
-        suspend fun getAllSignedMedia(): List<GalleyMedia>? = withContext(Dispatchers.IO) {
-            signedGalleyDAO.getAllSignedMedia()
+        suspend fun getAllSignedMedia(): List<GalleryMedia>? = withContext(Dispatchers.IO) {
+            signedGalleryDAO.getAllSignedMedia()
         }
 
-        suspend fun getAllMediaByType(isVideo: Boolean): List<GalleyMedia>? =
+        suspend fun getAllMediaByType(isVideo: Boolean): List<GalleryMedia>? =
             withContext(Dispatchers.IO) {
-                signedGalleyDAO.getAllMediaByType(isVideo)
+                signedGalleryDAO.getAllMediaByType(isVideo)
             }
 
-        suspend fun getAllGalley(isVideo: Boolean): List<String>? = withContext(Dispatchers.IO) {
-            signedGalleyDAO.getAllGalley(isVideo)
+        suspend fun getAllGallery(isVideo: Boolean): List<String>? = withContext(Dispatchers.IO) {
+            signedGalleryDAO.getAllGallery(isVideo)
         }
 
-        suspend fun getAllGalley(): List<String>? = withContext(Dispatchers.IO) {
-            signedGalleyDAO.getAllGalley()
+        suspend fun getAllGallery(): List<String>? = withContext(Dispatchers.IO) {
+            signedGalleryDAO.getAllGallery()
         }
 
-        suspend fun getAllMediaByGalley(name: String, isVideo: Boolean): List<GalleyMedia>? =
+        suspend fun getAllMediaByGallery(name: String, isVideo: Boolean): List<GalleryMedia>? =
             withContext(Dispatchers.IO) {
-                signedGalleyDAO.getAllMediaByGalley(name, isVideo)
+                signedGalleryDAO.getAllMediaByGallery(name, isVideo)
             }
 
-        suspend fun getAllMediaByGalley(name: String): List<GalleyMedia>? =
+        suspend fun getAllMediaByGallery(name: String): List<GalleryMedia>? =
             withContext(Dispatchers.IO) {
-                signedGalleyDAO.getAllMediaByGalley(name)
+                signedGalleryDAO.getAllMediaByGallery(name)
             }
 
-        suspend fun getSignedMedia(uri: Uri): GalleyMedia? = withContext(Dispatchers.IO) {
-            signedGalleyDAO.getSignedMedia(uri)
+        suspend fun getSignedMedia(uri: Uri): GalleryMedia? = withContext(Dispatchers.IO) {
+            signedGalleryDAO.getSignedMedia(uri)
         }
 
-        suspend fun getSignedMedia(path: String): GalleyMedia? = withContext(Dispatchers.IO) {
-            signedGalleyDAO.getSignedMedia(path)
+        suspend fun getSignedMedia(path: String): GalleryMedia? = withContext(Dispatchers.IO) {
+            signedGalleryDAO.getSignedMedia(path)
         }
 
         suspend fun deleteSignedMediaByUri(uri: Uri) = withContext(Dispatchers.IO) {
             getSignedMedia(uri)?.let { sendEvent(MediaAction.OnMediaDeleted(it)) }
-            signedGalleyDAO.deleteSignedMediaByUri(uri)
+            signedGalleryDAO.deleteSignedMediaByUri(uri)
         }
 
-        suspend fun deleteSignedMedia(media: GalleyMedia) = withContext(Dispatchers.IO) {
+        suspend fun deleteSignedMediasByGallery(gallery:String) = withContext(Dispatchers.IO) {
+            sendEvent(MediaAction.OnGalleryDeleted(gallery))
+            signedGalleryDAO.deleteSignedMediasByGallery(gallery)
+        }
+
+        suspend fun deleteSignedMedia(media: GalleryMedia) = withContext(Dispatchers.IO) {
             sendEvent(MediaAction.OnMediaDeleted(media))
-            signedGalleyDAO.deleteSignedMedia(media)
+            signedGalleryDAO.deleteSignedMedia(media)
         }
 
-        suspend fun insertSignedMedia(media: GalleyMedia): Long = withContext(Dispatchers.IO) {
+        suspend fun insertSignedMedia(media: GalleryMedia): Long = withContext(Dispatchers.IO) {
             sendEvent(MediaAction.OnMediaInserted(media))
-            signedGalleyDAO.insertSignedMedia(media)
+            signedGalleryDAO.insertSignedMedia(media)
         }
 
-        suspend fun updateSignedMedia(media: GalleyMedia) = withContext(Dispatchers.IO) {
+        suspend fun updateSignedMedia(media: GalleryMedia) = withContext(Dispatchers.IO) {
             sendEvent(MediaAction.OnMediaUpdated(media))
-            signedGalleyDAO.updateSignedMedia(media)
+            signedGalleryDAO.updateSignedMedia(media)
         }
     }
 
@@ -523,27 +528,27 @@ class DatabaseHelper {
         }
     }
 
-    sealed class BaseGalleyBucketDAO : BaseDao() {
+    sealed class BaseGalleryBucketDAO : BaseDao() {
 
-        private val galleyBucketDAO = getGalleyBucketDAO()
+        private val galleryBucketDAO = getGalleryBucketDAO()
 
-        suspend fun getGalleyBucket(name: String): GalleyBucket? = withContext(Dispatchers.IO) {
-            galleyBucketDAO.getGalleyBucket(name)
+        suspend fun getGalleryBucket(name: String): GalleryBucket? = withContext(Dispatchers.IO) {
+            galleryBucketDAO.getGalleryBucket(name)
         }
 
-        suspend fun getALLGalleyBucket(isVideo: Boolean): List<GalleyBucket>? =
+        suspend fun getAllGalleryBucket(isVideo: Boolean): List<GalleryBucket>? =
             withContext(Dispatchers.IO) {
-                galleyBucketDAO.getALLGalleyBucket(isVideo)
+                galleryBucketDAO.getAllGalleryBucket(isVideo)
             }
 
-        suspend fun insertGalleyBucket(galleyBucket: GalleyBucket) = withContext(Dispatchers.IO) {
-            sendEvent(MediaAction.OnGalleyBucketInserted(galleyBucket))
-            galleyBucketDAO.insertGalleyBucket(galleyBucket)
+        suspend fun insertGalleryBucket(galleryBucket: GalleryBucket) = withContext(Dispatchers.IO) {
+            sendEvent(MediaAction.OnGalleryBucketInserted(galleryBucket))
+            galleryBucketDAO.insertGalleryBucket(galleryBucket)
         }
 
-        suspend fun deleteGalleyBucket(galleyBucket: GalleyBucket) = withContext(Dispatchers.IO) {
-            sendEvent(MediaAction.OnGalleyBucketDeleted(galleyBucket))
-            galleyBucketDAO.deleteGalleyBucket(galleyBucket)
+        suspend fun deleteGalleryBucket(galleryBucket: GalleryBucket) = withContext(Dispatchers.IO) {
+            sendEvent(MediaAction.OnGalleryBucketDeleted(galleryBucket))
+            galleryBucketDAO.deleteGalleryBucket(galleryBucket)
         }
     }
 
@@ -557,11 +562,11 @@ class DatabaseHelper {
                 galleriesWithNotesDAO.insertGalleriesWithNotes(galleriesWithNotes)
             }
 
-        suspend fun getNotesWithGalley(uri: Uri): List<Note> = withContext(Dispatchers.IO) {
-            galleriesWithNotesDAO.getNotesWithGalley(uri) ?: mutableListOf()
+        suspend fun getNotesWithGallery(uri: Uri): List<Note> = withContext(Dispatchers.IO) {
+            galleriesWithNotesDAO.getNotesWithGallery(uri) ?: mutableListOf()
         }
 
-        suspend fun getGalleriesWithNote(noteId: Long): List<GalleyMedia> =
+        suspend fun getGalleriesWithNote(noteId: Long): List<GalleryMedia> =
             withContext(Dispatchers.IO) {
                 galleriesWithNotesDAO.getGalleriesWithNote(noteId) ?: mutableListOf()
             }

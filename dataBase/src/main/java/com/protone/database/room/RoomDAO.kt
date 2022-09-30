@@ -4,8 +4,8 @@ import android.content.Context
 import com.protone.database.room.dao.*
 import com.wajahatkarim3.roomexplorer.RoomExplorer
 
-fun getGalleyDAO(): SignedGalleyDAO {
-    return SeennDataBase.database.getGalleyDAO()
+fun getGalleryDAO(): SignedGalleryDAO {
+    return SeennDataBase.database.getGalleryDAO()
 }
 
 fun getNoteDAO(): NoteDAO {
@@ -24,8 +24,8 @@ fun getMusicDAO(): MusicDAO {
     return SeennDataBase.database.getMusicDAO()
 }
 
-fun getGalleyBucketDAO(): GalleyBucketDAO {
-    return SeennDataBase.database.getGalleyBucketDAO()
+fun getGalleryBucketDAO(): GalleryBucketDAO {
+    return SeennDataBase.database.getGalleryBucketDAO()
 }
 
 fun getGalleriesWithNotesDAO(): GalleriesWithNotesDAO {

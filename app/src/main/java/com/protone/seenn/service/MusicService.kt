@@ -3,7 +3,6 @@ package com.protone.seenn.service
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Binder
@@ -35,7 +34,7 @@ import kotlin.system.exitProcess
 /**
  * MusicService by ProTone 2022/03/23
  */
-class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO), IMusicService,
+class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Default), IMusicService,
     MediaPlayer.OnCompletionListener {
 
     companion object {
@@ -56,13 +55,6 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
                     SApplication.app,
                     playList[playPosition.get()].uri
                 ).also {
-                    it.setAudioAttributes(
-                        AudioAttributes
-                            .Builder()
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                            .build()
-                    )
                     it.setOnCompletionListener(this)
                 }
             }
@@ -81,7 +73,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
 
     private val appReceiver = object : ApplicationBroadCast() {
         override fun finish() {
-            stopSelf()
+            SApplication.app.stopService(MusicService::class.intent)
             onDestroy()
         }
 
@@ -150,7 +142,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        launch(Dispatchers.IO) {
+        launch(Dispatchers.Default) {
             synchronized(playList) {
                 if (playList.isNotEmpty())
                     currentMusic.postValue(playList[playPosition.get()])
@@ -166,14 +158,14 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.IO)
     }
 
     override fun onDestroy() {
-        cancel()
+        activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
         finishMusic()
         unregisterReceiver(receiver)
         unregisterReceiver(appReceiver)
         musicBroadCastManager.unregisterReceiver(receiver)
         notificationManager?.cancelAll()
-        activityOperationBroadcast.sendBroadcast(Intent(ACTIVITY_FINISH))
         super.onDestroy()
+        cancel()
         val activityManager =
             SApplication.app.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         activityManager.killBackgroundProcesses(SApplication.app.packageName)

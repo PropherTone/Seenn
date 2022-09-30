@@ -99,13 +99,13 @@
                     app:layout_constraintTop_toTopOf="@id/noteBook" />
 
                 <ImageView
-                    android:id="@+id/galley"
+                    android:id="@+id/gallery"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/action_icon_p"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:contentDescription="@string/model_Galley"
-                    android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Galley.INSTANCE)}"
+                    android:contentDescription="@string/model_gallery"
+                    android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Gallery.INSTANCE)}"
                     android:paddingTop="@dimen/icon_padding_mid"
                     android:paddingBottom="@dimen/icon_padding_mid"
                     android:src="@drawable/ic_baseline_image_24_white"
@@ -125,7 +125,7 @@
                     android:paddingBottom="@dimen/icon_padding_mid"
                     android:src="@drawable/ic_baseline_book_24_white"
                     app:layout_constraintEnd_toStartOf="@id/music"
-                    app:layout_constraintStart_toEndOf="@id/galley"
+                    app:layout_constraintStart_toEndOf="@id/gallery"
                     app:layout_constraintTop_toBottomOf="@id/userCard" />
 
                 <ImageView
@@ -176,8 +176,8 @@
                 android:layout_height="@dimen/action_icon"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:contentDescription="@string/model_Galley"
-                android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Galley.INSTANCE)}"
+                android:contentDescription="@string/model_gallery"
+                android:onClick="@{()->activity.sendViewEvent(MainViewEvent.Gallery.INSTANCE)}"
                 android:paddingTop="@dimen/main_padding"
                 android:paddingBottom="@dimen/main_padding"
                 android:src="@drawable/ic_baseline_image_24_white" />

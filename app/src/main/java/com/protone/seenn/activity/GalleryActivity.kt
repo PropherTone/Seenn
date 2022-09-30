@@ -9,57 +9,57 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.protone.api.context.root
 import com.protone.api.json.toJson
 import com.protone.api.json.toUriJson
-import com.protone.seenn.databinding.GalleyActivityBinding
-import com.protone.seenn.fragment.GalleyFragment
+import com.protone.seenn.databinding.GalleryActivityBinding
+import com.protone.seenn.fragment.GalleryFragment
 import com.protone.ui.R
 import com.protone.ui.adapter.MyFragmentStateAdapter
 import com.protone.worker.database.userConfig
 import com.protone.worker.viewModel.BaseViewModel
-import com.protone.worker.viewModel.GalleyViewModel
-import com.protone.worker.viewModel.GalleyViewModel.Companion.CHOOSE_PHOTO
-import com.protone.worker.viewModel.GalleyViewModel.Companion.CHOOSE_VIDEO
+import com.protone.worker.viewModel.GalleryViewModel
+import com.protone.worker.viewModel.GalleryViewModel.Companion.CHOOSE_PHOTO
+import com.protone.worker.viewModel.GalleryViewModel.Companion.CHOOSE_VIDEO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class GalleyActivity :
-    BaseMediaActivity<GalleyActivityBinding, GalleyViewModel, BaseViewModel.ViewEvent>(false) {
-    override val viewModel: GalleyViewModel by viewModels()
+class GalleryActivity :
+    BaseMediaActivity<GalleryActivityBinding, GalleryViewModel, BaseViewModel.ViewEvent>(false) {
+    override val viewModel: GalleryViewModel by viewModels()
 
-    override fun createView(): GalleyActivityBinding {
-        return GalleyActivityBinding.inflate(layoutInflater, root, false).apply {
-            activity = this@GalleyActivity
+    override fun createView(): GalleryActivityBinding {
+        return GalleryActivityBinding.inflate(layoutInflater, root, false).apply {
+            activity = this@GalleryActivity
             fitStatuesBar(root)
             initPop()
         }
     }
 
-    override suspend fun GalleyViewModel.init() {
-        val chooseType = intent.getStringExtra(GalleyViewModel.CHOOSE_MODE) ?: ""
+    override suspend fun GalleryViewModel.init() {
+        val chooseType = intent.getStringExtra(GalleryViewModel.CHOOSE_MODE) ?: ""
 
         if (chooseType.isNotEmpty()) {
-            binding.galleyActionMenu.isVisible = false
-            binding.galleyChooseConfirm.isGone = chooseType.isEmpty()
-            binding.galleyChooseConfirm.setOnClickListener { confirm() }
+            binding.galleryActionMenu.isVisible = false
+            binding.galleryChooseConfirm.isGone = chooseType.isEmpty()
+            binding.galleryChooseConfirm.setOnClickListener { confirm() }
         }
         initPager(chooseType)
     }
 
-    private suspend fun GalleyViewModel.initPager(
+    private suspend fun GalleryViewModel.initPager(
         chooseType: String = "",
     ) = withContext(Dispatchers.Main) {
-        val combine = userConfig.combineGalley
-        binding.galleyPager.adapter = MyFragmentStateAdapter(
-            this@GalleyActivity,
+        val combine = userConfig.combineGallery
+        binding.galleryPager.adapter = MyFragmentStateAdapter(
+            this@GalleryActivity,
             mutableListOf<Fragment>().also { fs ->
-                val lock = userConfig.lockGalley.isNotEmpty()
+                val lock = userConfig.lockGallery.isNotEmpty()
                 when (chooseType) {
                     CHOOSE_PHOTO ->
-                        fs.add(GalleyFragment(false, lock, false) { f -> setMailer(frag1 = f) })
+                        fs.add(GalleryFragment(false, lock, false) { f -> setMailer(frag1 = f) })
                     CHOOSE_VIDEO ->
-                        fs.add(GalleyFragment(true, lock, false) { f -> setMailer(frag2 = f) })
+                        fs.add(GalleryFragment(true, lock, false) { f -> setMailer(frag2 = f) })
                     else -> {
-                        fs.add(GalleyFragment(false, lock, combine) { f -> setMailer(frag1 = f) })
-                        if (!combine) fs.add(GalleyFragment(
+                        fs.add(GalleryFragment(false, lock, combine) { f -> setMailer(frag1 = f) })
+                        if (!combine) fs.add(GalleryFragment(
                             true,
                             lock,
                             false
@@ -72,13 +72,13 @@ class GalleyActivity :
             CHOOSE_PHOTO -> arrayOf(R.string.photo)
             CHOOSE_VIDEO -> arrayOf(R.string.video)
             else -> {
-                if (combine) arrayOf(R.string.model_Galley)
+                if (combine) arrayOf(R.string.model_gallery)
                 else arrayOf(R.string.photo, R.string.video)
             }
         }.let { tabList ->
             TabLayoutMediator(
-                binding.galleyTab.apply { addOnTabSelectedListener(viewModel) },
-                binding.galleyPager
+                binding.galleryTab.apply { addOnTabSelectedListener(viewModel) },
+                binding.galleryPager
             ) { tab, position -> tab.setText(tabList[position]) }.attach()
         }
     }
@@ -88,15 +88,15 @@ class GalleyActivity :
             if (list.size <= 0) return
             setResult(
                 RESULT_OK,
-                Intent().putExtra(GalleyViewModel.URI, list[0].uri.toUriJson())
-                    .putExtra(GalleyViewModel.GALLEY_DATA, list[0].toJson())
+                Intent().putExtra(GalleryViewModel.URI, list[0].uri.toUriJson())
+                    .putExtra(GalleryViewModel.Gallery_DATA, list[0].toJson())
             )
         }
         finish()
     }
 
     fun showPop() {
-        showPop(binding.galleyActionMenu, (viewModel.chooseData?.size ?: 0) <= 0)
+        showPop(binding.galleryActionMenu, (viewModel.chooseData?.size ?: 0) <= 0)
     }
 
     override fun popDelete() {
@@ -108,7 +108,7 @@ class GalleyActivity :
     override fun popMoveTo() {
         viewModel.chooseData?.let {
             if (it.size <= 0) return
-            moveTo(binding.galleyBar, it[0].isVideo, it) { target, list ->
+            moveTo(binding.galleryBar, it[0].isVideo, it) { target, list ->
                 viewModel.addBucket(target, list)
             }
         }

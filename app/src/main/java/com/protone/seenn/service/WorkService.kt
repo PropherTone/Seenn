@@ -12,7 +12,7 @@ import com.protone.api.ActiveTimer
 import com.protone.api.TAG
 import com.protone.api.baseType.toast
 import com.protone.api.context.workIntentFilter
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.api.entity.Music
 import com.protone.seenn.broadcast.MediaContentObserver
 import com.protone.seenn.broadcast.WorkReceiver
@@ -28,12 +28,12 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
 
     companion object {
         private const val UPDATE_MUSIC = 1
-        private const val UPDATE_GALLEY = 2
+        private const val UPDATE_GALLERY = 2
     }
 
     private val activeTimer = ActiveTimer().apply {
         addFunction(UPDATE_MUSIC) { this@WorkService.updateMusic() }
-        addFunction(UPDATE_GALLEY) { this@WorkService.updateGalley() }
+        addFunction(UPDATE_GALLERY) { this@WorkService.updateGallery() }
     }
 
     private val workReceiver: BroadcastReceiver = object : WorkReceiver() {
@@ -46,11 +46,11 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
             }
         }
 
-        override fun updateGalley(data: Uri?) {
+        override fun updateGallery(data: Uri?) {
             if (data != null) {
-                this@WorkService.updateGalley(data)
+                this@WorkService.updateGallery(data)
             } else {
-                activeTimer.active(UPDATE_GALLEY)
+                activeTimer.active(UPDATE_GALLERY)
             }
         }
     }
@@ -138,23 +138,28 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
         }
     }
 
-    private fun updateGalley(uri: Uri) = launch(Dispatchers.IO) {
-        scanGalleyWithUri(uri) {
+    private fun updateGallery(uri: Uri) = launch(Dispatchers.IO) {
+        scanGalleryWithUri(uri) {
             val checkedMedia =
                 DatabaseHelper
                     .instance
-                    .signedGalleyDAOBridge
+                    .signedGalleryDAOBridge
                     .insertSignedMediaChecked(it)
             if (checkedMedia != null) {
-                Log.d(TAG, "updateGalley(uri: Uri): 相册更新完毕")
+                Log.d(TAG, "updateGallery(uri: Uri): 相册更新完毕")
                 makeToast("相册更新完毕")
             }
         }
     }
 
-    private fun updateGalley() = DatabaseHelper.instance.signedGalleyDAOBridge.run {
+    private fun updateGallery() = DatabaseHelper.instance.signedGalleryDAOBridge.run {
         launch(Dispatchers.IO) {
             val sortMedias = async(Dispatchers.Default) {
+                val allGallery = getAllGallery() as MutableList<String>
+                sortGalleries(allGallery)
+                allGallery.forEach {
+
+                }
                 val allSignedMedia = getAllSignedMedia() as MutableList
                 flow {
                     allSignedMedia.forEach {
@@ -170,9 +175,9 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
             val allSignedMedia = getAllSignedMedia()
 
             suspend fun sortMedia(
-                dao: DatabaseHelper.GalleyDAOBridge,
-                allSignedMedia: List<GalleyMedia>?,
-                it: GalleyMedia
+                dao: DatabaseHelper.GalleryDAOBridge,
+                allSignedMedia: List<GalleryMedia>?,
+                it: GalleryMedia
             ) {
                 if (allSignedMedia != null && allSignedMedia.isNotEmpty()) {
                     allSignedMedia.indexOf(it).let { index ->
@@ -190,8 +195,8 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
 
             val scanPicture = async(Dispatchers.Default) {
                 flow {
-                    scanPicture { _, galleyMedia ->
-                        emit(galleyMedia)
+                    scanPicture { _, galleryMedia ->
+                        emit(galleryMedia)
                     }
                 }.buffer().collect {
                     sortMedia(this@run, allSignedMedia, it)
@@ -200,8 +205,8 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
 
             val scanVideo = async(Dispatchers.Default) {
                 flow {
-                    scanVideo { _, galleyMedia ->
-                        emit(galleyMedia)
+                    scanVideo { _, galleryMedia ->
+                        emit(galleryMedia)
                     }
                 }.buffer().collect {
                     sortMedia(this@run, allSignedMedia, it)

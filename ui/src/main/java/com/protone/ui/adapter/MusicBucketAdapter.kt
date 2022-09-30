@@ -60,15 +60,6 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 val index =
                     musicBuckets.indexOfFirst { it.musicBucketId == data.bucket.musicBucketId }
                 if (index != -1 && index != 0) {
-//                    selectList.getOrNull(0)?.let { select ->
-//                        musicBuckets.indexOfFirst { it.musicBucketId == select.musicBucketId }
-//                    }?.let {
-//                        withContext(Dispatchers.Main) {
-//                            notifyItemChanged(it)
-//                        }
-//                    }
-//                    selectList.clear()
-//                    selectList.add(data.bucket)
                     musicBuckets[index].apply {
                         name = data.bucket.name
                         icon = data.bucket.icon
@@ -76,10 +67,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                         detail = data.bucket.detail
                         date = data.bucket.date
                     }
-                    withContext(Dispatchers.Main) {
-                        notifyItemChanged(index)
-//                        clickCallback?.invoke(data.bucket)
-                    }
+                    notifyItemChangedCO(index)
                 }
             }
             is MusicBucketAEvent.DeleteBucket -> {

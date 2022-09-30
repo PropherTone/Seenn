@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.root
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.seenn.R
 import com.protone.seenn.databinding.PictureBoxActivityBinding
 import com.protone.ui.adapter.PictureBoxAdapter
@@ -24,16 +24,16 @@ class PictureBoxActivity :
     }
 
     override suspend fun PictureBoxViewModel.init() {
-        val gainListData = getGainListData<GalleyMedia>()
+        val gainListData = getGainListData<GalleryMedia>()
         if (gainListData != null) {
-            initPictureBox(gainListData as MutableList<GalleyMedia>)
+            initPictureBox(gainListData as MutableList<GalleryMedia>)
         } else {
             R.string.failed_msg.getString().toast()
             finish()
         }
     }
 
-    private fun initPictureBox(picUri: MutableList<GalleyMedia>) {
+    private fun initPictureBox(picUri: MutableList<GalleryMedia>) {
         binding.picView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = PictureBoxAdapter(context, picUri)

@@ -8,10 +8,10 @@ import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.Nullable
 import com.protone.api.context.SApplication
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.api.entity.Music
 
-inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
+inline fun scanGalleryWithUri(mediaUri: Uri, callBack: (GalleryMedia) -> Unit) {
     if (mediaUri.toString().contains("images")) {
         val queryArray = arrayOf(
             MediaStore.Images.Media.DISPLAY_NAME,
@@ -46,7 +46,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
                 val thumbnailUri =
                     Uri.withAppendedPath(externalContentUri, "${it.getLong(tn)}")
                 callBack.invoke(
-                    GalleyMedia(
+                    GalleryMedia(
                         uri,
                         imageName,
                         path,
@@ -102,7 +102,7 @@ inline fun scanGalleyWithUri(mediaUri: Uri, callBack: (GalleyMedia) -> Unit) {
                     Uri.withAppendedPath(externalContentUri, "${it.getLong(tn)}")
                 val duration = it.getLong(du)
                 callBack.invoke(
-                    GalleyMedia(
+                    GalleryMedia(
                         uri,
                         imageName,
                         path,
@@ -190,7 +190,19 @@ inline fun scanAudioWithUri(mediaUri: Uri, callBack: (Music) -> Unit) {
     }
 }
 
-inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)) {
+fun sortGalleries(galleries:MutableList<String>) {
+    val externalUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    val quarryArray = arrayOf(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+    scan(externalUri, quarryArray) {
+        val bucket = it.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+        while (it.moveToNext()) {
+            val gallery = it.getString(bucket)
+            galleries.remove(gallery)
+        }
+    }
+}
+
+inline fun scanPicture(function: ((Uri, GalleryMedia) -> Unit)) {
     val externalContentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val queryArray = arrayOf(
         MediaStore.Images.Media.DISPLAY_NAME,
@@ -225,7 +237,7 @@ inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)) {
             val dateModifiedTime = it.getLong(dateModified)
             val thumbnailUri =
                 Uri.withAppendedPath(externalContentUri, "${it.getLong(tn)}")
-            GalleyMedia(
+            GalleryMedia(
                 uri,
                 imageName,
                 path,
@@ -244,7 +256,7 @@ inline fun scanPicture(function: ((Uri, GalleyMedia) -> Unit)) {
     }
 }
 
-inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)) {
+inline fun scanVideo(function: ((Uri, GalleryMedia) -> Unit)) {
     val externalContentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     val query = arrayOf(
         MediaStore.Video.Media.DISPLAY_NAME,
@@ -282,7 +294,7 @@ inline fun scanVideo(function: ((Uri, GalleyMedia) -> Unit)) {
             val thumbnailUri =
                 Uri.withAppendedPath(externalContentUri, "${it.getLong(tn)}")
             val duration = it.getLong(du)
-            GalleyMedia(
+            GalleryMedia(
                 uri,
                 imageName,
                 path,

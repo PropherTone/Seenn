@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Seenn</string>
     <string name="model_account">用户</string>
-    <string name="model_Galley">相册</string>
+    <string name="model_gallery">相册</string>
     <string name="model_noteBook">记事本</string>
     <string name="photo">相片</string>
     <string name="video">视频</string>
@@ -31,10 +31,10 @@
     <string name="no_permission">未取得权限</string>
     <string name="unknown_error">未知错误</string>
     <string name="failed_msg">好像没有成功哦</string>
-    <string name="no_bucket">没有相册</string>
+    <string name="no_data">没有数据</string>
     <string name="search">搜索</string>
     <string name="surfing">浏览模式</string>
-    <string name="all_galley">全部</string>
+    <string name="all_gallery">全部</string>
     <string name="none">无</string>
     <string name="welcome_msg">Hello there</string>
     <string name="enter_title">请输入标题</string>
@@ -387,6 +387,6 @@ II. 幂等 的意味着对同一URL的多个请求应该返回同样的结果。
     <string name="retry">重试</string>
     <string name="image_cache_failed">以下图片缓存失败</string>
     <string name="share">笔记</string>
-    <string name="combine_galley">设置合并相册</string>
-    <string name="dispatch_galley">设置拆分相册</string>
+    <string name="combine_gallery">设置合并相册</string>
+    <string name="dispatch_gallery">设置拆分相册</string>
 </resources>

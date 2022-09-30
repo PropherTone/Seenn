@@ -5,7 +5,7 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.imageSaveToDisk
 import com.protone.api.baseType.toast
 import com.protone.api.entity.GalleriesWithNotes
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.api.entity.Note
 import com.protone.api.entity.NoteDirWithNotes
 import com.protone.api.json.toUriJson
@@ -35,7 +35,7 @@ class NoteEditViewModel : BaseViewModel() {
     var noteByName: Note? = null
     var allNote: MutableList<String>? = null
     var onEdit = false
-    var medias = arrayListOf<GalleyMedia>()
+    var medias = arrayListOf<GalleryMedia>()
 
     suspend fun saveIcon(name: String) = withContext(Dispatchers.IO) {
         iconUri?.imageSaveToDisk(name, null).let {

@@ -1,7 +1,7 @@
 package com.protone.worker.viewModel
 
 import android.net.Uri
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -29,9 +29,9 @@ class NoteViewViewModel : BaseViewModel() {
         DatabaseHelper.instance.musicDAOBridge.getMusicByUri(uri)
     }
 
-    suspend fun filterMedia(uri: Uri, isVideo: Boolean): MutableList<GalleyMedia>? =
+    suspend fun filterMedia(uri: Uri, isVideo: Boolean): MutableList<GalleryMedia>? =
         withContext(Dispatchers.IO) {
-            DatabaseHelper.instance.signedGalleyDAOBridge.getAllMediaByType(isVideo)?.stream()
+            DatabaseHelper.instance.signedGalleryDAOBridge.getAllMediaByType(isVideo)?.stream()
                 ?.filter { media -> media.uri == uri }
                 ?.collect(Collectors.toList())
         }

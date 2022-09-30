@@ -71,7 +71,7 @@ class SplashActivity :
     }
 
     private fun updateMedia() {
-        workLocalBroadCast.sendBroadcast(Intent(UPDATE_GALLEY))
+        workLocalBroadCast.sendBroadcast(Intent(UPDATE_GALLERY))
         workLocalBroadCast.sendBroadcast(Intent(UPDATE_MUSIC))
         sendViewEvent(SplashViewModel.SplashEvent.InitConfig)
     }

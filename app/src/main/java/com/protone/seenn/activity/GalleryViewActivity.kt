@@ -15,42 +15,42 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toDateString
 import com.protone.api.context.intent
 import com.protone.api.context.root
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.api.json.toEntity
 import com.protone.api.onResult
 import com.protone.seenn.R
-import com.protone.seenn.databinding.GalleyViewActivityBinding
-import com.protone.seenn.fragment.GalleyViewFragment
+import com.protone.seenn.databinding.GalleryViewActivityBinding
+import com.protone.seenn.fragment.GalleryViewFragment
 import com.protone.ui.adapter.CatoListAdapter
 import com.protone.ui.adapter.CheckListAdapter
-import com.protone.worker.viewModel.GalleyViewViewModel
+import com.protone.worker.viewModel.GalleryViewViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class GalleyViewActivity : BaseMediaActivity<
-        GalleyViewActivityBinding,
-        GalleyViewViewModel,
-        GalleyViewViewModel.GalleyViewEvent>(true) {
-    override val viewModel: GalleyViewViewModel by viewModels()
+class GalleryViewActivity : BaseMediaActivity<
+        GalleryViewActivityBinding,
+        GalleryViewViewModel,
+        GalleryViewViewModel.GalleryViewEvent>(true) {
+    override val viewModel: GalleryViewViewModel by viewModels()
 
-    override fun createView(): GalleyViewActivityBinding {
-        return GalleyViewActivityBinding.inflate(layoutInflater, root, false).apply {
-            activity = this@GalleyViewActivity
-            fitStatuesBarUsePadding(galleyVCover)
+    override fun createView(): GalleryViewActivityBinding {
+        return GalleryViewActivityBinding.inflate(layoutInflater, root, false).apply {
+            activity = this@GalleryViewActivity
+            fitStatuesBarUsePadding(galleryVCover)
             initPop()
-            popLayout?.galleyIntoBox?.isGone = true
-            popLayout?.galleySelectAll?.isGone = true
+            popLayout?.galleryIntoBox?.isGone = true
+            popLayout?.gallerySelectAll?.isGone = true
             next.setOnClickListener {
-                galleyVView.setCurrentItem(1 + galleyVView.currentItem, true)
+                galleryVView.setCurrentItem(1 + galleryVView.currentItem, true)
             }
             previous.setOnClickListener {
-                galleyVView.setCurrentItem(galleyVView.currentItem - 1, true)
+                galleryVView.setCurrentItem(galleryVView.currentItem - 1, true)
             }
-            galleyVLinks.apply {
-                adapter = CheckListAdapter(this@GalleyViewActivity, check = false).also {
+            galleryVLinks.apply {
+                adapter = CheckListAdapter(this@GalleryViewActivity, check = false).also {
                     it.startNote = {
                         startActivity(NoteViewActivity::class.intent.apply {
                             putExtra(NoteViewViewModel.NOTE_NAME, it)
@@ -59,10 +59,10 @@ class GalleyViewActivity : BaseMediaActivity<
                 }
                 layoutManager = LinearLayoutManager(context)
             }
-            galleyVCatoContainer.apply {
-                adapter = CatoListAdapter(this@GalleyViewActivity,
+            galleryVCatoContainer.apply {
+                adapter = CatoListAdapter(this@GalleryViewActivity,
                     object : CatoListAdapter.CatoListDataProxy {
-                        override fun getMedia(): GalleyMedia {
+                        override fun getMedia(): GalleryMedia {
                             return viewModel.getCurrentMedia()
                         }
                     })
@@ -73,14 +73,14 @@ class GalleyViewActivity : BaseMediaActivity<
         }
     }
 
-    override suspend fun GalleyViewViewModel.init() {
-        val isVideo = intent.getBooleanExtra(GalleyViewViewModel.TYPE, false)
-        val galley =
-            intent.getStringExtra(GalleyViewViewModel.GALLEY) ?: R.string.all_galley.getString()
-        initGalleyData(galley, isVideo)
+    override suspend fun GalleryViewViewModel.init() {
+        val isVideo = intent.getBooleanExtra(GalleryViewViewModel.TYPE, false)
+        val gallery =
+            intent.getStringExtra(GalleryViewViewModel.GALLERY) ?: R.string.all_gallery.getString()
+        initGalleryData(gallery, isVideo)
 
         val mediaIndex = getMediaIndex()
-        initViewPager(mediaIndex, galleyMedias) { position ->
+        initViewPager(mediaIndex, galleryMedias) { position ->
             curPosition = position
             setMediaInfo(position)
         }
@@ -89,13 +89,13 @@ class GalleyViewActivity : BaseMediaActivity<
 
         onViewEvent {
             when (it) {
-                GalleyViewViewModel.GalleyViewEvent.SetNote -> setInfo()
-                GalleyViewViewModel.GalleyViewEvent.Share -> prepareSharedMedia()?.let { path ->
+                GalleryViewViewModel.GalleryViewEvent.SetNote -> setInfo()
+                GalleryViewViewModel.GalleryViewEvent.Share -> prepareSharedMedia()?.let { path ->
                     startActivityForResult(Intent(Intent.ACTION_SEND).apply {
                         putExtra(
                             Intent.EXTRA_STREAM,
                             FileProvider.getUriForFile(
-                                this@GalleyViewActivity,
+                                this@GalleryViewActivity,
                                 "com.protone.seenn.fileProvider",
                                 File(path)
                             )
@@ -109,28 +109,29 @@ class GalleyViewActivity : BaseMediaActivity<
         }
     }
 
-    private suspend fun GalleyViewViewModel.setInfo() = withContext(Dispatchers.Default) {
-        val galleyMedia = getSignedMedia()
+    private suspend fun GalleryViewViewModel.setInfo() = withContext(Dispatchers.Default) {
+        val galleryMedia = getSignedMedia()
         removeCato()
-        galleyMedia?.cate?.onEach {
+        galleryMedia?.cate?.onEach {
 
         }
-        setNotes(getNotesWithGalley(galleyMedia?.uri ?: Uri.EMPTY))
+        setNotes(getNotesWithGallery(galleryMedia?.uri ?: Uri.EMPTY))
     }
 
-    private fun GalleyViewViewModel.setMediaInfo(position: Int) = galleyMedias[position].let { m ->
-        setMediaInfo(
-            m.name,
-            m.date.toDateString("yyyy/MM/dd").toString(),
-            m.size.getStorageSize(),
-            m.path ?: m.uri.toString()
-        )
-    }
+    private fun GalleryViewViewModel.setMediaInfo(position: Int) =
+        galleryMedias[position].let { m ->
+            setMediaInfo(
+                m.name,
+                m.date.toDateString("yyyy/MM/dd").toString(),
+                m.size.getStorageSize(),
+                m.path ?: m.uri.toString()
+            )
+        }
 
-    private suspend fun GalleyViewViewModel.getMediaIndex() = onResult { co ->
-        val galleyMedia =
-            intent.getStringExtra(GalleyViewViewModel.MEDIA)?.toEntity(GalleyMedia::class.java)
-        val indexOf = galleyMedias.indexOf(galleyMedia)
+    private suspend fun GalleryViewViewModel.getMediaIndex() = onResult { co ->
+        val galleryMedia =
+            intent.getStringExtra(GalleryViewViewModel.MEDIA)?.toEntity(GalleryMedia::class.java)
+        val indexOf = galleryMedias.indexOf(galleryMedia)
         curPosition = indexOf
         co.resumeWith(Result.success(indexOf))
 
@@ -138,20 +139,20 @@ class GalleyViewActivity : BaseMediaActivity<
 
     private fun initViewPager(
         position: Int,
-        data: MutableList<GalleyMedia>,
+        data: MutableList<GalleryMedia>,
         onChange: (Int) -> Unit
     ) {
-        binding.galleyVView.apply {
+        binding.galleryVView.apply {
             val onSingleClick = {
-                binding.galleyVCover.isVisible = !binding.galleyVCover.isVisible
+                binding.galleryVCover.isVisible = !binding.galleryVCover.isVisible
             }
-            adapter = object : FragmentStateAdapter(this@GalleyViewActivity) {
+            adapter = object : FragmentStateAdapter(this@GalleryViewActivity) {
                 override fun getItemCount(): Int = data.size
                 override fun getItemViewType(position: Int): Int = position
                 override fun createFragment(position: Int): Fragment =
-                    GalleyViewFragment(data[position], onSingleClick)
+                    GalleryViewFragment(data[position], onSingleClick)
             }
-            binding.galleyVCover.isVisible = false
+            binding.galleryVCover.isVisible = false
 
             registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
@@ -161,7 +162,7 @@ class GalleyViewActivity : BaseMediaActivity<
 
                 override fun onPageScrollStateChanged(state: Int) {
                     super.onPageScrollStateChanged(state)
-                    if (state == ViewPager2.SCREEN_STATE_OFF) sendViewEvent(GalleyViewViewModel.GalleyViewEvent.SetNote)
+                    if (state == ViewPager2.SCREEN_STATE_OFF) sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
                 }
             })
             setCurrentItem(position, false)
@@ -174,39 +175,39 @@ class GalleyViewActivity : BaseMediaActivity<
         size: String,
         type: String,
     ) = binding.run {
-        galleyVTitle.text = title
-        galleyVTime.text = String.format(
+        galleryVTitle.text = title
+        galleryVTime.text = String.format(
             R.string.time.getString(),
             time.ifEmpty { R.string.none.getString() })
-        galleyVSize.text = String.format(
+        galleryVSize.text = String.format(
             R.string.size.getString(),
             size.ifEmpty { R.string.none.getString() })
-        galleyVType.text = String.format(
+        galleryVType.text = String.format(
             R.string.location.getString(),
             type.ifEmpty { R.string.none.getString() })
     }
 
     private suspend fun setNotes(notes: MutableList<String>) = withContext(Dispatchers.Main) {
-        binding.galleyVLinks.isGone = notes.isEmpty()
-        if (binding.galleyVLinks.adapter is CheckListAdapter)
-            (binding.galleyVLinks.adapter as CheckListAdapter).dataList = notes
+        binding.galleryVLinks.isGone = notes.isEmpty()
+        if (binding.galleryVLinks.adapter is CheckListAdapter)
+            (binding.galleryVLinks.adapter as CheckListAdapter).dataList = notes
     }
 
     private suspend fun removeCato() = withContext(Dispatchers.Main) {
-        binding.galleyVCatoContainer.removeAllViews()
+        binding.galleryVCatoContainer.removeAllViews()
     }
 
     fun showPop() {
-        showPop(binding.galleyVAction, false)
+        showPop(binding.galleryVAction, false)
     }
 
     override fun popDelete() {
         tryDelete(mutableListOf(viewModel.getCurrentMedia())) {
             if (it.size == 1) {
-                val index = viewModel.galleyMedias.indexOf(it[0])
+                val index = viewModel.galleryMedias.indexOf(it[0])
                 if (index != -1) {
-                    viewModel.galleyMedias.removeAt(index)
-                    binding.galleyVView.adapter?.notifyItemRemoved(index)
+                    viewModel.galleryMedias.removeAt(index)
+                    binding.galleryVView.adapter?.notifyItemRemoved(index)
                 }
             }
         }
@@ -215,7 +216,7 @@ class GalleyViewActivity : BaseMediaActivity<
     override fun popMoveTo() {
         launch {
             moveTo(
-                binding.galleyVAction,
+                binding.galleryVAction,
                 viewModel.getCurrentMedia().isVideo,
                 mutableListOf(viewModel.getCurrentMedia())
             ) { _, _ -> }

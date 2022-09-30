@@ -7,16 +7,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.SearchModel
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
-import com.protone.api.context.MUSIC_PLAY
+import com.protone.api.context.MUSIC_PLAY_CUR
 import com.protone.api.context.linkInput
 import com.protone.api.context.root
 import com.protone.api.entity.Music
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.seenn.databinding.PickMusicActivityBinding
+import com.protone.seenn.service.MusicService
 import com.protone.ui.adapter.AddMusicListAdapter
 import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.PickMusicViewModel
+import com.protone.worker.viewModel.PickMusicViewModel.Companion.SEARCH_MUSIC
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,16 +44,20 @@ class PickMusicActivity :
         }
 
         if (bucket != null) {
-            initSeen(bucket, mode ?: PickMusicViewModel.ADD_BUCKET)
+            if (!mode.isNullOrEmpty() && mode == SEARCH_MUSIC) {
+                bindMusicService { initSeen(bucket, mode, it) }
+            } else {
+                initSeen(bucket, mode ?: PickMusicViewModel.ADD_BUCKET)
+            }
         } else {
-            R.string.no_bucket.getString().toast()
+            R.string.no_data.getString().toast()
             finish()
         }
 
-        getList()?.let { data.addAll(it) }
         val searchModel = SearchModel(binding.addMBSearch) {
-            viewModel.query(getInput())
+            query(getInput())
         }
+
         onFinish = {
             searchModel.destroy()
         }
@@ -88,7 +94,11 @@ class PickMusicActivity :
         }
     }
 
-    private suspend fun initSeen(bucket: String, mode: String) {
+    private suspend fun initSeen(
+        bucket: String,
+        mode: String,
+        binder: MusicService.MusicBinder? = null
+    ) {
         binding.addMBConfirm.also {
             it.isGone = mode == PickMusicViewModel.ADD_BUCKET
             binding.addMBLeave.isGone = !it.isGone
@@ -108,7 +118,8 @@ class PickMusicActivity :
                     ) = viewModel.deleteMusicWithMusicBucket(musicBaseId, musicBucket)
 
                     override fun play(music: Music) {
-                        musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY))
+                        binder?.play(music)
+                        musicBroadCastManager.sendBroadcast(Intent(MUSIC_PLAY_CUR))
                     }
 
                     override suspend fun insertMusicWithMusicBucket(
@@ -119,6 +130,7 @@ class PickMusicActivity :
                 viewModel.getMusics()
             )
         }
+        getList()?.let { viewModel.data.addAll(it) }
     }
 
     private fun newAdapter(

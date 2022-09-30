@@ -2,17 +2,13 @@ package com.protone.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import com.protone.api.TAG
 import com.protone.api.baseType.toStringMinuteTime
 import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.Music
 import com.protone.ui.R
 import com.protone.ui.databinding.MusicListLayoutBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class MusicListAdapter(context: Context, private val musicList: MutableList<Music>) :
     SelectListAdapter<MusicListLayoutBinding, Music, MusicListAdapter.MusicListEvent>(
@@ -53,18 +49,14 @@ class MusicListAdapter(context: Context, private val musicList: MutableList<Musi
                     clearAllSelected()
                     selectList.add(data.music)
                     playPosition = musicList.indexOf(data.music)
-                    withContext(Dispatchers.Main) {
-                        notifyItemChanged(playPosition)
-                    }
+                    notifyItemChangedCO(playPosition)
                 }
             }
             is MusicListEvent.InsertMusics -> {
                 if (data.musics.isEmpty()) return
                 val oldSize = musicList.size - 1
                 musicList.addAll(data.musics)
-                withContext(Dispatchers.Main){
-                    notifyItemRangeInserted(oldSize,musicList.size -1)
-                }
+                notifyItemRangeInsertedCO(oldSize, musicList.size - 1)
             }
         }
     }

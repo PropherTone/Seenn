@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import com.bumptech.glide.Glide
 import com.protone.api.context.newLayoutInflater
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.ui.databinding.ImageCateLayoutBinding
 import com.protone.ui.databinding.TextCateLayoutBinding
 
@@ -53,7 +53,7 @@ class CatoListAdapter(context: Context, val catoListDataProxy: CatoListDataProxy
     }
 
     interface CatoListDataProxy {
-        fun getMedia(): GalleyMedia
+        fun getMedia(): GalleryMedia
     }
 
 }

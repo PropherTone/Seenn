@@ -25,13 +25,13 @@ class UserConfig(context: Context) {
 
     var userPassword by config.string("USER_PASSWORD", "")
 
-    var lockGalley by config.string("LOCK_GALLEY", "")
+    var lockGallery by config.string("LOCK_GALLERY", "")
 
     var lockNote by config.string("LOCK_NOTE", "")
 
     var lockMusic by config.string("LOCK_MUSIC", "")
 
-    var combineGalley by config.boolean("COMBINE_GALLEY", false)
+    var combineGallery by config.boolean("COMBINE_GALLERY", false)
 
 
     var lastMusicBucket by config.string(
@@ -52,7 +52,7 @@ class UserConfig(context: Context) {
         val isLogin: Boolean,
         val userIcon: String,
         val userPassword: String,
-        val lockGalley: String,
+        val lockGallery: String,
         val lockNote: String,
         val lockMusic: String
     )
@@ -63,7 +63,7 @@ class UserConfig(context: Context) {
             isLogin,
             userIcon,
             userPassword,
-            lockGalley,
+            lockGallery,
             lockNote,
             lockMusic
         )

@@ -4,20 +4,20 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.protone.api.entity.GalleyBucket
+import com.protone.api.entity.GalleryBucket
 
 @Dao
-interface GalleyBucketDAO {
+interface GalleryBucketDAO {
 
     @Insert
-    fun insertGalleyBucket(galleyBucket: GalleyBucket)
+    fun insertGalleryBucket(galleryBucket: GalleryBucket)
 
-    @Query("SELECT * FROM GalleyBucket WHERE type LIKE :name")
-    fun getGalleyBucket(name: String): GalleyBucket?
+    @Query("SELECT * FROM GalleryBucket WHERE type LIKE :name")
+    fun getGalleryBucket(name: String): GalleryBucket?
 
     @Delete
-    fun deleteGalleyBucket(galleyBucket: GalleyBucket)
+    fun deleteGalleryBucket(galleryBucket: GalleryBucket)
 
-    @Query("SELECT * FROM GalleyBucket WHERE image LIKE :isVideo")
-    fun getALLGalleyBucket(isVideo : Boolean): List<GalleyBucket>?
+    @Query("SELECT * FROM GalleryBucket WHERE image LIKE :isVideo")
+    fun getAllGalleryBucket(isVideo : Boolean): List<GalleryBucket>?
 }

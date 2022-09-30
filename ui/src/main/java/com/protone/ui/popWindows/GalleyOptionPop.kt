@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 
-class GalleyOptionPop(val context: Context, val view: View) : PopupWindow() {
+class GalleryOptionPop(val context: Context, val view: View) : PopupWindow() {
 
     init {
         contentView = view

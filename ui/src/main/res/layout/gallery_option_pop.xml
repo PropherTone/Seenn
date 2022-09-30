@@ -8,7 +8,7 @@
     android:background="@color/white">
 
     <TextView
-        android:id="@+id/galley_rename"
+        android:id="@+id/gallery_rename"
         android:layout_width="@dimen/user_icon"
         android:layout_height="@dimen/user_icon"
         android:gravity="center"
@@ -19,57 +19,57 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/galley_moveTo"
+        android:id="@+id/gallery_moveTo"
         android:layout_width="@dimen/user_icon"
         android:layout_height="@dimen/user_icon"
         android:gravity="center"
         android:text="@string/moveTo"
         android:textStyle="bold"
         app:drawableTopCompat="@drawable/ic_outline_move_24"
-        app:layout_constraintStart_toEndOf="@+id/galley_rename"
+        app:layout_constraintStart_toEndOf="@+id/gallery_rename"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/galley_delete"
+        android:id="@+id/gallery_delete"
         android:layout_width="@dimen/user_icon"
         android:layout_height="@dimen/user_icon"
         android:gravity="center"
         android:text="@string/delete"
         android:textStyle="bold"
         app:drawableTopCompat="@drawable/ic_outline_delete_24"
-        app:layout_constraintStart_toEndOf="@+id/galley_moveTo"
+        app:layout_constraintStart_toEndOf="@+id/gallery_moveTo"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/galley_setCate"
+        android:id="@+id/gallery_setCate"
         android:layout_width="@dimen/user_icon"
         android:layout_height="@dimen/user_icon"
         android:gravity="center"
         android:text="@string/setCategory"
         android:textStyle="bold"
         app:drawableTopCompat="@drawable/ic_outline_category_24"
-        app:layout_constraintStart_toEndOf="@+id/galley_delete"
+        app:layout_constraintStart_toEndOf="@+id/gallery_delete"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/galley_selectAll"
+        android:id="@+id/gallery_selectAll"
         android:layout_width="@dimen/user_icon"
         android:layout_height="@dimen/user_icon"
         android:gravity="center"
         android:text="@string/selectAll"
         android:textStyle="bold"
         app:drawableTopCompat="@drawable/ic_outline_select_all_24"
-        app:layout_constraintStart_toEndOf="@+id/galley_rename"
-        app:layout_constraintTop_toBottomOf="@+id/galley_moveTo" />
+        app:layout_constraintStart_toEndOf="@+id/gallery_rename"
+        app:layout_constraintTop_toBottomOf="@+id/gallery_moveTo" />
 
     <TextView
-        android:id="@+id/galley_intoBox"
+        android:id="@+id/gallery_intoBox"
         android:layout_width="@dimen/user_icon"
         android:layout_height="@dimen/user_icon"
         android:gravity="center"
         android:textStyle="bold"
         android:text="@string/surfing"
         app:drawableTopCompat="@drawable/ic_outline_surfing_24"
-        app:layout_constraintStart_toEndOf="@+id/galley_selectAll"
-        app:layout_constraintTop_toBottomOf="@+id/galley_delete" />
+        app:layout_constraintStart_toEndOf="@+id/gallery_selectAll"
+        app:layout_constraintTop_toBottomOf="@+id/gallery_delete" />
 </androidx.constraintlayout.widget.ConstraintLayout>

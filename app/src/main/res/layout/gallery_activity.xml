@@ -6,7 +6,7 @@
 
         <variable
             name="activity"
-            type="com.protone.seenn.activity.GalleyActivity" />
+            type="com.protone.seenn.activity.GalleryActivity" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,16 +14,16 @@
         android:layout_height="match_parent">
 
         <RelativeLayout
-            android:id="@+id/galley_bar"
+            android:id="@+id/gallery_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/galley_back"
+                android:id="@+id/gallery_back"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_alignBottom="@id/galley_tab"
+                android:layout_alignBottom="@id/gallery_tab"
                 android:background="@color/blue_1"
                 android:contentDescription="@string/back" />
 
@@ -39,7 +39,7 @@
                 android:src="@drawable/ic_round_arrow_left__white_24" />
 
             <com.google.android.material.tabs.TabLayout
-                android:id="@+id/galley_tab"
+                android:id="@+id/gallery_tab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -61,7 +61,7 @@
             </com.google.android.material.tabs.TabLayout>
 
             <ImageView
-                android:id="@+id/galley_choose_confirm"
+                android:id="@+id/gallery_choose_confirm"
                 android:layout_width="@dimen/small_Icon"
                 android:layout_height="@dimen/small_Icon"
                 android:layout_alignParentEnd="true"
@@ -73,7 +73,7 @@
                 android:visibility="gone" />
 
             <ImageView
-                android:id="@+id/galley_actionMenu"
+                android:id="@+id/gallery_actionMenu"
                 android:layout_width="@dimen/small_Icon"
                 android:layout_height="@dimen/small_Icon"
                 android:layout_alignParentEnd="true"
@@ -86,13 +86,13 @@
         </RelativeLayout>
 
         <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/galley_pager"
+            android:id="@+id/gallery_pager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/galley_bar" />
+            app:layout_constraintTop_toBottomOf="@+id/gallery_bar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

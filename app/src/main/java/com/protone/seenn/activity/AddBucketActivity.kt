@@ -14,7 +14,7 @@ import com.protone.api.json.toUri
 import com.protone.seenn.R
 import com.protone.seenn.databinding.AddBucketActivityBinding
 import com.protone.worker.viewModel.AddBucketViewModel
-import com.protone.worker.viewModel.GalleyViewModel
+import com.protone.worker.viewModel.GalleryViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -80,14 +80,14 @@ class AddBucketActivity : BaseActivity<
 
     private suspend fun chooseIcon() = withContext(Dispatchers.Main) {
         startActivityForResult(
-            GalleyActivity::class.intent.also { intent ->
+            GalleryActivity::class.intent.also { intent ->
                 intent.putExtra(
-                    GalleyViewModel.CHOOSE_MODE,
-                    GalleyViewModel.CHOOSE_PHOTO
+                    GalleryViewModel.CHOOSE_MODE,
+                    GalleryViewModel.CHOOSE_PHOTO
                 )
             }
         ).let { result ->
-            uri = result?.data?.getStringExtra(GalleyViewModel.URI)?.toUri()
+            uri = result?.data?.getStringExtra(GalleryViewModel.URI)?.toUri()
         }
     }
 

@@ -14,7 +14,7 @@ import com.protone.seenn.databinding.NoteViewActivityBinding
 import com.protone.seenn.service.MusicService
 import com.protone.ui.customView.richText.RichNoteView
 import com.protone.worker.R
-import com.protone.worker.viewModel.GalleyViewViewModel
+import com.protone.worker.viewModel.GalleryViewViewModel
 import com.protone.worker.viewModel.NoteEditViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
 import kotlinx.coroutines.launch
@@ -84,9 +84,9 @@ class NoteViewActivity :
                     launch {
                         val collect = filterMedia(uri, isVideo)
                         if (collect != null && collect.size > 0) {
-                            startActivity(GalleyViewActivity::class.intent.apply {
-                                putExtra(GalleyViewViewModel.MEDIA, collect[0].toJson())
-                                putExtra(GalleyViewViewModel.TYPE, isVideo)
+                            startActivity(GalleryViewActivity::class.intent.apply {
+                                putExtra(GalleryViewViewModel.MEDIA, collect[0].toJson())
+                                putExtra(GalleryViewViewModel.TYPE, isVideo)
                             })
                         } else R.string.none.getString().toast()
                     }

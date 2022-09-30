@@ -10,7 +10,7 @@ import com.protone.api.converters.UriTypeConverter
     primaryKeys = ["media_uri", "noteId"],
     foreignKeys = [
         ForeignKey(
-            entity = GalleyMedia::class,
+            entity = GalleryMedia::class,
             parentColumns = ["media_uri"],
             childColumns = ["media_uri"],
             onDelete = CASCADE

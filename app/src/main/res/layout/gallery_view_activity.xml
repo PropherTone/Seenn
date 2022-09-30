@@ -6,9 +6,9 @@
 
         <variable
             name="activity"
-            type="com.protone.seenn.activity.GalleyViewActivity" />
+            type="com.protone.seenn.activity.GalleryViewActivity" />
 
-        <import type="com.protone.worker.viewModel.GalleyViewViewModel.GalleyViewEvent" />
+        <import type="com.protone.worker.viewModel.GalleryViewViewModel.GalleryViewEvent" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,21 +18,21 @@
         android:elevation="0dp">
 
         <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/galleyV_view"
+            android:id="@+id/galleryV_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/black"
             android:elevation="0dp" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/galleyV_cover"
+            android:id="@+id/galleryV_cover"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:elevation="@dimen/small_elevation"
             android:visibility="invisible">
 
             <TextView
-                android:id="@+id/galleyV_title"
+                android:id="@+id/galleryV_title"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/action_icon_p"
                 android:background="@color/foreDark_1"
@@ -44,12 +44,12 @@
                 android:paddingEnd="@dimen/action_icon_p"
                 android:textColor="@color/white"
                 android:textSize="@dimen/title_text"
-                app:layout_constraintEnd_toStartOf="@+id/galleyV_share"
-                app:layout_constraintStart_toEndOf="@+id/galleyV_back"
+                app:layout_constraintEnd_toStartOf="@+id/galleryV_share"
+                app:layout_constraintStart_toEndOf="@+id/galleryV_back"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/galleyV_back"
+                android:id="@+id/galleryV_back"
                 android:layout_width="@dimen/action_icon_p"
                 android:layout_height="@dimen/action_icon_p"
                 android:contentDescription="@string/action"
@@ -60,7 +60,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/galleyV_action"
+                android:id="@+id/galleryV_action"
                 android:layout_width="@dimen/action_icon_p"
                 android:layout_height="@dimen/action_icon_p"
                 android:contentDescription="@string/action"
@@ -71,46 +71,46 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/galleyV_share"
+                android:id="@+id/galleryV_share"
                 android:layout_width="@dimen/action_icon_p"
                 android:layout_height="@dimen/action_icon_p"
                 android:contentDescription="@string/action"
-                android:onClick="@{()->activity.sendViewEvent(GalleyViewEvent.Share.INSTANCE)}"
+                android:onClick="@{()->activity.sendViewEvent(GalleryViewEvent.Share.INSTANCE)}"
                 android:padding="@dimen/icon_padding_mid"
                 android:src="@drawable/ic_baseline_share_24_white"
-                app:layout_constraintEnd_toStartOf="@id/galleyV_action"
+                app:layout_constraintEnd_toStartOf="@id/galleryV_action"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/galleyV_time"
+                android:id="@+id/galleryV_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/foreDark_1"
                 android:padding="@dimen/main_padding"
                 android:textColor="@color/white"
                 android:textSize="@dimen/sub_text"
-                app:layout_constraintBottom_toTopOf="@+id/galleyV_size" />
+                app:layout_constraintBottom_toTopOf="@+id/galleryV_size" />
 
             <TextView
-                android:id="@+id/galleyV_size"
+                android:id="@+id/galleryV_size"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/foreDark_1"
                 android:padding="@dimen/main_padding"
                 android:textColor="@color/white"
                 android:textSize="@dimen/sub_text"
-                app:layout_constraintBottom_toTopOf="@+id/galleyV_cato" />
+                app:layout_constraintBottom_toTopOf="@+id/galleryV_cato" />
 
             <LinearLayout
-                android:id="@+id/galleyV_cato"
+                android:id="@+id/galleryV_cato"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/foreDark_1"
                 android:orientation="horizontal"
-                app:layout_constraintBottom_toTopOf="@+id/galleyV_type">
+                app:layout_constraintBottom_toTopOf="@+id/galleryV_type">
 
                 <TextView
-                    android:id="@+id/galleyV_cato_name"
+                    android:id="@+id/galleryV_cato_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/main_padding"
@@ -119,7 +119,7 @@
                     android:textSize="@dimen/sub_text" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/galleyV_cato_container"
+                    android:id="@+id/galleryV_cato_container"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1" />
@@ -127,17 +127,17 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/galleyV_type"
+                android:id="@+id/galleryV_type"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/foreDark_1"
                 android:padding="@dimen/main_padding"
                 android:textColor="@color/white"
                 android:textSize="@dimen/sub_text"
-                app:layout_constraintBottom_toTopOf="@+id/galleyV_links" />
+                app:layout_constraintBottom_toTopOf="@+id/galleryV_links" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/galleyV_links"
+                android:id="@+id/galleryV_links"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/huge_icon"
                 android:background="@color/foreDark_1"
@@ -152,9 +152,9 @@
                 android:background="@drawable/black_gradient_left"
                 android:contentDescription="@string/action"
                 android:src="@drawable/ic_round_arrow_left__white_24"
-                app:layout_constraintBottom_toTopOf="@+id/galleyV_time"
+                app:layout_constraintBottom_toTopOf="@+id/galleryV_time"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/galleyV_back"
+                app:layout_constraintTop_toBottomOf="@+id/galleryV_back"
                 app:layout_constraintWidth_percent="0.12" />
 
             <ImageView
@@ -164,9 +164,9 @@
                 android:background="@drawable/black_gradient_right"
                 android:contentDescription="@string/action"
                 android:src="@drawable/ic_round_arrow_right_white_24"
-                app:layout_constraintBottom_toTopOf="@+id/galleyV_time"
+                app:layout_constraintBottom_toTopOf="@+id/galleryV_time"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/galleyV_action"
+                app:layout_constraintTop_toBottomOf="@+id/galleryV_action"
                 app:layout_constraintWidth_percent="0.12" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

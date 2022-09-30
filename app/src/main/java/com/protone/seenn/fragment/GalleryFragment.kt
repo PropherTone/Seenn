@@ -19,44 +19,44 @@ import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.onGlobalLayout
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.api.json.toJson
 import com.protone.seenn.R
-import com.protone.seenn.activity.GalleySearchActivity
-import com.protone.seenn.activity.GalleyViewActivity
+import com.protone.seenn.activity.GallerySearchActivity
+import com.protone.seenn.activity.GalleryViewActivity
 import com.protone.seenn.activity.PictureBoxActivity
 import com.protone.ui.adapter.BaseAdapter
-import com.protone.ui.adapter.GalleyBucketAdapter
-import com.protone.ui.adapter.GalleyListAdapter
+import com.protone.ui.adapter.GalleryBucketAdapter
+import com.protone.ui.adapter.GalleryListAdapter
 import com.protone.ui.customView.StatusImageView
-import com.protone.ui.databinding.GalleyBucketListLayoutBinding
-import com.protone.ui.databinding.GalleyFragmentLayoutBinding
+import com.protone.ui.databinding.GalleryBucketListLayoutBinding
+import com.protone.ui.databinding.GalleryFragmentLayoutBinding
 import com.protone.ui.dialog.titleDialog
-import com.protone.ui.itemDecoration.GalleyItemDecoration
+import com.protone.ui.itemDecoration.GalleryItemDecoration
 import com.protone.worker.IntentDataHolder
-import com.protone.worker.viewModel.GalleyFragmentViewModel
-import com.protone.worker.viewModel.GalleyViewViewModel
+import com.protone.worker.viewModel.GalleryFragmentViewModel
+import com.protone.worker.viewModel.GalleryViewViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 
-class GalleyFragment(
+class GalleryFragment(
     private val isVideo: Boolean,
     private val isLock: Boolean,
     private val combine: Boolean,
-    private val onAttach: (MutableSharedFlow<GalleyFragmentViewModel.FragEvent>) -> Unit
+    private val onAttach: (MutableSharedFlow<GalleryFragmentViewModel.FragEvent>) -> Unit
 ) : Fragment(), CoroutineScope by MainScope(),
-    GalleyListAdapter.OnSelect {
+    GalleryListAdapter.OnSelect {
 
-    private lateinit var viewModel: GalleyFragmentViewModel
+    private lateinit var viewModel: GalleryFragmentViewModel
 
-    private lateinit var binding: GalleyFragmentLayoutBinding
+    private lateinit var binding: GalleryFragmentLayoutBinding
 
     private var onSelectMod = false
         set(value) {
             launch {
-                binding.galleyToolButton.isVisible = value
+                binding.galleryToolButton.isVisible = value
             }
             field = value
         }
@@ -65,60 +65,60 @@ class GalleyFragment(
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        val model: GalleyFragmentViewModel by viewModels()
+        val model: GalleryFragmentViewModel by viewModels()
         viewModel = model
         viewModel.apply {
             attachFragEvent(onAttach)
             launch(Dispatchers.Default) {
                 fragEvent.buffer().collect {
                     when (it) {
-                        is GalleyFragmentViewModel.FragEvent.AddBucket -> {
+                        is GalleryFragmentViewModel.FragEvent.AddBucket -> {
                             insertNewMedias(it.name, it.list)
                         }
-                        is GalleyFragmentViewModel.FragEvent.SelectAll -> {
+                        is GalleryFragmentViewModel.FragEvent.SelectAll -> {
                             getListAdapter().selectAll()
                             onSelectMod = true
                         }
-                        is GalleyFragmentViewModel.FragEvent.OnActionBtn -> {
+                        is GalleryFragmentViewModel.FragEvent.OnActionBtn -> {
                             onSelectMod = true
                         }
-                        is GalleyFragmentViewModel.FragEvent.IntoBox -> {
+                        is GalleryFragmentViewModel.FragEvent.IntoBox -> {
                             IntentDataHolder.put(
                                 (if (getListAdapter().selectList.size > 0) {
                                     getListAdapter().selectList
                                 } else {
-                                    getGalley(getGalleyName())
-                                        ?: getGalley(R.string.all_galley.getString())
+                                    getGallery(getGalleryName())
+                                        ?: getGallery(R.string.all_gallery.getString())
                                 })
                             )
                             startActivity(PictureBoxActivity::class.intent)
                         }
-                        is GalleyFragmentViewModel.FragEvent.OnNewBucket -> {
+                        is GalleryFragmentViewModel.FragEvent.OnNewBucket -> {
                             insertBucket(it.pairs)
                         }
-                        is GalleyFragmentViewModel.FragEvent.OnMediaDeleted -> {
-                            refreshBucket(it.galleyMedia)
-                            if (onTargetGalley(it.galleyMedia.bucket)) {
+                        is GalleryFragmentViewModel.FragEvent.OnMediaDeleted -> {
+                            refreshBucket(it.galleryMedia)
+                            if (onTargetGallery(it.galleryMedia.bucket)) {
                                 noticeListUpdate(
-                                    it.galleyMedia,
-                                    GalleyListAdapter.MediaStatus.DELETED
+                                    it.galleryMedia,
+                                    GalleryListAdapter.MediaStatus.DELETED
                                 )
                             }
                         }
-                        is GalleyFragmentViewModel.FragEvent.OnMediaInserted -> {
-                            refreshBucket(it.galleyMedia)
-                            if (onTargetGalley(it.galleyMedia.bucket)) {
+                        is GalleryFragmentViewModel.FragEvent.OnMediaInserted -> {
+                            refreshBucket(it.galleryMedia)
+                            if (onTargetGallery(it.galleryMedia.bucket)) {
                                 noticeListUpdate(
-                                    it.galleyMedia,
-                                    GalleyListAdapter.MediaStatus.INSERTED
+                                    it.galleryMedia,
+                                    GalleryListAdapter.MediaStatus.INSERTED
                                 )
                             }
                         }
-                        is GalleyFragmentViewModel.FragEvent.OnMediaUpdated -> {
-                            if (onTargetGalley(it.galleyMedia.bucket)) {
+                        is GalleryFragmentViewModel.FragEvent.OnMediaUpdated -> {
+                            if (onTargetGallery(it.galleryMedia.bucket)) {
                                 noticeListUpdate(
-                                    it.galleyMedia,
-                                    GalleyListAdapter.MediaStatus.UPDATED
+                                    it.galleryMedia,
+                                    GalleryListAdapter.MediaStatus.UPDATED
                                 )
                             }
                         }
@@ -126,8 +126,8 @@ class GalleyFragment(
                     }
                 }
             }
-            isVideo = this@GalleyFragment.isVideo
-            isLock = this@GalleyFragment.isLock
+            isVideo = this@GalleryFragment.isVideo
+            isLock = this@GalleryFragment.isLock
         }
     }
 
@@ -136,44 +136,44 @@ class GalleyFragment(
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = GalleyFragmentLayoutBinding.inflate(inflater, container, false).apply {
+        binding = GalleryFragmentLayoutBinding.inflate(inflater, container, false).apply {
             root.onGlobalLayout {
-                galleyBucketContainer.botBlock = tabController.measuredHeight.toFloat()
-                toolButtonAnimator = AnimationHelper.rotation(galleyToolButton, 45f)
-                galleyShowBucket.setOnStateListener(object : StatusImageView.StateListener {
+                galleryBucketContainer.botBlock = tabController.measuredHeight.toFloat()
+                toolButtonAnimator = AnimationHelper.rotation(galleryToolButton, 45f)
+                galleryShowBucket.setOnStateListener(object : StatusImageView.StateListener {
                     override fun onActive() {
                         viewModel.isBucketShowUp = true
-                        galleyToolButton.isVisible = true
-                        galleyBucketContainer.show()
+                        galleryToolButton.isVisible = true
+                        galleryBucketContainer.show()
                         toolButtonAnimator.reverse()
                     }
 
                     override fun onNegative() {
-                        if (viewModel.rightGalley == "") {
-                            binding.galleyBucket.findViewHolderForLayoutPosition(0)?.let {
-                                if (it is BaseAdapter.Holder<*> && it.binding is GalleyBucketListLayoutBinding) {
-                                    (it.binding as GalleyBucketListLayoutBinding).bucket.performClick()
+                        if (viewModel.rightGallery == "") {
+                            binding.galleryBucket.findViewHolderForLayoutPosition(0)?.let {
+                                if (it is BaseAdapter.Holder<*> && it.binding is GalleryBucketListLayoutBinding) {
+                                    (it.binding as GalleryBucketListLayoutBinding).bucket.performClick()
                                     return
                                 }
                             }
                         }
                         viewModel.isBucketShowUp = false
-                        galleyToolButton.isVisible = onSelectMod
-                        galleyBucketContainer.hide()
+                        galleryToolButton.isVisible = onSelectMod
+                        galleryBucketContainer.hide()
                         toolButtonAnimator.start()
                     }
                 })
             }
-            galleySearch.setOnClickListener {
-                val galley = viewModel.getGalleyName()
-                IntentDataHolder.put(viewModel.getGalley(galley))
-                startActivity(GalleySearchActivity::class.intent.also { intent ->
-                    intent.putExtra("GALLEY", galley)
+            gallerySearch.setOnClickListener {
+                val gallery = viewModel.getGalleryName()
+                IntentDataHolder.put(viewModel.getGallery(gallery))
+                startActivity(GallerySearchActivity::class.intent.also { intent ->
+                    intent.putExtra("gallery", gallery)
                 })
             }
-            galleyToolButton.setOnClickListener {
+            galleryToolButton.setOnClickListener {
                 if (!viewModel.isBucketShowUp) {
-                    (galleyList.adapter as GalleyListAdapter).quitSelectMod()
+                    (galleryList.adapter as GalleryListAdapter).quitSelectMod()
                     onSelectMod = false
                 } else {
                     activity?.titleDialog(R.string.user_name.getString(), "") {
@@ -194,27 +194,27 @@ class GalleyFragment(
     }
 
     private fun initList() = binding.run {
-        galleyList.apply {
+        galleryList.apply {
             layoutManager = GridLayoutManager(context, 4)
-            adapter = GalleyListAdapter(context, true).also {
+            adapter = GalleryListAdapter(context, true).also {
                 it.multiChoose = true
-                it.setOnSelectListener(this@GalleyFragment)
+                it.setOnSelectListener(this@GalleryFragment)
             }
-            addItemDecoration(GalleyItemDecoration(paddingEnd))
+            addItemDecoration(GalleryItemDecoration(paddingEnd))
         }
-        galleyBucket.apply {
+        galleryBucket.apply {
             layoutManager = LinearLayoutManager(context)
-            adapter = GalleyBucketAdapter(
+            adapter = GalleryBucketAdapter(
                 context,
-                object : GalleyBucketAdapter.GalleyBucketAdapterDataProxy {
-                    override fun deleteGalleyBucket(bucket: String) {
-                        viewModel.deleteGalleyBucket(bucket)
+                object : GalleryBucketAdapter.GalleryBucketAdapterDataProxy {
+                    override fun deleteGalleryBucket(bucket: String) {
+                        viewModel.deletegalleryBucket(bucket)
                     }
                 }
             ) {
-                viewModel.rightGalley = it
-                binding.galleyShowBucket.negative()
-                noticeListUpdate(viewModel.getGalley(it))
+                viewModel.rightGallery = it
+                binding.galleryShowBucket.negative()
+                noticeListUpdate(viewModel.getGallery(it))
             }
             addItemDecoration(object : RecyclerView.ItemDecoration() {
                 override fun getItemOffsets(
@@ -234,60 +234,60 @@ class GalleyFragment(
         getBucketAdapter().insertBucket(pairs)
     }
 
-    private fun refreshBucket(media: GalleyMedia): Unit = viewModel.run {
+    private fun refreshBucket(media: GalleryMedia): Unit = viewModel.run {
         getBucketAdapter().run {
             refreshBucket(getBucket(media.bucket))
-            refreshBucket(getBucket(R.string.all_galley.getString()))
+            refreshBucket(getBucket(R.string.all_gallery.getString()))
         }
     }
 
-    private fun noticeListUpdate(media: GalleyMedia, status: GalleyListAdapter.MediaStatus) {
+    private fun noticeListUpdate(media: GalleryMedia, status: GalleryListAdapter.MediaStatus) {
         if (viewModel.isBucketShowUp) return
         launch {
             when (status) {
-                GalleyListAdapter.MediaStatus.INSERTED -> {
+                GalleryListAdapter.MediaStatus.INSERTED -> {
                     getListAdapter().noticeListItemInsert(media)
                 }
-                GalleyListAdapter.MediaStatus.DELETED -> {
+                GalleryListAdapter.MediaStatus.DELETED -> {
                     getListAdapter().noticeListItemDelete(media)
                 }
-                GalleyListAdapter.MediaStatus.UPDATED -> {
+                GalleryListAdapter.MediaStatus.UPDATED -> {
                     getListAdapter().noticeListItemUpdate(media)
                 }
             }
         }
     }
 
-    private fun noticeListUpdate(data: MutableList<GalleyMedia>?) {
+    private fun noticeListUpdate(data: MutableList<GalleryMedia>?) {
         if (viewModel.isBucketShowUp) return
         launch {
-            binding.galleyList.swapAdapter(GalleyListAdapter(requireContext(), true).also {
+            binding.galleryList.swapAdapter(GalleryListAdapter(requireContext(), true).also {
                 data?.let { medias -> it.setMedias(medias) }
                 it.multiChoose = true
-                it.setOnSelectListener(this@GalleyFragment)
+                it.setOnSelectListener(this@GalleryFragment)
             }, false)
         }
     }
 
     private fun getBucketAdapter() =
-        binding.galleyBucket.adapter as GalleyBucketAdapter
+        binding.galleryBucket.adapter as GalleryBucketAdapter
 
     private fun getListAdapter() =
-        binding.galleyList.adapter as GalleyListAdapter
+        binding.galleryList.adapter as GalleryListAdapter
 
-    override fun select(galleyMedia: GalleyMedia) = Unit
+    override fun select(galleryMedia: GalleryMedia) = Unit
 
-    override fun select(galleyMedia: MutableList<GalleyMedia>) {
+    override fun select(galleryMedia: MutableList<GalleryMedia>) {
         launch {
-            viewModel.sendEvent(GalleyFragmentViewModel.FragEvent.OnSelect(galleyMedia))
+            viewModel.sendEvent(GalleryFragmentViewModel.FragEvent.OnSelect(galleryMedia))
         }
     }
 
-    override fun openView(galleyMedia: GalleyMedia) {
-        startActivity(GalleyViewActivity::class.intent.apply {
-            putExtra(GalleyViewViewModel.MEDIA, galleyMedia.toJson())
-            putExtra(GalleyViewViewModel.TYPE, galleyMedia.isVideo)
-            putExtra(GalleyViewViewModel.GALLEY, viewModel.getGalleyName())
+    override fun openView(galleryMedia: GalleryMedia) {
+        startActivity(GalleryViewActivity::class.intent.apply {
+            putExtra(GalleryViewViewModel.MEDIA, galleryMedia.toJson())
+            putExtra(GalleryViewViewModel.TYPE, galleryMedia.isVideo)
+            putExtra(GalleryViewViewModel.GALLERY, viewModel.getGalleryName())
         })
     }
 

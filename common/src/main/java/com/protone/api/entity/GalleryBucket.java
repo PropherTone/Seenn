@@ -5,11 +5,11 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity
-public class GalleyBucket {
+public class GalleryBucket {
 
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "galleyBucketId")
-    private Long galleyBucketId;
+    @ColumnInfo(name = "galleryBucketId")
+    private Long galleryBucketId;
 
     @ColumnInfo(name = "type")
     private String type;
@@ -17,17 +17,17 @@ public class GalleyBucket {
     @ColumnInfo(name = "image")
     private boolean image;
 
-    public GalleyBucket(String type, boolean image) {
+    public GalleryBucket(String type, boolean image) {
         this.type = type;
         this.image = image;
     }
 
-    public Long getGalleyBucketId() {
-        return galleyBucketId;
+    public Long getGalleryBucketId() {
+        return galleryBucketId;
     }
 
-    public void setGalleyBucketId(Long galleyBucketId) {
-        this.galleyBucketId = galleyBucketId;
+    public void setGalleryBucketId(Long galleryBucketId) {
+        this.galleryBucketId = galleryBucketId;
     }
 
     public String getType() {
@@ -51,7 +51,7 @@ public class GalleyBucket {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        GalleyBucket that = (GalleyBucket) o;
+        GalleryBucket that = (GalleryBucket) o;
 
         if (image != that.image) return false;
         return type.equals(that.type);

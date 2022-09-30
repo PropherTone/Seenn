@@ -6,7 +6,7 @@ import android.net.Uri
 import android.os.Handler
 import android.util.Log
 import com.protone.api.TAG
-import com.protone.api.context.UPDATE_GALLEY
+import com.protone.api.context.UPDATE_GALLERY
 import com.protone.api.context.UPDATE_MUSIC
 
 class MediaContentObserver(mHandler: Handler) : ContentObserver(mHandler) {
@@ -25,7 +25,7 @@ class MediaContentObserver(mHandler: Handler) : ContentObserver(mHandler) {
             else -> {
                 workLocalBroadCast.sendBroadcast(Intent().apply {
                     if (isUpdate(uri ?: Uri.EMPTY)) putExtra("uri", uriString)
-                    action = UPDATE_GALLEY
+                    action = UPDATE_GALLERY
                 })
             }
         }

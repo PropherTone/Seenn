@@ -13,13 +13,13 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.ui.databinding.PictureBoxAdapterGifLayoutBinding
 import com.protone.ui.databinding.PictureBoxAdapterLayoutBinding
 import com.protone.ui.databinding.PictureBoxAdapterVideoLayoutBinding
 import kotlin.math.roundToInt
 
-class PictureBoxAdapter(context: Context, private val picUri: MutableList<GalleyMedia>) :
+class PictureBoxAdapter(context: Context, private val picUri: MutableList<GalleryMedia>) :
     BaseAdapter<ViewDataBinding, Any>(context) {
 
     private val image = 0

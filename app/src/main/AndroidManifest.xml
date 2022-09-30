@@ -50,17 +50,17 @@
             android:launchMode="singleTop" />
         <activity android:name=".activity.NoteActivity" />
         <activity android:name=".activity.PictureBoxActivity" />
-        <activity android:name=".activity.GalleyActivity" />
+        <activity android:name=".activity.GalleryActivity" />
         <activity android:name=".activity.MusicActivity" />
         <activity android:name=".activity.AddBucketActivity" />
         <activity android:name=".activity.NoteEditActivity" />
         <activity android:name=".activity.NoteViewActivity" />
-        <activity android:name=".activity.GalleyViewActivity" />
+        <activity android:name=".activity.GalleryViewActivity" />
         <activity android:name=".activity.PickMusicActivity" />
         <activity android:name=".activity.UserConfigActivity" />
         <activity android:name=".activity.LogActivity" />
         <activity android:name=".activity.MusicViewActivity" />
-        <activity android:name=".activity.GalleySearchActivity" />
+        <activity android:name=".activity.GallerySearchActivity" />
 
         <service
             android:name=".service.MusicService"
@@ -91,7 +91,7 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="UPDATE_MUSIC" />
-                <action android:name="UPDATE_GALLEY" />
+                <action android:name="UPDATE_gallery" />
             </intent-filter>
         </receiver>
         <receiver

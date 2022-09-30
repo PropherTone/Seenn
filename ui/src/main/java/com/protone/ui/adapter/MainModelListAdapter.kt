@@ -7,15 +7,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.protone.api.baseType.toDateString
 import com.protone.api.context.newLayoutInflater
-import com.protone.api.entity.GalleyMedia
-import com.protone.api.entity.Music
+import com.protone.api.entity.GalleryMedia
 import com.protone.api.entity.Note
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.ui.R
 import com.protone.ui.databinding.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainModelListAdapter(
@@ -118,7 +116,7 @@ class MainModelListAdapter(
             }
             is PhotoCardBinding -> {
                 val media =
-                    itemList[position].substring(6).toEntity(GalleyMedia::class.java)
+                    itemList[position].substring(6).toEntity(GalleryMedia::class.java)
                 holder.binding.photoCard.apply {
                     title = media.date.toDateString("yyyy/MM/dd E").toString()
                     photo.let {
@@ -131,7 +129,7 @@ class MainModelListAdapter(
             }
             is VideoCardBinding -> {
                 val media =
-                    itemList[position].substring(6).toEntity(GalleyMedia::class.java)
+                    itemList[position].substring(6).toEntity(GalleryMedia::class.java)
                 holder.binding.videoPlayer.apply {
                     setVideoPath(media.uri)
                     setFullScreen {

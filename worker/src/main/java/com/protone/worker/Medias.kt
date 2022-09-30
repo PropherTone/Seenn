@@ -1,19 +1,19 @@
 package com.protone.worker
 
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.api.entity.Note
 import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
-fun photoInToday(): GalleyMedia? {
+fun photoInToday(): GalleryMedia? {
     val ca = Calendar.getInstance(Locale.CHINA)
     val now = Calendar.getInstance(Locale.CHINA).apply {
         timeInMillis = System.currentTimeMillis()
     }
     val allPhoto = runBlocking(Dispatchers.IO) {
-        DatabaseHelper.instance.signedGalleyDAOBridge.getAllMediaByType(false)
+        DatabaseHelper.instance.signedGalleryDAOBridge.getAllMediaByType(false)
     }
     allPhoto?.forEach {
         ca.timeInMillis = it.date * 1000
@@ -27,13 +27,13 @@ fun photoInToday(): GalleyMedia? {
     return allPhoto?.let { if (it.isEmpty()) null else it[(it.indices).random()] }
 }
 
-fun videoInToday(): GalleyMedia? {
+fun videoInToday(): GalleryMedia? {
     val ca = Calendar.getInstance(Locale.CHINA)
     val now = Calendar.getInstance(Locale.CHINA).apply {
         timeInMillis = System.currentTimeMillis()
     }
     val allVideo = runBlocking(Dispatchers.IO) {
-        DatabaseHelper.instance.signedGalleyDAOBridge.getAllMediaByType(true)
+        DatabaseHelper.instance.signedGalleryDAOBridge.getAllMediaByType(true)
     }
     allVideo?.forEach {
         ca.timeInMillis = it.date * 1000

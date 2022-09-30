@@ -1,20 +1,20 @@
 package com.protone.worker.viewModel
 
 import androidx.lifecycle.viewModelScope
-import com.protone.api.entity.GalleyMedia
+import com.protone.api.entity.GalleryMedia
 import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.*
 
-class GalleySearchViewModel : BaseViewModel() {
+class GallerySearchViewModel : BaseViewModel() {
 
-    val data = mutableListOf<GalleyMedia>()
+    val data = mutableListOf<GalleryMedia>()
 
     var onQueryListener: OnQuery? = null
 
-    var selectList: MutableList<GalleyMedia> = mutableListOf()
+    var selectList: MutableList<GalleryMedia> = mutableListOf()
 
     fun isVideo(): Boolean {
         return if (data.size > 0) {
@@ -33,7 +33,7 @@ class GalleySearchViewModel : BaseViewModel() {
                 data.filter {
                     it.name.contains(input, true)
                 }.let { nameFilterList ->
-                    onQueryListener?.onGalleyResult(nameFilterList as MutableList<GalleyMedia>)
+                    onQueryListener?.onGalleryResult(nameFilterList as MutableList<GalleryMedia>)
                     cancel()
                 }
             }
@@ -41,20 +41,20 @@ class GalleySearchViewModel : BaseViewModel() {
                 data.filter {
                     it.cate?.any { name -> name.contains(input, true) } == true
                 }.let { catoFilterList ->
-                    onQueryListener?.onCatoResult(catoFilterList as MutableList<GalleyMedia>)
+                    onQueryListener?.onCatoResult(catoFilterList as MutableList<GalleryMedia>)
                     cancel()
                 }
             }
             launch(Dispatchers.Default) {
                 data.filter {
-                    val notesWithGalley =
+                    val notesWithGallery =
                         DatabaseHelper
                             .instance
-                            .galleriesWithNotesDAOBridge.getNotesWithGalley(it.uri)
+                            .galleriesWithNotesDAOBridge.getNotesWithGallery(it.uri)
                             .map { note -> note.title }
-                    notesWithGalley.any { name -> name.contains(input, true) }
+                    notesWithGallery.any { name -> name.contains(input, true) }
                 }.let { noteFilterList ->
-                    onQueryListener?.onNoteResult(noteFilterList as MutableList<GalleyMedia>)
+                    onQueryListener?.onNoteResult(noteFilterList as MutableList<GalleryMedia>)
                     cancel()
                 }
             }
@@ -62,8 +62,8 @@ class GalleySearchViewModel : BaseViewModel() {
     }
 
     interface OnQuery {
-        fun onGalleyResult(list: MutableList<GalleyMedia>)
-        fun onCatoResult(list: MutableList<GalleyMedia>)
-        fun onNoteResult(list: MutableList<GalleyMedia>)
+        fun onGalleryResult(list: MutableList<GalleryMedia>)
+        fun onCatoResult(list: MutableList<GalleryMedia>)
+        fun onNoteResult(list: MutableList<GalleryMedia>)
     }
 }

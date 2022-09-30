@@ -20,7 +20,7 @@ import com.protone.seenn.databinding.NoteEditActivityBinding
 import com.protone.ui.customView.richText.note.spans.ISpanForUse
 import com.protone.ui.dialog.imageListDialog
 import com.protone.ui.popWindows.ColorfulPopWindow
-import com.protone.worker.viewModel.GalleyViewModel
+import com.protone.worker.viewModel.GalleryViewModel
 import com.protone.worker.viewModel.NoteEditViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
 import com.protone.worker.viewModel.PickMusicViewModel
@@ -118,7 +118,7 @@ class NoteEditActivity :
     }
 
     private suspend fun NoteEditViewModel.pickIcon() {
-        startGalleyPick(true)?.let { re ->
+        startGalleryPick(true)?.let { re ->
             if (noteByName != null) {
                 noteByName?.imagePath?.deleteFile()
             }
@@ -128,7 +128,7 @@ class NoteEditActivity :
     }
 
     private suspend fun pickVideo() {
-        startGalleyPick(false)?.let { re ->
+        startGalleryPick(false)?.let { re ->
             insertVideo(re.uri)
         }
     }
@@ -147,7 +147,7 @@ class NoteEditActivity :
     }
 
     private suspend fun NoteEditViewModel.pickImage() {
-        startGalleyPick(true)?.let { re ->
+        startGalleryPick(true)?.let { re ->
             insertImage(
                 RichPhotoStates(
                     re.uri, re.name, null,
@@ -218,14 +218,14 @@ class NoteEditActivity :
         } else R.string.failed_msg.getString().toast()
     }
 
-    private suspend fun startGalleyPick(isPhoto: Boolean) =
-        startActivityForResult(GalleyActivity::class.intent.apply {
+    private suspend fun startGalleryPick(isPhoto: Boolean) =
+        startActivityForResult(GalleryActivity::class.intent.apply {
             putExtra(
-                GalleyViewModel.CHOOSE_MODE,
-                if (isPhoto) GalleyViewModel.CHOOSE_PHOTO else GalleyViewModel.CHOOSE_VIDEO
+                GalleryViewModel.CHOOSE_MODE,
+                if (isPhoto) GalleryViewModel.CHOOSE_PHOTO else GalleryViewModel.CHOOSE_VIDEO
             )
         })?.let { re ->
-            re.data?.getStringExtra(GalleyViewModel.GALLEY_DATA)?.toEntity(GalleyMedia::class.java)
+            re.data?.getStringExtra(GalleryViewModel.Gallery_DATA)?.toEntity(GalleryMedia::class.java)
         }
 
 

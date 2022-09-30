@@ -11,40 +11,36 @@ import com.protone.api.baseType.getString
 import com.protone.api.context.SApplication
 import com.protone.api.context.newLayoutInflater
 import com.protone.ui.R
-import com.protone.ui.databinding.GalleyBucketListLayoutBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.protone.ui.databinding.GalleryBucketListLayoutBinding
 
-class GalleyBucketAdapter(
+class GalleryBucketAdapter(
     context: Context,
-    private val galleyBucketAdapterDataProxy: GalleyBucketAdapterDataProxy,
+    private val galleryBucketAdapterDataProxy: GalleryBucketAdapterDataProxy,
     private val selectBucket: (String) -> Unit
-) : SelectListAdapter<GalleyBucketListLayoutBinding, Pair<Uri, Array<String>>, GalleyBucketAdapter.GalleyBucketEvent>(
+) : SelectListAdapter<GalleryBucketListLayoutBinding, Pair<Uri, Array<String>>, GalleryBucketAdapter.GalleryBucketEvent>(
     context, true
 ) {
 
-    sealed class GalleyBucketEvent {
-        data class DeleteBucket(val bucket: Pair<Uri, Array<String>>) : GalleyBucketEvent()
-        data class RefreshBucket(val bucket: Pair<Uri, Array<String>>) : GalleyBucketEvent()
-        data class InsertBucket(val bucket: Pair<Uri, Array<String>>) : GalleyBucketEvent()
+    sealed class GalleryBucketEvent {
+        data class DeleteBucket(val bucket: Pair<Uri, Array<String>>) : GalleryBucketEvent()
+        data class RefreshBucket(val bucket: Pair<Uri, Array<String>>) : GalleryBucketEvent()
+        data class InsertBucket(val bucket: Pair<Uri, Array<String>>) : GalleryBucketEvent()
     }
 
     private var galleries: MutableList<Pair<Uri, Array<String>>> = mutableListOf()
 
-    override suspend fun onEventIO(data: GalleyBucketEvent) {
+    override suspend fun onEventIO(data: GalleryBucketEvent) {
         when (data) {
-            is GalleyBucketEvent.DeleteBucket -> {
+            is GalleryBucketEvent.DeleteBucket -> {
                 galleries.find { it.second[0] == data.bucket.second[0] }?.let {
                     val index = galleries.indexOf(it)
                     galleries.removeAt(index)
                     selectList.remove(it)
-                    withContext(Dispatchers.Main) {
-                        notifyItemRemoved(index)
-                    }
+                    notifyItemRemovedCO(index)
                 }
             }
-            is GalleyBucketEvent.RefreshBucket -> {
-                if (data.bucket.second[0] != R.string.all_galley.getString() &&
+            is GalleryBucketEvent.RefreshBucket -> {
+                if (data.bucket.second[0] != R.string.all_gallery.getString() &&
                     data.bucket.second[1].toInt() <= 0
                 ) {
                     galleries.find { data.bucket.second[0] == it.second[0] }
@@ -61,24 +57,20 @@ class GalleyBucketAdapter(
                             }
                         }
                         galleries[index] = data.bucket
-                        withContext(Dispatchers.Main) {
-                            notifyItemChanged(index)
-                        }
+                        notifyItemChangedCO(index)
                         break
                     }
                     index++
                 }
             }
-            is GalleyBucketEvent.InsertBucket -> {
+            is GalleryBucketEvent.InsertBucket -> {
                 galleries.add(data.bucket)
-                withContext(Dispatchers.Main) {
-                    notifyItemInserted(galleries.size)
-                }
+                notifyItemInsertedCO(galleries.size)
             }
         }
     }
 
-    override val select: (holder: Holder<GalleyBucketListLayoutBinding>, isSelect: Boolean) -> Unit =
+    override val select: (holder: Holder<GalleryBucketListLayoutBinding>, isSelect: Boolean) -> Unit =
         { holder, isSelect -> holder.binding.bucketCheck.isChecked = isSelect }
 
     override fun itemIndex(path: Pair<Uri, Array<String>>): Int {
@@ -88,15 +80,15 @@ class GalleyBucketAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): Holder<GalleyBucketListLayoutBinding> {
+    ): Holder<GalleryBucketListLayoutBinding> {
         return Holder(
-            GalleyBucketListLayoutBinding.inflate(context.newLayoutInflater, parent, false).apply {
+            GalleryBucketListLayoutBinding.inflate(context.newLayoutInflater, parent, false).apply {
                 root.updateLayoutParams { height = SApplication.screenHeight / 10 }
                 bucketThumb.scaleType = ImageView.ScaleType.CENTER_CROP
             })
     }
 
-    override fun onBindViewHolder(holder: Holder<GalleyBucketListLayoutBinding>, position: Int) {
+    override fun onBindViewHolder(holder: Holder<GalleryBucketListLayoutBinding>, position: Int) {
         galleries[position].let { data ->
             setSelect(holder, data in selectList)
             holder.binding.apply {
@@ -106,7 +98,7 @@ class GalleyBucketAdapter(
                         .setPositiveButton(
                             R.string.confirm
                         ) { dialog, _ ->
-                            galleyBucketAdapterDataProxy.deleteGalleyBucket(galleries[position].second[0])
+                            galleryBucketAdapterDataProxy.deleteGalleryBucket(galleries[position].second[0])
                             deleteBucket(galleries[position])
                             dialog.dismiss()
                         }.setNegativeButton(R.string.cancel) { dialog, _ ->
@@ -134,7 +126,7 @@ class GalleyBucketAdapter(
     }
 
     override fun checkSelect(
-        holder: Holder<GalleyBucketListLayoutBinding>,
+        holder: Holder<GalleryBucketListLayoutBinding>,
         item: Pair<Uri, Array<String>>
     ) {
         if (!multiChoose) clearSelected()
@@ -143,22 +135,22 @@ class GalleyBucketAdapter(
     }
 
     private fun deleteBucket(bucket: Pair<Uri, Array<String>>) {
-        emit(GalleyBucketEvent.DeleteBucket(bucket))
+        emit(GalleryBucketEvent.DeleteBucket(bucket))
     }
 
     fun refreshBucket(item: Pair<Uri, Array<String>>) {
-        emit(GalleyBucketEvent.RefreshBucket(item))
+        emit(GalleryBucketEvent.RefreshBucket(item))
     }
 
     fun insertBucket(item: Pair<Uri, Array<String>>) {
-        emit(GalleyBucketEvent.InsertBucket(item))
+        emit(GalleryBucketEvent.InsertBucket(item))
     }
 
     override fun getItemCount(): Int {
         return galleries.size
     }
 
-    interface GalleyBucketAdapterDataProxy {
-        fun deleteGalleyBucket(bucket: String)
+    interface GalleryBucketAdapterDataProxy {
+        fun deleteGalleryBucket(bucket: String)
     }
 }

@@ -18,7 +18,7 @@ class MainViewModel : BaseViewModel() {
     val btnH = SApplication.app.resources.getDimensionPixelSize(R.dimen.action_icon_p)
 
     sealed class MainViewEvent : ViewEvent{
-        object Galley : MainViewEvent()
+        object Gallery : MainViewEvent()
         object Music : MainViewEvent()
         object Note : MainViewEvent()
         object UserConfig : MainViewEvent()

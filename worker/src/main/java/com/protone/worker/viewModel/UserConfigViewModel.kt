@@ -26,15 +26,15 @@ class UserConfigViewModel : BaseViewModel() {
         object Refresh : UserConfigEvent()
         object ClearCache : UserConfigEvent()
         object Log : UserConfigEvent()
-        object CombineGalley : UserConfigEvent()
-        object DispatchGalley : UserConfigEvent()
+        object CombineGallery : UserConfigEvent()
+        object DispatchGallery : UserConfigEvent()
     }
 
     enum class DisplayMode {
         UnRegis,
         Locked,
         Normal,
-        CombineGalley
+        CombineGallery
     }
 
     private var onClear = false
