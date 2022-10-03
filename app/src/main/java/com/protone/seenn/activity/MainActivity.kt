@@ -75,10 +75,7 @@ class MainActivity :
                 }
                 toolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
                     binding.toolMotion.progress =
-                        (-verticalOffset / appBarLayout.totalScrollRange.toFloat()).also {
-                            binding.actionBtnContainer.y =
-                                viewModel.btnY - (viewModel.btnH * it) * 2
-                        }
+                        (-verticalOffset / appBarLayout.totalScrollRange.toFloat())
                 }
                 musicPlayer.duration = userConfig.lastMusicProgress
             }

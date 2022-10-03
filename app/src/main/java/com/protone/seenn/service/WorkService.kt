@@ -153,12 +153,12 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
     }
 
     private fun updateGallery() = DatabaseHelper.instance.signedGalleryDAOBridge.run {
-        launch(Dispatchers.IO) {
+        launch(Dispatchers.Default) {
             val sortMedias = async(Dispatchers.Default) {
                 val allGallery = getAllGallery() as MutableList<String>
                 sortGalleries(allGallery)
                 allGallery.forEach {
-
+                    deleteSignedMediasByGallery(it)
                 }
                 val allSignedMedia = getAllSignedMedia() as MutableList
                 flow {

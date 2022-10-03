@@ -1,8 +1,11 @@
 package com.protone.worker.viewModel
 
 import androidx.lifecycle.viewModelScope
+import com.protone.api.baseType.getString
+import com.protone.api.baseType.imageSaveToDisk
 import com.protone.api.entity.Music
 import com.protone.api.entity.MusicBucket
+import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.MediaAction
 import com.protone.worker.database.userConfig
@@ -61,8 +64,15 @@ class MusicModel : BaseViewModel() {
 
     suspend fun getBucketRefreshed(name: String) = withContext(Dispatchers.IO) {
         getBucket(name)?.let {
-            it.size =
-                DatabaseHelper.instance.musicWithMusicBucketDAOBridge.getMusicWithMusicBucket(it.musicBucketId).size
+            it.size
+            val newBucket = DatabaseHelper.instance
+                .musicWithMusicBucketDAOBridge
+                .getMusicWithMusicBucket(it.musicBucketId)
+            if (it.size == 0 && newBucket.isNotEmpty()) {
+                it.icon = newBucket[0].uri.imageSaveToDisk(name, R.string.music_bucket.getString())
+                DatabaseHelper.instance.musicBucketDAOBridge.updateMusicBucket(it)
+            }
+            it.size = newBucket.size
             it
         }
     }
@@ -80,8 +90,12 @@ class MusicModel : BaseViewModel() {
             ((musicBucketDAOBridge.getAllMusicBucket() as MutableList<MusicBucket>?)
                 ?: mutableListOf()).let { list ->
                 list.forEach {
-                    it.size = musicWithMusicBucketDAOBridge
+                    val newSize = musicWithMusicBucketDAOBridge
                         .getMusicWithMusicBucket(it.musicBucketId).size
+                    if (it.size != newSize) {
+                        it.size = newSize
+                        musicBucketDAOBridge.updateMusicBucket(it)
+                    }
                 }
                 list
             }
@@ -100,15 +114,6 @@ class MusicModel : BaseViewModel() {
                 }
                 musicBucketByName
             } else null
-        }
-    }
-
-    suspend fun doSearch(playList: List<Music>, text: String) = withContext(Dispatchers.Default) {
-        playList.filter {
-            it.displayName?.contains(text, true) == true
-                    || it.album?.contains(text, true) == true
-                    || it.title.contains(text, true)
-                    || it.artist?.contains(text, true) == true
         }
     }
 

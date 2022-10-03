@@ -57,8 +57,9 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 }
             }
             is MusicBucketAEvent.RefreshBucket -> {
-                val index =
-                    musicBuckets.indexOfFirst { it.musicBucketId == data.bucket.musicBucketId }
+                val index = musicBuckets.find {
+                    it.name == data.bucket.name
+                }.let { musicBuckets.indexOf(it) }
                 if (index != -1 && index != 0) {
                     musicBuckets[index].apply {
                         name = data.bucket.name
@@ -71,7 +72,9 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
                 }
             }
             is MusicBucketAEvent.DeleteBucket -> {
-                val index = musicBuckets.indexOf(data.musicBucket)
+                val index = musicBuckets.find {
+                    it.name == data.musicBucket.name
+                }.let { musicBuckets.indexOf(it) }
                 if (index < 0) return
                 withContext(Dispatchers.Main) {
                     musicBuckets.removeAt(index)

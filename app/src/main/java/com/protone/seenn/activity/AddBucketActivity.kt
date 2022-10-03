@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.viewModels
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.marginBottom
@@ -122,6 +123,11 @@ class AddBucketActivity : BaseActivity<
     private suspend fun refresh(musicBucket: MusicBucket) = withContext(Dispatchers.Main) {
         this@AddBucketActivity.name = musicBucket.name
         detail = musicBucket.detail.toString()
-        Glide.with(this@AddBucketActivity).load(musicBucket.icon).into(binding.musicBucketIcon)
+        Glide.with(this@AddBucketActivity)
+            .asDrawable()
+            .skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .load(musicBucket.icon)
+            .into(binding.musicBucketIcon)
     }
 }

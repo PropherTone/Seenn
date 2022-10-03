@@ -55,7 +55,7 @@ suspend fun Uri.imageSaveToDisk(
                     true
                 } else {
                     exists = true
-                    false
+                    true
                 }
             },
             onNewFile = { file ->

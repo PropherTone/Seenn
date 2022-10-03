@@ -1,6 +1,7 @@
 package com.protone.worker.viewModel
 
 import android.net.Uri
+import com.protone.api.baseType.deleteFile
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.imageSaveToDisk
 import com.protone.api.entity.MusicBucket
@@ -49,6 +50,7 @@ class AddBucketViewModel : BaseViewModel() {
     ) = DatabaseHelper.instance.musicBucketDAOBridge.updateMusicBucket(
         musicBucket.also { mb ->
             if (mb.name != name) mb.name = name
+            mb.icon?.deleteFile()
             val toFile = uri?.imageSaveToDisk(name, R.string.music_bucket.getString())
             if (mb.icon?.equals(toFile) == false) mb.icon = toFile
             if (mb.detail != detail) mb.detail = detail

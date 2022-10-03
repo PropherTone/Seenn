@@ -147,7 +147,6 @@
                     android:id="@+id/musicPlayer"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/music_player_mid"
-                    android:layout_marginTop="@dimen/main_margin"
                     app:layout_constraintTop_toBottomOf="@id/noteBook" />
 
             </androidx.constraintlayout.motion.widget.MotionLayout>

@@ -192,8 +192,8 @@
 
             <com.protone.ui.customView.StatusImageView
                 android:id="@+id/music_showBucket"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/smaller_Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:clickable="true"
                 android:elevation="1dp"
                 android:focusable="true"
@@ -202,7 +202,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.4"
                 tools:ignore="ContentDescription" />
 
             <com.protone.ui.customView.musicPlayer.MusicPlayerViewLite

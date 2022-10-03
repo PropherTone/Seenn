@@ -27,8 +27,6 @@ class GallerySearchViewModel : BaseViewModel() {
     fun query(input: String) {
         if (input.isEmpty()) return
         viewModelScope.launch(Dispatchers.Default) {
-            val lowercase = input.lowercase(Locale.getDefault())
-            val uppercase = input.uppercase(Locale.getDefault())
             launch(Dispatchers.Default) {
                 data.filter {
                     it.name.contains(input, true)

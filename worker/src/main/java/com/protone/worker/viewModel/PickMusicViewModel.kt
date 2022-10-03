@@ -59,4 +59,8 @@ class PickMusicViewModel : BaseViewModel() {
                 .insertMusicWithMusicBucket(musicBaseId, bucket)
         }
 
+    suspend fun updateMusicBucket(){
+
+    }
+
 }
