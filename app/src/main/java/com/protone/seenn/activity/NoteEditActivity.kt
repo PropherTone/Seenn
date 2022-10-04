@@ -3,6 +3,7 @@ package com.protone.seenn.activity
 import android.content.Intent
 import android.graphics.drawable.Animatable
 import android.net.Uri
+import android.text.style.AbsoluteSizeSpan
 import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
@@ -225,7 +226,8 @@ class NoteEditActivity :
                 if (isPhoto) GalleryViewModel.CHOOSE_PHOTO else GalleryViewModel.CHOOSE_VIDEO
             )
         })?.let { re ->
-            re.data?.getStringExtra(GalleryViewModel.Gallery_DATA)?.toEntity(GalleryMedia::class.java)
+            re.data?.getStringExtra(GalleryViewModel.Gallery_DATA)
+                ?.toEntity(GalleryMedia::class.java)
         }
 
 
@@ -238,13 +240,18 @@ class NoteEditActivity :
     override fun setItalic() = binding.noteEditRichNote.setItalic()
 
     override fun setSize() {
-        if (numberPopWindow != null) {
-            numberPopWindow?.dismiss()
-            numberPopWindow = null
-        } else ColorfulPopWindow(this).also {
-            numberPopWindow = it
-            it.setOnDismissListener { numberPopWindow = null }
-        }.startNumberPickerPopup(binding.noteEditTool) { binding.noteEditRichNote.setSize(it) }
+        binding.run {
+            if (numberPopWindow != null) {
+                numberPopWindow?.dismiss()
+                numberPopWindow = null
+            } else ColorfulPopWindow(this@NoteEditActivity).also {
+                numberPopWindow = it
+                it.setOnDismissListener { numberPopWindow = null }
+            }.startNumberPickerPopup(
+                noteEditTool,
+                noteEditRichNote.getSelectionTextSize()
+            ) { noteEditRichNote.setSize(it) }
+        }
     }
 
     private suspend fun insertImage(photo: RichPhotoStates) =
@@ -275,7 +282,7 @@ class NoteEditActivity :
         Glide.with(this@NoteEditActivity).asDrawable().load(path).into(binding.noteEditIcon)
     }
 
-    private fun showProgress(isShow: Boolean) = onUiThread {
+    private suspend fun showProgress(isShow: Boolean) = withContext(Dispatchers.Main) {
         (binding.toolbar.getViewById(R.id.noteEdit_progress) as ImageView?)?.apply {
             drawable.let {
                 when (it) {
@@ -287,7 +294,7 @@ class NoteEditActivity :
         }
     }
 
-    private fun changeIconAni(view: ImageView) = onUiThread {
+    private suspend fun changeIconAni(view: ImageView) = withContext(Dispatchers.Main) {
         AnimationHelper.apply {
             animatorSet(scaleX(view, 0f), scaleY(view, 0f), doOnEnd = {
                 view.setImageDrawable(R.drawable.ic_baseline_check_24.getDrawable())

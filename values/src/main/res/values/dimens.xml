@@ -5,6 +5,7 @@
     <dimen name="small_Icon">40dp</dimen>
     <dimen name="smaller_Icon">30dp</dimen>
     <dimen name="hug_title_text">40sp</dimen>
+    <dimen name="mid_title_text">32sp</dimen>
     <dimen name="title_text">20sp</dimen>
     <dimen name="sub_text">15sp</dimen>
     <dimen name="user_icon">100dp</dimen>
@@ -30,7 +31,7 @@
 
     <dimen name="model_icon_dimen">60dp</dimen>
     <dimen name="list_item_height">68dp</dimen>
-    <dimen name="huge_icon">180dp</dimen>
+    <dimen name="huge_icon">160dp</dimen>
     <dimen name="small_title_text">18sp</dimen>
     <dimen name="small_elevation">2dp</dimen>
     <dimen name="action_icon_p">58dp</dimen>

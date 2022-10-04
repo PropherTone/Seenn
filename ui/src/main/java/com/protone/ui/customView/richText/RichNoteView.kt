@@ -13,12 +13,14 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
+import androidx.core.text.getSpans
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import com.bumptech.glide.Glide
 import com.protone.api.baseType.deleteFile
 import com.protone.api.baseType.imageSaveToDisk
+import com.protone.api.baseType.indexSpan
 import com.protone.api.baseType.toBitmap
 import com.protone.api.context.SApplication
 import com.protone.api.context.newLayoutInflater
@@ -251,6 +253,18 @@ class RichNoteView @JvmOverloads constructor(
         return bitmap
     }
 
+    fun getSelectionTextSize() =
+        getEdittext(curPosition)?.text?.let {
+            val spans = it.getSpans(
+                0,
+                it.length,
+                AbsoluteSizeSpan::class.java
+            )
+            if (spans.isNotEmpty() && spans.size == 1) {
+                spans[0].size
+            }else getEdittext(curPosition)?.textSize?.toInt()
+        } ?: 20
+
     private fun insertText(note: RichNoteStates) {
         addView(when (isEditable) {
             true ->
@@ -259,7 +273,7 @@ class RichNoteView @JvmOverloads constructor(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
-                    textSize = context.resources.getDimension(R.dimen.subContent_text)
+                    textSize = 20f
                     background = null
                     setText(note.text)
                     setOnKeyListener { _, keyCode, event ->
@@ -330,7 +344,7 @@ class RichNoteView @JvmOverloads constructor(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-                textSize = context.resources.getDimension(R.dimen.subContent_text)
+                textSize = 20f
                 text = note.text
             }
         }).run {

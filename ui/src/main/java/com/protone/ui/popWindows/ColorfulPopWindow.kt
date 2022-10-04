@@ -24,7 +24,8 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
 
     inline fun startColorPickerPopup(anchor: View, crossinline onCall: (Int) -> Unit) =
         weakContext.get()?.let { context ->
-            val binder = ColorPopLayoutBinding.inflate(context.newLayoutInflater, context.root, false)
+            val binder =
+                ColorPopLayoutBinding.inflate(context.newLayoutInflater, context.root, false)
             startPopup(context, binder.root, anchor) {
                 (contentView.findViewById(R.id.pop_Color_picker) as MyColorPicker).onColorChangeListener {
                     onCall(
@@ -34,19 +35,23 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
             }
         }
 
-    inline fun startNumberPickerPopup(anchor: View, crossinline onCall: (Int) -> Unit) =
-        weakContext.get()?.let { context ->
-            val binder =
-                NumberPickerPopLayoutBinding.inflate(context.newLayoutInflater, context.root, false)
-            startPopup(context, binder.root, anchor) {
-                (contentView.findViewById(R.id.number_picker) as NumberPicker).apply {
-                    maxValue = 999
-                    minValue = 1
-                    descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
-                    setOnValueChangedListener { _, _, newVal -> onCall.invoke(newVal) }
-                }
+    inline fun startNumberPickerPopup(
+        anchor: View,
+        number: Int,
+        crossinline onCall: (Int) -> Unit
+    ) = weakContext.get()?.let { context ->
+        val binder =
+            NumberPickerPopLayoutBinding.inflate(context.newLayoutInflater, context.root, false)
+        startPopup(context, binder.root, anchor) {
+            (contentView.findViewById(R.id.number_picker) as NumberPicker).apply {
+                maxValue = 999
+                minValue = 1
+                value = number
+                descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
+                setOnValueChangedListener { _, _, newVal -> onCall.invoke(newVal) }
             }
         }
+    }
 
     inline fun startListPopup(
         title: String = "",

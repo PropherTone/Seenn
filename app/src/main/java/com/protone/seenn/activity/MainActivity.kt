@@ -15,6 +15,7 @@ import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.todayDate
 import com.protone.seenn.databinding.MainActivityBinding
+import com.protone.seenn.databinding.MainActivityTempBinding
 import com.protone.seenn.service.WorkService
 import com.protone.seenn.service.getEmptyMusic
 import com.protone.seenn.viewModel.MusicControllerIMP
@@ -30,7 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity :
-    BaseActivity<MainActivityBinding, MainViewModel, MainViewModel.MainViewEvent>(true),
+    BaseActivity<MainActivityTempBinding, MainViewModel, MainViewModel.MainViewEvent>(true),
     MainModelListAdapter.ModelClk {
     override val viewModel: MainViewModel by viewModels()
 
@@ -65,28 +66,29 @@ class MainActivity :
             field = value
         }
 
-    override fun createView(): MainActivityBinding {
-        return MainActivityBinding.inflate(layoutInflater, root, false).apply {
+    override fun createView(): MainActivityTempBinding {
+        return MainActivityTempBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MainActivity
+            fitStatuesBarUsePadding(mainGroup)
             root.onGlobalLayout {
                 actionBtnContainer.also {
                     it.y = it.y + viewModel.btnH * 2
                     viewModel.btnY = it.y
                 }
-                toolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-                    binding.toolMotion.progress =
-                        (-verticalOffset / appBarLayout.totalScrollRange.toFloat())
-                }
+//                toolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+//                    binding.toolMotion.progress =
+//                        (-verticalOffset / appBarLayout.totalScrollRange.toFloat())
+//                }
                 musicPlayer.duration = userConfig.lastMusicProgress
             }
-            modelList.apply {
-                setPadding(
-                    paddingLeft,
-                    paddingTop,
-                    paddingRight,
-                    viewModel.btnH
-                )
-            }
+//            modelList.apply {
+//                setPadding(
+//                    paddingLeft,
+//                    paddingTop,
+//                    paddingRight,
+//                    viewModel.btnH
+//                )
+//            }
 
         }
     }
@@ -100,9 +102,9 @@ class MainActivity :
             startActivity(MusicViewActivity::class.intent)
         }
 
-        refreshModelList()
+//        refreshModelList()
         bindMusicService {
-            (binding.modelList.adapter as MainModelListAdapter).loadDataBelow()
+//            (binding.modelList.adapter as MainModelListAdapter).loadDataBelow()
             musicController.setBinder(this@MainActivity, it) { loopMode ->
                 userConfig.musicLoopMode = loopMode
             }
@@ -153,30 +155,30 @@ class MainActivity :
         }
     }
 
-    private fun refreshModelList() {
-        binding.modelList.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = MainModelListAdapter(
-                context,
-                object : MainModelListAdapter.MainModelListAdapterDataProxy {
-                    override fun photoInTodayJson(): String? {
-                        return viewModel.photoInTodayJson()
-                    }
-
-                    override fun videoInTodayJson(): String? {
-                        return viewModel.videoInTodayJson()
-                    }
-
-                    override fun randomNoteJson(): String? {
-                        return viewModel.randomNoteJson()
-                    }
-                }
-            ).apply {
-                modelClkListener = this@MainActivity
-            }
-            addItemDecoration(ModelListItemDecoration(0))
-        }
-    }
+//    private fun refreshModelList() {
+//        binding.modelList.apply {
+//            layoutManager = LinearLayoutManager(context)
+//            adapter = MainModelListAdapter(
+//                context,
+//                object : MainModelListAdapter.MainModelListAdapterDataProxy {
+//                    override fun photoInTodayJson(): String? {
+//                        return viewModel.photoInTodayJson()
+//                    }
+//
+//                    override fun videoInTodayJson(): String? {
+//                        return viewModel.videoInTodayJson()
+//                    }
+//
+//                    override fun randomNoteJson(): String? {
+//                        return viewModel.randomNoteJson()
+//                    }
+//                }
+//            ).apply {
+//                modelClkListener = this@MainActivity
+//            }
+//            addItemDecoration(ModelListItemDecoration(0))
+//        }
+//    }
 
     override fun onPhoto(json: String) {
         startActivity(GalleryViewActivity::class.intent.apply {
