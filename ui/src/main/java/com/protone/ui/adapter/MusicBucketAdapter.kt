@@ -94,7 +94,7 @@ class MusicBucketAdapter(context: Context, musicBucket: MusicBucket) :
         { holder, isSelect ->
             holder.binding.musicBucketBack.setBackgroundColor(
                 context.resources.getColor(
-                    if (isSelect) R.color.gray_2 else R.color.white,
+                    if (isSelect) R.color.gray_1 else R.color.white,
                     context.theme
                 )
             )

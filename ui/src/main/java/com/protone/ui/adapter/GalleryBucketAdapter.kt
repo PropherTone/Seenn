@@ -5,6 +5,8 @@ import android.content.Context
 import android.net.Uri
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
 import com.protone.api.baseType.getString
@@ -71,7 +73,13 @@ class GalleryBucketAdapter(
     }
 
     override val select: (holder: Holder<GalleryBucketListLayoutBinding>, isSelect: Boolean) -> Unit =
-        { holder, isSelect -> holder.binding.bucketCheck.isChecked = isSelect }
+        { holder, isSelect ->
+            holder.binding.bucketCheck.apply {
+                isChecked = isSelect
+                isVisible = isSelect
+            }
+
+        }
 
     override fun itemIndex(path: Pair<Uri, Array<String>>): Int {
         return galleries.indexOf(path)

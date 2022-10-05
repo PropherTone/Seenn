@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/masked">
-        <color android:color="@color/foreDark_1"/>
+        <color android:color="@color/foreDark"/>
     </item>
 
 </ripple>

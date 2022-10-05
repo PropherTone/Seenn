@@ -18,7 +18,7 @@
             android:id="@+id/music_cover_back"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@drawable/music_cover_back_round"
+            android:background="@drawable/oval_fore_dark"
             android:contentDescription="@string/icon"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="@id/music_back"
@@ -39,7 +39,7 @@
             app:layout_constraintEnd_toEndOf="@id/music_cover_back"
             app:layout_constraintStart_toStartOf="@id/music_cover_back"
             app:layout_constraintTop_toTopOf="@id/music_cover_back"
-            app:layout_constraintWidth_percent="0.11" />
+            app:layout_constraintWidth_percent="0.12" />
 
         <TextView
             android:id="@+id/music_name"

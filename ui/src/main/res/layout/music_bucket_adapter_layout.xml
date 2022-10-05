@@ -6,17 +6,14 @@
         android:id="@+id/musicBucket_card"
         android:layout_width="match_parent"
         android:layout_height="@dimen/list_item_height"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="@dimen/small_margin"
-        android:layout_marginEnd="6dp"
         app:cardBackgroundColor="@color/transparent"
-        app:cardCornerRadius="5dp"
+        app:cardCornerRadius="0dp"
         app:cardElevation="1dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/red_5">
+            android:background="@drawable/main_background">
 
             <ImageView
                 android:id="@+id/musicBucket_edit"
@@ -54,7 +51,6 @@
                 android:id="@+id/musicBucket_action"
                 android:layout_width="@dimen/small_Icon"
                 android:layout_height="@dimen/list_item_height"
-                android:background="@color/background_white"
                 android:contentDescription="@string/action"
                 android:src="@drawable/ic_baseline_more_vert_24_white"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -89,9 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/texts_margin"
-                android:layout_marginBottom="@dimen/texts_margin"
                 android:letterSpacing="0.05"
-                android:text=""
                 android:textSize="@dimen/title_text"
                 app:layout_constraintBottom_toBottomOf="@+id/musicBucket_time"
                 app:layout_constraintStart_toEndOf="@+id/musicBucket_icon"

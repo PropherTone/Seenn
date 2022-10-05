@@ -32,7 +32,7 @@
                 app:layout_constraintStart_toStartOf="@+id/controller"
                 app:layout_constraintTop_toTopOf="@+id/controller"
                 app:layout_constraintVertical_bias="0.24"
-                app:layout_constraintWidth_percent="0.6" />
+                app:layout_constraintWidth_percent="0.58" />
 
             <com.protone.ui.customView.SwitchImageView
                 android:id="@+id/music_cover"

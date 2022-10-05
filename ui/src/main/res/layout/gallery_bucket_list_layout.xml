@@ -39,9 +39,9 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <CheckBox
+        <RadioButton
             android:id="@+id/bucket_check"
-            style="@style/MyRoundCheckBox"
+            style="@style/BlueRadioCheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/main_padding"

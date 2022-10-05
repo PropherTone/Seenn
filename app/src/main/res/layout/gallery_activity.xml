@@ -20,14 +20,6 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/gallery_back"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_alignBottom="@id/gallery_tab"
-                android:background="@color/blue_1"
-                android:contentDescription="@string/back" />
-
-            <ImageView
                 android:layout_width="@dimen/smaller_Icon"
                 android:layout_height="@dimen/smaller_Icon"
                 android:layout_centerVertical="true"

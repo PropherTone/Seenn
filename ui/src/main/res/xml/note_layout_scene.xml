@@ -55,7 +55,7 @@
             app:layout_constraintEnd_toEndOf="parent">
             <CustomAttribute
                 app:attributeName="backgroundColor"
-                app:customColorValue="@color/blue_5" />
+                app:customColorValue="@color/main_color1" />
         </Constraint>
     </ConstraintSet>
 
@@ -112,7 +112,7 @@
             app:layout_constraintEnd_toEndOf="parent">
             <CustomAttribute
                 app:attributeName="backgroundColor"
-                app:customColorValue="@color/blue_1" />
+                app:customColorValue="@color/main_color2" />
         </Constraint>
     </ConstraintSet>
 

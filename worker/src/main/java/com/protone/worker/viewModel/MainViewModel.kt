@@ -17,7 +17,7 @@ class MainViewModel : BaseViewModel() {
     var btnY = 0f
     val btnH = SApplication.app.resources.getDimensionPixelSize(R.dimen.action_icon_p)
 
-    sealed class MainViewEvent : ViewEvent{
+    sealed class MainViewEvent : ViewEvent {
         object Gallery : MainViewEvent()
         object Music : MainViewEvent()
         object Note : MainViewEvent()
@@ -44,16 +44,16 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    fun photoInTodayJson(): String? {
-        return photoInToday()?.toJson()
+    suspend fun getPhotoInToday() = withContext(Dispatchers.Default) {
+        photoInToday()
     }
 
-    fun videoInTodayJson(): String? {
-        return videoInToday()?.toJson()
+    suspend fun getVideoInToday() = withContext(Dispatchers.Default) {
+        videoInToday()
     }
 
-    fun randomNoteJson(): String? {
-        return randomNote()?.toJson()
+    suspend fun getRandomNote() = withContext(Dispatchers.Default) {
+        randomNote()
     }
 
 }

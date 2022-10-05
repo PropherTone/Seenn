@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.protone.api.baseType.getString
+import com.protone.api.baseType.toDateString
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.onGlobalLayout
@@ -102,9 +103,22 @@ class MainActivity :
             startActivity(MusicViewActivity::class.intent)
         }
 
-//        refreshModelList()
+        onResume = {
+            userName = userConfig.userName
+            userIcon = userConfig.userIcon.also {
+                musicController.setInterceptAlbumCover(it.isEmpty())
+            }
+        }
+
+        onFinish = {
+            userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
+            userConfig.lastMusic = musicController.getPlayingMusic()?.toJson() ?: ""
+            DatabaseHelper.instance.shutdownNow()
+            stopService(WorkService::class.intent)
+        }
+
+        refreshModelList()
         bindMusicService {
-//            (binding.modelList.adapter as MainModelListAdapter).loadDataBelow()
             musicController.setBinder(this@MainActivity, it) { loopMode ->
                 userConfig.musicLoopMode = loopMode
             }
@@ -121,20 +135,6 @@ class MainActivity :
                     )
                 }
             }
-        }
-
-        onResume = {
-            userName = userConfig.userName
-            userIcon = userConfig.userIcon.also {
-                musicController.setInterceptAlbumCover(it.isEmpty())
-            }
-        }
-
-        onFinish = {
-            userConfig.lastMusicProgress = musicController.getProgress() ?: 0L
-            userConfig.lastMusic = musicController.getPlayingMusic()?.toJson() ?: ""
-            DatabaseHelper.instance.shutdownNow()
-            stopService(WorkService::class.intent)
         }
 
         onViewEvent {
@@ -155,30 +155,16 @@ class MainActivity :
         }
     }
 
-//    private fun refreshModelList() {
-//        binding.modelList.apply {
-//            layoutManager = LinearLayoutManager(context)
-//            adapter = MainModelListAdapter(
-//                context,
-//                object : MainModelListAdapter.MainModelListAdapterDataProxy {
-//                    override fun photoInTodayJson(): String? {
-//                        return viewModel.photoInTodayJson()
-//                    }
-//
-//                    override fun videoInTodayJson(): String? {
-//                        return viewModel.videoInTodayJson()
-//                    }
-//
-//                    override fun randomNoteJson(): String? {
-//                        return viewModel.randomNoteJson()
-//                    }
-//                }
-//            ).apply {
-//                modelClkListener = this@MainActivity
-//            }
-//            addItemDecoration(ModelListItemDecoration(0))
-//        }
-//    }
+    private suspend fun MainViewModel.refreshModelList() {
+        getPhotoInToday()?.let {
+            Glide.with(this@MainActivity).load(it.uri).into(binding.photoCardPhoto)
+            binding.photoCardTitle.text = it.date.toDateString("yyyy/MM/dd")
+        }
+        getVideoInToday()?.let {
+            binding.videoPlayer.setVideoPath(it.uri)
+            binding.videoCardTitle.text = it.date.toDateString()
+        }
+    }
 
     override fun onPhoto(json: String) {
         startActivity(GalleryViewActivity::class.intent.apply {

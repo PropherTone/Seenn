@@ -43,7 +43,7 @@ class MusicPlayerViewLite @JvmOverloads constructor(
     override fun setDetail(detail: String) {}
 
     init {
-        coverSwitcher.enableShapeAppearance = true
+        coverSwitcher.enableShapeAppearance = false
     }
 
 }
