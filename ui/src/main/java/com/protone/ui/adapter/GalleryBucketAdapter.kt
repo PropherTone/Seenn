@@ -78,7 +78,6 @@ class GalleryBucketAdapter(
                 isChecked = isSelect
                 isVisible = isSelect
             }
-
         }
 
     override fun itemIndex(path: Pair<Uri, Array<String>>): Int {

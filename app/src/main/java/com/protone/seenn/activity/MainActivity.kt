@@ -32,8 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity :
-    BaseActivity<MainActivityTempBinding, MainViewModel, MainViewModel.MainViewEvent>(true),
-    MainModelListAdapter.ModelClk {
+    BaseActivity<MainActivityTempBinding, MainViewModel, MainViewModel.MainViewEvent>(true) {
     override val viewModel: MainViewModel by viewModels()
 
     private var userName: String? = null
@@ -76,21 +75,8 @@ class MainActivity :
                     it.y = it.y + viewModel.btnH * 2
                     viewModel.btnY = it.y
                 }
-//                toolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-//                    binding.toolMotion.progress =
-//                        (-verticalOffset / appBarLayout.totalScrollRange.toFloat())
-//                }
                 musicPlayer.duration = userConfig.lastMusicProgress
             }
-//            modelList.apply {
-//                setPadding(
-//                    paddingLeft,
-//                    paddingTop,
-//                    paddingRight,
-//                    viewModel.btnH
-//                )
-//            }
-
         }
     }
 
@@ -159,27 +145,17 @@ class MainActivity :
         getPhotoInToday()?.let {
             Glide.with(this@MainActivity).load(it.uri).into(binding.photoCardPhoto)
             binding.photoCardTitle.text = it.date.toDateString("yyyy/MM/dd")
+            binding.timePhoto.setOnClickListener {
+                startActivity(GalleryViewActivity::class.intent.apply {
+                    putExtra(GalleryViewViewModel.MEDIA, it.toJson())
+                    putExtra(GalleryViewViewModel.TYPE, false)
+                    putExtra(GalleryViewViewModel.GALLERY, R.string.all_gallery.getString())
+                })
+            }
         }
         getVideoInToday()?.let {
             binding.videoPlayer.setVideoPath(it.uri)
             binding.videoCardTitle.text = it.date.toDateString()
         }
-    }
-
-    override fun onPhoto(json: String) {
-        startActivity(GalleryViewActivity::class.intent.apply {
-            putExtra(GalleryViewViewModel.MEDIA, json)
-            putExtra(GalleryViewViewModel.TYPE, false)
-            putExtra(GalleryViewViewModel.GALLERY, R.string.all_gallery.getString())
-        })
-    }
-
-    override fun onNote(json: String) {
-    }
-
-    override fun onVideo(json: String) {
-    }
-
-    override fun onMusic(json: String) {
     }
 }
