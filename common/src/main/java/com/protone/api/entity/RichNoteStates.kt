@@ -1,28 +1,14 @@
 package com.protone.api.entity
 
-import android.os.Parcel
-import android.text.TextUtils
-import android.util.Base64
+import com.protone.api.baseType.indexSpan
 
 data class RichNoteStates(val spanStates: List<SpanStates>) : RichStates(name = "") {
     var text: CharSequence? = ""
-        get() {
-            val parcel = Parcel.obtain()
-            return try {
-                val bytes = Base64.decode(field.toString(), Base64.DEFAULT)
-                parcel.unmarshall(bytes, 0, bytes.size)
-                parcel.setDataPosition(0)
-                TextUtils.CHAR_SEQUENCE_CREATOR.createFromParcel(parcel)
-            } catch (e: Exception) {
-                ""
-            } finally {
-                parcel.recycle()
-            }
-        }
+        get() = spanStates.let { field?.indexSpan(it) }
 
     constructor(text: CharSequence, spanStates: List<SpanStates>) : this(spanStates) {
         this.text = text
     }
 }
 
-data class RichNoteSer(val text: String, val spans: String)
+data class RichNoteSer(val text : String,val spans : String)

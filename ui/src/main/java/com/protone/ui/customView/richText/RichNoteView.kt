@@ -4,23 +4,15 @@ import android.animation.LayoutTransition
 import android.content.Context
 import android.graphics.*
 import android.net.Uri
-import android.os.Parcel
 import android.text.Editable
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.TextUtils
-import android.text.style.AbsoluteSizeSpan
-import android.text.style.StrikethroughSpan
-import android.text.style.StyleSpan
-import android.text.style.UnderlineSpan
+import android.text.Spanned
+import android.text.style.*
 import android.util.AttributeSet
-import android.util.Base64
 import android.view.KeyEvent
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
-import androidx.core.text.toSpannable
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
@@ -125,9 +117,10 @@ class RichNoteView @JvmOverloads constructor(
                         statesStrings[listSize--].toEntity(RichVideoStates::class.java)
                     }
                     else -> {
-                        val richNoteSer =
+                        val toEntity =
                             statesStrings[listSize--].toEntity(RichNoteSer::class.java)
-                        RichNoteStates(richNoteSer.text, mutableListOf())
+                        val toEntity1 = toEntity.spans.jsonToList(SpanStates::class.java)
+                        RichNoteStates(toEntity.text, toEntity1)
                     }
                 }
             )
@@ -195,19 +188,8 @@ class RichNoteView @JvmOverloads constructor(
                         taskChannel.offer(
                             Pair(
                                 RichNoteSer(
-                                    getEdittext(i)?.text?.let {
-                                        val parcel = Parcel.obtain()
-                                        try {
-                                            TextUtils.writeToParcel(it, parcel, 0)
-                                            val marshall = parcel.marshall()
-                                            String(Base64.encode(marshall, Base64.DEFAULT))
-                                        } catch (e: Exception) {
-                                            ""
-                                        } finally {
-                                            parcel.recycle()
-                                        }
-                                    } ?: "",
-                                    ""
+                                    getEdittext(i)?.text.toString(),
+                                    tag.spanStates.listToJson(SpanStates::class.java)
                                 ).toJson(), i
                             )
                         )
@@ -327,6 +309,14 @@ class RichNoteView @JvmOverloads constructor(
                             getCurRichStates().let {
                                 if (it is RichNoteStates) it.apply {
                                     text = s
+                                    if (s?.isEmpty() == true) (spanStates as ArrayList?)?.clear()
+                                    val iterator = (spanStates as ArrayList?)?.iterator()
+                                    while (iterator?.hasNext() == true) {
+                                        iterator.next().let { ss ->
+                                            if (ss.end > (s?.length ?: 0)) ss.end = s?.length ?: 0
+                                            if (ss.end <= ss.start) iterator.remove()
+                                        }
+                                    }
                                 }
                                 tag = it
                             }
@@ -426,28 +416,69 @@ class RichNoteView @JvmOverloads constructor(
      * Basic function for set span and update [RichNoteStates]
      *
      * @param span Target span
+     * @param targetSpan Enum that market the span
+     * @param iColor Use for [ForegroundColorSpan] and [BackgroundColorSpan],[String] and [Int] are Supported
+     * @param absoluteSize Use for [AbsoluteSizeSpan]
+     * @param relativeSize Use for [RelativeSizeSpan]
+     * @param scaleX Use for [ScaleXSpan]
+     * @param style Use for [StyleSpan]
+     * @param url Use for [URLSpan]
      */
-    private fun setEditTextSpan(span: Any) {
+    private fun setEditTextSpan(
+        span: Any,
+        targetSpan: SpanStates.Spans,
+        iColor: Any? = null,
+        absoluteSize: Int? = null,
+        relativeSize: Float? = null,
+        scaleX: Float? = null,
+        style: Int? = null,
+        url: String? = null
+    ) {
         getEdittext(curPosition)?.also {
             val start = it.selectionStart
             val end = it.selectionEnd
-            val spannableStringBuilder =
-                SpannableStringBuilder(Editable.Factory.getInstance().newEditable(it.text))
-            val subSequence = it.text.subSequence(start, end)
-            val spannable = subSequence.toSpannable()
-            spannable.removeSpan(span)
-            val replace = spannableStringBuilder.replace(start, end, spannable)
-            replace.setSpan(
+            it.text.setSpan(
                 span,
                 start,
                 end,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
-            it.text = replace
-            it.setSelection(start, end)
             getCurRichStates().let { rs ->
                 if (rs is RichNoteStates?) rs?.apply {
                     this.text = it.text
+                    (spanStates as ArrayList).let { spans ->
+                        val iterator = spans.iterator()
+                        while (iterator.hasNext()) {
+                            val next = iterator.next()
+                            if (next.targetSpan == targetSpan) {
+                                when {
+                                    next.start >= start && next.end <= end -> {
+                                        iterator.remove()
+                                    }
+                                    next.start >= start && next.end > end -> {
+                                        next.start = end
+                                    }
+                                    next.start < start && next.end <= end -> {
+                                        next.end = start
+                                    }
+                                }
+                            }
+                        }
+                        spans.add(
+                            SpanStates(
+                                start,
+                                end,
+                                targetSpan,
+                                iColor,
+                                absoluteSize,
+                                relativeSize,
+                                scaleX,
+                                style,
+                                url
+                            )
+                        )
+                    }
+
                 }
                 getEdittext(curPosition)?.tag = rs
             }
@@ -556,23 +587,31 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     override fun setBold() {
-        setEditTextSpan(StyleSpan(Typeface.BOLD))
+        setEditTextSpan(StyleSpan(Typeface.BOLD), SpanStates.Spans.StyleSpan, style = Typeface.BOLD)
     }
 
     override fun setItalic() {
-        setEditTextSpan(StyleSpan(Typeface.ITALIC))
+        setEditTextSpan(
+            StyleSpan(Typeface.ITALIC),
+            SpanStates.Spans.StyleSpan,
+            style = Typeface.ITALIC
+        )
     }
 
     override fun setSize(size: Int) {
-        setEditTextSpan(AbsoluteSizeSpan(size))
+        setEditTextSpan(
+            AbsoluteSizeSpan(size),
+            SpanStates.Spans.AbsoluteSizeSpan,
+            absoluteSize = size
+        )
     }
 
     override fun setUnderlined() {
-        setEditTextSpan(UnderlineSpan())
+        setEditTextSpan(UnderlineSpan(), SpanStates.Spans.UnderlineSpan)
     }
 
     override fun setStrikethrough() {
-        setEditTextSpan(StrikethroughSpan())
+        setEditTextSpan(StrikethroughSpan(), SpanStates.Spans.StrikeThroughSpan)
     }
 
     override fun setColor(color: Any) {
@@ -581,7 +620,7 @@ class RichNoteView @JvmOverloads constructor(
                 is Int -> ColorSpan(color)
                 is String -> ColorSpan(color)
                 else -> ColorSpan(Color.BLACK)
-            }
+            }, SpanStates.Spans.ForegroundColorSpan, iColor = color
         )
     }
 
