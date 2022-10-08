@@ -4,23 +4,24 @@ import android.animation.LayoutTransition
 import android.content.Context
 import android.graphics.*
 import android.net.Uri
+import android.os.Parcel
 import android.text.Editable
 import android.text.Spanned
+import android.text.TextUtils
 import android.text.style.*
 import android.util.AttributeSet
+import android.util.Base64
 import android.view.KeyEvent
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
-import androidx.core.text.getSpans
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import com.bumptech.glide.Glide
 import com.protone.api.baseType.deleteFile
 import com.protone.api.baseType.imageSaveToDisk
-import com.protone.api.baseType.indexSpan
 import com.protone.api.baseType.toBitmap
 import com.protone.api.context.SApplication
 import com.protone.api.context.newLayoutInflater
@@ -119,10 +120,9 @@ class RichNoteView @JvmOverloads constructor(
                         statesStrings[listSize--].toEntity(RichVideoStates::class.java)
                     }
                     else -> {
-                        val toEntity =
+                        val richNoteSer =
                             statesStrings[listSize--].toEntity(RichNoteSer::class.java)
-                        val toEntity1 = toEntity.spans.jsonToList(SpanStates::class.java)
-                        RichNoteStates(toEntity.text, toEntity1)
+                        RichNoteStates(richNoteSer.text, mutableListOf())
                     }
                 }
             )
@@ -190,8 +190,19 @@ class RichNoteView @JvmOverloads constructor(
                         taskChannel.offer(
                             Pair(
                                 RichNoteSer(
-                                    getEdittext(i)?.text.toString(),
-                                    tag.spanStates.listToJson(SpanStates::class.java)
+                                    getEdittext(i)?.text?.let {
+                                        val parcel = Parcel.obtain()
+                                        try {
+                                            TextUtils.writeToParcel(it, parcel, 0)
+                                            val marshall = parcel.marshall()
+                                            String(Base64.encode(marshall, Base64.DEFAULT))
+                                        } catch (e: Exception) {
+                                            ""
+                                        }finally {
+                                            parcel.recycle()
+                                        }
+                                    } ?: "",
+                                    ""
                                 ).toJson(), i
                             )
                         )
@@ -262,7 +273,7 @@ class RichNoteView @JvmOverloads constructor(
             )
             if (spans.isNotEmpty() && spans.size == 1) {
                 spans[0].size
-            }else getEdittext(curPosition)?.textSize?.toInt()
+            } else getEdittext(curPosition)?.textSize?.toInt()
         } ?: 20
 
     private fun insertText(note: RichNoteStates) {

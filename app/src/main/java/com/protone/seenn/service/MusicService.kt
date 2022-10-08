@@ -34,7 +34,8 @@ import kotlin.system.exitProcess
 /**
  * MusicService by ProTone 2022/03/23
  */
-class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Default), IMusicService,
+class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Default),
+    IMusicService,
     MediaPlayer.OnCompletionListener {
 
     companion object {
@@ -60,6 +61,21 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
             }
             return field
         }
+
+    private fun initMusicPlayer(): MediaPlayer? {
+        if (playList.isEmpty()) return null
+        if (musicPlayer == null) {
+
+            musicPlayer = MediaPlayer.create(
+                SApplication.app,
+                playList[playPosition.get()].uri
+            ).also {
+                it.setOnCompletionListener(this)
+            }
+        }
+        return musicPlayer
+    }
+
     private var progressTimer: Timer? = null
 
     private val mutex by lazy { Mutex() }
@@ -244,6 +260,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
     override fun play(music: Music?) {
         launch {
             mutex.withLock {
+                finishMusic()
                 if (playList.isEmpty()) {
                     currentMusic.postValue(getEmptyMusic())
                     return@launch
@@ -254,9 +271,8 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
                     }
                     val index = playList.indexOf(music)
                     playPosition.set(index)
-                    finishMusic()
                 }
-                musicPlayer?.apply {
+                initMusicPlayer()?.apply {
                     start()
                     currentMusic.postValue(playList[playPosition.get()])
                     playState.postValue(true)
@@ -274,7 +290,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
 
     override fun pause() {
         launch {
-            synchronized(this@MusicService) {
+            mutex.withLock {
                 if (musicPlayer?.isPlaying == true)
                     musicPlayer?.apply {
                         pause()
@@ -357,13 +373,11 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
     }
 
     private fun finishMusic() {
-        synchronized(this@MusicService) {
-            musicPlayer?.apply {
-                stop()
-                reset()
-                release()
-                musicPlayer = null
-            }
+        musicPlayer?.apply {
+            stop()
+            reset()
+            release()
+            musicPlayer = null
         }
     }
 
