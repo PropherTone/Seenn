@@ -3,7 +3,6 @@ package com.protone.seenn.activity
 import android.content.Intent
 import android.graphics.drawable.Animatable
 import android.net.Uri
-import android.text.style.AbsoluteSizeSpan
 import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
@@ -18,6 +17,7 @@ import com.protone.api.json.toJson
 import com.protone.api.json.toUri
 import com.protone.seenn.R
 import com.protone.seenn.databinding.NoteEditActivityBinding
+import com.protone.ui.customView.richText.RichNoteImageLoader
 import com.protone.ui.customView.richText.note.spans.ISpanForUse
 import com.protone.ui.dialog.imageListDialog
 import com.protone.ui.popWindows.ColorfulPopWindow
@@ -59,6 +59,7 @@ class NoteEditActivity :
                 }
             }
             noteEditRichNote.isEditable = true
+            noteEditRichNote.setImageLoader(RichNoteImageLoader())
         }
     }
 
@@ -211,7 +212,9 @@ class NoteEditActivity :
                 finish()
             }
         } else if (insertNote(
-                note.apply { saveIcon(checkedTitle)?.let { imagePath = it } },
+                note.apply {
+                    imagePath = saveIcon(checkedTitle)
+                },
                 intent.getStringExtra(NoteEditViewModel.NOTE_DIR)
             )
         ) {

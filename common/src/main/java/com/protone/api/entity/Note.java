@@ -103,7 +103,8 @@ public class Note {
         if (richCode != note.richCode) return false;
         if (!title.equals(note.title)) return false;
         if (!text.equals(note.text)) return false;
-        if (!imagePath.equals(note.imagePath)) return false;
+        if (imagePath == null || note.imagePath == null || !imagePath.equals(note.imagePath))
+            return false;
         return time.equals(note.time);
     }
 

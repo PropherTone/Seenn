@@ -12,6 +12,7 @@ import com.protone.api.entity.Note
 import com.protone.api.json.toJson
 import com.protone.seenn.databinding.NoteViewActivityBinding
 import com.protone.seenn.service.MusicService
+import com.protone.ui.customView.richText.RichNoteImageLoader
 import com.protone.ui.customView.richText.RichNoteView
 import com.protone.worker.R
 import com.protone.worker.viewModel.GalleryViewViewModel
@@ -28,6 +29,7 @@ class NoteViewActivity :
     override fun createView(): NoteViewActivityBinding {
         return NoteViewActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@NoteViewActivity
+            noteEditRichNote.setImageLoader(RichNoteImageLoader())
         }
     }
 

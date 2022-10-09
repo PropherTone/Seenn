@@ -30,7 +30,7 @@ data class SpanStates(
         SubscriptSpan,//下标（数学公式会用到）
         SuperscriptSpan,//上标（数学公式会用到）
         TypefaceSpan,//文本字体
-        URLSpan// 文本超链接
+        URLSpan;// 文本超链接
     }
 
     private fun getColorSpan(back: Boolean): CharacterStyle? =

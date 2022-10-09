@@ -42,7 +42,9 @@ class NoteEditViewModel : BaseViewModel() {
             if (!it.isNullOrEmpty()) {
                 it
             } else {
-                R.string.failed_upload_image.getString().toast()
+                if (null == iconUri) {
+                    R.string.failed_upload_image.getString().toast()
+                }
                 iconUri?.toUriJson()
             }
         }

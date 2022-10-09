@@ -21,6 +21,7 @@ suspend fun Uri.imageSaveToFile(
     w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
     h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
 ) = withContext(Dispatchers.IO) {
+    if (this == Uri.EMPTY) return@withContext null
     toBitmap(w, h)?.let {
         try {
             it.saveToFile("$fileName.png", dir)
@@ -39,6 +40,7 @@ suspend fun Uri.imageSaveToDisk(
     w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
     h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
 ): String? {
+    if (this == Uri.EMPTY) return null
     var exists = false
     var hasBytes = true
     return onResult {
@@ -76,7 +78,7 @@ suspend fun Uri.toBitmap(
     w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
     h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
 ): Bitmap? = onResult {
-    it.resumeWith(Result.success(
+    if (this != Uri.EMPTY) it.resumeWith(Result.success(
         toMediaBitmap(w, h) ?: try {
             toBitmapByteArray()?.let { byteArray ->
                 BitmapFactory.decodeByteArray(
@@ -92,6 +94,7 @@ suspend fun Uri.toBitmap(
 }
 
 fun Uri.toMediaBitmap(w: Int, h: Int): Bitmap? {
+    if (this == Uri.EMPTY) return null
     var ois = try {
         SApplication.app.contentResolver.openInputStream(this)
     } catch (e: FileNotFoundException) {

@@ -2,7 +2,6 @@ package com.protone.seenn.activity
 
 import androidx.activity.viewModels
 import androidx.core.view.isGone
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.protone.api.baseType.getString
@@ -15,13 +14,10 @@ import com.protone.api.entity.Music
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.todayDate
-import com.protone.seenn.databinding.MainActivityBinding
 import com.protone.seenn.databinding.MainActivityTempBinding
 import com.protone.seenn.service.WorkService
 import com.protone.seenn.service.getEmptyMusic
 import com.protone.seenn.viewModel.MusicControllerIMP
-import com.protone.ui.adapter.MainModelListAdapter
-import com.protone.ui.itemDecoration.ModelListItemDecoration
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.userConfig
@@ -122,6 +118,8 @@ class MainActivity :
                 }
             }
         }
+
+        binding.noteBook.performClick()
 
         onViewEvent {
             when (it) {

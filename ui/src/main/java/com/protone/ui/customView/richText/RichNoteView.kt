@@ -2,13 +2,15 @@ package com.protone.ui.customView.richText
 
 import android.animation.LayoutTransition
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Typeface
 import android.net.Uri
 import android.text.Editable
-import android.text.Spanned
-import android.text.style.*
+import android.text.style.AbsoluteSizeSpan
 import android.util.AttributeSet
 import android.view.KeyEvent
+import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.AttrRes
@@ -16,33 +18,15 @@ import androidx.annotation.StyleRes
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
-import com.bumptech.glide.Glide
-import com.protone.api.baseType.deleteFile
-import com.protone.api.baseType.imageSaveToDisk
-import com.protone.api.baseType.toBitmap
-import com.protone.api.context.SApplication
 import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.*
-import com.protone.api.json.jsonToList
-import com.protone.api.json.listToJson
-import com.protone.api.json.toEntity
-import com.protone.api.json.toJson
-import com.protone.api.onResult
-import com.protone.ui.R
 import com.protone.ui.customView.musicPlayer.BaseMusicPlayer
+import com.protone.ui.customView.richText.note.IRichNoteImageLoader
 import com.protone.ui.customView.richText.note.MyTextWatcher
 import com.protone.ui.customView.richText.note.spans.ISpanForEditor
 import com.protone.ui.databinding.RichMusicLayoutBinding
 import com.protone.ui.databinding.RichPhotoLayoutBinding
 import com.protone.ui.databinding.VideoCardBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
 
 /**
  * RichText editor by ProTone 2022/4/15
@@ -57,21 +41,12 @@ class RichNoteView @JvmOverloads constructor(
     var isEditable: Boolean = false
 ) : LinearLayout(context, attrs, defStyleAttr, defStyleRes), ISpanForEditor {
 
-    companion object {
-        const val TEXT = 0X01
-        const val PHOTO = 0X02
-        const val MUSIC = 0x03
-        const val VIDEO = 0x04
-    }
-
     private var curPlaying = 0
-    private var curPosition = 0
     private var isPlaying = false
-    private var inIndex = false
-
-    private val deletedMedias by lazy { mutableListOf<String>() }
 
     var iRichListener: IRichListener? = null
+
+    private val noteHandler = RichNoteHandler(this)
 
     init {
         orientation = VERTICAL
@@ -85,147 +60,20 @@ class RichNoteView @JvmOverloads constructor(
      */
     suspend fun setRichList(list: List<RichStates>) {
         removeAllViews()
-
-        inIndex = true
-        list.forEach {
-            when (it) {
-                is RichNoteStates -> insertText(it)
-                is RichVideoStates -> insertVideo(it)
-                is RichPhotoStates -> insertImage(it, it.uri.toBitmap())
-                is RichMusicStates -> insertMusic(it)
-            }
-            curPosition++
-        }
-        inIndex = false
+        noteHandler.setRichList(list)
     }
 
     suspend fun setRichList(richCode: Int, text: String) {
-        var code = richCode
-        val statesStrings = text.jsonToList(String::class.java)
-        var listSize = statesStrings.size - 1
-        val richList = arrayListOf<RichStates>()
-        while (code > 0) {
-            richList.add(
-                when (code % 10) {
-                    PHOTO -> {
-                        statesStrings[listSize--].toEntity(RichPhotoStates::class.java)
-                    }
-                    MUSIC -> {
-                        statesStrings[listSize--].toEntity(RichMusicStates::class.java)
-                    }
-                    VIDEO -> {
-                        statesStrings[listSize--].toEntity(RichVideoStates::class.java)
-                    }
-                    else -> {
-                        val toEntity =
-                            statesStrings[listSize--].toEntity(RichNoteSer::class.java)
-                        val toEntity1 = toEntity.spans.jsonToList(SpanStates::class.java)
-                        RichNoteStates(toEntity.text, toEntity1)
-                    }
-                }
-            )
-            code /= 10
-        }
-        setRichList(richList.reversed())
+        noteHandler.setRichList(richCode, text)
     }
 
-    /**
-     * Indexing rich note for database to store
-     *
-     * @return [Pair]
-     * <[Int],[String]>
-     *
-     * [Int] : A sort of number that mark the [RichStates] from left to right
-     *
-     * [String] : Json of [RichStates]>
-     */
     suspend fun indexRichNote(
         title: String,
         onSaveResult: suspend (ArrayList<Uri>) -> Boolean
-    ): Pair<Int, String> {
-        val richArray = arrayOfNulls<String>(childCount)
-        val richSer = arrayListOf<String>()
-        val reList = arrayListOf<Uri>()
-        val taskChannel = Channel<Pair<String, Int>>(Channel.UNLIMITED)
-        var richStates = 0
-        var count = 0
-        return onResult(Dispatchers.Default) {
-            async(Dispatchers.IO) {
-                deletedMedias.forEach {
-                    it.deleteFile()
-                }
-            }.start()
-            async(Dispatchers.Default) {
-                while (isActive) {
-                    taskChannel.receiveAsFlow().buffer().collect {
-                        if (it.second < childCount) {
-                            richArray[it.second] = it.first
-                            count++
-                        }
-                        if (count >= childCount) {
-                            taskChannel.close()
-                        }
-                    }
-                    if (withContext(Dispatchers.Main) {
-                            onSaveResult.invoke(reList)
-                        }) {
-                        richArray.onEach {
-                            it?.let { state ->
-                                richSer.add(state)
-                            }
-                        }
-                        it.resumeWith(
-                            Result.success(Pair(richStates, richSer.listToJson(String::class.java)))
-                        )
-                    }
-                    break
-                }
-            }.start()
-            for (i in 0 until childCount) {
-                when (val tag = getChildAt(i).tag) {
-                    is RichNoteStates -> {
-                        richStates = richStates * 10 + TEXT
-                        taskChannel.offer(
-                            Pair(
-                                RichNoteSer(
-                                    getEdittext(i)?.text.toString(),
-                                    tag.spanStates.listToJson(SpanStates::class.java)
-                                ).toJson(), i
-                            )
-                        )
-                    }
-                    is RichVideoStates -> {
-                        richStates = richStates * 10 + VIDEO
-                        taskChannel.offer(Pair(tag.toJson(), i))
-                    }
-                    is RichPhotoStates -> {
-                        richStates = richStates * 10 + PHOTO
-                        val child = getChildAt(i)
-                        if (tag.path != null) {
-                            taskChannel.offer(Pair(tag.toJson(), i))
-                        } else async(Dispatchers.IO) {
-                            tag.uri.imageSaveToDisk(
-                                tag.name + "_${title}",
-                                dir = title,
-                                w = child.measuredWidth,
-                                h = child.measuredHeight
-                            )?.let {
-                                if (tag.path == null) {
-                                    tag.path = it
-                                } else {
-                                    reList.add(tag.uri)
-                                }
-                            }
-                            taskChannel.offer(Pair(tag.toJson(), i))
-                        }.start()
-                    }
-                    is RichMusicStates -> {
-                        richStates = richStates * 10 + MUSIC
-                        taskChannel.offer(Pair(tag.toJson(), i))
-                    }
-                }
-            }
-        }
+    ): Pair<Int, String> = noteHandler.indexRichNote(title, childCount, onSaveResult)
+
+    fun setImageLoader(loader: IRichNoteImageLoader) {
+        noteHandler.imageLoader = loader
     }
 
     fun setMusicProgress(progress: Long) {
@@ -237,7 +85,7 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     fun setMusicDuration(duration: Long) {
-        getChildAt(curPosition)?.let {
+        noteHandler.getCurrentChild()?.let {
             if (it is BaseMusicPlayer) {
                 it.duration = duration
             }
@@ -252,18 +100,18 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     fun getSelectionTextSize() =
-        getEdittext(curPosition)?.text?.let {
-            val spans = it.getSpans(
-                0,
-                it.length,
+        noteHandler.getCurrentEditText()?.let {
+            val spans = it.text.getSpans(
+                it.selectionStart,
+                it.selectionEnd,
                 AbsoluteSizeSpan::class.java
             )
             if (spans.isNotEmpty() && spans.size == 1) {
                 spans[0].size
-            } else getEdittext(curPosition)?.textSize?.toInt()
+            } else it.textSize.toInt()
         } ?: 20
 
-    private fun insertText(note: RichNoteStates) {
+    override fun insertText(note: RichNoteStates) {
         addView(when (isEditable) {
             true ->
                 EditText(context).apply {
@@ -289,7 +137,7 @@ class RichNoteView @JvmOverloads constructor(
                                     if (it is ImageView) {
                                         if (it.tag != null && it.tag is RichPhotoStates) {
                                             (it.tag as RichPhotoStates).path?.let { path ->
-                                                deletedMedias.add(path)
+                                                noteHandler.addDeleteMedias(path)
                                             }
                                         }
                                     }
@@ -305,18 +153,10 @@ class RichNoteView @JvmOverloads constructor(
                     }
                     addTextChangedListener(object : MyTextWatcher {
                         override fun afterTextChanged(s: Editable?) {
-                            if (!inIndex) curPosition = this@RichNoteView.indexOfChild(this@apply)
-                            getCurRichStates().let {
+                            noteHandler.updatePosition(this@RichNoteView.indexOfChild(this@apply))
+                            noteHandler.getCurRichStates().let {
                                 if (it is RichNoteStates) it.apply {
                                     text = s
-                                    if (s?.isEmpty() == true) (spanStates as ArrayList?)?.clear()
-                                    val iterator = (spanStates as ArrayList?)?.iterator()
-                                    while (iterator?.hasNext() == true) {
-                                        iterator.next().let { ss ->
-                                            if (ss.end > (s?.length ?: 0)) ss.end = s?.length ?: 0
-                                            if (ss.end <= ss.start) iterator.remove()
-                                        }
-                                    }
                                 }
                                 tag = it
                             }
@@ -324,11 +164,11 @@ class RichNoteView @JvmOverloads constructor(
                     })
                     setOnFocusChangeListener { _, hasFocus ->
                         if (hasFocus) {
-                            if (!inIndex) curPosition = this@RichNoteView.indexOfChild(this)
+                            noteHandler.updatePosition(this@RichNoteView.indexOfChild(this@apply))
                         }
                     }
                     setOnClickListener {
-                        if (!inIndex) curPosition = this@RichNoteView.indexOfChild(this)
+                        noteHandler.updatePosition(this@RichNoteView.indexOfChild(this@apply))
                     }
                     setOnTouchListener { _, _ ->
                         this@RichNoteView.indexOfChild(this)
@@ -347,39 +187,10 @@ class RichNoteView @JvmOverloads constructor(
             }
         }).run {
             this@RichNoteView.requestFocus()
-            getEdittext(curPosition)?.also {
+            noteHandler.getCurrentEditText()?.also {
                 it.requestFocus()
                 it.performClick()
             }
-        }
-    }
-
-    private fun getBitmapWH(dba: Bitmap): IntArray? {
-        return try {
-            val height = dba.height
-            val width = dba.width
-            val index = width / height
-            val bmH = SApplication.screenWidth / index
-            intArrayOf(SApplication.screenWidth, bmH)
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    private fun getWHFromPath(path: String?): IntArray? {
-        return try {
-            val option = BitmapFactory.Options().apply {
-                inJustDecodeBounds = true
-            }
-            val dba = path?.toBitmap(option) ?: return null
-            val height = dba.height
-            val width = dba.width
-            val index = width / height
-            val bmH = SApplication.screenWidth / index
-            dba.recycle()
-            intArrayOf(SApplication.screenWidth, bmH)
-        } catch (e: Exception) {
-            null
         }
     }
 
@@ -389,8 +200,8 @@ class RichNoteView @JvmOverloads constructor(
      * @param func Callback used for custom
      */
     private inline fun insertMedia(func: (Int) -> Unit) {
-        var insertPosition = curPosition
-        if (!inIndex) {
+        var insertPosition = noteHandler.curPosition
+        if (!noteHandler.inIndex) {
             //While inserting a view,delete the empty edittext at the top of the target(Image)
             if (isEditable && insertPosition in 0 until childCount) {
                 val child = getChildAt(insertPosition)
@@ -400,121 +211,16 @@ class RichNoteView @JvmOverloads constructor(
                 }
             }
         }
-        var index = insertPosition + if (!inIndex) 1 else 0
+        var index = insertPosition + if (!noteHandler.inIndex) 1 else 0
         if (index >= childCount) index = childCount
         func(index)
         //Insert a edittext to make sure there have a place for input
-        if (isEditable && !inIndex) insertText(
+        if (isEditable && !noteHandler.inIndex) insertText(
             RichNoteStates(
                 "",
                 arrayListOf()
             )
         )
-    }
-
-    /**
-     * Basic function for set span and update [RichNoteStates]
-     *
-     * @param span Target span
-     * @param targetSpan Enum that market the span
-     * @param iColor Use for [ForegroundColorSpan] and [BackgroundColorSpan],[String] and [Int] are Supported
-     * @param absoluteSize Use for [AbsoluteSizeSpan]
-     * @param relativeSize Use for [RelativeSizeSpan]
-     * @param scaleX Use for [ScaleXSpan]
-     * @param style Use for [StyleSpan]
-     * @param url Use for [URLSpan]
-     */
-    private fun setEditTextSpan(
-        span: Any,
-        targetSpan: SpanStates.Spans,
-        iColor: Any? = null,
-        absoluteSize: Int? = null,
-        relativeSize: Float? = null,
-        scaleX: Float? = null,
-        style: Int? = null,
-        url: String? = null
-    ) {
-        getEdittext(curPosition)?.also {
-            val start = it.selectionStart
-            val end = it.selectionEnd
-            it.text.setSpan(
-                span,
-                start,
-                end,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-            getCurRichStates().let { rs ->
-                if (rs is RichNoteStates?) rs?.apply {
-                    this.text = it.text
-                    (spanStates as ArrayList).let { spans ->
-                        val iterator = spans.iterator()
-                        while (iterator.hasNext()) {
-                            val next = iterator.next()
-                            if (next.targetSpan == targetSpan) {
-                                when {
-                                    next.start >= start && next.end <= end -> {
-                                        iterator.remove()
-                                    }
-                                    next.start >= start && next.end > end -> {
-                                        next.start = end
-                                    }
-                                    next.start < start && next.end <= end -> {
-                                        next.end = start
-                                    }
-                                }
-                            }
-                        }
-                        spans.add(
-                            SpanStates(
-                                start,
-                                end,
-                                targetSpan,
-                                iColor,
-                                absoluteSize,
-                                relativeSize,
-                                scaleX,
-                                style,
-                                url
-                            )
-                        )
-                    }
-
-                }
-                getEdittext(curPosition)?.tag = rs
-            }
-        }
-    }
-
-    /**
-     * Get edittext
-     *
-     * @param position target
-     * @return [EditText] or null when target is not [EditText] or caught [IndexOutOfBoundsException]
-     */
-    private fun getEdittext(position: Int): EditText? {
-        return try {
-            getChildAt(position).let {
-                if (it is EditText) it else null
-            }
-        } catch (e: IndexOutOfBoundsException) {
-            null
-        }
-    }
-
-    /**
-     * Get current [RichStates]
-     *
-     * @return [RichStates] or null when caught [IndexOutOfBoundsException]
-     */
-    private fun getCurRichStates(): RichStates? {
-        return try {
-            when (getChildAt(curPosition).tag) {
-                is RichStates -> getChildAt(curPosition).tag as RichStates
-                else -> null
-            }
-        } catch (e: IndexOutOfBoundsException) {
-            null
-        }
     }
 
     override fun insertVideo(video: RichVideoStates) = insertMedia {
@@ -553,26 +259,17 @@ class RichNoteView @JvmOverloads constructor(
         }.root.also { r -> r.tag = music }, it)
     }
 
+    override fun getChild(index: Int): View? = getChildAt(index)
+
     override fun insertImage(photo: RichPhotoStates, ba: Bitmap?) = insertMedia {
         addView(RichPhotoLayoutBinding.inflate(context.newLayoutInflater, this, false).apply {
             if (ba == null && photo.path == null) {
-                Glide.with(context).asDrawable()
-                    .load(R.drawable.ic_baseline_error_outline_24_black)
-                    .into(this.richPhotoIv)
+                noteHandler.imageLoader?.loadError(context, this.richPhotoIv)
             } else if (photo.path != null) {
                 ba?.recycle()
-                val bitmapWH = getWHFromPath(photo.path)
-                Glide.with(context).asDrawable()
-                    .load(photo.path).error(R.drawable.ic_baseline_error_outline_24_black)
-                    .let { glide ->
-                        if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
-                    }.into(this.richPhotoIv)
+                noteHandler.imageLoader?.loadImage(context, photo.path, this.richPhotoIv)
             } else if (ba != null) {
-                val bitmapWH = getBitmapWH(ba)
-                Glide.with(context).asDrawable().load(photo.uri)
-                    .error(R.drawable.ic_baseline_error_outline_24_black).let { glide ->
-                        if (bitmapWH != null) glide.override(bitmapWH[0], bitmapWH[1]) else glide
-                    }.into(this.richPhotoIv)
+                noteHandler.imageLoader?.loadImage(context, ba, this.richPhotoIv)
                 richPhotoTitle.text = photo.name
                 richPhotoDetail.text = photo.date
             }
@@ -587,41 +284,27 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     override fun setBold() {
-        setEditTextSpan(StyleSpan(Typeface.BOLD), SpanStates.Spans.StyleSpan, style = Typeface.BOLD)
+        noteHandler.setEditTextSpan(SpanStates.Spans.StyleSpan, style = Typeface.BOLD)
     }
 
     override fun setItalic() {
-        setEditTextSpan(
-            StyleSpan(Typeface.ITALIC),
-            SpanStates.Spans.StyleSpan,
-            style = Typeface.ITALIC
-        )
+        noteHandler.setEditTextSpan(SpanStates.Spans.StyleSpan, style = Typeface.ITALIC)
     }
 
     override fun setSize(size: Int) {
-        setEditTextSpan(
-            AbsoluteSizeSpan(size),
-            SpanStates.Spans.AbsoluteSizeSpan,
-            absoluteSize = size
-        )
+        noteHandler.setEditTextSpan(SpanStates.Spans.AbsoluteSizeSpan, absoluteSize = size)
     }
 
     override fun setUnderlined() {
-        setEditTextSpan(UnderlineSpan(), SpanStates.Spans.UnderlineSpan)
+        noteHandler.setEditTextSpan(SpanStates.Spans.UnderlineSpan)
     }
 
     override fun setStrikethrough() {
-        setEditTextSpan(StrikethroughSpan(), SpanStates.Spans.StrikeThroughSpan)
+        noteHandler.setEditTextSpan(SpanStates.Spans.StrikeThroughSpan)
     }
 
     override fun setColor(color: Any) {
-        setEditTextSpan(
-            when (color) {
-                is Int -> ColorSpan(color)
-                is String -> ColorSpan(color)
-                else -> ColorSpan(Color.BLACK)
-            }, SpanStates.Spans.ForegroundColorSpan, iColor = color
-        )
+        noteHandler.setEditTextSpan(SpanStates.Spans.ForegroundColorSpan, iColor = color)
     }
 
     interface IRichListener {
