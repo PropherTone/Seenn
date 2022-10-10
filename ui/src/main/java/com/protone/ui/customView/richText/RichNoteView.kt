@@ -8,11 +8,14 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.text.Editable
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
@@ -124,6 +127,12 @@ class RichNoteView @JvmOverloads constructor(
                     textSize = 18f
                     setTextColor(Color.BLACK)
                     background = null
+                    inputType = EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                    setSpannableFactory(object : Spannable.Factory() {
+                        override fun newSpannable(source: CharSequence?): Spannable {
+                            return SpannableStringBuilder(source)
+                        }
+                    })
                     setText(note.text, TextView.BufferType.SPANNABLE)
                     setOnKeyListener { _, keyCode, event ->
                         //Noticed if no text to delete when delete key pressed
@@ -185,6 +194,12 @@ class RichNoteView @JvmOverloads constructor(
                 )
                 textSize = 18f
                 setTextColor(Color.BLACK)
+                setSpannableFactory(object : Spannable.Factory() {
+                    override fun newSpannable(source: CharSequence?): Spannable {
+                        return SpannableStringBuilder(source)
+                    }
+                })
+                setText(note.text,TextView.BufferType.SPANNABLE)
                 text = note.text
             }
         }).run {
