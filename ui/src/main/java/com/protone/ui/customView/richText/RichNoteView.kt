@@ -4,6 +4,7 @@ import android.animation.LayoutTransition
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.text.Editable
@@ -20,10 +21,11 @@ import androidx.core.view.isVisible
 import androidx.core.widget.NestedScrollView
 import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.*
+import com.protone.api.note.IRichNoteImageLoader
+import com.protone.api.note.MyTextWatcher
+import com.protone.api.spans.ISpanForEditor
+import com.protone.api.spans.SpanStates
 import com.protone.ui.customView.musicPlayer.BaseMusicPlayer
-import com.protone.ui.customView.richText.note.IRichNoteImageLoader
-import com.protone.ui.customView.richText.note.MyTextWatcher
-import com.protone.ui.customView.richText.note.spans.ISpanForEditor
 import com.protone.ui.databinding.RichMusicLayoutBinding
 import com.protone.ui.databinding.RichPhotoLayoutBinding
 import com.protone.ui.databinding.VideoCardBinding
@@ -119,9 +121,10 @@ class RichNoteView @JvmOverloads constructor(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     )
-                    textSize = 20f
+                    textSize = 18f
+                    setTextColor(Color.BLACK)
                     background = null
-                    setText(note.text)
+                    setText(note.text, TextView.BufferType.SPANNABLE)
                     setOnKeyListener { _, keyCode, event ->
                         //Noticed if no text to delete when delete key pressed
                         if (keyCode == KeyEvent.KEYCODE_DEL &&
@@ -144,7 +147,7 @@ class RichNoteView @JvmOverloads constructor(
                                 }
                                 //Insert new edittext when there is no input place
                                 if (--indexOfChild >= 0 && getChildAt(indexOfChild) !is EditText || childCount <= 0) {
-                                    insertText(RichNoteStates("", arrayListOf()))
+                                    insertText(RichNoteStates(""))
                                 }
                             }
 
@@ -155,9 +158,7 @@ class RichNoteView @JvmOverloads constructor(
                         override fun afterTextChanged(s: Editable?) {
                             noteHandler.updatePosition(this@RichNoteView.indexOfChild(this@apply))
                             noteHandler.getCurRichStates().let {
-                                if (it is RichNoteStates) it.apply {
-                                    text = s
-                                }
+                                if (it is RichNoteStates) it.apply { text = s }
                                 tag = it
                             }
                         }
@@ -182,7 +183,8 @@ class RichNoteView @JvmOverloads constructor(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-                textSize = 20f
+                textSize = 18f
+                setTextColor(Color.BLACK)
                 text = note.text
             }
         }).run {
@@ -215,12 +217,7 @@ class RichNoteView @JvmOverloads constructor(
         if (index >= childCount) index = childCount
         func(index)
         //Insert a edittext to make sure there have a place for input
-        if (isEditable && !noteHandler.inIndex) insertText(
-            RichNoteStates(
-                "",
-                arrayListOf()
-            )
-        )
+        if (isEditable && !noteHandler.inIndex) insertText(RichNoteStates(""))
     }
 
     override fun insertVideo(video: RichVideoStates) = insertMedia {
@@ -284,27 +281,43 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     override fun setBold() {
-        noteHandler.setEditTextSpan(SpanStates.Spans.StyleSpan, style = Typeface.BOLD)
+        noteHandler.setEditTextSpan(SpanStates.Spans.Style(Typeface.BOLD))
     }
 
     override fun setItalic() {
-        noteHandler.setEditTextSpan(SpanStates.Spans.StyleSpan, style = Typeface.ITALIC)
+        noteHandler.setEditTextSpan(SpanStates.Spans.Style(Typeface.ITALIC))
     }
 
     override fun setSize(size: Int) {
-        noteHandler.setEditTextSpan(SpanStates.Spans.AbsoluteSizeSpan, absoluteSize = size)
+        noteHandler.setEditTextSpan(SpanStates.Spans.AbsoluteSize(size))
     }
 
     override fun setUnderlined() {
-        noteHandler.setEditTextSpan(SpanStates.Spans.UnderlineSpan)
+        noteHandler.setEditTextSpan(SpanStates.Spans.Underline)
     }
 
     override fun setStrikethrough() {
-        noteHandler.setEditTextSpan(SpanStates.Spans.StrikeThroughSpan)
+        noteHandler.setEditTextSpan(SpanStates.Spans.StrikeThrough)
+    }
+
+    override fun setURL(url: String) {
+        noteHandler.setEditTextSpan(SpanStates.Spans.URL(url))
+    }
+
+    override fun setSubscript() {
+        noteHandler.setEditTextSpan(SpanStates.Spans.Subscript)
+    }
+
+    override fun setSuperscript() {
+        noteHandler.setEditTextSpan(SpanStates.Spans.Superscript)
     }
 
     override fun setColor(color: Any) {
-        noteHandler.setEditTextSpan(SpanStates.Spans.ForegroundColorSpan, iColor = color)
+        noteHandler.setEditTextSpan(SpanStates.Spans.ForegroundColor(color))
+    }
+
+    override fun setBackColor(color: Any) {
+        noteHandler.setEditTextSpan(SpanStates.Spans.BackgroundColor(color))
     }
 
     interface IRichListener {

@@ -29,32 +29,34 @@
             android:overScrollMode="never"
             android:padding="@dimen/small_elevation"
             app:layout_constraintTop_toBottomOf="@id/title"
-            app:layout_constraintBottom_toTopOf="@id/list_confirm" />
+            app:layout_constraintBottom_toTopOf="@id/action_btn_container" />
 
-        <TextView
-            android:id="@+id/list_confirm"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/action_icon"
-            android:textColor="@color/white"
-            android:text="@string/do_not_cache"
-            android:gravity="center"
-            android:background="@drawable/background_ripple_blue"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/list_dismiss"
-            app:layout_constraintStart_toStartOf="parent" />
+        <LinearLayout
+            android:id="@+id/action_btn_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/list_list">
 
-        <TextView
-            android:id="@+id/list_dismiss"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/action_icon"
-            android:textColor="@color/white"
-            android:text="@string/retry"
-            android:gravity="center"
-            android:layout_marginStart="@dimen/lists_margin"
-            android:background="@drawable/background_ripple_blue"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/list_confirm" />
+            <Button
+                android:id="@+id/list_dismiss"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/do_not_cache"
+                android:textColor="@color/red" />
+
+            <Button
+                android:id="@+id/list_confirm"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/retry"
+                android:textColor="@color/main_color1" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

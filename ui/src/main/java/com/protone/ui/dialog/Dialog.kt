@@ -77,16 +77,15 @@ fun Activity.titleDialog(title: String, name: String, callBack: (String) -> Unit
 
     AlertDialog.Builder(this).also {
         it.setView(binding.root)
-        it.setPositiveButton(
-            R.string.confirm
-        ) { p0, _ ->
+    }.create().also { dialog ->
+        binding.confirm.setOnClickListener {
             callBack(binding.renameInput.text.toString())
-            p0?.dismiss()
+            dialog.dismiss()
         }
-        it.setNegativeButton(R.string.cancel) { p0, _ ->
-            p0?.dismiss()
+        binding.cancel.setOnClickListener {
+            dialog.dismiss()
         }
-    }.create().show()
+    }.show()
 }
 
 fun Activity.cateDialog(

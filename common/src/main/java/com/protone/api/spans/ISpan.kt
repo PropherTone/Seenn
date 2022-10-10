@@ -1,8 +1,11 @@
-package com.protone.ui.customView.richText.note.spans
+package com.protone.api.spans
 
 interface ISpan {
     fun setBold()
     fun setItalic()
     fun setUnderlined()
     fun setStrikethrough()
+    fun setURL(url: String)
+    fun setSubscript()
+    fun setSuperscript()
 }

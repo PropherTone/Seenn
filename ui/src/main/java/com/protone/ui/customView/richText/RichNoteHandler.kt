@@ -1,12 +1,6 @@
 package com.protone.ui.customView.richText
 
 import android.net.Uri
-import android.os.Parcel
-import android.text.Spannable
-import android.text.TextUtils
-import android.text.style.AbsoluteSizeSpan
-import android.text.style.StyleSpan
-import android.util.Base64
 import android.widget.EditText
 import com.protone.api.baseType.deleteFile
 import com.protone.api.baseType.imageSaveToDisk
@@ -16,9 +10,12 @@ import com.protone.api.json.jsonToList
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
+import com.protone.api.note.IRichNoteImageLoader
 import com.protone.api.onResult
-import com.protone.ui.customView.richText.note.IRichNoteImageLoader
-import com.protone.ui.customView.richText.note.spans.ISpanForEditor
+import com.protone.api.spans.ISpanForEditor
+import com.protone.api.spans.SpanStates
+import com.protone.api.spans.setSpan
+import com.protone.api.spans.toBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
@@ -79,91 +76,13 @@ class RichNoteHandler(private val editor: ISpanForEditor) {
      *
      * @param targetSpan Target span
      */
-    fun setEditTextSpan(
-        targetSpan: SpanStates.Spans,
-        iColor: Any? = null,
-        absoluteSize: Int? = null,
-        relativeSize: Float? = null,
-        scaleX: Float? = null,
-        style: Int? = null,
-        url: String? = null
-    ) {
+    fun setEditTextSpan(targetSpan: SpanStates.Spans) {
         getCurrentEditText()?.also {
             val start = it.selectionStart
             val end = it.selectionEnd
-            val span = SpanStates(
-                start,
-                end,
-                targetSpan,
-                iColor,
-                absoluteSize,
-                relativeSize,
-                scaleX,
-                style,
-                url
-            )
-            var isCancellableSpan = false
-            val spans = span.getTargetSpan()?.let { targetSpan ->
-                isCancellableSpan = targetSpan is AbsoluteSizeSpan
-                val getSpans = it.text.getSpans(
-                    it.selectionStart,
-                    it.selectionEnd,
-                    targetSpan.javaClass
-                )
-                if (targetSpan is StyleSpan) {
-                    getSpans.filter { charStyle -> (charStyle as StyleSpan).style == style }
-                        .toTypedArray()
-                } else getSpans
-            }
-            val styleList = mutableListOf<SpanStyle>()
-            if (spans?.isNotEmpty() == true) {
-                fun addStyle(start: Int, end: Int) {
-                    span.getTargetSpan()?.let { style ->
-                        styleList.add(SpanStyle(style, start, end))
-                    }
-                }
-                spans.forEach { eachSpan ->
-                    val spanStart = it.text.getSpanStart(eachSpan)
-                    val spanEnd = it.text.getSpanEnd(eachSpan)
-                    when {
-                        end in spanStart..spanEnd -> {
-                            if (start > spanStart && spanStart != start) {
-                                addStyle(spanStart, start)
-                            }
-                            if (end != spanEnd) {
-                                addStyle(end, spanEnd)
-                            }
-                        }
-                        start in spanStart..spanEnd -> {
-                            if (end < spanEnd && end != spanEnd) {
-                                addStyle(end, spanEnd)
-                            }
-                            if (spanStart != start) {
-                                addStyle(spanStart, start)
-                            }
-                        }
-                    }
-                    it.text.removeSpan(eachSpan)
-                }
-            }
-            if (spans?.isNotEmpty() == false || isCancellableSpan) {
-                span.getTargetSpan()?.let { style ->
-                    styleList.add(SpanStyle(style, start, end))
-                }
-            }
-            styleList.forEach { spanStyle ->
-                it.text.setSpan(
-                    spanStyle.span,
-                    spanStyle.start,
-                    spanStyle.end,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            }
-            getCurRichStates().let { rs ->
-                if (rs is RichNoteStates?) rs?.apply {
-                    this.text = it.text
-                }
-                getCurrentEditText()?.tag = rs
+            it.text.setSpan(SpanStates(start, end, targetSpan,), start, end)
+            it.tag?.let { rs ->
+                if (rs is RichNoteStates) rs.apply { this.text = it.text }
             }
         }
     }
@@ -209,7 +128,7 @@ class RichNoteHandler(private val editor: ISpanForEditor) {
                     else -> {
                         val richNoteSer =
                             statesStrings[listSize--].toEntity(RichNoteSer::class.java)
-                        RichNoteStates(richNoteSer.text, mutableListOf())
+                        RichNoteStates(richNoteSer.text)
                     }
                 }
             )
@@ -285,18 +204,7 @@ class RichNoteHandler(private val editor: ISpanForEditor) {
                             taskChannel.offer(
                                 Pair(
                                     RichNoteSer(
-                                        getEditText(i)?.text?.let {
-                                            val parcel = Parcel.obtain()
-                                            try {
-                                                TextUtils.writeToParcel(it, parcel, 0)
-                                                val marshall = parcel.marshall()
-                                                String(Base64.encode(marshall, Base64.DEFAULT))
-                                            } catch (e: Exception) {
-                                                ""
-                                            } finally {
-                                                parcel.recycle()
-                                            }
-                                        } ?: "",
+                                        (view as EditText).text?.toBase64() ?: "",
                                         ""
                                     ).toJson(), i
                                 )

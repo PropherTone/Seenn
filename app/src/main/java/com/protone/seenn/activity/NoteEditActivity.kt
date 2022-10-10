@@ -15,11 +15,13 @@ import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.json.toUri
+import com.protone.api.spans.ISpanForUse
+import com.protone.api.spans.SpanStates
 import com.protone.seenn.R
 import com.protone.seenn.databinding.NoteEditActivityBinding
 import com.protone.ui.customView.richText.RichNoteImageLoader
-import com.protone.ui.customView.richText.note.spans.ISpanForUse
 import com.protone.ui.dialog.imageListDialog
+import com.protone.ui.dialog.titleDialog
 import com.protone.ui.popWindows.ColorfulPopWindow
 import com.protone.worker.viewModel.GalleryViewModel
 import com.protone.worker.viewModel.NoteEditViewModel
@@ -64,7 +66,7 @@ class NoteEditActivity :
     }
 
     override suspend fun NoteEditViewModel.init() {
-        binding.noteEditRichNote.setRichList(listOf(RichNoteStates("", arrayListOf())))
+        binding.noteEditRichNote.setRichList(listOf(RichNoteStates("")))
         val contentTitle = intent.getStringExtra(NoteEditViewModel.CONTENT_TITLE)
         val noteName = intent.getStringExtra(NoteEditViewModel.NOTE)
         if (contentTitle != null) {
@@ -233,28 +235,8 @@ class NoteEditActivity :
                 ?.toEntity(GalleryMedia::class.java)
         }
 
-
     private suspend fun initEditor(richCode: Int, text: String) = withContext(Dispatchers.Main) {
         binding.noteEditRichNote.setRichList(richCode, text)
-    }
-
-    override fun setBold() = binding.noteEditRichNote.setBold()
-
-    override fun setItalic() = binding.noteEditRichNote.setItalic()
-
-    override fun setSize() {
-        binding.run {
-            if (numberPopWindow != null) {
-                numberPopWindow?.dismiss()
-                numberPopWindow = null
-            } else ColorfulPopWindow(this@NoteEditActivity).also {
-                numberPopWindow = it
-                it.setOnDismissListener { numberPopWindow = null }
-            }.startNumberPickerPopup(
-                noteEditTool,
-                noteEditRichNote.getSelectionTextSize()
-            ) { noteEditRichNote.setSize(it) }
-        }
     }
 
     private suspend fun insertImage(photo: RichPhotoStates) =
@@ -308,12 +290,40 @@ class NoteEditActivity :
         }
     }
 
+    override fun setBold() = binding.noteEditRichNote.setBold()
+
+    override fun setItalic() = binding.noteEditRichNote.setItalic()
+
+    override fun setSize() {
+        binding.run {
+            if (numberPopWindow != null) {
+                numberPopWindow?.dismiss()
+                numberPopWindow = null
+            } else ColorfulPopWindow(this@NoteEditActivity).also {
+                numberPopWindow = it
+                it.setOnDismissListener { numberPopWindow = null }
+            }.startNumberPickerPopup(
+                noteEditTool,
+                noteEditRichNote.getSelectionTextSize()
+            ) { noteEditRichNote.setSize(it) }
+        }
+    }
+
     override fun setUnderlined() = binding.noteEditRichNote.setUnderlined()
+
     override fun setStrikethrough() = binding.noteEditRichNote.setStrikethrough()
-    override fun insertImage() = Unit
-    override fun insertVideo() = Unit
-    override fun insertMusic() = Unit
-    override fun setColor() {
+
+    override fun setURL(url: String) {
+        this.titleDialog(R.string.enter_url.getString(), "") {
+            binding.noteEditRichNote.setURL(it)
+        }
+    }
+
+    override fun setSubscript() = binding.noteEditRichNote.setSubscript()
+
+    override fun setSuperscript() = binding.noteEditRichNote.setSuperscript()
+
+    override fun setColor(isBackGround: Boolean) {
         if (colorPopWindow != null) {
             colorPopWindow?.dismiss()
             colorPopWindow = null
@@ -321,7 +331,15 @@ class NoteEditActivity :
             colorPopWindow = it
             it.setOnDismissListener { colorPopWindow = null }
         }.startColorPickerPopup(binding.noteEditTool) {
-            binding.noteEditRichNote.setColor(it.toHexColor())
+            if (isBackGround) {
+                binding.noteEditRichNote.setBackColor(it.toHexColor())
+            } else {
+                binding.noteEditRichNote.setColor(it.toHexColor())
+            }
         }
     }
+
+    override fun insertImage() = Unit
+    override fun insertVideo() = Unit
+    override fun insertMusic() = Unit
 }

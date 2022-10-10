@@ -1,4 +1,4 @@
-package com.protone.ui.customView.richText.note
+package com.protone.api.note
 
 import android.content.Context
 import android.graphics.Bitmap

@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide
 import com.protone.api.baseType.toBitmap
 import com.protone.api.context.SApplication
 import com.protone.ui.R
-import com.protone.ui.customView.richText.note.IRichNoteImageLoader
+import com.protone.api.note.IRichNoteImageLoader
 
 class RichNoteImageLoader : IRichNoteImageLoader {
 
