@@ -8,11 +8,14 @@ import com.protone.api.entity.GalleriesWithNotes
 import com.protone.api.entity.GalleryMedia
 import com.protone.api.entity.Note
 import com.protone.api.entity.NoteDirWithNotes
+import com.protone.api.json.toUri
 import com.protone.api.json.toUriJson
+import com.protone.api.onResult
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.streams.toList
 
 class NoteEditViewModel : BaseViewModel() {
@@ -119,4 +122,18 @@ class NoteEditViewModel : BaseViewModel() {
     suspend fun getNoteByName(name: String) = withContext(Dispatchers.IO) {
         DatabaseHelper.instance.noteDAOBridge.getNoteByName(name)
     }
+
+    suspend fun checkNoteCover(note: Note) = onResult { co ->
+        onEdit = true
+        if (note.imagePath == null) return@onResult
+        val file = File(note.imagePath)
+        if (file.isFile) {
+            co.resumeWith(Result.success(true))
+        } else {
+            iconUri = note.imagePath.toUri()
+            co.resumeWith(Result.success(false))
+        }
+    }
+
+
 }

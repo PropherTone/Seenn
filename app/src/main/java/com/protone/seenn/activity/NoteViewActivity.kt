@@ -59,7 +59,8 @@ class NoteViewActivity :
         if (noteName == null) return
         val note = getNoteByName(noteName)
         if (note != null) {
-            initNote(note, object : RichNoteView.IRichListener {
+            initNote(note, object : RichNoteView.IRichListenerImp() {
+
                 override fun play(uri: Uri, progress: Long) {
                     launch {
                         getMusicByUri(uri)?.let {
@@ -67,9 +68,9 @@ class NoteViewActivity :
                             binder?.play(it)
                             binder?.setProgress(progress)
                         }
-                    }
-                    binder?.onProgress()?.observe(this@NoteViewActivity) {
-                        setMusicProgress(it)
+                        binder?.onProgress()?.observe(this@NoteViewActivity) {
+                            setMusicProgress(it)
+                        }
                     }
                 }
 

@@ -14,12 +14,12 @@ import com.protone.api.entity.*
 import com.protone.api.json.listToJson
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
-import com.protone.api.json.toUri
 import com.protone.api.spans.ISpanForUse
 import com.protone.api.spans.SpanStates
 import com.protone.seenn.R
 import com.protone.seenn.databinding.NoteEditActivityBinding
 import com.protone.ui.customView.richText.RichNoteImageLoader
+import com.protone.ui.customView.richText.RichNoteView
 import com.protone.ui.dialog.imageListDialog
 import com.protone.ui.dialog.titleDialog
 import com.protone.ui.popWindows.ColorfulPopWindow
@@ -29,7 +29,6 @@ import com.protone.worker.viewModel.NoteViewViewModel
 import com.protone.worker.viewModel.PickMusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 
 class NoteEditActivity :
     BaseActivity<NoteEditActivityBinding, NoteEditViewModel, NoteEditViewModel.NoteEvent>(true),
@@ -87,19 +86,13 @@ class NoteEditActivity :
         } else {
             noteByName = noteName?.let {
                 getNoteByName(it)?.let { n ->
-                    withContext(Dispatchers.IO) {
-                        if (n.imagePath == null) return@withContext
-                        val file = File(n.imagePath)
-                        if (file.isFile) {
-                            setNoteIcon(n.imagePath)
-                        } else {
-                            iconUri = n.imagePath.toUri()
-                            setNoteIcon(iconUri)
-                        }
+                    if (checkNoteCover(n)) {
+                        setNoteIcon(n.imagePath)
+                    } else {
+                        setNoteIcon(iconUri)
                     }
                     title = n.title
                     initEditor(n.richCode, n.text)
-                    onEdit = true
                     n
                 }
             }
@@ -236,7 +229,14 @@ class NoteEditActivity :
         }
 
     private suspend fun initEditor(richCode: Int, text: String) = withContext(Dispatchers.Main) {
-        binding.noteEditRichNote.setRichList(richCode, text)
+        binding.noteEditRichNote.apply {
+            setRichList(richCode, text)
+            iRichListener = object :RichNoteView.IRichListenerImp(){
+                override fun onContentGainedFocus() {
+                    binding.noteEditToolbar.setExpanded(false,false)
+                }
+            }
+        }
     }
 
     private suspend fun insertImage(photo: RichPhotoStates) =

@@ -181,7 +181,7 @@ class RichNoteView @JvmOverloads constructor(
                         noteHandler.updatePosition(this@RichNoteView.indexOfChild(this@apply))
                     }
                     setOnTouchListener { _, _ ->
-                        this@RichNoteView.indexOfChild(this)
+                        iRichListener?.onContentGainedFocus()
                         performClick()
                         false
                     }
@@ -199,7 +199,7 @@ class RichNoteView @JvmOverloads constructor(
                         return SpannableStringBuilder(source)
                     }
                 })
-                setText(note.text,TextView.BufferType.SPANNABLE)
+                setText(note.text, TextView.BufferType.SPANNABLE)
                 text = note.text
             }
         }).run {
@@ -336,9 +336,18 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     interface IRichListener {
+        fun onContentGainedFocus()
         fun play(uri: Uri, progress: Long)
         fun pause()
         fun jumpTo(note: String)
         fun open(uri: Uri, name: String, isVideo: Boolean)
+    }
+
+    open class IRichListenerImp : IRichListener {
+        override fun onContentGainedFocus() = Unit
+        override fun play(uri: Uri, progress: Long) = Unit
+        override fun pause() = Unit
+        override fun jumpTo(note: String) = Unit
+        override fun open(uri: Uri, name: String, isVideo: Boolean) = Unit
     }
 }
