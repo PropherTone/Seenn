@@ -2,6 +2,7 @@ package com.protone.api.baseType
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.text.Editable
 import android.widget.Toast
 import com.protone.api.context.SApplication
 import com.protone.api.context.onUiThread
@@ -95,4 +96,10 @@ fun String.toast() {
     SApplication.app.onUiThread {
         Toast.makeText(SApplication.app, this, Toast.LENGTH_SHORT).show()
     }
+}
+
+fun Editable.toInt(): Int? = this.toString().let { text ->
+    if (text.isNotEmpty()) {
+        text.toInt()
+    } else null
 }

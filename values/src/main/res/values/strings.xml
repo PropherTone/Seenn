@@ -390,4 +390,7 @@ II. 幂等 的意味着对同一URL的多个请求应该返回同样的结果。
     <string name="combine_gallery">设置合并相册</string>
     <string name="dispatch_gallery">设置拆分相册</string>
     <string name="enter_url">输入URL</string>
+    <string name="gap_width">间距:</string>
+    <string name="radius">半径:</string>
+    <string name="stripe_width">线宽:</string>
 </resources>

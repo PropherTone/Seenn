@@ -195,6 +195,30 @@
                     android:layout_height="@dimen/small_Icon"
                     android:layout_marginStart="@dimen/icon_margin"
                     android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setBullet()}"
+                    android:src="@drawable/ic_baseline_format_list_bulleted_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setQuote()}"
+                    android:src="@drawable/ic_baseline_format_quote_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
+                    android:onClick="@{()->activity.setParagraph()}"
+                    android:src="@drawable/ic_baseline_format_align_justify_24_black" />
+
+                <ImageView
+                    android:layout_width="@dimen/small_Icon"
+                    android:layout_height="@dimen/small_Icon"
+                    android:layout_marginStart="@dimen/icon_margin"
+                    android:contentDescription="@string/action"
                     android:onClick="@{()->activity.setColor(false)}"
                     android:padding="@dimen/main_padding"
                     android:src="@color/black" />

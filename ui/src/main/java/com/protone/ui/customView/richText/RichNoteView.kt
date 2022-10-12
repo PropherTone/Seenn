@@ -327,6 +327,22 @@ class RichNoteView @JvmOverloads constructor(
         noteHandler.setEditTextSpan(SpanStates.Spans.Superscript)
     }
 
+    override fun setBullet(gapWidth: Int?, color: Any?, radius: Int?) {
+        noteHandler.setEditTextSpan(SpanStates.Spans.Bullet(gapWidth, color, radius))
+    }
+
+    override fun setQuote(color: Any?, stripeWidth: Int?, gapWidth: Int?) {
+        noteHandler.setEditTextSpan(SpanStates.Spans.Quote(color, stripeWidth, gapWidth))
+    }
+
+    override fun setParagraph(alignment: SpanStates.SpanAlignment) {
+        if (alignment == SpanStates.SpanAlignment.FIRST_LINE_ALIGN) {
+            alignment.first = getSelectionTextSize() * 2
+        }
+        noteHandler.setEditTextSpan(SpanStates.Spans.Paragraph(alignment))
+
+    }
+
     override fun setColor(color: Any) {
         noteHandler.setEditTextSpan(SpanStates.Spans.ForegroundColor(color))
     }

@@ -16,7 +16,6 @@ import com.protone.worker.database.DatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.streams.toList
 
 class NoteEditViewModel : BaseViewModel() {
 
@@ -53,9 +52,8 @@ class NoteEditViewModel : BaseViewModel() {
         }
     }
 
-    suspend fun getAllNote() = withContext(Dispatchers.IO) {
+    suspend fun getAllNote() = withContext(Dispatchers.Default) {
         (DatabaseHelper.instance.noteDAOBridge.getAllNote() ?: mutableListOf())
-            .stream()
             .map { note -> note.title }.toList() as MutableList<String>
     }
 
@@ -69,11 +67,11 @@ class NoteEditViewModel : BaseViewModel() {
         inNote.text = note.text
         inNote.richCode = note.richCode
         inNote.time = note.time
+        inNote.imagePath = if (iconUri != null) saveIcon(note.title) else inNote.imagePath
     }
 
-    suspend fun updateNote(note: Note) = withContext(Dispatchers.IO) {
+    suspend fun updateNote(note: Note) =
         DatabaseHelper.instance.noteDAOBridge.updateNote(note)
-    }
 
     suspend fun insertNote(note: Note, dir: String?) = withContext(Dispatchers.Default) {
         DatabaseHelper.instance.noteDAOBridge.insertNoteRs(note).let { result ->
@@ -107,7 +105,7 @@ class NoteEditViewModel : BaseViewModel() {
         var count = 0
         var tempNoteTitle = noteTitle
         val names = mutableMapOf<String, Int>()
-        withContext(Dispatchers.IO) { DatabaseHelper.instance.noteDAOBridge.getAllNote() }?.forEach {
+        DatabaseHelper.instance.noteDAOBridge.getAllNote()?.forEach {
             names[it.title] = 1
             if (it.title == tempNoteTitle) {
                 tempNoteTitle = "${noteTitle}(${++count})"
@@ -116,12 +114,12 @@ class NoteEditViewModel : BaseViewModel() {
         while (names[tempNoteTitle] != null) {
             tempNoteTitle = "${noteTitle}(${++count})"
         }
-        tempNoteTitle
+        if (onEdit) noteTitle else tempNoteTitle
     }
 
-    suspend fun getNoteByName(name: String) = withContext(Dispatchers.IO) {
+    suspend fun getNoteByName(name: String) =
         DatabaseHelper.instance.noteDAOBridge.getNoteByName(name)
-    }
+
 
     suspend fun checkNoteCover(note: Note) = onResult { co ->
         onEdit = true
@@ -134,6 +132,5 @@ class NoteEditViewModel : BaseViewModel() {
             co.resumeWith(Result.success(false))
         }
     }
-
 
 }

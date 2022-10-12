@@ -35,9 +35,17 @@ class NoteEditActivity :
     ISpanForUse {
     override val viewModel: NoteEditViewModel by viewModels()
 
-    private var listPopWindow: ColorfulPopWindow? = null
-    private var numberPopWindow: ColorfulPopWindow? = null
-    private var colorPopWindow: ColorfulPopWindow? = null
+    private var popWindow: ColorfulPopWindow? = null
+        get() {
+            return if (field != null) {
+                field?.dismiss()
+                field = null
+                field
+            } else ColorfulPopWindow(this).also {
+                field = it
+                it.setOnDismissListener { field = null }
+            }
+        }
 
     private var title: String
         set(value) {
@@ -145,12 +153,7 @@ class NoteEditActivity :
 
     private suspend fun NoteEditViewModel.pickImage() {
         startGalleryPick(true)?.let { re ->
-            insertImage(
-                RichPhotoStates(
-                    re.uri, re.name, null,
-                    re.date.toDateString().toString()
-                )
-            )
+            insertImage(re)
             medias.add(re)
         }
     }
@@ -161,7 +164,7 @@ class NoteEditActivity :
             return
         }
         showProgress(true)
-        val checkedTitle = if (onEdit) title else checkNoteTitle(title)
+        val checkedTitle = checkNoteTitle(title)
         val indexedRichNote = binding.noteEditRichNote.indexRichNote(checkedTitle) {
             if (it.size <= 0) return@indexRichNote true
             return@indexRichNote imageListDialog(it)
@@ -186,7 +189,6 @@ class NoteEditActivity :
                 return
             }
             copyNote(inNote, note)
-            inNote.imagePath = if (iconUri != null) saveIcon(checkedTitle) else inNote.imagePath
             val re = updateNote(inNote)
             if (re == null && re == -1) {
                 insertNote(
@@ -206,10 +208,9 @@ class NoteEditActivity :
                 setResult(RESULT_OK)
                 finish()
             }
-        } else if (insertNote(
-                note.apply {
-                    imagePath = saveIcon(checkedTitle)
-                },
+        } else if (
+            insertNote(
+                note.apply { imagePath = saveIcon(checkedTitle) },
                 intent.getStringExtra(NoteEditViewModel.NOTE_DIR)
             )
         ) {
@@ -231,31 +232,11 @@ class NoteEditActivity :
     private suspend fun initEditor(richCode: Int, text: String) = withContext(Dispatchers.Main) {
         binding.noteEditRichNote.apply {
             setRichList(richCode, text)
-            iRichListener = object :RichNoteView.IRichListenerImp(){
+            iRichListener = object : RichNoteView.IRichListenerImp() {
                 override fun onContentGainedFocus() {
-                    binding.noteEditToolbar.setExpanded(false,false)
+                    binding.noteEditToolbar.setExpanded(false, false)
                 }
             }
-        }
-    }
-
-    private suspend fun insertImage(photo: RichPhotoStates) =
-        binding.noteEditRichNote.insertImage(photo, photo.uri.toBitmap())
-
-    private fun insertVideo(uri: Uri) {
-        binding.noteEditRichNote.insertVideo(RichVideoStates(uri, null, name = ""))
-    }
-
-    private fun insertMusic(uri: Uri, list: MutableList<String>, title: String) {
-        if (listPopWindow != null) {
-            listPopWindow?.dismiss()
-            listPopWindow = null
-        } else ColorfulPopWindow(this).also {
-            listPopWindow = it
-            it.setOnDismissListener { listPopWindow = null }
-        }.startListPopup(R.string.pick_note.getString(), binding.noteEditTool, list) {
-            listPopWindow?.dismiss()
-            binding.noteEditRichNote.insertMusic(RichMusicStates(uri, it, title))
         }
     }
 
@@ -268,8 +249,8 @@ class NoteEditActivity :
     }
 
     private suspend fun showProgress(isShow: Boolean) = withContext(Dispatchers.Main) {
-        (binding.toolbar.getViewById(R.id.noteEdit_progress) as ImageView?)?.apply {
-            drawable.let {
+        binding.noteEditProgress.apply {
+            drawable?.let {
                 when (it) {
                     is Animatable ->
                         if (isShow) it.start().also { isVisible = true }
@@ -290,19 +271,32 @@ class NoteEditActivity :
         }
     }
 
+    override suspend fun insertImage(media: GalleryMedia) =
+        binding.noteEditRichNote.insertImage(
+            RichPhotoStates(
+                media.uri, media.name, null,
+                media.date.toDateString().toString()
+            ), media.uri.toBitmap()
+        )
+
+    override fun insertVideo(uri: Uri) {
+        binding.noteEditRichNote.insertVideo(RichVideoStates(uri, null, name = ""))
+    }
+
+    override fun insertMusic(uri: Uri, list: MutableList<String>, title: String) {
+        popWindow?.startListPopup(R.string.pick_note.getString(), binding.noteEditTool, list) {
+            popWindow?.dismiss()
+            binding.noteEditRichNote.insertMusic(RichMusicStates(uri, it, title))
+        }
+    }
+
     override fun setBold() = binding.noteEditRichNote.setBold()
 
     override fun setItalic() = binding.noteEditRichNote.setItalic()
 
     override fun setSize() {
         binding.run {
-            if (numberPopWindow != null) {
-                numberPopWindow?.dismiss()
-                numberPopWindow = null
-            } else ColorfulPopWindow(this@NoteEditActivity).also {
-                numberPopWindow = it
-                it.setOnDismissListener { numberPopWindow = null }
-            }.startNumberPickerPopup(
+            popWindow?.startNumberPickerPopup(
                 noteEditTool,
                 noteEditRichNote.getSelectionTextSize()
             ) { noteEditRichNote.setSize(it) }
@@ -323,14 +317,26 @@ class NoteEditActivity :
 
     override fun setSuperscript() = binding.noteEditRichNote.setSuperscript()
 
+    override fun setBullet() {
+        popWindow?.startBulletSpanSettingPop(binding.noteEditTool) { gapWidth, color, radius ->
+            binding.noteEditRichNote.setBullet(gapWidth, color, radius)
+        }
+    }
+
+    override fun setQuote() {
+        popWindow?.startQuoteSpanSettingPop(binding.noteEditTool) { color, stripeWidth, gapWidth ->
+            binding.noteEditRichNote.setQuote(color, stripeWidth, gapWidth)
+        }
+    }
+
+    override fun setParagraph() {
+        popWindow?.startParagraphSpanSettingPop(binding.noteEditTool) { alignment ->
+            binding.noteEditRichNote.setParagraph(alignment)
+        }
+    }
+
     override fun setColor(isBackGround: Boolean) {
-        if (colorPopWindow != null) {
-            colorPopWindow?.dismiss()
-            colorPopWindow = null
-        } else ColorfulPopWindow(this).also {
-            colorPopWindow = it
-            it.setOnDismissListener { colorPopWindow = null }
-        }.startColorPickerPopup(binding.noteEditTool) {
+        popWindow?.startColorPickerPopup(binding.noteEditTool) {
             if (isBackGround) {
                 binding.noteEditRichNote.setBackColor(it.toHexColor())
             } else {
@@ -338,8 +344,4 @@ class NoteEditActivity :
             }
         }
     }
-
-    override fun insertImage() = Unit
-    override fun insertVideo() = Unit
-    override fun insertMusic() = Unit
 }

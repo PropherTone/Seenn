@@ -80,7 +80,7 @@ class RichNoteHandler(private val editor: ISpanForEditor) {
         getCurrentEditText()?.also {
             val start = it.selectionStart
             val end = it.selectionEnd
-            it.text.setSpan(SpanStates(start, end, targetSpan,), start, end)
+            it.text.setSpan(SpanStates(start, end, targetSpan), start, end)
             it.tag?.let { rs ->
                 if (rs is RichNoteStates) rs.apply { this.text = it.text }
             }

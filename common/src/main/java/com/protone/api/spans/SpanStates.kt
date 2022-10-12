@@ -36,7 +36,18 @@ data class SpanStates(var start: Int, var end: Int, val targetSpan: Spans) {
             val gapWidth: Int? = null
         ) : Spans() //文本左侧引用竖线
 
-        data class Paragraph(val alignment: Layout.Alignment) : Spans() //文本对齐
+        data class Paragraph(val alignment: SpanAlignment) : Spans() //文本对齐
+    }
+
+    enum class SpanAlignment {
+        ALIGN_NORMAL,
+        ALIGN_OPPOSITE,
+        ALIGN_CENTER,
+        FIRST_LINE_ALIGN,
+        ALIGN_RIGHT;
+
+        var first: Int = 0
+        var rest: Int = 0
     }
 
     private fun getColorSpan(back: Boolean, color: Any): Any =
@@ -124,8 +135,20 @@ data class SpanStates(var start: Int, var end: Int, val targetSpan: Spans) {
             return@let QuoteSpan()
         }
         is Spans.Paragraph -> {
-            AlignmentSpan {
-                targetSpan.alignment
+            when (targetSpan.alignment) {
+                SpanAlignment.ALIGN_NORMAL, SpanAlignment.ALIGN_OPPOSITE, SpanAlignment.ALIGN_CENTER ->
+                    AlignmentSpan {
+                        when (targetSpan.alignment) {
+                            SpanAlignment.ALIGN_CENTER -> Layout.Alignment.ALIGN_CENTER
+                            SpanAlignment.ALIGN_NORMAL -> Layout.Alignment.ALIGN_NORMAL
+                            SpanAlignment.ALIGN_OPPOSITE -> Layout.Alignment.ALIGN_OPPOSITE
+                            else -> null
+                        }
+                    }
+                else -> LeadingMarginSpan.Standard(
+                    targetSpan.alignment.first,
+                    targetSpan.alignment.rest
+                )
             }
         }
     }
