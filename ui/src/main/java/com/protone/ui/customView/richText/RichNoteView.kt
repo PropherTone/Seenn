@@ -15,7 +15,6 @@ import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
@@ -127,7 +126,6 @@ class RichNoteView @JvmOverloads constructor(
                     textSize = 18f
                     setTextColor(Color.BLACK)
                     background = null
-                    inputType = EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
                     setSpannableFactory(object : Spannable.Factory() {
                         override fun newSpannable(source: CharSequence?): Spannable {
                             return SpannableStringBuilder(source)
