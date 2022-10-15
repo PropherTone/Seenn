@@ -18,6 +18,7 @@ import com.protone.seenn.service.MusicService
 import com.protone.ui.adapter.AddMusicListAdapter
 import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.PickMusicViewModel
+import com.protone.worker.viewModel.PickMusicViewModel.Companion.ADD_BUCKET
 import com.protone.worker.viewModel.PickMusicViewModel.Companion.SEARCH_MUSIC
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +31,7 @@ class PickMusicActivity :
     override fun createView(): PickMusicActivityBinding {
         return PickMusicActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@PickMusicActivity
-            fitStatuesBar(root)
+            fitStatuesBarUsePadding(searchContainer)
             linkInput(addMBList, addMBSearch)
         }
     }
@@ -47,7 +48,7 @@ class PickMusicActivity :
             if (!mode.isNullOrEmpty() && mode == SEARCH_MUSIC) {
                 bindMusicService { initSeen(bucket, mode, it) }
             } else {
-                initSeen(bucket, mode ?: PickMusicViewModel.ADD_BUCKET)
+                initSeen(bucket, mode ?: ADD_BUCKET)
             }
         } else {
             R.string.no_data.getString().toast()
@@ -100,7 +101,7 @@ class PickMusicActivity :
         binder: MusicService.MusicBinder? = null
     ) {
         binding.addMBConfirm.also {
-            it.isGone = mode == PickMusicViewModel.ADD_BUCKET
+            it.isGone = mode == ADD_BUCKET || mode == SEARCH_MUSIC
             binding.addMBLeave.isGone = !it.isGone
         }
         binding.addMBList.apply {

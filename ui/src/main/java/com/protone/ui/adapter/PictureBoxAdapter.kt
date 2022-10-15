@@ -2,6 +2,7 @@ package com.protone.ui.adapter
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -82,16 +83,54 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galler
                     }).into(image)
             }
             is PictureBoxAdapterLayoutBinding -> holder.binding.apply {
-               image.setImageResource(picUri[position].uri)
+                image.setImageResource(picUri[position].uri)
             }
             is PictureBoxAdapterVideoLayoutBinding -> holder.binding.apply {
-                videoPlayer.setVideoPath(picUri[position].uri)
+                start.isGone = false
+                videoCover.isGone = false
+                Glide.with(context).load(picUri[position].path)
+                    .addListener(object : RequestListener<Drawable> {
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            resource?.apply {
+                                val mix = this.intrinsicWidth.toFloat().let {
+                                    videoCover.width / it
+                                }
+                                val heightSpan = (this.intrinsicHeight * mix).roundToInt()
+                                videoCover.updateLayoutParams {
+                                    this.height = heightSpan
+                                }
+                                videoPlayer.updateLayoutParams {
+                                    this.height = heightSpan
+                                }
+                            }
+                            return false
+                        }
+
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return false
+                        }
+
+                    }).into(videoCover)
+                start.setOnClickListener {
+                    start.isGone = true
+                    videoCover.isGone = true
+                    videoPlayer.setVideoPath(picUri[holder.layoutPosition].uri)
+                }
                 videoPlayer.doOnCompletion {
                     videoPlayer.release()
                     start.isGone = false
-                }
-                start.setOnClickListener {
-                    start.isGone = true
+                    videoCover.isGone = false
                 }
             }
         }
@@ -104,6 +143,7 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galler
             }
             is PictureBoxAdapterVideoLayoutBinding -> holder.binding.apply {
                 start.isGone = false
+                videoCover.isGone = false
                 videoPlayer.release()
             }
         }

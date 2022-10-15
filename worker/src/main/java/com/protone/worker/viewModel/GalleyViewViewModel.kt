@@ -17,7 +17,7 @@ class GalleryViewViewModel : BaseViewModel() {
 
     companion object {
         const val MEDIA = "GalleryViewActivity:MediaData"
-        const val TYPE = "GalleryViewActivity:IsVideo"
+        const val IS_VIDEO = "GalleryViewActivity:IsVideo"
         const val GALLERY = "GalleryViewActivity:Gallery"
     }
 

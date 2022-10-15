@@ -21,7 +21,7 @@ class GalleryListAdapter(
     context: Context,
     private val useSelect: Boolean = true,
     private val combine: Boolean = false
-) : SelectListAdapter<GalleryListAdapterLayoutBinding, GalleryMedia, GalleryListAdapter.galleryListEvent>(
+) : SelectListAdapter<GalleryListAdapterLayoutBinding, GalleryMedia, GalleryListAdapter.GalleryListEvent>(
     context, true
 ) {
     private val medias: MutableList<GalleryMedia> = mutableListOf()
@@ -32,15 +32,15 @@ class GalleryListAdapter(
         DELETED
     }
 
-    sealed class galleryListEvent {
-        object SelectAll : galleryListEvent()
-        object QuiteSelectAll : galleryListEvent()
-        data class NoticeDataUpdate(val item: MutableList<GalleryMedia>?) : galleryListEvent()
-        data class NoticeSelectChange(val item: GalleryMedia) : galleryListEvent()
-        data class RemoveMedia(val galleryMedia: GalleryMedia) : galleryListEvent()
-        data class NoticeListItemUpdate(val media: GalleryMedia) : galleryListEvent()
-        data class NoticeListItemDelete(val media: GalleryMedia) : galleryListEvent()
-        data class NoticeListItemInsert(val media: GalleryMedia) : galleryListEvent()
+    sealed class GalleryListEvent {
+        object SelectAll : GalleryListEvent()
+        object QuiteSelectAll : GalleryListEvent()
+        data class NoticeDataUpdate(val item: MutableList<GalleryMedia>?) : GalleryListEvent()
+        data class NoticeSelectChange(val item: GalleryMedia) : GalleryListEvent()
+        data class RemoveMedia(val galleryMedia: GalleryMedia) : GalleryListEvent()
+        data class NoticeListItemUpdate(val media: GalleryMedia) : GalleryListEvent()
+        data class NoticeListItemDelete(val media: GalleryMedia) : GalleryListEvent()
+        data class NoticeListItemInsert(val media: GalleryMedia) : GalleryListEvent()
     }
 
     fun setMedias(list: MutableList<GalleryMedia>) {
@@ -51,9 +51,9 @@ class GalleryListAdapter(
     private var onSelectMod = false
 
     @SuppressLint("NotifyDataSetChanged")
-    override suspend fun onEventIO(data: galleryListEvent) {
+    override suspend fun onEventIO(data: GalleryListEvent) {
         when (data) {
-            is galleryListEvent.QuiteSelectAll -> {
+            is GalleryListEvent.QuiteSelectAll -> {
                 if (!onSelectMod) return
                 onSelectMod = false
                 clearAllSelected()
@@ -61,27 +61,27 @@ class GalleryListAdapter(
                     onSelectListener?.select(selectList)
                 }
             }
-            is galleryListEvent.SelectAll -> {
+            is GalleryListEvent.SelectAll -> {
                 onSelectMod = true
                 for (i in 0 until medias.size) {
                     selectList.add(medias[i])
                     notifyItemChangedCO(i)
                 }
             }
-            is galleryListEvent.NoticeDataUpdate -> {
+            is GalleryListEvent.NoticeDataUpdate -> {
                 if (data.item == null) return
                 medias.clear()
                 medias.addAll(data.item)
                 notifyDataSetChangedCO()
             }
-            is galleryListEvent.NoticeSelectChange -> {
+            is GalleryListEvent.NoticeSelectChange -> {
                 val indexOf = medias.indexOf(data.item)
                 if (indexOf != -1) {
                     onSelectMod = true
                     notifyItemChangedCO(indexOf)
                 }
             }
-            is galleryListEvent.RemoveMedia -> {
+            is GalleryListEvent.RemoveMedia -> {
                 val index = medias.indexOf(data.galleryMedia)
                 if (index != -1) {
                     medias.removeAt(index)
@@ -89,21 +89,21 @@ class GalleryListAdapter(
                     notifyItemRemovedCO(index)
                 }
             }
-            is galleryListEvent.NoticeListItemUpdate -> {
+            is GalleryListEvent.NoticeListItemUpdate -> {
                 val index = medias.indexOf(data.media)
                 if (index != -1) {
                     medias[index] = data.media
                     notifyItemChangedCO(index)
                 }
             }
-            is galleryListEvent.NoticeListItemDelete -> {
+            is GalleryListEvent.NoticeListItemDelete -> {
                 val index = medias.indexOf(data.media)
                 if (index != -1) {
                     medias.removeAt(index)
                     notifyItemRemovedCO(index)
                 }
             }
-            is galleryListEvent.NoticeListItemInsert -> {
+            is GalleryListEvent.NoticeListItemInsert -> {
                 withContext(Dispatchers.Main) {
                     medias.add(0, data.media)
                     notifyItemInserted(0)
@@ -187,35 +187,35 @@ class GalleryListAdapter(
     }
 
     fun noticeDataUpdate(item: MutableList<GalleryMedia>?) {
-        emit(galleryListEvent.NoticeDataUpdate(item))
+        emit(GalleryListEvent.NoticeDataUpdate(item))
     }
 
     fun selectAll() {
-        emit(galleryListEvent.SelectAll)
+        emit(GalleryListEvent.SelectAll)
     }
 
     fun quitSelectMod() {
-        emit(galleryListEvent.QuiteSelectAll)
+        emit(GalleryListEvent.QuiteSelectAll)
     }
 
     fun noticeSelectChange(item: GalleryMedia) {
-        emit(galleryListEvent.NoticeSelectChange(item))
+        emit(GalleryListEvent.NoticeSelectChange(item))
     }
 
     fun removeMedia(galleryMedia: GalleryMedia) {
-        emit(galleryListEvent.RemoveMedia(galleryMedia))
+        emit(GalleryListEvent.RemoveMedia(galleryMedia))
     }
 
     fun noticeListItemUpdate(media: GalleryMedia) {
-        emit(galleryListEvent.NoticeListItemUpdate(media))
+        emit(GalleryListEvent.NoticeListItemUpdate(media))
     }
 
     fun noticeListItemDelete(media: GalleryMedia) {
-        emit(galleryListEvent.NoticeListItemDelete(media))
+        emit(GalleryListEvent.NoticeListItemDelete(media))
     }
 
     fun noticeListItemInsert(media: GalleryMedia) {
-        emit(galleryListEvent.NoticeListItemInsert(media))
+        emit(GalleryListEvent.NoticeListItemInsert(media))
     }
 
     override fun getItemCount(): Int {

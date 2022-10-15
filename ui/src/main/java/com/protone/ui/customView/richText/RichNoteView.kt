@@ -12,6 +12,7 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
 import android.util.AttributeSet
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
@@ -163,6 +164,7 @@ class RichNoteView @JvmOverloads constructor(
                     }
                     addTextChangedListener(object : MyTextWatcher {
                         override fun afterTextChanged(s: Editable?) {
+                            Log.d("TAG", "afterTextChanged: ${s.toString()}")
                             noteHandler.updatePosition(this@RichNoteView.indexOfChild(this@apply))
                             noteHandler.getCurRichStates().let {
                                 if (it is RichNoteStates) it.apply { text = s }

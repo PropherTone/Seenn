@@ -34,7 +34,7 @@ class MainViewModel : BaseViewModel() {
 
     fun loadBlurIcon(path: String): Bitmap? {
         return try {
-            Blur(SApplication.app).blur(
+            Blur.blur(
                 path.toBitmap(),
                 radius = 10,
                 sampling = 10

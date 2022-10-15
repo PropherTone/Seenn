@@ -77,8 +77,6 @@ class NoteActivity :
             }
         }
 
-        getNoteTypeAdapter()?.addNote?.invoke(R.string.all.getString())
-
         onViewEvent {
             when (it) {
                 NoteViewModel.NoteViewEvent.RefreshList -> refreshList()

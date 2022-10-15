@@ -119,8 +119,6 @@ class MainActivity :
             }
         }
 
-        binding.noteBook.performClick()
-
         onViewEvent {
             when (it) {
                 MainViewModel.MainViewEvent.Gallery ->
@@ -140,20 +138,27 @@ class MainActivity :
     }
 
     private suspend fun MainViewModel.refreshModelList() {
-        getPhotoInToday()?.let {
-            Glide.with(this@MainActivity).load(it.uri).into(binding.photoCardPhoto)
-            binding.photoCardTitle.text = it.date.toDateString("yyyy/MM/dd")
+        getPhotoInToday()?.let { media ->
+            Glide.with(this@MainActivity).load(media.uri).into(binding.photoCardPhoto)
+            binding.photoCardTitle.text = media.date.toDateString("yyyy/MM/dd")
             binding.timePhoto.setOnClickListener {
                 startActivity(GalleryViewActivity::class.intent.apply {
-                    putExtra(GalleryViewViewModel.MEDIA, it.toJson())
-                    putExtra(GalleryViewViewModel.TYPE, false)
+                    putExtra(GalleryViewViewModel.MEDIA, media.toJson())
+                    putExtra(GalleryViewViewModel.IS_VIDEO, false)
                     putExtra(GalleryViewViewModel.GALLERY, R.string.all_gallery.getString())
                 })
             }
         }
-        getVideoInToday()?.let {
-            binding.videoPlayer.setVideoPath(it.uri)
-            binding.videoCardTitle.text = it.date.toDateString()
+        getVideoInToday()?.let { media ->
+            binding.videoPlayer.setVideoPath(media.uri)
+            binding.videoCardTitle.text = media.date.toDateString()
+            binding.videoPlayer.setFullScreen {
+                startActivity(GalleryViewActivity::class.intent.apply {
+                    putExtra(GalleryViewViewModel.MEDIA, media.toJson())
+                    putExtra(GalleryViewViewModel.IS_VIDEO, true)
+                    putExtra(GalleryViewViewModel.GALLERY, R.string.all_gallery.getString())
+                })
+            }
         }
     }
 }

@@ -89,7 +89,7 @@ class NoteViewActivity :
                         if (collect != null && collect.size > 0) {
                             startActivity(GalleryViewActivity::class.intent.apply {
                                 putExtra(GalleryViewViewModel.MEDIA, collect[0].toJson())
-                                putExtra(GalleryViewViewModel.TYPE, isVideo)
+                                putExtra(GalleryViewViewModel.IS_VIDEO, isVideo)
                             })
                         } else R.string.none.getString().toast()
                     }

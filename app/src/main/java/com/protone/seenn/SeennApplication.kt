@@ -5,6 +5,7 @@ import android.content.Context
 import com.protone.api.SCrashHandler
 import com.protone.api.baseType.DPI
 import com.protone.api.context.SApplication
+import com.protone.api.img.Blur
 import com.protone.api.todayDate
 import java.io.File
 
@@ -13,6 +14,7 @@ class SeennApplication : Application() {
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
+        Blur.init(this)
         SApplication.init(this)
         DPI = SApplication.app.resources.displayMetrics.densityDpi
         val file = File("${base?.externalCacheDir?.path}/CrashLog")

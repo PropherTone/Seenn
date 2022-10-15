@@ -10,11 +10,13 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 @Suppress("DEPRECATION")
-class Blur(context: Context) {
-    private val contextRef = WeakReference(context)
-    private val defaultBlurRadius: Int
+object Blur {
+    private var defaultBlurRadius: Int = 0
+    private var rs : RenderScript? = null
 
-    init {
+    fun init(context: Context) {
+        val weakContext = WeakReference(context)
+        rs = RenderScript.create(weakContext.get())
         val densityStable =
             DisplayMetrics.DENSITY_DEVICE_STABLE / DisplayMetrics.DENSITY_DEFAULT.toFloat()
         defaultBlurRadius = min(BlurFactor.MAX_RADIUS, (densityStable * 10).roundToInt())
@@ -66,15 +68,12 @@ class Blur(context: Context) {
     }
 
     @Throws(RSRuntimeException::class)
-    private fun rs(bitmap: Bitmap, radius: Int): Bitmap? {
-        val context = contextRef.get() ?: return null
-        var rs: RenderScript? = null
+    private fun rs(bitmap: Bitmap, radius: Int): Bitmap {
         var input: Allocation? = null
         var output: Allocation? = null
         var blur: ScriptIntrinsicBlur? = null
         try {
-            rs = RenderScript.create(context)
-            rs.messageHandler = RenderScript.RSMessageHandler()
+            rs?.messageHandler = RenderScript.RSMessageHandler()
             input = Allocation.createFromBitmap(
                 rs, bitmap, Allocation.MipmapControl.MIPMAP_NONE,
                 Allocation.USAGE_SCRIPT
@@ -290,7 +289,8 @@ class Blur(context: Context) {
             y = 0
             while (y < h) {
                 // Preserve alpha channel: ( 0xff000000 & pix[yi] )
-                pix[yi] = -0x1000000 and pix[yi] or (dv[rsum] shl 16) or (dv[gsum] shl 8) or dv[bsum]
+                pix[yi] =
+                    -0x1000000 and pix[yi] or (dv[rsum] shl 16) or (dv[gsum] shl 8) or dv[bsum]
                 rsum -= routsum
                 gsum -= goutsum
                 bsum -= boutsum

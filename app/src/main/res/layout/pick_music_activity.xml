@@ -15,25 +15,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <EditText
-            android:id="@+id/addMB_search"
+        <FrameLayout
+            android:id="@+id/search_container"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/action_icon"
+            android:layout_height="wrap_content"
             android:background="@color/foreDark"
-            android:drawableStart="@drawable/ic_baseline_search_24_white"
-            android:drawablePadding="@dimen/icon_padding"
-            android:hint="@string/search_music"
-            android:importantForAutofill="no"
-            android:inputType="textNoSuggestions"
-            android:paddingStart="@dimen/icon_padding_mid"
-            android:paddingEnd="0dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/white"
-            android:textSize="@dimen/sub_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="LabelFor" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/addMB_search"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/action_icon"
+                android:background="@color/transparent"
+                android:drawableStart="@drawable/ic_baseline_search_24_white"
+                android:drawablePadding="@dimen/icon_padding"
+                android:hint="@string/search_music"
+                android:importantForAutofill="no"
+                android:inputType="textNoSuggestions"
+                android:paddingStart="@dimen/icon_padding_mid"
+                android:paddingEnd="0dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:textSize="@dimen/sub_text"
+                tools:ignore="LabelFor" />
+
+        </FrameLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/addMB_list"
@@ -43,7 +51,7 @@
             app:layout_constraintBottom_toTopOf="@id/action_btn_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/addMB_search" />
+            app:layout_constraintTop_toBottomOf="@+id/search_container" />
 
         <FrameLayout
             android:id="@+id/action_btn_container"

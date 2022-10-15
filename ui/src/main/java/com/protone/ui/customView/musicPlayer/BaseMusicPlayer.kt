@@ -73,7 +73,7 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
     private fun loadBlurCover(albumBitmap: Bitmap) {
         launch(Dispatchers.Default) {
             try {
-                val blur = Blur(context).blur(albumBitmap, radius = 30, sampling = 10)
+                val blur = Blur.blur(albumBitmap, radius = 12, sampling = 10)
                 if (interceptAlbumCover && blur != null) {
                     withContext(Dispatchers.Main) {
                         onBlurAlbumCover?.invoke(blur)

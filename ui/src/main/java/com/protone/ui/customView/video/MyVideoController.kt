@@ -1,11 +1,14 @@
 package com.protone.ui.customView.video
 
 import android.content.Context
+import android.net.Uri
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import com.bumptech.glide.Glide
 import com.protone.api.baseType.getDrawable
 import com.protone.api.context.newLayoutInflater
 import com.protone.ui.R
@@ -25,11 +28,11 @@ class MyVideoController @JvmOverloads constructor(
     private var pauseVideo: (() -> Unit)? = null
     private var fullScreen: (() -> Unit)? = null
 
-    var title : String = ""
-    set(value) {
-        binding.vTitle.text = value
-        field = value
-    }
+    var title: String = ""
+        set(value) {
+            binding.vTitle.text = value
+            field = value
+        }
 
     fun playVideo(func: () -> Unit) {
         playVideo = func
@@ -41,6 +44,14 @@ class MyVideoController @JvmOverloads constructor(
 
     fun fullScreen(func: () -> Unit) {
         fullScreen = func
+    }
+
+    fun loadCover(path: String) {
+        Glide.with(context).asDrawable().load(path).into(binding.vVideoCover)
+    }
+
+    fun loadCover(path: Uri) {
+        Glide.with(context).asDrawable().load(path).into(binding.vVideoCover)
     }
 
     private var isPlaying = false
@@ -86,8 +97,9 @@ class MyVideoController @JvmOverloads constructor(
         isPlaying = true
     }
 
-    private fun onPlay(){
+    private fun onPlay() {
         binding.vStart.isVisible = false
+        binding.vVideoCover.isGone = true
         binding.vContainer.isVisible = true
         isVisible = false
     }
@@ -97,7 +109,9 @@ class MyVideoController @JvmOverloads constructor(
         isVisible = true
         binding.vStart.isVisible = true
         binding.vContainer.isVisible = false
+        binding.vVideoCover.isGone = false
         binding.vSeekBar.stop()
+        binding.vSeekBar.barSeekTo(0)
     }
 
     fun setVideoDuration(duration: Long) {

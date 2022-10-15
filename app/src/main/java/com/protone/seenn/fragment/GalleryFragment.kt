@@ -286,7 +286,7 @@ class GalleryFragment(
     override fun openView(galleryMedia: GalleryMedia) {
         startActivity(GalleryViewActivity::class.intent.apply {
             putExtra(GalleryViewViewModel.MEDIA, galleryMedia.toJson())
-            putExtra(GalleryViewViewModel.TYPE, galleryMedia.isVideo)
+            putExtra(GalleryViewViewModel.IS_VIDEO, galleryMedia.isVideo)
             putExtra(GalleryViewViewModel.GALLERY, viewModel.getGalleryName())
         })
     }

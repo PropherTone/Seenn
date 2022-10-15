@@ -33,7 +33,7 @@ class MyVideoPlayer @JvmOverloads constructor(
 
     private val videoController: MyVideoController by lazy { MyVideoController(context) }
 
-    var title : String = ""
+    var title: String = ""
         set(value) {
             videoController.title = value
             field = value
@@ -113,8 +113,13 @@ class MyVideoPlayer @JvmOverloads constructor(
         )
     }
 
+    fun playVideo(func: () -> Unit) {
+        videoController.playVideo(func)
+    }
+
     fun setVideoPath(path: Uri) {
         this.path = path
+        loadCover(path)
         initPlayer()
     }
 
@@ -132,6 +137,14 @@ class MyVideoPlayer @JvmOverloads constructor(
         } catch (e: IllegalStateException) {
             if (isInDebug()) e.printStackTrace()
         }
+    }
+
+    private fun loadCover(path:String){
+        videoController.loadCover(path)
+    }
+
+    private fun loadCover(path: Uri){
+        videoController.loadCover(path)
     }
 
     fun pause() {
@@ -222,14 +235,14 @@ class MyVideoPlayer @JvmOverloads constructor(
         }
     }
 
-    private var onComplete : (()->Unit)? = null
+    private var onComplete: (() -> Unit)? = null
 
-    fun doOnCompletion(block:()->Unit){
+    fun doOnCompletion(block: () -> Unit) {
         onComplete = block
     }
 
     override fun onCompletion(p0: MediaPlayer?) {
-        videoController.complete()
+        release()
         onComplete?.invoke()
     }
 

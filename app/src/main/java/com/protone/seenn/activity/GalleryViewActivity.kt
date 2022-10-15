@@ -74,7 +74,7 @@ class GalleryViewActivity : BaseMediaActivity<
     }
 
     override suspend fun GalleryViewViewModel.init() {
-        val isVideo = intent.getBooleanExtra(GalleryViewViewModel.TYPE, false)
+        val isVideo = intent.getBooleanExtra(GalleryViewViewModel.IS_VIDEO, false)
         val gallery =
             intent.getStringExtra(GalleryViewViewModel.GALLERY) ?: R.string.all_gallery.getString()
         initGalleryData(gallery, isVideo)
