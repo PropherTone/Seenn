@@ -105,11 +105,12 @@ fun View.marginBottom(margin: Int) {
     layoutParams = marginLayoutParams
 }
 
-inline fun View.onGlobalLayout(crossinline block:View.()->Unit){
-    var onGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
-    onGlobalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
-        block.invoke(this)
-        viewTreeObserver.removeOnGlobalLayoutListener(onGlobalLayoutListener)
-    }
-    viewTreeObserver.addOnGlobalLayoutListener(onGlobalLayoutListener)
+inline fun View.onGlobalLayout(crossinline block: View.() -> Unit) {
+    val view = this
+    viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        override fun onGlobalLayout() {
+            block.invoke(view)
+            viewTreeObserver.removeOnGlobalLayoutListener(this)
+        }
+    })
 }

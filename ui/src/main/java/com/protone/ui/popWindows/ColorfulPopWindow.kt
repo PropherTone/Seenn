@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.NumberPicker
 import android.widget.PopupWindow
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
@@ -150,6 +151,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
 
     inline fun startParagraphSpanSettingPop(
         anchor: View,
+        alignments: List<SpanStates.SpanAlignment>?,
         crossinline onResult: (SpanStates.SpanAlignment) -> Unit
     ) = weakContext.get()?.let { context ->
         val binding = ParagraphSpanOptionalLayoutBinding.inflate(
@@ -157,16 +159,55 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
             context.root,
             false
         ).apply {
+            alignments?.forEach {
+                when (it) {
+                    SpanStates.SpanAlignment.ALIGN_OPPOSITE -> alignRight.alpha = 1.0f
+                    SpanStates.SpanAlignment.ALIGN_NORMAL -> alignLeft.alpha = 1.0f
+                    SpanStates.SpanAlignment.ALIGN_CENTER -> alignCenter.alpha = 1.0f
+                    SpanStates.SpanAlignment.FIRST_LINE_ALIGN -> firstAlign.alpha = 1.0f
+                    else -> {}
+                }
+            }
             alignCenter.setOnClickListener {
+                typeContainer.children.forEach { child ->
+                    if (child != it) {
+                        if (child != firstAlign) {
+                            child.alpha = 0.5f
+                        }
+                    } else {
+                        child.alpha = 1f
+                    }
+                }
                 onResult.invoke(SpanStates.SpanAlignment.ALIGN_CENTER)
             }
             alignLeft.setOnClickListener {
+                typeContainer.children.forEach { child ->
+                    if (child != it) {
+                        if (child != firstAlign) {
+                            child.alpha = 0.5f
+                        }
+                    } else {
+                        child.alpha = 1f
+                    }
+                }
                 onResult.invoke(SpanStates.SpanAlignment.ALIGN_NORMAL)
             }
             alignRight.setOnClickListener {
+                typeContainer.children.forEach { child ->
+                    if (child != it) {
+                        if (child != firstAlign) {
+                            child.alpha = 0.5f
+                        }
+                    } else {
+                        child.alpha = 1f
+                    }
+                }
                 onResult.invoke(SpanStates.SpanAlignment.ALIGN_OPPOSITE)
             }
             firstAlign.setOnClickListener {
+                typeContainer.children.find { child -> child == it }?.let { fa ->
+                    fa.alpha = if (fa.alpha != 1.0f) 1.0f else 0.5f
+                }
                 onResult.invoke(SpanStates.SpanAlignment.FIRST_LINE_ALIGN)
             }
         }

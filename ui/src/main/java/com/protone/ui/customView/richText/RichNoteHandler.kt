@@ -1,7 +1,9 @@
 package com.protone.ui.customView.richText
 
 import android.net.Uri
+import android.util.Log
 import android.widget.EditText
+import com.protone.api.TAG
 import com.protone.api.baseType.deleteFile
 import com.protone.api.baseType.imageSaveToDisk
 import com.protone.api.baseType.toBitmap
@@ -78,9 +80,27 @@ class RichNoteHandler(private val editor: ISpanForEditor) {
      */
     fun setEditTextSpan(targetSpan: SpanStates.Spans) {
         getCurrentEditText()?.also {
-            val start = it.selectionStart
-            val end = it.selectionEnd
-            it.text.setSpan(SpanStates(start, end, targetSpan), start, end)
+            var start = it.selectionStart
+            var end = it.selectionEnd
+            if (start == end) return
+            SpanStates(start, end, targetSpan).let { spanStates ->
+                if (spanStates.isParagraphSpan()) {
+                    val text = it.text
+                    Log.d(TAG, "setEditTextSpan: ${"\n".length}")
+                    start = text.substring(0, start).lastIndexOf("\n") + 1
+                    end = text.substring(end).indexOf("\n")
+                    if (start == -1) {
+                        start = 0
+                    }
+                    if (end == -1) {
+                        end = text.length
+                    } else {
+                        end += it.selectionEnd
+                    }
+                    it.setSelection(start, end)
+                }
+                it.text.setSpan(spanStates, start, end)
+            }
             it.tag?.let { rs ->
                 if (rs is RichNoteStates) rs.apply { this.text = it.text }
             }

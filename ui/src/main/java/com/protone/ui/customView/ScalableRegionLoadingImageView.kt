@@ -207,6 +207,11 @@ class ScalableRegionLoadingImageView @JvmOverloads constructor(
         if (isLongImage()) doAnimateScale(1f)
     }
 
+    override fun onDrawForeground(canvas: Canvas?) {
+
+        super.onDrawForeground(canvas)
+    }
+
     override fun onDraw(canvas: Canvas?) {
         if (decoder == null) {
             super.onDraw(canvas)

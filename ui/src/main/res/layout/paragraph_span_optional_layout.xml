@@ -4,9 +4,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:padding="@dimen/main_padding">
 
         <LinearLayout
+            android:id="@+id/type_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -18,6 +20,7 @@
                 android:id="@+id/align_center"
                 android:layout_width="@dimen/small_Icon"
                 android:layout_height="@dimen/small_Icon"
+                android:alpha="0.5"
                 android:contentDescription="@string/action"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_baseline_format_align_center_24_black" />
@@ -28,6 +31,7 @@
                 android:layout_height="@dimen/small_Icon"
                 android:layout_marginStart="@dimen/main_margin"
                 android:layout_marginEnd="@dimen/main_margin"
+                android:alpha="0.5"
                 android:contentDescription="@string/action"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_baseline_format_align_left_24_black" />
@@ -37,6 +41,7 @@
                 android:layout_width="@dimen/small_Icon"
                 android:layout_height="@dimen/small_Icon"
                 android:layout_marginEnd="@dimen/main_margin"
+                android:alpha="0.5"
                 android:contentDescription="@string/action"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_baseline_format_align_right_24_black" />
@@ -45,6 +50,7 @@
                 android:id="@+id/first_align"
                 android:layout_width="@dimen/small_Icon"
                 android:layout_height="@dimen/small_Icon"
+                android:alpha="0.5"
                 android:contentDescription="@string/action"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_baseline_format_first_align_24_black" />

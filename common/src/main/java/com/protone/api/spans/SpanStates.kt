@@ -57,6 +57,13 @@ data class SpanStates(var start: Int, var end: Int, val targetSpan: Spans) {
             else -> if (back) BackColorSpan(Color.BLACK) else ColorSpan(Color.BLACK)
         }
 
+    fun isParagraphSpan(): Boolean {
+        return targetSpan is Spans.Bullet || targetSpan is Spans.Quote || targetSpan is Spans.Paragraph
+    }
+
+    fun isCancellableSpan(): Boolean {
+        return targetSpan is Spans.AbsoluteSize || targetSpan is Spans.BackgroundColor || targetSpan is Spans.ForegroundColor
+    }
 
     private fun checkColor(color: Any?): Int? =
         when (color) {

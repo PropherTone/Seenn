@@ -10,14 +10,8 @@ import android.text.style.StyleSpan
 import android.util.Base64
 import com.protone.api.entity.SpanStyle
 
-private fun checkCancellableSpan(targetSpan: Any): Boolean {
-    return targetSpan is AbsoluteSizeSpan || targetSpan is ColorSpan || targetSpan is BackColorSpan
-}
-
 fun Spannable.setSpan(spanStates: SpanStates, start: Int, end: Int) {
-    var isCancellableSpan = false
     val spans = spanStates.getTargetSpan()?.let { targetSpan ->
-        isCancellableSpan = checkCancellableSpan(targetSpan)
         val getSpans = this.getSpans(
             start,
             end,
@@ -28,6 +22,7 @@ fun Spannable.setSpan(spanStates: SpanStates, start: Int, end: Int) {
                 .toTypedArray()
         } else getSpans
     }
+    val isCancellableSpan = spanStates.isCancellableSpan()
     val styleList = mutableListOf<SpanStyle>()
     if (spans?.isNotEmpty() == true) {
         fun addStyle(start: Int, end: Int) {
