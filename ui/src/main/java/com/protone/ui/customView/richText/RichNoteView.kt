@@ -8,9 +8,13 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.text.Editable
+import android.text.Layout
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
+import android.text.style.AlignmentSpan
+import android.text.style.LeadingMarginSpan
+import android.text.style.ParagraphStyle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyEvent
@@ -115,6 +119,27 @@ class RichNoteView @JvmOverloads constructor(
                 spans[0].size
             } else it.textSize.toInt()
         } ?: 20
+
+    fun getSelectionTextParagraphSpan() =
+        noteHandler.getCurrentEditText()?.let {
+            it.text.getSpans(it.selectionStart, it.selectionEnd, ParagraphStyle::class.java)
+                .filter { span ->
+                    span is AlignmentSpan || span is LeadingMarginSpan.Standard
+                }.map { style ->
+                    when (style) {
+                        is AlignmentSpan -> {
+                            when (style.alignment) {
+                                Layout.Alignment.ALIGN_CENTER -> SpanStates.SpanAlignment.ALIGN_CENTER
+                                Layout.Alignment.ALIGN_NORMAL -> SpanStates.SpanAlignment.ALIGN_NORMAL
+                                Layout.Alignment.ALIGN_OPPOSITE -> SpanStates.SpanAlignment.ALIGN_OPPOSITE
+                                null -> SpanStates.SpanAlignment.ALIGN_RIGHT
+                            }
+                        }
+                        is LeadingMarginSpan.Standard -> SpanStates.SpanAlignment.FIRST_LINE_ALIGN
+                        else -> SpanStates.SpanAlignment.ALIGN_RIGHT
+                    }
+                }.toList()
+        }
 
     override fun insertText(note: RichNoteStates) {
         addView(when (isEditable) {

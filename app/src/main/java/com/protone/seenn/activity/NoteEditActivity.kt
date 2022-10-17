@@ -284,6 +284,10 @@ class NoteEditActivity :
     }
 
     override fun insertMusic(uri: Uri, list: MutableList<String>, title: String) {
+        if (list.isEmpty()) {
+            binding.noteEditRichNote.insertMusic(RichMusicStates(uri, null, title))
+            return
+        }
         popWindow?.startListPopup(R.string.pick_note.getString(), binding.noteEditTool, list) {
             popWindow?.dismiss()
             binding.noteEditRichNote.insertMusic(RichMusicStates(uri, it, title))
@@ -330,8 +334,13 @@ class NoteEditActivity :
     }
 
     override fun setParagraph() {
-        popWindow?.startParagraphSpanSettingPop(binding.noteEditTool) { alignment ->
-            binding.noteEditRichNote.setParagraph(alignment)
+        binding.noteEditRichNote.apply {
+            popWindow?.startParagraphSpanSettingPop(
+                binding.noteEditTool,
+                getSelectionTextParagraphSpan()
+            ) { alignment ->
+                setParagraph(alignment)
+            }
         }
     }
 
