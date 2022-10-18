@@ -119,6 +119,8 @@ class MainActivity :
             }
         }
 
+        startActivity(NoteActivity::class.intent)
+
         onViewEvent {
             when (it) {
                 MainViewModel.MainViewEvent.Gallery ->

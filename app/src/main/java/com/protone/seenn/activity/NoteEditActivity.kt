@@ -36,16 +36,18 @@ class NoteEditActivity :
     override val viewModel: NoteEditViewModel by viewModels()
 
     private var popWindow: ColorfulPopWindow? = null
-        get() {
-            return if (field != null) {
-                field?.dismiss()
-                field = null
-                field
-            } else ColorfulPopWindow(this).also {
-                field = it
-                it.setOnDismissListener { field = null }
+    private fun getPopWindow(): ColorfulPopWindow? {
+        return if (popWindow != null) {
+            if (popWindow?.isShowing == false) {
+                popWindow?.dismiss()
             }
+            popWindow = null
+            popWindow
+        } else ColorfulPopWindow(this).also {
+            popWindow = it
+            it.setOnDismissListener { popWindow = null }
         }
+    }
 
     private var title: String
         set(value) {
@@ -61,6 +63,7 @@ class NoteEditActivity :
                     -verticalOffset / appBarLayout.totalScrollRange.toFloat()
             }
             setSoftInputStatusListener { height, isShow ->
+                popWindow?.dismiss()
                 if (isShow) {
                     root.marginBottom(height)
                 } else {
@@ -288,8 +291,8 @@ class NoteEditActivity :
             binding.noteEditRichNote.insertMusic(RichMusicStates(uri, null, title))
             return
         }
-        popWindow?.startListPopup(R.string.pick_note.getString(), binding.noteEditTool, list) {
-            popWindow?.dismiss()
+        getPopWindow()?.startListPopup(R.string.pick_note.getString(), binding.noteEditTool, list) {
+            getPopWindow()?.dismiss()
             binding.noteEditRichNote.insertMusic(RichMusicStates(uri, it, title))
         }
     }
@@ -300,7 +303,7 @@ class NoteEditActivity :
 
     override fun setSize() {
         binding.run {
-            popWindow?.startNumberPickerPopup(
+            getPopWindow()?.startNumberPickerPopup(
                 noteEditTool,
                 noteEditRichNote.getSelectionTextSize()
             ) { noteEditRichNote.setSize(it) }
@@ -322,20 +325,20 @@ class NoteEditActivity :
     override fun setSuperscript() = binding.noteEditRichNote.setSuperscript()
 
     override fun setBullet() {
-        popWindow?.startBulletSpanSettingPop(binding.noteEditTool) { gapWidth, color, radius ->
+        getPopWindow()?.startBulletSpanSettingPop(binding.noteEditTool) { gapWidth, color, radius ->
             binding.noteEditRichNote.setBullet(gapWidth, color, radius)
         }
     }
 
     override fun setQuote() {
-        popWindow?.startQuoteSpanSettingPop(binding.noteEditTool) { color, stripeWidth, gapWidth ->
+        getPopWindow()?.startQuoteSpanSettingPop(binding.noteEditTool) { color, stripeWidth, gapWidth ->
             binding.noteEditRichNote.setQuote(color, stripeWidth, gapWidth)
         }
     }
 
     override fun setParagraph() {
         binding.noteEditRichNote.apply {
-            popWindow?.startParagraphSpanSettingPop(
+            getPopWindow()?.startParagraphSpanSettingPop(
                 binding.noteEditTool,
                 getSelectionTextParagraphSpan()
             ) { alignment ->
@@ -345,7 +348,7 @@ class NoteEditActivity :
     }
 
     override fun setColor(isBackGround: Boolean) {
-        popWindow?.startColorPickerPopup(binding.noteEditTool) {
+        getPopWindow()?.startColorPickerPopup(binding.noteEditTool) {
             if (isBackGround) {
                 binding.noteEditRichNote.setBackColor(it.toHexColor())
             } else {

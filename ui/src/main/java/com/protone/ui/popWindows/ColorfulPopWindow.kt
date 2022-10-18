@@ -33,7 +33,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
         val binding =
             ColorPopLayoutBinding.inflate(context.newLayoutInflater, context.root, false)
         binding.popColorPicker.onColorChangeListener { onCall(it) }
-        startPopup(context, binding.root, anchor, isUpToBot)
+        startPopup(context, binding.root, anchor, isUpToBot,isOutsideTouchable = false)
     }
 
     inline fun startNumberPickerPopup(
@@ -51,7 +51,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
             descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
             setOnValueChangedListener { _, _, newVal -> onCall.invoke(newVal) }
         }
-        startPopup(context, binding.root, anchor, isUpToBot)
+        startPopup(context, binding.root, anchor, isUpToBot,isOutsideTouchable = false)
     }
 
     inline fun startListPopup(
@@ -107,10 +107,11 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
                     }
                 }
                 confirm.setOnClickListener {
+                    this@ColorfulPopWindow.dismiss()
                     onResult.invoke(gapWidth.text.toInt(), color, radius.text.toInt())
                 }
             }
-        startPopup(context, binding.root, anchor, false)
+        startPopup(context, binding.root, anchor,  isUpToBot = false,isOutsideTouchable = false)
     }
 
     inline fun startQuoteSpanSettingPop(
@@ -143,10 +144,11 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
                     }
                 }
                 confirm.setOnClickListener {
+                    this@ColorfulPopWindow.dismiss()
                     onResult.invoke(color, stripeWidth.text.toInt(), gapWidth.text.toInt())
                 }
             }
-        startPopup(context, binding.root, anchor, false)
+        startPopup(context, binding.root, anchor,  isUpToBot = false,isOutsideTouchable = false)
     }
 
     inline fun startParagraphSpanSettingPop(
@@ -211,7 +213,7 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
                 onResult.invoke(SpanStates.SpanAlignment.FIRST_LINE_ALIGN)
             }
         }
-        startPopup(context, binding.root, anchor, false)
+        startPopup(context, binding.root, anchor, isUpToBot = false,isOutsideTouchable = false)
     }
 
     inline fun startPopup(
@@ -219,13 +221,15 @@ class ColorfulPopWindow(context: Context) : PopupWindow(context) {
         view: View,
         anchor: View,
         isUpToBot: Boolean,
+        isOutsideTouchable : Boolean = true,
+        focusable : Boolean = false,
         func: () -> Unit = {}
     ) {
         contentView = view
         width = anchor.measuredWidth
         height = ViewGroup.LayoutParams.WRAP_CONTENT
-        this.isOutsideTouchable = true
-        this.isFocusable = true
+        this.isOutsideTouchable = isOutsideTouchable
+        this.isFocusable = focusable
         this.animationStyle =
             if (isUpToBot) R.style.PopAnimationUpToBot else R.style.PopAnimationBotToUp
         setBackgroundDrawable(
