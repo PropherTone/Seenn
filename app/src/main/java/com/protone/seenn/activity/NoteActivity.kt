@@ -77,7 +77,7 @@ class NoteActivity :
             }
         }
 
-        getNoteTypeAdapter()?.addNote?.invoke(R.string.all.getString())
+//        getNoteTypeAdapter()?.addNote?.invoke(R.string.all.getString())
 
         onViewEvent {
             when (it) {

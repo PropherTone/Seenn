@@ -38,6 +38,12 @@ class ColorfulProgressBar @JvmOverloads constructor(
     private var moveLength = 0f
     private var isTouch = false
     var barDuration: Long = 0
+        set(value) {
+            if (value >= 0) {
+                start()
+            }
+            field = value
+        }
     private var v = 0
     private var millis: Long = 50
 
@@ -53,6 +59,7 @@ class ColorfulProgressBar @JvmOverloads constructor(
     private val foreBarPaint = Paint().apply {
         style = Paint.Style.STROKE
         isAntiAlias = true
+        flags = Paint.ANTI_ALIAS_FLAG
         isDither = true
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
@@ -61,6 +68,7 @@ class ColorfulProgressBar @JvmOverloads constructor(
     private val backBarPaint = Paint().apply {
         style = Paint.Style.STROKE
         isAntiAlias = true
+        flags = Paint.ANTI_ALIAS_FLAG
         isDither = true
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
@@ -171,7 +179,7 @@ class ColorfulProgressBar @JvmOverloads constructor(
     fun start() {
         if (scope != null) return
         scope = MainScope()
-        scope?.launch(Dispatchers.IO) {
+        scope?.launch(Dispatchers.Default) {
             while (isActive) {
                 scroll += steep
                 if (scroll >= v) {
@@ -197,7 +205,9 @@ class ColorfulProgressBar @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        start()
+        if (barDuration >= 0) {
+            start()
+        }
     }
 
     override fun onDetachedFromWindow() {

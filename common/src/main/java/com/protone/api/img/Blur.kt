@@ -12,14 +12,22 @@ import kotlin.math.roundToInt
 @Suppress("DEPRECATION")
 object Blur {
     private var defaultBlurRadius: Int = 0
-    private var rs : RenderScript? = null
+    private var rs: RenderScript? = null
+    private var blur: ScriptIntrinsicBlur? = null
 
     fun init(context: Context) {
         val weakContext = WeakReference(context)
         rs = RenderScript.create(weakContext.get())
+        blur = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs))
         val densityStable =
             DisplayMetrics.DENSITY_DEVICE_STABLE / DisplayMetrics.DENSITY_DEFAULT.toFloat()
         defaultBlurRadius = min(BlurFactor.MAX_RADIUS, (densityStable * 10).roundToInt())
+    }
+
+    fun doFastBlur(bitmap: Bitmap, radius: Float) = try {
+        rs(bitmap, radius)
+    } catch (e: RSRuntimeException) {
+        stack(bitmap, radius.toInt(), true)
     }
 
     fun blur(
@@ -71,24 +79,41 @@ object Blur {
     private fun rs(bitmap: Bitmap, radius: Int): Bitmap {
         var input: Allocation? = null
         var output: Allocation? = null
-        var blur: ScriptIntrinsicBlur? = null
         try {
-            rs?.messageHandler = RenderScript.RSMessageHandler()
             input = Allocation.createFromBitmap(
                 rs, bitmap, Allocation.MipmapControl.MIPMAP_NONE,
                 Allocation.USAGE_SCRIPT
             )
             output = Allocation.createTyped(rs, input.type)
-            blur = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs))
-            blur.setInput(input)
-            blur.setRadius(radius.toFloat())
-            blur.forEach(output)
+            blur?.let {
+                it.setInput(input)
+                it.setRadius(radius.toFloat())
+                it.forEach(output)
+            }
             output.copyTo(bitmap)
         } finally {
-            rs?.destroy()
             input?.destroy()
             output?.destroy()
-            blur?.destroy()
+        }
+        return bitmap
+    }
+
+    @Throws(RSRuntimeException::class)
+    private fun rs(bitmap: Bitmap, radius: Float): Bitmap {
+        var input: Allocation? = null
+        var output: Allocation? = null
+        try {
+            input = Allocation.createFromBitmap(rs, bitmap)
+            output = Allocation.createTyped(rs, input.type)
+            blur?.let {
+                it.setInput(input)
+                it.setRadius(radius)
+                it.forEach(output)
+            }
+            output.copyTo(bitmap)
+        } finally {
+            input?.destroy()
+            output?.destroy()
         }
         return bitmap
     }

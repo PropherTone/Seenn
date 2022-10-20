@@ -119,7 +119,7 @@ class MainActivity :
             }
         }
 
-        startActivity(NoteActivity::class.intent)
+//        startActivity(NoteActivity::class.intent)
 
         onViewEvent {
             when (it) {
