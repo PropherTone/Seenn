@@ -1,0 +1,151 @@
+package com.protone.ui.customView.blurView
+
+import android.graphics.*
+import android.view.View
+import android.view.ViewTreeObserver
+import androidx.annotation.ColorInt
+
+abstract class BaseBlurFactory(protected val blurEngine: BlurEngine) : IBlurTool, IBlurConfig {
+    protected val scaleFactory = ScaleFactory()
+    protected val decorCanvas = BlurCanvas()
+    protected var decorBitmap: Bitmap? = null
+
+    protected var maskColor: Int = Color.TRANSPARENT
+        private set
+    protected var xfMode: PorterDuff.Mode = PorterDuff.Mode.ADD
+        private set
+
+    protected fun transformCanvas() {
+        scaleFactory.apply {
+            decorCanvas.translate(leftScaled, rightScaled)
+            decorCanvas.scale(1 / wScaled, 1 / hScaled)
+        }
+    }
+
+    protected fun makeCanvas(w: Int, h: Int, config: Bitmap.Config) {
+        decorBitmap = Bitmap.createBitmap(w, h, config)
+        decorCanvas.setBitmap(decorBitmap)
+    }
+
+    override fun setMaskXfMode(mode: PorterDuff.Mode) {
+        this.xfMode = mode
+    }
+
+    override fun setMaskColor(@ColorInt color: Int) {
+        this.maskColor = color
+    }
+
+    override fun setBlurRadius(radius: Float) {
+        blurEngine.setRadius(radius)
+    }
+
+    inner class BlurCanvas : Canvas()
+}
+
+class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
+    BaseBlurFactory(blurEngine) {
+
+    private var blurView: SBlurView? = null
+
+    private val bitmapPaint: Paint = Paint().apply {
+        flags = Paint.FILTER_BITMAP_FLAG
+    }
+
+    private var isResized = false
+    private var start = false
+
+    override fun drawDecor() {
+        if (!start && !isResized) return
+        root.apply {
+            if (width <= 0 || height <= 0) return
+            decorBitmap?.eraseColor(Color.TRANSPARENT)
+            draw(decorCanvas)
+        }
+    }
+
+    override fun blur() {
+        if (!start) return
+        drawDecor()
+        decorBitmap = decorBitmap?.apply { blurEngine.blur(this) }
+    }
+
+    override fun resize() {
+        isResized = false
+        blurView?.let {
+            scaleFactory.apply {
+                wScaled = (it.width / (decorBitmap?.width ?: it.width).toFloat())
+                hScaled = (it.height / (decorBitmap?.height ?: it.height).toFloat())
+                leftScaled = -it.x / wScaled
+                rightScaled = -it.y / hScaled
+            }
+            transformCanvas()
+            isResized = true
+        }
+    }
+
+    override fun drawBlurred(canvas: Canvas?) {
+        if (!start) return
+        decorBitmap?.also {
+            canvas?.apply {
+                save()
+                scale(scaleFactory.wScaled, scaleFactory.hScaled)
+                drawBitmap(it, 0f, 0f, bitmapPaint)
+                restore()
+            }
+            drawMask(canvas)
+        }
+    }
+
+    override fun drawMask(canvas: Canvas?) {
+        if (maskColor != Color.TRANSPARENT) {
+            canvas?.drawColor(maskColor, xfMode)
+        }
+    }
+
+    override fun setBlurView(view: SBlurView) {
+        this.blurView = view.apply {
+            setWillNotDraw(true)
+            onGlobalLayout {
+                val scaleFactor = blurEngine.getScaleFactor(width)
+                makeCanvas(
+                    (width / scaleFactor).toInt(),
+                    (height / scaleFactor).toInt(),
+                    blurEngine.getBitmapConfig()
+                )
+                resize()
+                start = true
+                setWillNotDraw(false)
+            }
+        }
+    }
+
+    override fun release() {
+        start = false
+        blurView?.setWillNotDraw(true)
+        decorBitmap?.recycle()
+    }
+
+    private inline fun View.onGlobalLayout(crossinline block: View.() -> Unit) {
+        val view = this
+        viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                viewTreeObserver.removeOnGlobalLayoutListener(this)
+                block.invoke(view)
+            }
+        })
+    }
+}
+
+class EmptyIBlurTool(blurEngine: BlurEngine = DefaultBlurEngine()) : BaseBlurFactory(blurEngine) {
+    override fun drawDecor() = Unit
+    override fun blur() = Unit
+    override fun resize() = Unit
+    override fun drawBlurred(canvas: Canvas?) = Unit
+    override fun drawMask(canvas: Canvas?) = Unit
+    override fun setMaskXfMode(mode: PorterDuff.Mode) = Unit
+    override fun setBlurView(view: SBlurView) = Unit
+    override fun setMaskColor(color: Int) = Unit
+    override fun setBlurRadius(radius: Float) = Unit
+    override fun release() = Unit
+}

@@ -9,16 +9,17 @@ import androidx.annotation.ColorInt
 
 class SBlurView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
+) : View(context, attrs, defStyleAttr), IBlurConfig {
 
-    private var blurTool: BlurTool = EmptyBlurTool()
+    private var blurTool: BaseBlurFactory = EmptyIBlurTool()
         set(value) {
             value.setBlurView(this)
             field = value
         }
 
-    fun initBlurTool(blurTool: BlurTool) {
+    fun initBlurTool(blurTool: BaseBlurFactory): BaseBlurFactory {
         this.blurTool = blurTool
+        return this.blurTool
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -35,24 +36,21 @@ class SBlurView @JvmOverloads constructor(
         blurTool.blur()
     }
 
-    fun setMaskColor(@ColorInt color: Int): BlurTool {
-        blurTool.setMaskColor(color)
-        return blurTool
-    }
-
-    fun release(): BlurTool {
+    fun release(): BaseBlurFactory {
         blurTool.release()
         return blurTool
     }
 
-    fun setXfMode(mode: PorterDuff.Mode): BlurTool {
+    override fun setMaskXfMode(mode: PorterDuff.Mode) {
         blurTool.setMaskXfMode(mode)
-        return blurTool
     }
 
-    fun setBlurRadius(radius: Float): BlurTool {
+    override fun setMaskColor(@ColorInt color: Int) {
+        blurTool.setMaskColor(color)
+    }
+
+    override fun setBlurRadius(radius: Float) {
         blurTool.setBlurRadius(radius)
-        return blurTool
     }
 
 }

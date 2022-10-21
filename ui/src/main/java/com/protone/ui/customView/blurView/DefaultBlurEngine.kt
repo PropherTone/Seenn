@@ -1,27 +1,12 @@
 package com.protone.ui.customView.blurView
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
 import com.protone.api.img.Blur
 import kotlin.math.roundToInt
 
 class DefaultBlurEngine : BlurEngine() {
 
-    private val bitmapPaint: Paint = Paint().apply {
-        flags = Paint.FILTER_BITMAP_FLAG
-    }
-
     override fun blur(bitmap: Bitmap): Bitmap? = Blur.doFastBlur(bitmap, blurRadius)
-
-    override fun draw(canvas: Canvas?, bitmap: Bitmap, scaleFactor: ScaleFactor) {
-        canvas?.apply {
-            save()
-            scale(scaleFactor.wScaled, scaleFactor.hScaled)
-            drawBitmap(bitmap, 0f, 0f, bitmapPaint)
-            restore()
-        }
-    }
 
     private fun calculateRoundedScaleFactor(w: Int, roundedScaleFactor: Float): Float {
         val round = (w / roundedScaleFactor).toInt() / DEFAULT_BITMAP_RENDER_ROUNDED

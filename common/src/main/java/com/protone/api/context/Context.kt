@@ -109,8 +109,8 @@ inline fun View.onGlobalLayout(crossinline block: View.() -> Unit) {
     val view = this
     viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
         override fun onGlobalLayout() {
-            block.invoke(view)
             viewTreeObserver.removeOnGlobalLayoutListener(this)
+            block.invoke(view)
         }
     })
 }

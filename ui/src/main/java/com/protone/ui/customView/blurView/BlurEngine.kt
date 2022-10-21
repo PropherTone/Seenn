@@ -1,7 +1,6 @@
 package com.protone.ui.customView.blurView
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
 
 abstract class BlurEngine {
     companion object {
@@ -20,7 +19,6 @@ abstract class BlurEngine {
     }
 
     abstract fun blur(bitmap: Bitmap): Bitmap?
-    abstract fun draw(canvas: Canvas?,bitmap: Bitmap,scaleFactor: ScaleFactor)
     abstract fun getScaleFactor(w: Int): Float
     abstract fun getBitmapConfig(): Bitmap.Config
     abstract fun release()
