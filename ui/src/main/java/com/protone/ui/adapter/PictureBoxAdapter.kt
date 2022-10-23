@@ -155,4 +155,3 @@ class PictureBoxAdapter(context: Context, private val picUri: MutableList<Galler
         return picUri.size
     }
 }
-

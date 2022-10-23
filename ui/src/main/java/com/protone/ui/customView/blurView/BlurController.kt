@@ -63,23 +63,33 @@ class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
         }
     }
 
-    override fun blur() {
-        if (!start) return
+    override fun blur(): Boolean {
+        if (!start) return false
         drawDecor()
         decorBitmap = decorBitmap?.apply { blurEngine.blur(this) }
+        return true
     }
 
     override fun resize() {
+        start = false
         isResized = false
-        blurView?.let {
+        blurView?.apply {
+            if (width == 0 || height == 0) return@apply
+            val scaleFactor = blurEngine.getScaleFactor(width)
+            makeCanvas(
+                (width / scaleFactor).toInt(),
+                (height / scaleFactor).toInt(),
+                blurEngine.getBitmapConfig()
+            )
             scaleFactory.apply {
-                wScaled = (it.width / (decorBitmap?.width ?: it.width).toFloat())
-                hScaled = (it.height / (decorBitmap?.height ?: it.height).toFloat())
-                leftScaled = -it.x / wScaled
-                rightScaled = -it.y / hScaled
+                wScaled = (width / (decorBitmap?.width ?: width).toFloat())
+                hScaled = (height / (decorBitmap?.height ?: height).toFloat())
+                leftScaled = -x / wScaled
+                rightScaled = -y / hScaled
             }
             transformCanvas()
             isResized = true
+            start = true
         }
     }
 
@@ -106,14 +116,7 @@ class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
         this.blurView = view.apply {
             setWillNotDraw(true)
             onGlobalLayout {
-                val scaleFactor = blurEngine.getScaleFactor(width)
-                makeCanvas(
-                    (width / scaleFactor).toInt(),
-                    (height / scaleFactor).toInt(),
-                    blurEngine.getBitmapConfig()
-                )
                 resize()
-                start = true
                 setWillNotDraw(false)
             }
         }
@@ -139,7 +142,7 @@ class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
 
 class EmptyIBlurTool(blurEngine: BlurEngine = DefaultBlurEngine()) : BaseBlurFactory(blurEngine) {
     override fun drawDecor() = Unit
-    override fun blur() = Unit
+    override fun blur() = false
     override fun resize() = Unit
     override fun drawBlurred(canvas: Canvas?) = Unit
     override fun drawMask(canvas: Canvas?) = Unit

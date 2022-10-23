@@ -2,6 +2,7 @@ package com.protone.worker.viewModel
 
 import com.protone.api.SCrashHandler
 import com.protone.api.baseType.getParentPath
+import com.protone.api.spans.toBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -12,7 +13,7 @@ class LogViewModel : BaseViewModel() {
     fun getLogContent(path:String): String {
         val file = File(path)
         val fileReader = FileReader(file)
-        return fileReader.readText()
+        return fileReader.readText().toBase64()
     }
 
     suspend fun getLogs(): MutableList<String>? {

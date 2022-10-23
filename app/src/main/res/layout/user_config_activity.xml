@@ -13,32 +13,38 @@
     <FrameLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
+        android:background="@color/blue_5"
         android:layout_height="match_parent">
 
         <ScrollView
-            android:layout_marginBottom="@dimen/action_icon_p"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <LinearLayout
                 android:id="@+id/userRoot"
-                android:background="@color/white"
+                android:paddingBottom="@dimen/action_icon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"/>
 
         </ScrollView>
 
-        <ImageView
-            android:layout_gravity="bottom"
-            android:id="@+id/user_leave"
+        <com.protone.ui.customView.blurView.SBlurView
+            android:id="@+id/blur"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/action_icon_p"
-            android:background="@drawable/trans_dark_ripple"
-            android:contentDescription="@string/action"
-            android:onClick="@{()-> activity.finish()}"
-            android:padding="@dimen/icon_padding_lite"
-            android:src="@drawable/ic_round_keyboard_backspace_24_white" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom">
+
+            <ImageView
+                android:id="@+id/user_leave"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/action_icon_p"
+                android:contentDescription="@string/action"
+                android:onClick="@{()-> activity.finish()}"
+                android:padding="@dimen/icon_padding_lite"
+                android:src="@drawable/ic_round_keyboard_backspace_24_white" />
+
+        </com.protone.ui.customView.blurView.SBlurView>
 
     </FrameLayout>
 

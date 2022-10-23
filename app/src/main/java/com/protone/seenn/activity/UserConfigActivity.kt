@@ -15,6 +15,8 @@ import com.protone.api.entity.GalleryMedia
 import com.protone.api.json.toEntity
 import com.protone.seenn.R
 import com.protone.seenn.databinding.UserConfigActivityBinding
+import com.protone.ui.customView.blurView.DefaultBlurController
+import com.protone.ui.customView.blurView.DefaultBlurEngine
 import com.protone.ui.databinding.UserConfigItemLayoutBinding
 import com.protone.ui.dialog.checkListDialog
 import com.protone.ui.dialog.loginDialog
@@ -35,6 +37,13 @@ class UserConfigActivity : BaseActivity<
     override fun createView(): UserConfigActivityBinding {
         return UserConfigActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@UserConfigActivity
+            blur.initBlurTool(DefaultBlurController(root, DefaultBlurEngine())).apply {
+                setBlurRadius(24f)
+            }
+            root.viewTreeObserver.addOnPreDrawListener {
+                blur.renderFrame()
+                true
+            }
         }
     }
 

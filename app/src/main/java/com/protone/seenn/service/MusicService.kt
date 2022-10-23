@@ -260,19 +260,19 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
     override fun play(music: Music?) {
         launch {
             mutex.withLock {
-                finishMusic()
-                if (playList.isEmpty()) {
-                    currentMusic.postValue(getEmptyMusic())
-                    return@launch
-                }
-                if (music != null) {
+                (if (music != null) {
+                    finishMusic()
+                    if (playList.isEmpty()) {
+                        currentMusic.postValue(getEmptyMusic())
+                        return@launch
+                    }
                     if (music !in playList) {
                         playList.add(music)
                     }
                     val index = playList.indexOf(music)
                     playPosition.set(index)
-                }
-                initMusicPlayer()?.apply {
+                    initMusicPlayer()
+                } else musicPlayer)?.apply {
                     start()
                     currentMusic.postValue(playList[playPosition.get()])
                     playState.postValue(true)

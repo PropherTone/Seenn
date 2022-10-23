@@ -1,9 +1,14 @@
 package com.protone.seenn.activity
 
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.Rect
+import android.view.View
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.protone.api.SearchModel
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
@@ -16,6 +21,8 @@ import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.seenn.databinding.PickMusicActivityBinding
 import com.protone.seenn.service.MusicService
 import com.protone.ui.adapter.AddMusicListAdapter
+import com.protone.ui.customView.blurView.DefaultBlurController
+import com.protone.ui.customView.blurView.DefaultBlurEngine
 import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.PickMusicViewModel
 import com.protone.worker.viewModel.PickMusicViewModel.Companion.ADD_BUCKET
@@ -33,6 +40,14 @@ class PickMusicActivity :
             activity = this@PickMusicActivity
             fitStatuesBarUsePadding(searchContainer)
             linkInput(addMBList, addMBSearch)
+//            actionBtnContainer.initBlurTool(DefaultBlurController(root, DefaultBlurEngine()))
+//                .apply {
+//                    setBlurRadius(24f)
+//                }
+//            root.viewTreeObserver.addOnPreDrawListener {
+//                actionBtnContainer.renderFrame()
+//                true
+//            }
         }
     }
 
@@ -130,6 +145,19 @@ class PickMusicActivity :
                 },
                 viewModel.getMusics()
             )
+            addItemDecoration(object : RecyclerView.ItemDecoration() {
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    super.getItemOffsets(outRect, view, parent, state)
+                    if (parent.getChildLayoutPosition(view) >= state.itemCount - 1) {
+                        outRect.bottom = resources.getDimensionPixelSize(R.dimen.action_icon_p)
+                    }
+                }
+            })
         }
         getList()?.let { viewModel.data.addAll(it) }
     }

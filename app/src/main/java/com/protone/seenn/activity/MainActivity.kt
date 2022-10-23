@@ -18,6 +18,8 @@ import com.protone.seenn.databinding.MainActivityTempBinding
 import com.protone.seenn.service.WorkService
 import com.protone.seenn.service.getEmptyMusic
 import com.protone.seenn.viewModel.MusicControllerIMP
+import com.protone.ui.customView.blurView.DefaultBlurController
+import com.protone.ui.customView.blurView.DefaultBlurEngine
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.userConfig
@@ -65,7 +67,7 @@ class MainActivity :
     override fun createView(): MainActivityTempBinding {
         return MainActivityTempBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MainActivity
-            fitStatuesBarUsePadding(mainGroup)
+            fitStatuesBarUsePadding(toolMotion)
             root.onGlobalLayout {
                 actionBtnContainer.also {
                     it.y = it.y + viewModel.btnH * 2
@@ -118,8 +120,6 @@ class MainActivity :
                 }
             }
         }
-
-//        startActivity(NoteActivity::class.intent)
 
         onViewEvent {
             when (it) {

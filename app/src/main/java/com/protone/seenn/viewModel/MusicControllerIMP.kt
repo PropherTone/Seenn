@@ -155,8 +155,12 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
 
     private fun setDetail(it: Music) {
         controller.apply {
-            cover = it.uri
-            duration = it.duration
+            if (cover != it.uri) {
+                cover = it.uri
+            }
+            if (duration != it.duration) {
+                duration = it.duration
+            }
             setName(it.title)
             setDetail("${it.artist ?: "ARTIST"}·${it.album ?: "NONE"}")
         }

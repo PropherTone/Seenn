@@ -103,7 +103,10 @@ object Blur {
         var input: Allocation? = null
         var output: Allocation? = null
         try {
-            input = Allocation.createFromBitmap(rs, bitmap)
+            input = Allocation.createFromBitmap(
+                rs, bitmap, Allocation.MipmapControl.MIPMAP_NONE,
+                Allocation.USAGE_SHARED or Allocation.USAGE_SCRIPT or Allocation.USAGE_GRAPHICS_TEXTURE
+            )
             output = Allocation.createTyped(rs, input.type)
             blur?.let {
                 it.setInput(input)

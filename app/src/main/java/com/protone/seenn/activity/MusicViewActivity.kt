@@ -1,5 +1,7 @@
 package com.protone.seenn.activity
 
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.transition.TransitionManager
 import android.view.ViewGroup
 import androidx.activity.viewModels
@@ -8,9 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.protone.api.context.root
 import com.protone.api.context.statuesBarHeight
 import com.protone.api.entity.Music
+import com.protone.seenn.R
 import com.protone.seenn.databinding.MusicViewActivityBinding
 import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.ui.adapter.TransparentPlayListAdapter
+import com.protone.ui.customView.blurView.DefaultBlurController
+import com.protone.ui.customView.blurView.DefaultBlurEngine
 import com.protone.ui.itemDecoration.GalleryItemDecoration
 import com.protone.worker.database.userConfig
 import com.protone.worker.viewModel.BaseViewModel
@@ -24,6 +29,17 @@ class MusicViewActivity :
         return MusicViewActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MusicViewActivity
             toolBar.layoutParams = toolBar.layoutParams.apply { height = statuesBarHeight }
+            pop.initBlurTool(DefaultBlurController(root, DefaultBlurEngine())).apply {
+                setMaskColor(Color.BLACK)
+                setMaskXfMode(PorterDuff.Mode.SCREEN)
+                setBlurRadius(16f)
+            }
+            root.viewTreeObserver.addOnPreDrawListener {
+                if (!pop.isGone) {
+                    pop.renderFrame()
+                }
+                true
+            }
         }
     }
 
@@ -39,6 +55,9 @@ class MusicViewActivity :
                 binder.getPlayList(), musicController.getPlayingMusic(),
                 object : TransparentPlayListAdapter.OnPlayListClk {
                     override fun onClk(music: Music) {
+                        if (musicController.getPlayingMusic() == music) {
+                            return
+                        }
                         musicController.play(music)
                     }
                 })
@@ -57,7 +76,7 @@ class MusicViewActivity :
             adapter = TransparentPlayListAdapter(context, onPlay, playList).also {
                 it.onPlayListClkListener = listener
             }
-            addItemDecoration(GalleryItemDecoration(paddingEnd))
+            addItemDecoration(GalleryItemDecoration(resources.getDimensionPixelSize(R.dimen.small_elevation)))
         }
     }
 

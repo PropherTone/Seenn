@@ -47,7 +47,7 @@
                 app:layout_constraintWidth_percent="0.56" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/round_background_fore_dark"
                 android:gravity="center"
@@ -57,11 +57,12 @@
                 app:layout_constraintEnd_toEndOf="@+id/controller"
                 app:layout_constraintStart_toStartOf="@+id/controller"
                 app:layout_constraintTop_toBottomOf="@id/music_cover_back"
-                app:layout_constraintVertical_bias="0.12">
+                app:layout_constraintVertical_bias="0.12"
+                app:layout_constraintWidth_percent="0.52">
 
                 <TextView
                     android:id="@+id/music_name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:ellipsize="marquee"
@@ -78,7 +79,7 @@
 
                 <TextView
                     android:id="@+id/music_detail"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:ellipsize="marquee"

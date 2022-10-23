@@ -2,6 +2,7 @@
 <resources>
     <dimen name="music_player_mid">150dp</dimen>
     <dimen name="action_icon">50dp</dimen>
+    <dimen name="action_icon_p">58dp</dimen>
     <dimen name="small_Icon">40dp</dimen>
     <dimen name="smaller_Icon">30dp</dimen>
     <dimen name="hug_title_text">40sp</dimen>
@@ -34,5 +35,4 @@
     <dimen name="huge_icon">160dp</dimen>
     <dimen name="small_title_text">18sp</dimen>
     <dimen name="small_elevation">2dp</dimen>
-    <dimen name="action_icon_p">58dp</dimen>
 </resources>

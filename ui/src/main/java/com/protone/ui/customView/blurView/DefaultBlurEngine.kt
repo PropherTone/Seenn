@@ -15,7 +15,7 @@ class DefaultBlurEngine : BlurEngine() {
         }
         return calculateRoundedScaleFactor(
             w,
-            w / (round.roundToInt() * DEFAULT_BITMAP_RENDER_ROUNDED)
+            w / (round.toInt() * DEFAULT_BITMAP_RENDER_ROUNDED)
         )
     }
 

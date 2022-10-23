@@ -41,6 +41,7 @@ class TransparentPlayListAdapter(
             setSelect(holder, selectList.contains(music))
             holder.binding.playListName.text = music.title
             holder.binding.playListName.setOnClickListener {
+                if (selectList.contains(music)) return@setOnClickListener
                 checkSelect(holder, music)
                 onPlayListClkListener?.onClk(music)
             }

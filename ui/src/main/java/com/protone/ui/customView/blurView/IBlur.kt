@@ -7,7 +7,7 @@ import androidx.annotation.ColorInt
 interface IBlurTool {
     fun setBlurView(view: SBlurView)
     fun drawDecor()
-    fun blur()
+    fun blur() : Boolean
     fun resize()
     fun drawBlurred(canvas: Canvas?)
     fun drawMask(canvas: Canvas?)

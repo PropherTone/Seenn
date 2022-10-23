@@ -48,12 +48,12 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:overScrollMode="never"
-            app:layout_constraintBottom_toTopOf="@id/action_btn_container"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_container" />
 
-        <FrameLayout
+        <com.protone.ui.customView.blurView.SBlurView
             android:id="@+id/action_btn_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -83,7 +83,7 @@
                 android:src="@drawable/ic_baseline_check_24_white"
                 android:visibility="gone" />
 
-        </FrameLayout>
+        </com.protone.ui.customView.blurView.SBlurView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,6 +1,7 @@
 package com.protone.ui.customView.musicPlayer
 
 import android.content.Context
+import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.View
 import android.widget.ImageView
@@ -41,6 +42,7 @@ class MusicPlayerViewFull @JvmOverloads constructor(
     }
 
     override fun setName(name: String) {
+        binding.musicName.ellipsize = TextUtils.TruncateAt.MARQUEE
         binding.musicName.text = name
     }
 

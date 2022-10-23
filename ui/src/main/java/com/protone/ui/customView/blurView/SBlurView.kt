@@ -5,11 +5,12 @@ import android.graphics.Canvas
 import android.graphics.PorterDuff
 import android.util.AttributeSet
 import android.view.View
+import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 
 class SBlurView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr), IBlurConfig {
+) : FrameLayout(context, attrs, defStyleAttr), IBlurConfig {
 
     private var blurTool: BaseBlurFactory = EmptyIBlurTool()
         set(value) {
@@ -33,7 +34,14 @@ class SBlurView @JvmOverloads constructor(
     }
 
     fun renderFrame() {
-        blurTool.blur()
+        if (!blurTool.blur()) {
+            blurTool.setBlurView(this)
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        release()
     }
 
     fun release(): BaseBlurFactory {
