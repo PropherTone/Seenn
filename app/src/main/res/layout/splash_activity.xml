@@ -8,8 +8,8 @@
 
         <com.protone.ui.customView.AnimateGradientView
             android:layout_width="match_parent"
-            app:color1="@color/blue_5"
-            app:color2="@color/blue_1"
+            app:color1="@color/main_color1"
+            app:color2="@color/main_color2"
             android:layout_height="match_parent" />
 
         <TextView

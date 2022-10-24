@@ -193,10 +193,13 @@ inline fun scanAudioWithUri(mediaUri: Uri, callBack: (Music) -> Unit) {
 fun sortGalleries(galleries:MutableList<String>) {
     val externalUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     val quarryArray = arrayOf(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+    val lastGalleries = mutableListOf<String>()
     scan(externalUri, quarryArray) {
         val bucket = it.getColumnIndex(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
         while (it.moveToNext()) {
             val gallery = it.getString(bucket)
+            if (lastGalleries.contains(gallery)) continue
+            lastGalleries.add(gallery)
             galleries.remove(gallery)
         }
     }

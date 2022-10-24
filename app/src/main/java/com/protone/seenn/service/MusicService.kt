@@ -48,19 +48,6 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
     private var remoteViews: RemoteViews? = null
 
     private var musicPlayer: MediaPlayer? = null
-        get() {
-            if (playList.isEmpty()) return null
-            if (field == null) {
-
-                field = MediaPlayer.create(
-                    SApplication.app,
-                    playList[playPosition.get()].uri
-                ).also {
-                    it.setOnCompletionListener(this)
-                }
-            }
-            return field
-        }
 
     private fun initMusicPlayer(): MediaPlayer? {
         if (playList.isEmpty()) return null
@@ -70,7 +57,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
                 SApplication.app,
                 playList[playPosition.get()].uri
             ).also {
-                it.setOnCompletionListener(this)
+                it?.setOnCompletionListener(this)
             }
         }
         return musicPlayer
@@ -307,6 +294,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
         launch {
             if (playPosition.incrementAndGet() > playList.size - 1) playPosition.set(0)
             finishMusic()
+            initMusicPlayer()
             play()
         }
     }
@@ -316,6 +304,7 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
         launch {
             if (playPosition.decrementAndGet() <= 0) playPosition.set(playList.size - 1)
             finishMusic()
+            initMusicPlayer()
             play()
         }
     }
