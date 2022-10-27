@@ -18,8 +18,6 @@ import com.protone.seenn.databinding.MainActivityTempBinding
 import com.protone.seenn.service.WorkService
 import com.protone.seenn.service.getEmptyMusic
 import com.protone.seenn.viewModel.MusicControllerIMP
-import com.protone.ui.customView.blurView.DefaultBlurController
-import com.protone.ui.customView.blurView.DefaultBlurEngine
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.userConfig

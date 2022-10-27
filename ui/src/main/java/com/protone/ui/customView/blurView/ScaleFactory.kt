@@ -1,4 +1,4 @@
-package com.protone.ui.customView.blurView
+ package com.protone.ui.customView.blurView
 
 data class ScaleFactory(
     var wScaled: Float = 0f,

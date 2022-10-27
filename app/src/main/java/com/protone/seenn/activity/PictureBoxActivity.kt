@@ -28,7 +28,7 @@ class PictureBoxActivity :
         if (gainListData != null) {
             initPictureBox(gainListData as MutableList<GalleryMedia>)
         } else {
-            R.string.failed_msg.getString().toast()
+            R.string.no_data.getString().toast()
             finish()
         }
     }
@@ -45,9 +45,10 @@ class PictureBoxActivity :
                         val firstVisible = it.findFirstVisibleItemPosition()
                         val lastVisible = it.findLastVisibleItemPosition()
                         for (i in firstVisible..lastVisible) {
-                            val child = it.findViewByPosition(i)
-                            if (child is ScalableRegionLoadingImageView && child.isLongImage()) {
-                                child.reZone()
+                            when (val child = it.findViewByPosition(i)) {
+                                is ScalableRegionLoadingImageView -> if (child.isLongImage()) {
+                                    child.reZone()
+                                }
                             }
                         }
                     }

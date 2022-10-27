@@ -5,6 +5,8 @@ import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isGone
+import androidx.transition.TransitionManager
 import com.protone.api.baseType.getString
 import com.protone.api.entity.NoteDir
 import com.protone.ui.R
@@ -13,9 +15,13 @@ import com.protone.ui.databinding.NoteTpyeListAdapterBinding
 class NoteTypeListAdapter(
     context: Context,
     private val noteTypeListAdapterDataProxy: NoteTypeListAdapterDataProxy
-) : BaseAdapter<NoteTpyeListAdapterBinding, Any>(context) {
+) : SelectListAdapter<NoteTpyeListAdapterBinding, NoteDir, Any>(context) {
 
     private val noteDirList = arrayListOf<NoteDir>()
+
+    init {
+        multiChoose = false
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -34,8 +40,11 @@ class NoteTypeListAdapter(
     var onTypeSelected: ((String?) -> Unit)? = null
 
     override fun onBindViewHolder(holder: Holder<NoteTpyeListAdapterBinding>, position: Int) {
+        setSelect(holder, noteDirList[position] in selectList)
         holder.binding.apply {
             root.setOnClickListener {
+                if (selectList.contains(noteDirList[position])) return@setOnClickListener
+                checkSelect(holder, noteDirList[position])
                 onTypeSelected?.invoke(noteTypeName.text.toString())
             }
             root.setOnLongClickListener {
@@ -79,7 +88,16 @@ class NoteTypeListAdapter(
         notifyDataSetChanged()
     }
 
-    interface NoteTypeListAdapterDataProxy{
+    interface NoteTypeListAdapterDataProxy {
         fun deleteNoteDir(noteType: NoteDir)
     }
+
+    override val select: (holder: Holder<NoteTpyeListAdapterBinding>, isSelect: Boolean) -> Unit =
+        { holder, select ->
+            TransitionManager.beginDelayedTransition(holder.binding.root as ViewGroup)
+            holder.binding.noteTypeSelectGuide.isGone = !select
+        }
+
+    override fun itemIndex(path: NoteDir): Int = noteDirList.indexOf(path)
+
 }

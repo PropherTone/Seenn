@@ -40,15 +40,15 @@ class UserConfigActivity : BaseActivity<
             blur.initBlurTool(DefaultBlurController(root, DefaultBlurEngine())).apply {
                 setBlurRadius(24f)
             }
-            root.viewTreeObserver.addOnPreDrawListener {
-                blur.renderFrame()
-                true
-            }
         }
     }
 
     override suspend fun UserConfigViewModel.init() {
         refreshLayout()
+        binding.root.viewTreeObserver.addOnPreDrawListener {
+            binding.blur.renderFrame()
+            true
+        }
         onViewEvent {
             when (it) {
                 UserConfigViewModel.UserConfigEvent.Login -> startLoginDialog()

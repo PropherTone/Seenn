@@ -73,6 +73,7 @@ class RichNoteView @JvmOverloads constructor(
     }
 
     suspend fun setRichList(richCode: Int, text: String) {
+        removeAllViews()
         noteHandler.setRichList(richCode, text)
     }
 

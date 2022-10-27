@@ -3,8 +3,8 @@ package com.protone.worker.viewModel
 import android.graphics.Bitmap
 import com.protone.api.baseType.toBitmap
 import com.protone.api.context.SApplication
+import com.protone.api.entity.GalleryMedia
 import com.protone.api.img.Blur
-import com.protone.api.json.toJson
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.photoInToday
@@ -44,9 +44,10 @@ class MainViewModel : BaseViewModel() {
         }
     }
 
-    suspend fun getPhotoInToday() = withContext(Dispatchers.Default) {
+    suspend fun getPhotoInToday(): GalleryMedia? = withContext(Dispatchers.Default) {
         photoInToday()
     }
+
 
     suspend fun getVideoInToday() = withContext(Dispatchers.Default) {
         videoInToday()

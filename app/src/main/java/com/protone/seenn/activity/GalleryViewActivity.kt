@@ -118,15 +118,18 @@ class GalleryViewActivity : BaseMediaActivity<
         setNotes(getNotesWithGallery(galleryMedia?.uri ?: Uri.EMPTY))
     }
 
-    private fun GalleryViewViewModel.setMediaInfo(position: Int) =
-        galleryMedias[position].let { m ->
-            setMediaInfo(
-                m.name,
-                m.date.toDateString("yyyy/MM/dd").toString(),
-                m.size.getStorageSize(),
-                m.path ?: m.uri.toString()
-            )
+    private fun GalleryViewViewModel.setMediaInfo(position: Int) {
+        if (position < galleryMedias.size - 1) {
+            galleryMedias[position].let { m ->
+                setMediaInfo(
+                    m.name,
+                    m.date.toDateString("yyyy/MM/dd").toString(),
+                    m.size.getStorageSize(),
+                    m.path ?: m.uri.toString()
+                )
+            }
         }
+    }
 
     private suspend fun GalleryViewViewModel.getMediaIndex() = onResult { co ->
         val galleryMedia =
