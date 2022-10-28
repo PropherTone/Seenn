@@ -18,4 +18,5 @@ interface IBlurConfig{
     fun setMaskXfMode(mode: PorterDuff.Mode)
     fun setMaskColor(@ColorInt color: Int)
     fun setBlurRadius(radius: Float)
+    fun setWillMove(willMove : Boolean)
 }

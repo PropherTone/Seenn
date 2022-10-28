@@ -14,6 +14,9 @@ object Blur {
     private var defaultBlurRadius: Int = 0
     private var rs: RenderScript? = null
     private var blur: ScriptIntrinsicBlur? = null
+    private var output: Allocation? = null
+    private var cacheW: Int = 0
+    private var cacheH: Int = 0
 
     fun init(context: Context) {
         val weakContext = WeakReference(context)
@@ -76,49 +79,41 @@ object Blur {
     }
 
     @Throws(RSRuntimeException::class)
-    private fun rs(bitmap: Bitmap, radius: Int): Bitmap {
-        var input: Allocation? = null
-        var output: Allocation? = null
-        try {
-            input = Allocation.createFromBitmap(
+    private fun rs(bitmap: Bitmap, radius: Int): Bitmap =
+        baseRs(
+            bitmap, radius.toFloat(), Allocation.createFromBitmap(
                 rs, bitmap, Allocation.MipmapControl.MIPMAP_NONE,
                 Allocation.USAGE_SCRIPT
             )
-            output = Allocation.createTyped(rs, input.type)
-            blur?.let {
-                it.setInput(input)
-                it.setRadius(radius.toFloat())
-                it.forEach(output)
-            }
-            output.copyTo(bitmap)
-        } finally {
-            input?.destroy()
-            output?.destroy()
-        }
-        return bitmap
-    }
+        )
 
     @Throws(RSRuntimeException::class)
-    private fun rs(bitmap: Bitmap, radius: Float): Bitmap {
-        var input: Allocation? = null
-        var output: Allocation? = null
-        try {
-            input = Allocation.createFromBitmap(
+    private fun rs(bitmap: Bitmap, radius: Float): Bitmap =
+        baseRs(
+            bitmap, radius, Allocation.createFromBitmap(
                 rs, bitmap, Allocation.MipmapControl.MIPMAP_NONE,
                 Allocation.USAGE_SHARED or Allocation.USAGE_SCRIPT or Allocation.USAGE_GRAPHICS_TEXTURE
             )
-            output = Allocation.createTyped(rs, input.type)
+        )
+
+    private fun baseRs(bitmap: Bitmap, radius: Float, input: Allocation): Bitmap {
+        try {
+            if (cacheH != bitmap.height || cacheW != bitmap.width) {
+                cacheH = bitmap.height
+                cacheW = bitmap.width
+                output?.destroy()
+                output = Allocation.createTyped(rs, input.type)
+            }
             blur?.let {
                 it.setInput(input)
                 it.setRadius(radius)
                 it.forEach(output)
             }
-            output.copyTo(bitmap)
+            output?.copyTo(bitmap)
+            return bitmap
         } finally {
-            input?.destroy()
-            output?.destroy()
+            input.destroy()
         }
-        return bitmap
     }
 
     private fun stack(sentBitmap: Bitmap, radius: Int, canReuseInBitmap: Boolean): Bitmap? {

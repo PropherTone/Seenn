@@ -1,8 +1,6 @@
 package com.protone.seenn.activity
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.PorterDuff
 import android.graphics.Rect
 import android.view.View
 import androidx.activity.viewModels
@@ -40,14 +38,14 @@ class PickMusicActivity :
             activity = this@PickMusicActivity
             fitStatuesBarUsePadding(searchContainer)
             linkInput(addMBList, addMBSearch)
-//            actionBtnContainer.initBlurTool(DefaultBlurController(root, DefaultBlurEngine()))
-//                .apply {
-//                    setBlurRadius(24f)
-//                }
-//            root.viewTreeObserver.addOnPreDrawListener {
-//                actionBtnContainer.renderFrame()
-//                true
-//            }
+            actionBtnContainer.initBlurTool(DefaultBlurController(root, DefaultBlurEngine()))
+                .apply {
+                    setBlurRadius(24f)
+                }
+            root.viewTreeObserver.addOnPreDrawListener {
+                actionBtnContainer.renderFrame()
+                true
+            }
         }
     }
 

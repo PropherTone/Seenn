@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.PorterDuff
 import android.util.AttributeSet
-import android.view.View
 import android.widget.FrameLayout
 import androidx.annotation.ColorInt
 
@@ -59,6 +58,10 @@ class SBlurView @JvmOverloads constructor(
 
     override fun setBlurRadius(radius: Float) {
         blurTool.setBlurRadius(radius)
+    }
+
+    override fun setWillMove(willMove: Boolean) {
+        blurTool.setWillMove(willMove)
     }
 
 }

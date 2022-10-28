@@ -1,6 +1,5 @@
 package com.protone.ui.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -82,11 +81,12 @@ class NoteListAdapter(context: Context) :
 
     override fun getItemCount(): Int = noteList.size
 
-    @SuppressLint("NotifyDataSetChanged")
     fun setNoteList(list: List<Note>) {
+        val size = noteList.size
         noteList.clear()
+        notifyItemRangeRemoved(0, size)
         noteList.addAll(list)
-        notifyDataSetChanged()
+        notifyItemRangeInserted(0, noteList.size)
     }
 
     fun deleteNote(note: Note) {

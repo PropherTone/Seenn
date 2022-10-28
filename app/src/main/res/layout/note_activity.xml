@@ -62,30 +62,21 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-        <androidx.constraintlayout.motion.widget.MotionLayout
-            android:id="@+id/note_bucket"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/note_bucketList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="@dimen/user_icon"
-            app:layoutDescription="@xml/note_bucket_layout_scene"
+            android:paddingTop="@dimen/list_icon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/note_bucketList"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingTop="@dimen/list_icon" />
-
-        </androidx.constraintlayout.motion.widget.MotionLayout>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/note_addBucket"
             android:layout_width="@dimen/action_icon"
             android:layout_height="@dimen/action_icon"
-            android:background="@color/glass"
+            android:background="@drawable/background_ripple_glass"
             android:contentDescription="@string/action"
             android:onClick="@{()->activity.sendViewEvent(NoteViewEvent.AddBucket.INSTANCE)}"
             android:padding="@dimen/icon_padding_lite"
@@ -97,7 +88,7 @@
             android:id="@+id/note_refreshBucket"
             android:layout_width="@dimen/action_icon"
             android:layout_height="@dimen/action_icon"
-            android:background="@color/glass"
+            android:background="@drawable/background_ripple_glass"
             android:contentDescription="@string/action"
             android:onClick="@{()->activity.sendViewEvent(NoteViewEvent.Refresh.INSTANCE)}"
             android:padding="@dimen/icon_padding_lite"

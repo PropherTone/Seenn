@@ -19,9 +19,13 @@ class NoteTypeListAdapter(
 
     private val noteDirList = arrayListOf<NoteDir>()
 
-    init {
-        multiChoose = false
-    }
+    override val select: (holder: Holder<NoteTpyeListAdapterBinding>, isSelect: Boolean) -> Unit =
+        { holder, select ->
+            TransitionManager.beginDelayedTransition(holder.binding.root as ViewGroup)
+            holder.binding.noteTypeSelectGuide.isGone = !select
+        }
+
+    override fun itemIndex(path: NoteDir): Int = noteDirList.indexOf(path)
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -43,7 +47,7 @@ class NoteTypeListAdapter(
         setSelect(holder, noteDirList[position] in selectList)
         holder.binding.apply {
             root.setOnClickListener {
-                if (selectList.contains(noteDirList[position])) return@setOnClickListener
+                if (noteDirList[position] in selectList) return@setOnClickListener
                 checkSelect(holder, noteDirList[position])
                 onTypeSelected?.invoke(noteTypeName.text.toString())
             }
@@ -77,13 +81,10 @@ class NoteTypeListAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun setNoteTypeList(list: List<NoteDir>) {
         noteDirList.clear()
-        noteDirList.add(
-            NoteDir(
-                context.getString(
-                    R.string.all
-                ), ""
-            )
-        )
+        NoteDir(R.string.all.getString(), "").let {
+            noteDirList.add(it)
+            selectList.add(it)
+        }
         noteDirList.addAll(list)
         notifyDataSetChanged()
     }
@@ -91,13 +92,5 @@ class NoteTypeListAdapter(
     interface NoteTypeListAdapterDataProxy {
         fun deleteNoteDir(noteType: NoteDir)
     }
-
-    override val select: (holder: Holder<NoteTpyeListAdapterBinding>, isSelect: Boolean) -> Unit =
-        { holder, select ->
-            TransitionManager.beginDelayedTransition(holder.binding.root as ViewGroup)
-            holder.binding.noteTypeSelectGuide.isGone = !select
-        }
-
-    override fun itemIndex(path: NoteDir): Int = noteDirList.indexOf(path)
 
 }

@@ -117,7 +117,6 @@ class NoteActivity :
         ValueAnimator.ofFloat(progress, abs(progress - 1f)).apply {
             addUpdateListener {
                 binding.noteContainer.progress = (it.animatedValue as Float)
-                binding.noteBucket.progress = binding.noteContainer.progress
             }
         }.start()
     }

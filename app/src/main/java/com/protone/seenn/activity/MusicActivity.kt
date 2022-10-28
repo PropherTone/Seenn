@@ -8,15 +8,19 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.protone.api.baseType.getDrawable
 import com.protone.api.baseType.getString
+import com.protone.api.baseType.toBitmap
 import com.protone.api.baseType.toast
 import com.protone.api.context.*
 import com.protone.api.entity.MusicBucket
+import com.protone.api.img.Blur
 import com.protone.seenn.R
 import com.protone.seenn.databinding.MusicActivtiyBinding
 import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.ui.adapter.MusicBucketAdapter
 import com.protone.ui.adapter.MusicListAdapter
 import com.protone.ui.customView.StatusImageView
+import com.protone.ui.customView.blurView.DefaultBlurController
+import com.protone.ui.customView.blurView.DefaultBlurEngine
 import com.protone.worker.viewModel.AddBucketViewModel
 import com.protone.worker.viewModel.MusicModel
 import com.protone.worker.viewModel.PickMusicViewModel
@@ -26,6 +30,9 @@ import kotlinx.coroutines.withContext
 
 class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.MusicEvent>(true),
     StatusImageView.StateListener {
+
+    private var doBlur = false
+
     override val viewModel: MusicModel by lazy {
         ViewModelProvider(this).get(MusicModel::class.java).apply {
             onMusicDataEvent = object : MusicModel.OnMusicDataEvent {
@@ -58,6 +65,14 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 appToolbar.onGlobalLayout {
                     appToolbar.setExpanded(false, false)
                 }
+                doBlur = true
+                bucketContainerBlur.initBlurTool(DefaultBlurController(root, DefaultBlurEngine()))
+                musicBucketContainer.withStartAction {
+                    bucketContainerBlur.setWillMove(true)
+                }.withEndAction {
+                    bucketContainerBlur.setWillMove(false)
+                }
+                bucketContainerBlur.renderFrame()
             }
             appToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
                 toolbar.progress = -verticalOffset / appBarLayout.totalScrollRange.toFloat()
@@ -91,6 +106,9 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                                         musicBucketIcon.measuredWidth,
                                         musicBucketIcon.measuredHeight
                                     ).into(musicBucketIcon)
+                                it.icon?.toBitmap()?.let { bm ->
+                                    binding.blurredBucketCover.setImageBitmap(Blur.blur(bm, 24, 10))
+                                }
                             } else {
                                 musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
                             }
@@ -189,6 +207,10 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
             controller.onClick {
                 binding.musicShowBucket.performClick()
             }
+            binding.root.viewTreeObserver.addOnPreDrawListener {
+                if (doBlur) binding.bucketContainerBlur.renderFrame()
+                true
+            }
         }
     }
 
@@ -280,10 +302,12 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
 
     override fun onActive() {
         binding.appToolbar.setExpanded(false, false)
+        doBlur = true
         binding.musicBucketContainer.show()
     }
 
     override fun onNegative() {
+        doBlur = true
         binding.musicBucketContainer.hide()
     }
 

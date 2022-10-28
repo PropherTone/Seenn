@@ -38,14 +38,15 @@
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
         <Constraint
-            android:id="@+id/note_bucket"
+            android:id="@+id/note_bucketList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginStart="@dimen/user_icon"
             android:background="@drawable/main_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibilityMode="ignore" />
 
         <Constraint
             android:id="@+id/note_action"
@@ -96,13 +97,14 @@
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
         <Constraint
-            android:id="@+id/note_bucket"
+            android:id="@+id/note_bucketList"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:background="@drawable/main_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibilityMode="ignore" />
 
         <Constraint
             android:id="@+id/note_action"

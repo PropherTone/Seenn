@@ -12,7 +12,7 @@
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/main_activity.xml" value="0.1" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/music_activtiy.xml" value="0.1" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/music_view_activity.xml" value="0.19794784095767423" />
-        <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/note_activity.xml" value="0.19794784095767423" />
+        <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/note_activity.xml" value="0.1" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/note_edit_activity.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/note_view_activity.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/app/src/main/res/layout/pick_music_activity.xml" value="0.1" />
@@ -121,8 +121,10 @@
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/background_ripple_glass.xml" value="0.124" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/background_ripple_red.xml" value="0.1235" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/background_ripple_transparent_white.xml" value="0.137" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/background_ripple_white.xml" value="0.124" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/black_gradient_left.xml" value="0.145" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/black_gradient_right.xml" value="0.145" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/ic_baseline_add_24.xml" value="0.124" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/ic_baseline_check_24.xml" value="0.1545" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/ic_baseline_check_24_white.xml" value="0.1545" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/drawable/ic_baseline_format_first_align_24_black.xml" value="0.124" />
@@ -157,7 +159,8 @@
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/music_card.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/music_list_layout.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/note_card.xml" value="0.19794784095767423" />
-        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/note_tpye_list_adapter.xml" value="0.128" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/note_list_adapter_layout.xml" value="0.19794784095767423" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/note_tpye_list_adapter.xml" value="0.2" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/paragraph_span_optional_layout.xml" value="0.19709277469003847" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/photo_card.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/picture_box_adapter_gif_layout.xml" value="0.19794784095767423" />
@@ -167,6 +170,7 @@
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/rename_dialog_layout.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/rich_video_layout.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/text_cate_layout.xml" value="0.19794784095767423" />
+        <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/user_config_item_layout.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/video_card.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidProject/Seenn/ui/src/main/res/layout/video_controller.xml" value="0.19794784095767423" />
         <entry key="..\:/AndroidStudioProject/Seen/app/src/main/res/layout/activity_test.xml" value="0.1" />

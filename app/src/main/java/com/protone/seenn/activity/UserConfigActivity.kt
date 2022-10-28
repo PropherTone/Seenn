@@ -61,7 +61,8 @@ class UserConfigActivity : BaseActivity<
                 UserConfigViewModel.UserConfigEvent.Refresh -> refreshLayout()
                 UserConfigViewModel.UserConfigEvent.ClearCache -> viewModel.clearCache()
                 UserConfigViewModel.UserConfigEvent.Log -> startActivity(LogActivity::class.intent)
-                UserConfigViewModel.UserConfigEvent.CombineGallery -> userConfig.combineGallery = true
+                UserConfigViewModel.UserConfigEvent.CombineGallery -> userConfig.combineGallery =
+                    true
                 UserConfigViewModel.UserConfigEvent.DispatchGallery -> userConfig.combineGallery =
                     false
             }
@@ -144,14 +145,13 @@ class UserConfigActivity : BaseActivity<
     private fun initModeView(
         name: String,
         onClick: (UserConfigItemLayoutBinding) -> UserConfigViewModel.UserConfigEvent
-    ) =
-        UserConfigItemLayoutBinding.inflate(layoutInflater, root, false)
-            .apply {
-                itemName.text = name
-                itemName.setOnClickListener {
-                    sendViewEvent(onClick.invoke(this))
-                }
-            }.root
+    ) = UserConfigItemLayoutBinding.inflate(layoutInflater, root, false)
+        .apply {
+            itemName.text = name
+            itemName.setOnClickListener {
+                sendViewEvent(onClick.invoke(this))
+            }
+        }.root
 
     private suspend fun startIconPick() {
         startActivityForResult(

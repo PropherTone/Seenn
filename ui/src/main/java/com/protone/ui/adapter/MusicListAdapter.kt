@@ -36,7 +36,9 @@ class MusicListAdapter(context: Context, private val musicList: MutableList<Musi
                     musicListName,
                     musicListTime,
                     musicListDetail,
-                    dispatch = false
+                    dispatch = false,
+                    backgroundColor = R.color.foreDark,
+                    textsColor = R.color.white
                 )
             }
         }

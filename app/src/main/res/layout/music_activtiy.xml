@@ -16,17 +16,21 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
+        <com.protone.ui.customView.SwitchImageView
+            android:id="@+id/blurred_bucket_cover"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/blue_5"
-            android:elevation="0dp">
+            android:layout_height="match_parent" />
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/music_model_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/appToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/main_background"
+                android:background="@color/transparent"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$Behavior">
 
                 <androidx.constraintlayout.motion.widget.MotionLayout
@@ -54,8 +58,8 @@
                         android:id="@+id/music_bucketIcon"
                         android:layout_width="@dimen/huge_icon"
                         android:layout_height="@dimen/huge_icon"
-                        android:layout_marginTop="@dimen/icon_margin"
-                        android:background="@color/glass"
+                        android:layout_marginTop="28dp"
+                        android:background="@drawable/trans_dark_ripple"
                         android:contentDescription="@string/icon"
                         android:padding="@dimen/icon_padding"
                         android:scaleType="centerCrop"
@@ -69,7 +73,7 @@
                         android:id="@+id/music_bucketName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="@dimen/icon_margin"
+                        android:layout_marginTop="@dimen/icon_margin"
                         android:textColor="@color/white"
                         android:textSize="@dimen/title_text"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -98,12 +102,13 @@
                         android:src="@drawable/ic_baseline_edit_24_white"
                         app:layout_constraintEnd_toStartOf="@id/music_bucketDelete"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/music_bucketMsg" />
+                        app:layout_constraintTop_toTopOf="@id/music_bucketDelete" />
 
                     <ImageView
                         android:id="@+id/music_bucketDelete"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
+                        android:layout_marginTop="@dimen/main_margin"
                         android:contentDescription="@string/action"
                         android:onClick="@{()->activity.sendDelete()}"
                         android:padding="@dimen/icon_padding_mid"
@@ -123,7 +128,7 @@
                         android:src="@drawable/ic_baseline_more_24_white"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/music_bucketDelete"
-                        app:layout_constraintTop_toBottomOf="@id/music_bucketMsg" />
+                        app:layout_constraintTop_toTopOf="@id/music_bucketDelete" />
 
                 </androidx.constraintlayout.motion.widget.MotionLayout>
 
@@ -133,8 +138,6 @@
                 android:id="@+id/music_musicList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/white"
-                android:elevation="0dp"
                 android:overScrollMode="never"
                 app:layout_anchor="@id/appToolbar"
                 app:layout_anchorGravity="bottom"
@@ -184,11 +187,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize"
-            android:background="@color/zima_blue"
             android:clickable="true"
             android:elevation="2dp"
             android:focusable="true"
             android:orientation="vertical">
+
+            <com.protone.ui.customView.blurView.SBlurView
+                android:id="@+id/bucket_container_blur"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
             <com.protone.ui.customView.StatusImageView
                 android:id="@+id/music_showBucket"
@@ -208,7 +215,6 @@
                 android:id="@+id/mySmallMusicPlayer"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/model_icon_dimen"
-                android:background="@color/white"
                 app:layout_constraintBottom_toTopOf="@id/music_bucket"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -218,7 +224,6 @@
                 android:id="@+id/music_bucket"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:background="@color/white"
                 app:layout_constraintBottom_toTopOf="@id/music_addBucket"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -228,11 +233,11 @@
                 android:id="@+id/music_addBucket"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
+                android:background="@drawable/background_ripple_glass"
                 android:contentDescription="@string/action"
                 android:onClick="@{()->activity.sendViewEvent(MusicEvent.AddMusicBucket.INSTANCE)}"
                 android:padding="@dimen/main_padding"
-                android:src="@drawable/ic_baseline_add_24"
+                android:src="@drawable/ic_baseline_add_24_white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

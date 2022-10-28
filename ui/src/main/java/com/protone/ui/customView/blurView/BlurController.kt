@@ -1,6 +1,7 @@
 package com.protone.ui.customView.blurView
 
 import android.graphics.*
+import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.annotation.ColorInt
@@ -9,6 +10,8 @@ abstract class BaseBlurFactory(protected val blurEngine: BlurEngine) : IBlurTool
     protected val scaleFactory = ScaleFactory()
     protected val decorCanvas = BlurCanvas()
     protected var decorBitmap: Bitmap? = null
+
+    protected var canMove = false
 
     protected var maskColor: Int = Color.TRANSPARENT
         private set
@@ -39,6 +42,10 @@ abstract class BaseBlurFactory(protected val blurEngine: BlurEngine) : IBlurTool
         blurEngine.setRadius(radius)
     }
 
+    override fun setWillMove(willMove: Boolean) {
+        this.canMove = willMove
+    }
+
     inner class BlurCanvas : Canvas()
 }
 
@@ -59,7 +66,14 @@ class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
         root.apply {
             if (width <= 0 || height <= 0) return
             decorBitmap?.eraseColor(Color.TRANSPARENT)
-            draw(decorCanvas)
+            if (canMove) {
+                decorCanvas.save()
+                calculateSize()
+                draw(decorCanvas)
+                decorCanvas.restore()
+            } else {
+                draw(decorCanvas)
+            }
         }
     }
 
@@ -68,6 +82,31 @@ class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
         drawDecor()
         decorBitmap = decorBitmap?.apply { blurEngine.blur(this) }
         return true
+    }
+
+    private fun calculateSize() {
+        start = false
+        isResized = false
+        blurView?.apply {
+            scaleFactory.apply {
+                wScaled = (width / (decorBitmap?.width ?: width).toFloat())
+                hScaled = (height / (decorBitmap?.height ?: height).toFloat())
+                val rootLocation = intArrayOf(0, 0)
+                val viewLocation = intArrayOf(0, 0)
+                root.getLocationOnScreen(rootLocation)
+                getLocationOnScreen(viewLocation)
+                val rect = Rect()
+                getLocalVisibleRect(rect)
+                Log.d("TAG", "calculateSize: " + rect)
+                val opsX = viewLocation[0] - rootLocation[0]
+                val opsY = viewLocation[1] - rootLocation[1]
+                leftScaled = -opsX / wScaled
+                rightScaled = -opsY / hScaled
+            }
+            transformCanvas()
+        }
+        isResized = true
+        start = true
     }
 
     override fun resize() {
@@ -81,15 +120,7 @@ class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
                 (height / scaleFactor).toInt(),
                 blurEngine.getBitmapConfig()
             )
-            scaleFactory.apply {
-                wScaled = (width / (decorBitmap?.width ?: width).toFloat())
-                hScaled = (height / (decorBitmap?.height ?: height).toFloat())
-                leftScaled = -x / wScaled
-                rightScaled = -y / hScaled
-            }
-            transformCanvas()
-            isResized = true
-            start = true
+            calculateSize()
         }
     }
 
