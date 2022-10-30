@@ -85,6 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/texts_margin"
+                android:textColor="@color/black"
                 android:letterSpacing="0.05"
                 android:textSize="@dimen/title_text"
                 app:layout_constraintBottom_toBottomOf="@+id/musicBucket_time"

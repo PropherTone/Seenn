@@ -95,9 +95,6 @@ class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
                 val viewLocation = intArrayOf(0, 0)
                 root.getLocationOnScreen(rootLocation)
                 getLocationOnScreen(viewLocation)
-                val rect = Rect()
-                getLocalVisibleRect(rect)
-                Log.d("TAG", "calculateSize: " + rect)
                 val opsX = viewLocation[0] - rootLocation[0]
                 val opsY = viewLocation[1] - rootLocation[1]
                 leftScaled = -opsX / wScaled

@@ -15,40 +15,29 @@ class TableCardView @JvmOverloads constructor(
 
     var interpolator = AccelerateDecelerateInterpolator()
 
-    private var startAction: Runnable? = null
-    private var endAction: Runnable? = null
-    private var updateListener: ValueAnimator.AnimatorUpdateListener? = null
-
-    fun withStartAction(start: Runnable): TableCardView {
-        this.startAction = start
-        return this
-    }
-
-    fun withEndAction(end: Runnable): TableCardView {
-        this.endAction = end
-        return this
-    }
-
-    fun setUpdateListener(listener: ValueAnimator.AnimatorUpdateListener): TableCardView {
-        this.updateListener = listener
-        return this
-    }
-
-    fun show() {
+    fun show(
+        onStart: Runnable? = null,
+        onEnd: Runnable? = null,
+        update: ValueAnimator.AnimatorUpdateListener? = null
+    ) {
         animate().setInterpolator(interpolator)
             .translationY(0f + topBlock)
-            .withEndAction(endAction)
-            .withStartAction(startAction)
-            .setUpdateListener(updateListener)
+            .withEndAction(onEnd)
+            .withStartAction(onStart)
+            .setUpdateListener(update)
             .start()
     }
 
-    fun hide() {
+    fun hide(
+        onStart: Runnable? = null,
+        onEnd: Runnable? = null,
+        update: ValueAnimator.AnimatorUpdateListener? = null
+    ) {
         animate().setInterpolator(interpolator)
             .translationY(measuredHeight.toFloat() - botBlock)
-            .withEndAction(endAction)
-            .setUpdateListener(updateListener)
-            .withStartAction(startAction)
+            .withEndAction(onEnd)
+            .withStartAction(onStart)
+            .setUpdateListener(update)
             .start()
     }
 

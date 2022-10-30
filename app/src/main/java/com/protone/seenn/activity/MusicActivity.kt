@@ -3,6 +3,7 @@ package com.protone.seenn.activity
 import androidx.core.view.marginBottom
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -67,11 +68,6 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 }
                 doBlur = true
                 bucketContainerBlur.initBlurTool(DefaultBlurController(root, DefaultBlurEngine()))
-                musicBucketContainer.withStartAction {
-                    bucketContainerBlur.setWillMove(true)
-                }.withEndAction {
-                    bucketContainerBlur.setWillMove(false)
-                }
                 bucketContainerBlur.renderFrame()
             }
             appToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -82,6 +78,9 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
 
     override suspend fun MusicModel.init() {
         val controller = MusicControllerIMP(binding.mySmallMusicPlayer)
+        controller.setOnBlurAlbumCover {
+            binding.musicPlayerCover.setImageBitmap(it)
+        }
 
         onViewEvent {
             when (it) {
@@ -301,13 +300,13 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
     }
 
     override fun onActive() {
-        binding.appToolbar.setExpanded(false, false)
-        doBlur = true
-        binding.musicBucketContainer.show()
+        binding.apply {
+            appToolbar.setExpanded(false, false)
+            musicBucketContainer.show()
+        }
     }
 
     override fun onNegative() {
-        doBlur = true
         binding.musicBucketContainer.hide()
     }
 
