@@ -1,7 +1,6 @@
 package com.protone.ui.customView.blurView
 
 import android.graphics.*
-import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.annotation.ColorInt
@@ -20,6 +19,7 @@ abstract class BaseBlurFactory(protected val blurEngine: BlurEngine) : IBlurTool
 
     protected fun transformCanvas() {
         scaleFactory.apply {
+            decorCanvas.save()
             decorCanvas.translate(leftScaled, rightScaled)
             decorCanvas.scale(1 / wScaled, 1 / hScaled)
         }
@@ -43,6 +43,10 @@ abstract class BaseBlurFactory(protected val blurEngine: BlurEngine) : IBlurTool
     }
 
     override fun setWillMove(willMove: Boolean) {
+        if (canMove != willMove) {
+            if (willMove) decorCanvas.restore()
+            else transformCanvas()
+        }
         this.canMove = willMove
     }
 

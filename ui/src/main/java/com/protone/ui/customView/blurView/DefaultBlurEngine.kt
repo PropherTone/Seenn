@@ -2,7 +2,6 @@ package com.protone.ui.customView.blurView
 
 import android.graphics.Bitmap
 import com.protone.api.img.Blur
-import kotlin.math.roundToInt
 
 class DefaultBlurEngine : BlurEngine() {
 
@@ -20,7 +19,10 @@ class DefaultBlurEngine : BlurEngine() {
     }
 
     override fun getScaleFactor(w: Int): Float {
-        return calculateRoundedScaleFactor(w, DEFAULT_SCALE_FACTOR)
+        return calculateRoundedScaleFactor(
+            w,
+            if (scaleFactor >= 1f) scaleFactor else DEFAULT_SCALE_FACTOR
+        )
     }
 
     override fun getBitmapConfig(): Bitmap.Config = Bitmap.Config.ARGB_8888

@@ -67,6 +67,7 @@ class SwitchImageView @JvmOverloads constructor(
         switcher.apply {
             (nextView as ImageView).setImageDrawable(drawable)
             showNext()
+            (nextView as ImageView).setImageBitmap(null)
         }
     }
 

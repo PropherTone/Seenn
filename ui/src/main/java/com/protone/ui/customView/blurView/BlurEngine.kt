@@ -11,6 +11,8 @@ abstract class BlurEngine {
     var blurRadius = 24f
         private set
 
+    var scaleFactor = -1f
+
     fun setRadius(radius: Float) {
         if (radius !in 1f..24f) {
             throw IllegalArgumentException("Blur Radius must in 1..24")

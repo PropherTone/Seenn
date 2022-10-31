@@ -6,7 +6,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import androidx.transition.TransitionManager
 import com.protone.api.baseType.getString
 import com.protone.api.entity.NoteDir
 import com.protone.ui.R
@@ -21,7 +20,6 @@ class NoteTypeListAdapter(
 
     override val select: (holder: Holder<NoteTpyeListAdapterBinding>, isSelect: Boolean) -> Unit =
         { holder, select ->
-            TransitionManager.beginDelayedTransition(holder.binding.root as ViewGroup)
             holder.binding.noteTypeSelectGuide.isGone = !select
         }
 

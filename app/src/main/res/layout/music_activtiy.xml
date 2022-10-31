@@ -15,18 +15,13 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/main_background">
+        android:background="@drawable/main_background"
+        android:clipChildren="false">
 
         <com.protone.ui.customView.SwitchImageView
             android:id="@+id/blurred_bucket_cover"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
-        <com.protone.ui.customView.SwitchImageView
-            android:id="@+id/musicPlayerCover"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_gravity="top" />
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:id="@+id/music_model_container"
@@ -206,6 +201,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
+            <com.protone.ui.customView.SwitchImageView
+                android:id="@+id/musicPlayerCover"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/model_icon_dimen"
+                android:elevation="0dp"
+                app:layout_constraintBottom_toBottomOf="@id/mySmallMusicPlayer" />
+
             <com.protone.ui.customView.StatusImageView
                 android:id="@+id/music_showBucket"
                 android:layout_width="wrap_content"
@@ -253,6 +255,28 @@
                 app:layout_constraintTop_toBottomOf="@id/music_bucket" />
 
         </com.protone.ui.customView.TableCardView>
+
+        <ImageView
+            android:id="@+id/music_finishPhanton"
+            android:layout_width="?attr/actionBarSize"
+            android:layout_height="?attr/actionBarSize"
+            android:contentDescription="@string/action"
+            android:elevation="@dimen/small_elevation"
+            android:onClick="@{()->activity.finish()}"
+            android:padding="@dimen/icon_padding_mid"
+            android:src="@drawable/ic_round_arrow_left__white_24"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/music_bucketNamePhanton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/icon_margin"
+            android:elevation="@dimen/small_elevation"
+            android:textColor="@color/white"
+            android:textSize="@dimen/title_text"
+            android:visibility="gone" />
 
     </FrameLayout>
 

@@ -1,6 +1,8 @@
 package com.protone.seenn.activity
 
+import androidx.core.view.isGone
 import androidx.core.view.marginBottom
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.transition.TransitionManager
@@ -32,7 +34,7 @@ import kotlinx.coroutines.withContext
 class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.MusicEvent>(true),
     StatusImageView.StateListener {
 
-    private var doBlur = false
+    private var doBlur = true
 
     override val viewModel: MusicModel by lazy {
         ViewModelProvider(this).get(MusicModel::class.java).apply {
@@ -57,6 +59,16 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
         return MusicActivtiyBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MusicActivity
             fitStatuesBar(musicBucketContainer)
+            musicPlayerCover.updateLayoutParams {
+                height += (toolbar.minHeight + statuesBarHeight)
+            }
+            bucketContainerBlur.initBlurTool(
+                DefaultBlurController(
+                    root,
+                    DefaultBlurEngine().also {
+                        it.scaleFactor = 12f
+                    })
+            )
             root.onGlobalLayout {
                 actionBtnContainer.marginBottom(mySmallMusicPlayer.height + search.marginBottom)
                 appToolbar.paddingTop(appToolbar.paddingTop + statuesBarHeight)
@@ -65,9 +77,14 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 musicMusicList.setPadding(0, 0, 0, mySmallMusicPlayer.height)
                 appToolbar.onGlobalLayout {
                     appToolbar.setExpanded(false, false)
+                    musicBucketNamePhanton.isGone = false
+                    musicFinishPhanton.isGone = false
+                    val location = intArrayOf(0, 0)
+                    musicBucketName.getLocationOnScreen(location)
+                    musicBucketNamePhanton.y = location[1].toFloat()
+                    musicFinish.getLocationOnScreen(location)
+                    musicFinishPhanton.y = location[1].toFloat()
                 }
-                doBlur = true
-                bucketContainerBlur.initBlurTool(DefaultBlurController(root, DefaultBlurEngine()))
                 bucketContainerBlur.renderFrame()
             }
             appToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -78,6 +95,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
 
     override suspend fun MusicModel.init() {
         val controller = MusicControllerIMP(binding.mySmallMusicPlayer)
+        controller.setInterceptAlbumCover(true)
         controller.setOnBlurAlbumCover {
             binding.musicPlayerCover.setImageBitmap(it)
         }
@@ -112,6 +130,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                                 musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
                             }
                             musicBucketName.text = it.name
+                            musicBucketNamePhanton.text = it.name
                             musicBucketMsg.text =
                                 if (it.date != null && it.detail != null) "${it.date} ${it.detail}" else R.string.none.getString()
                         }
@@ -302,12 +321,42 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
     override fun onActive() {
         binding.apply {
             appToolbar.setExpanded(false, false)
-            musicBucketContainer.show()
+            doBlur = true
+            var isDone = false
+            musicBucketContainer.show(onStart = {
+                bucketContainerBlur.setWillMove(true)
+                musicBucketNamePhanton.isGone = false
+                musicFinishPhanton.isGone = false
+            }, update = {
+                if ((it?.animatedValue as Float) > 0.8f) {
+                    if (isDone) return@show
+                    isDone = true
+                    TransitionManager.beginDelayedTransition(musicBucketContainer)
+                    musicPlayerCover.updateLayoutParams {
+                        height += (toolbar.minHeight + statuesBarHeight)
+                    }
+                }
+            }, onEnd = {
+                bucketContainerBlur.setWillMove(false)
+            })
         }
     }
 
     override fun onNegative() {
-        binding.musicBucketContainer.hide()
+        binding.apply {
+            musicBucketNamePhanton.isGone = true
+            musicFinishPhanton.isGone = true
+            musicBucketContainer.hide(onStart = {
+                bucketContainerBlur.setWillMove(true)
+                TransitionManager.beginDelayedTransition(musicBucketContainer)
+                musicPlayerCover.updateLayoutParams {
+                    height -= (toolbar.minHeight + statuesBarHeight)
+                }
+            }, onEnd = {
+                bucketContainerBlur.setWillMove(false)
+                doBlur = false
+            })
+        }
     }
 
 }
