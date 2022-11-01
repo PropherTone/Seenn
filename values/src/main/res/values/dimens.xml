@@ -14,6 +14,7 @@
     <dimen name="icon">24dp</dimen>
     <dimen name="subContent_text">12sp</dimen>
     <dimen name="card_corner">10dp</dimen>
+    <dimen name="action_btn">50dp</dimen>
 
     <dimen name="icon_padding_lite">10dp</dimen>
     <dimen name="icon_padding_mid">15dp</dimen>

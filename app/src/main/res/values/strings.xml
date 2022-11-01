@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="this_file_op_failed">以下文件操作失败</string>
-    <string name="choose">选择</string>
-    <string name="search_music">搜索音乐/专辑/歌手</string>
-</resources>

@@ -2,6 +2,7 @@ package com.protone.ui.customView.blurView
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.util.AttributeSet
 import android.widget.FrameLayout
@@ -17,6 +18,8 @@ class SBlurView @JvmOverloads constructor(
             field = value
         }
 
+    private var maskColor: Int = Color.TRANSPARENT
+
     fun initBlurTool(blurTool: BaseBlurFactory): BaseBlurFactory {
         this.blurTool = blurTool
         return this.blurTool
@@ -25,6 +28,12 @@ class SBlurView @JvmOverloads constructor(
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         blurTool.resize()
+    }
+
+    override fun onDrawForeground(canvas: Canvas?) {
+        if (maskColor == Color.TRANSPARENT) return
+        canvas?.drawColor(maskColor)
+        super.onDrawForeground(canvas)
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -46,6 +55,10 @@ class SBlurView @JvmOverloads constructor(
     fun release(): BaseBlurFactory {
         blurTool.release()
         return blurTool
+    }
+
+    fun setForeColor(color: Int) {
+        this.maskColor = color
     }
 
     override fun setMaskXfMode(mode: PorterDuff.Mode) {

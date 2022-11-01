@@ -108,8 +108,8 @@ object Blur {
                 it.setInput(input)
                 it.setRadius(radius)
                 it.forEach(output)
+                output?.copyTo(bitmap)
             }
-            output?.copyTo(bitmap)
             return bitmap
         } finally {
             input.destroy()

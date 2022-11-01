@@ -149,7 +149,7 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
         controller.interceptAlbumCover = intercept
     }
 
-    fun setOnBlurAlbumCover(block: (Bitmap) -> Unit) {
+    fun setOnBlurAlbumCover(block: (Bitmap?) -> Unit) {
         controller.onBlurAlbumCover(block)
     }
 

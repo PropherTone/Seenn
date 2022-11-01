@@ -42,9 +42,14 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
         }
 
     var interceptAlbumCover = false
+        set(value) {
+            switcher.setImageBitmap(null)
+            switcher.setImageBitmap(null)
+            field = value
+        }
 
-    private var onBlurAlbumCover: ((Bitmap) -> Unit)? = null
-    fun onBlurAlbumCover(block: (Bitmap) -> Unit) {
+    private var onBlurAlbumCover: ((Bitmap?) -> Unit)? = null
+    fun onBlurAlbumCover(block: (Bitmap?) -> Unit) {
         this.onBlurAlbumCover = block
     }
 
@@ -74,10 +79,9 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
         launch(Dispatchers.Default) {
             try {
                 val blur = Blur.blur(albumBitmap, radius = 12, sampling = 10)
-                if (interceptAlbumCover && blur != null) {
+                if (interceptAlbumCover) {
                     withContext(Dispatchers.Main) {
                         onBlurAlbumCover?.invoke(blur)
-                        switcher.setImageBitmap(null)
                     }
                     return@launch
                 }

@@ -33,7 +33,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/transparent"
-
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$Behavior">
 
                 <androidx.constraintlayout.motion.widget.MotionLayout
@@ -142,8 +141,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:overScrollMode="never"
-                app:layout_anchor="@id/appToolbar"
-                app:layout_anchorGravity="bottom"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -272,7 +269,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/icon_margin"
             android:elevation="@dimen/small_elevation"
             android:textColor="@color/white"
             android:textSize="@dimen/title_text"

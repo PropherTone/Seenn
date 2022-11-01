@@ -59,6 +59,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
         return MusicActivtiyBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MusicActivity
             fitStatuesBar(musicBucketContainer)
+            mySmallMusicPlayer.interceptAlbumCover = true
             musicPlayerCover.updateLayoutParams {
                 height += (toolbar.minHeight + statuesBarHeight)
             }
@@ -66,25 +67,19 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 DefaultBlurController(
                     root,
                     DefaultBlurEngine().also {
-                        it.scaleFactor = 12f
+                        it.scaleFactor = 16f
                     })
             )
+            bucketContainerBlur.setForeColor(getColor(R.color.foreDark))
             root.onGlobalLayout {
                 actionBtnContainer.marginBottom(mySmallMusicPlayer.height + search.marginBottom)
                 appToolbar.paddingTop(appToolbar.paddingTop + statuesBarHeight)
                 musicBucketContainer.botBlock = mySmallMusicPlayer.measuredHeight.toFloat()
                 musicShowBucket.setOnStateListener(this@MusicActivity)
                 musicMusicList.setPadding(0, 0, 0, mySmallMusicPlayer.height)
-                appToolbar.onGlobalLayout {
-                    appToolbar.setExpanded(false, false)
-                    musicBucketNamePhanton.isGone = false
-                    musicFinishPhanton.isGone = false
-                    val location = intArrayOf(0, 0)
-                    musicBucketName.getLocationOnScreen(location)
-                    musicBucketNamePhanton.y = location[1].toFloat()
-                    musicFinish.getLocationOnScreen(location)
-                    musicFinishPhanton.y = location[1].toFloat()
-                }
+                appToolbar.setExpanded(false, false)
+                musicBucketNamePhanton.isGone = false
+                musicFinishPhanton.isGone = false
                 bucketContainerBlur.renderFrame()
             }
             appToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -95,7 +90,6 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
 
     override suspend fun MusicModel.init() {
         val controller = MusicControllerIMP(binding.mySmallMusicPlayer)
-        controller.setInterceptAlbumCover(true)
         controller.setOnBlurAlbumCover {
             binding.musicPlayerCover.setImageBitmap(it)
         }
@@ -219,15 +213,22 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
             controller.setBinder(this@MusicActivity, it, onPlaying = { music ->
                 getMusicListAdapter()?.playPosition(music)
             })
-            binding.mySmallMusicPlayer.coverSwitcher.setOnClickListener {
-                startActivity(MusicViewActivity::class.intent)
-            }
             controller.onClick {
                 binding.musicShowBucket.performClick()
             }
-            binding.root.viewTreeObserver.addOnPreDrawListener {
-                if (doBlur) binding.bucketContainerBlur.renderFrame()
-                true
+            binding.apply {
+                mySmallMusicPlayer.coverSwitcher.setOnClickListener {
+                    startActivity(MusicViewActivity::class.intent)
+                }
+                val location = intArrayOf(0, 0)
+                musicBucketName.getLocationOnScreen(location)
+                musicBucketNamePhanton.y = location[1].toFloat()
+                musicFinish.getLocationOnScreen(location)
+                musicFinishPhanton.y = location[1].toFloat()
+                root.viewTreeObserver.addOnPreDrawListener {
+                    if (doBlur) bucketContainerBlur.renderFrame()
+                    true
+                }
             }
         }
     }
