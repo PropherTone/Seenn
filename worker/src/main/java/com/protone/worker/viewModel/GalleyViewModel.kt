@@ -18,6 +18,7 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
         const val Gallery_DATA = "GalleryData"
         const val CHOOSE_PHOTO = "PHOTO"
         const val CHOOSE_VIDEO = "VIDEO"
+        const val CHOOSE_MEDIA = "MEDIA"
     }
 
     var chooseData: MutableList<GalleryMedia>? = null

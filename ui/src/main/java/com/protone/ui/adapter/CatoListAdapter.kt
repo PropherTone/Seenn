@@ -8,8 +8,9 @@ import com.protone.api.context.newLayoutInflater
 import com.protone.api.entity.GalleryMedia
 import com.protone.ui.databinding.ImageCateLayoutBinding
 import com.protone.ui.databinding.TextCateLayoutBinding
+import kotlinx.coroutines.launch
 
-class CatoListAdapter(context: Context, val catoListDataProxy: CatoListDataProxy) :
+class CatoListAdapter(context: Context, private val catoListDataProxy: CatoListDataProxy) :
     BaseAdapter<ViewDataBinding, String>(context) {
 
     private val catoList = mutableListOf<String>()
@@ -31,17 +32,17 @@ class CatoListAdapter(context: Context, val catoListDataProxy: CatoListDataProxy
     override fun onBindViewHolder(holder: Holder<ViewDataBinding>, position: Int) {
         holder.binding.apply {
             when (this) {
-                is ImageCateLayoutBinding -> {
-                    val media = catoListDataProxy.getMedia()
-                    Glide.with(context).asDrawable().load(media.uri).into(catoBack)
-                    catoName.text = media.name
-                    root.setOnClickListener {
-                        itemClick?.invoke(catoList[position])
+                is ImageCateLayoutBinding ->
+                    launch {
+                        catoListDataProxy.getMedia(catoList[position])?.let { media ->
+                            Glide.with(context).asDrawable().load(media.uri).into(catoBack)
+                            catoName.text = media.name
+                            root.setOnClickListener {
+                                itemClick?.invoke(catoList[position])
+                            }
+                        }
                     }
-                }
-                is TextCateLayoutBinding -> {
-                    cato.text = catoList[position]
-                }
+                is TextCateLayoutBinding -> cato.text = catoList[position]
             }
         }
     }
@@ -52,8 +53,18 @@ class CatoListAdapter(context: Context, val catoListDataProxy: CatoListDataProxy
         this.itemClick = itemClick
     }
 
+    fun refresh(cateList : Collection<String>?){
+        if (cateList == null) return
+        if (catoList.containsAll(cateList)) return
+        val size = catoList.size
+        catoList.clear()
+        notifyItemRangeRemoved(0, size)
+        catoList.addAll(cateList)
+        notifyItemRangeInserted(0, catoList.size)
+    }
+
     interface CatoListDataProxy {
-        fun getMedia(): GalleryMedia
+        suspend fun getMedia(cate: String): GalleryMedia?
     }
 
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
+import com.protone.api.baseType.withIOContext
 import com.protone.api.entity.*
 import com.protone.database.R
 import com.protone.database.room.*
@@ -361,25 +362,25 @@ class DatabaseHelper {
 
         private val musicBucketDAO = getMusicBucketDAO()
 
-        suspend fun getAllMusicBucket(): List<MusicBucket>? = withContext(Dispatchers.IO) {
+        suspend fun getAllMusicBucket(): List<MusicBucket>? = withIOContext {
             musicBucketDAO.getAllMusicBucket()
         }
 
-        suspend fun getMusicBucketByName(name: String): MusicBucket? = withContext(Dispatchers.IO) {
+        suspend fun getMusicBucketByName(name: String): MusicBucket? = withIOContext {
             musicBucketDAO.getMusicBucketByName(name)
         }
 
-        suspend fun addMusicBucket(musicBucket: MusicBucket) = withContext(Dispatchers.IO) {
+        suspend fun addMusicBucket(musicBucket: MusicBucket) = withIOContext {
             sendEvent(MediaAction.OnNewMusicBucket(musicBucket))
             musicBucketDAO.addMusicBucket(musicBucket)
         }
 
-        suspend fun updateMusicBucket(musicBucket: MusicBucket): Int = withContext(Dispatchers.IO) {
+        suspend fun updateMusicBucket(musicBucket: MusicBucket): Int = withIOContext {
             sendEvent(MediaAction.OnMusicBucketUpdated(musicBucket))
             musicBucketDAO.updateMusicBucket(musicBucket)
         }
 
-        suspend fun deleteMusicBucket(musicBucket: MusicBucket) = withContext(Dispatchers.IO) {
+        suspend fun deleteMusicBucket(musicBucket: MusicBucket) = withIOContext {
             sendEvent(MediaAction.OnMusicBucketDeleted(musicBucket))
             musicBucketDAO.deleteMusicBucket(musicBucket)
         }
@@ -391,22 +392,22 @@ class DatabaseHelper {
         private val musicDAO = getMusicDAO()
 
         suspend fun getAllMusic(): List<Music>? =
-            withContext(Dispatchers.IO) { musicDAO.getAllMusic() }
+            withIOContext { musicDAO.getAllMusic() }
 
         suspend fun getMusicByUri(uri: Uri): Music? =
-            withContext(Dispatchers.IO) { musicDAO.getMusicByUri(uri) }
+            withIOContext { musicDAO.getMusicByUri(uri) }
 
-        suspend fun insertMusic(music: Music) = withContext(Dispatchers.IO) {
+        suspend fun insertMusic(music: Music) = withIOContext {
             sendEvent(MediaAction.OnMusicInserted(music))
             musicDAO.insertMusic(music)
         }
 
-        suspend fun deleteMusic(music: Music) = withContext(Dispatchers.IO) {
+        suspend fun deleteMusic(music: Music) = withIOContext {
             sendEvent(MediaAction.OnMusicDeleted(music))
             musicDAO.deleteMusic(music)
         }
 
-        suspend fun updateMusic(music: Music): Int = withContext(Dispatchers.IO) {
+        suspend fun updateMusic(music: Music): Int = withIOContext {
             sendEvent(MediaAction.OnMusicUpdate(music))
             musicDAO.updateMusic(music)
         }
@@ -417,62 +418,62 @@ class DatabaseHelper {
 
         private val signedGalleryDAO = getGalleryDAO()
 
-        suspend fun getAllSignedMedia(): List<GalleryMedia>? = withContext(Dispatchers.IO) {
+        suspend fun getAllSignedMedia(): List<GalleryMedia>? = withIOContext {
             signedGalleryDAO.getAllSignedMedia()
         }
 
         suspend fun getAllMediaByType(isVideo: Boolean): List<GalleryMedia>? =
-            withContext(Dispatchers.IO) {
+            withIOContext {
                 signedGalleryDAO.getAllMediaByType(isVideo)
             }
 
-        suspend fun getAllGallery(isVideo: Boolean): List<String>? = withContext(Dispatchers.IO) {
+        suspend fun getAllGallery(isVideo: Boolean): List<String>? = withIOContext {
             signedGalleryDAO.getAllGallery(isVideo)
         }
 
-        suspend fun getAllGallery(): List<String>? = withContext(Dispatchers.IO) {
+        suspend fun getAllGallery(): List<String>? = withIOContext {
             signedGalleryDAO.getAllGallery()
         }
 
         suspend fun getAllMediaByGallery(name: String, isVideo: Boolean): List<GalleryMedia>? =
-            withContext(Dispatchers.IO) {
+            withIOContext {
                 signedGalleryDAO.getAllMediaByGallery(name, isVideo)
             }
 
         suspend fun getAllMediaByGallery(name: String): List<GalleryMedia>? =
-            withContext(Dispatchers.IO) {
+            withIOContext {
                 signedGalleryDAO.getAllMediaByGallery(name)
             }
 
-        suspend fun getSignedMedia(uri: Uri): GalleryMedia? = withContext(Dispatchers.IO) {
+        suspend fun getSignedMedia(uri: Uri): GalleryMedia? = withIOContext {
             signedGalleryDAO.getSignedMedia(uri)
         }
 
-        suspend fun getSignedMedia(path: String): GalleryMedia? = withContext(Dispatchers.IO) {
+        suspend fun getSignedMedia(path: String): GalleryMedia? = withIOContext {
             signedGalleryDAO.getSignedMedia(path)
         }
 
-        suspend fun deleteSignedMediaByUri(uri: Uri) = withContext(Dispatchers.IO) {
+        suspend fun deleteSignedMediaByUri(uri: Uri) = withIOContext {
             getSignedMedia(uri)?.let { sendEvent(MediaAction.OnMediaDeleted(it)) }
             signedGalleryDAO.deleteSignedMediaByUri(uri)
         }
 
-        suspend fun deleteSignedMediasByGallery(gallery:String) = withContext(Dispatchers.IO) {
+        suspend fun deleteSignedMediasByGallery(gallery:String) = withIOContext {
             sendEvent(MediaAction.OnGalleryDeleted(gallery))
             signedGalleryDAO.deleteSignedMediasByGallery(gallery)
         }
 
-        suspend fun deleteSignedMedia(media: GalleryMedia) = withContext(Dispatchers.IO) {
+        suspend fun deleteSignedMedia(media: GalleryMedia) = withIOContext {
             sendEvent(MediaAction.OnMediaDeleted(media))
             signedGalleryDAO.deleteSignedMedia(media)
         }
 
-        suspend fun insertSignedMedia(media: GalleryMedia): Long = withContext(Dispatchers.IO) {
+        suspend fun insertSignedMedia(media: GalleryMedia): Long = withIOContext {
             sendEvent(MediaAction.OnMediaInserted(media))
             signedGalleryDAO.insertSignedMedia(media)
         }
 
-        suspend fun updateSignedMedia(media: GalleryMedia) = withContext(Dispatchers.IO) {
+        suspend fun updateSignedMedia(media: GalleryMedia) = withIOContext {
             sendEvent(MediaAction.OnMediaUpdated(media))
             signedGalleryDAO.updateSignedMedia(media)
         }
@@ -482,25 +483,25 @@ class DatabaseHelper {
 
         private val noteDAO = getNoteDAO()
 
-        suspend fun getAllNote(): List<Note>? = withContext(Dispatchers.IO) {
+        suspend fun getAllNote(): List<Note>? = withIOContext {
             noteDAO.getAllNote()
         }
 
-        suspend fun getNoteByName(name: String): Note? = withContext(Dispatchers.IO) {
+        suspend fun getNoteByName(name: String): Note? = withIOContext {
             noteDAO.getNoteByName(name)
         }
 
-        suspend fun updateNote(note: Note): Int? = withContext(Dispatchers.IO) {
+        suspend fun updateNote(note: Note): Int? = withIOContext {
             sendEvent(MediaAction.OnNoteUpdated(note))
             noteDAO.updateNote(note)
         }
 
-        suspend fun deleteNote(note: Note) = withContext(Dispatchers.IO) {
+        suspend fun deleteNote(note: Note) = withIOContext {
             sendEvent(MediaAction.OnNoteDeleted(note))
             noteDAO.deleteNote(note)
         }
 
-        suspend fun insertNote(note: Note): Long = withContext(Dispatchers.IO) {
+        suspend fun insertNote(note: Note): Long = withIOContext {
             sendEvent(MediaAction.OnNoteInserted(note))
             noteDAO.insertNote(note)
         }
@@ -512,17 +513,17 @@ class DatabaseHelper {
         private val noteTypeDAO = getNoteTypeDAO()
 
         suspend fun getNoteDir(name: String): NoteDir? =
-            withContext(Dispatchers.IO) { noteTypeDAO.getNoteDir(name) }
+            withIOContext { noteTypeDAO.getNoteDir(name) }
 
         suspend fun getALLNoteDir(): List<NoteDir>? =
-            withContext(Dispatchers.IO) { noteTypeDAO.getALLNoteDir() }
+            withIOContext { noteTypeDAO.getALLNoteDir() }
 
-        suspend fun insertNoteDir(noteDir: NoteDir) = withContext(Dispatchers.IO) {
+        suspend fun insertNoteDir(noteDir: NoteDir) = withIOContext {
             sendEvent(MediaAction.OnNoteDirInserted(noteDir))
             noteTypeDAO.insertNoteDir(noteDir)
         }
 
-        suspend fun deleteNoteDir(noteDir: NoteDir) = withContext(Dispatchers.IO) {
+        suspend fun deleteNoteDir(noteDir: NoteDir) = withIOContext {
             sendEvent(MediaAction.OnNoteDirDeleted(noteDir))
             noteTypeDAO.deleteNoteDir(noteDir)
         }
@@ -532,21 +533,21 @@ class DatabaseHelper {
 
         private val galleryBucketDAO = getGalleryBucketDAO()
 
-        suspend fun getGalleryBucket(name: String): GalleryBucket? = withContext(Dispatchers.IO) {
+        suspend fun getGalleryBucket(name: String): GalleryBucket? = withIOContext {
             galleryBucketDAO.getGalleryBucket(name)
         }
 
         suspend fun getAllGalleryBucket(isVideo: Boolean): List<GalleryBucket>? =
-            withContext(Dispatchers.IO) {
+            withIOContext {
                 galleryBucketDAO.getAllGalleryBucket(isVideo)
             }
 
-        suspend fun insertGalleryBucket(galleryBucket: GalleryBucket) = withContext(Dispatchers.IO) {
+        suspend fun insertGalleryBucket(galleryBucket: GalleryBucket) = withIOContext {
             sendEvent(MediaAction.OnGalleryBucketInserted(galleryBucket))
             galleryBucketDAO.insertGalleryBucket(galleryBucket)
         }
 
-        suspend fun deleteGalleryBucket(galleryBucket: GalleryBucket) = withContext(Dispatchers.IO) {
+        suspend fun deleteGalleryBucket(galleryBucket: GalleryBucket) = withIOContext {
             sendEvent(MediaAction.OnGalleryBucketDeleted(galleryBucket))
             galleryBucketDAO.deleteGalleryBucket(galleryBucket)
         }
@@ -557,17 +558,17 @@ class DatabaseHelper {
         private val galleriesWithNotesDAO = getGalleriesWithNotesDAO()
 
         suspend fun insertGalleriesWithNotes(galleriesWithNotes: GalleriesWithNotes) =
-            withContext(Dispatchers.IO) {
+            withIOContext {
                 sendEvent(MediaAction.OnGalleriesWithNotesInserted(galleriesWithNotes))
                 galleriesWithNotesDAO.insertGalleriesWithNotes(galleriesWithNotes)
             }
 
-        suspend fun getNotesWithGallery(uri: Uri): List<Note> = withContext(Dispatchers.IO) {
+        suspend fun getNotesWithGallery(uri: Uri): List<Note> = withIOContext {
             galleriesWithNotesDAO.getNotesWithGallery(uri) ?: mutableListOf()
         }
 
         suspend fun getGalleriesWithNote(noteId: Long): List<GalleryMedia> =
-            withContext(Dispatchers.IO) {
+            withIOContext {
                 galleriesWithNotesDAO.getGalleriesWithNote(noteId) ?: mutableListOf()
             }
     }
@@ -577,16 +578,16 @@ class DatabaseHelper {
         private val noteDirWithNoteDAO = getNoteDirWithNoteDAO()
 
         suspend fun insertNoteDirWithNote(noteDirWithNotes: NoteDirWithNotes) =
-            withContext(Dispatchers.IO) {
+            withIOContext {
                 sendEvent(MediaAction.OnNoteDirWithNoteInserted(noteDirWithNotes))
                 noteDirWithNoteDAO.insertNoteDirWithNote(noteDirWithNotes)
             }
 
-        suspend fun getNotesWithNoteDir(noteDirId: Long): List<Note> = withContext(Dispatchers.IO) {
+        suspend fun getNotesWithNoteDir(noteDirId: Long): List<Note> = withIOContext {
             noteDirWithNoteDAO.getNotesWithNoteDir(noteDirId) ?: mutableListOf()
         }
 
-        suspend fun getNoteDirWithNote(noteId: Long): List<NoteDir> = withContext(Dispatchers.IO) {
+        suspend fun getNoteDirWithNote(noteId: Long): List<NoteDir> = withIOContext {
             noteDirWithNoteDAO.getNoteDirWithNote(noteId) ?: mutableListOf()
         }
     }
@@ -596,24 +597,24 @@ class DatabaseHelper {
         private val musicWithMusicBucketDAO = getMusicWithMusicBucketDAO()
 
         suspend fun insertMusicWithMusicBucket(musicWithMusicBucket: MusicWithMusicBucket): Long? =
-            withContext(Dispatchers.IO) {
+            withIOContext {
                 sendEvent(MediaAction.OnMusicWithMusicBucketInserted(musicWithMusicBucket))
                 musicWithMusicBucketDAO.insertMusicWithMusicBucket(musicWithMusicBucket)
             }
 
         suspend fun deleteMusicWithMusicBucket(musicID: Long, musicBucketId: Long) =
-            withContext(Dispatchers.IO) {
+            withIOContext {
                 sendEvent(MediaAction.OnMusicWithMusicBucketDeleted(musicID))
                 musicWithMusicBucketDAO.deleteMusicWithMusicBucket(musicID, musicBucketId)
             }
 
         suspend fun getMusicWithMusicBucket(musicBucketId: Long): List<Music> =
-            withContext(Dispatchers.IO) {
+            withIOContext {
                 musicWithMusicBucketDAO.getMusicWithMusicBucket(musicBucketId) ?: mutableListOf()
             }
 
         suspend fun getMusicBucketWithMusic(musicID: Long): List<MusicBucket> =
-            withContext(Dispatchers.IO) {
+            withIOContext {
                 musicWithMusicBucketDAO.getMusicBucketWithMusic(musicID) ?: mutableListOf()
             }
     }

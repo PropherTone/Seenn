@@ -16,6 +16,7 @@ import com.protone.ui.adapter.MyFragmentStateAdapter
 import com.protone.worker.database.userConfig
 import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.GalleryViewModel
+import com.protone.worker.viewModel.GalleryViewModel.Companion.CHOOSE_MEDIA
 import com.protone.worker.viewModel.GalleryViewModel.Companion.CHOOSE_PHOTO
 import com.protone.worker.viewModel.GalleryViewModel.Companion.CHOOSE_VIDEO
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +48,7 @@ class GalleryActivity :
     private suspend fun GalleryViewModel.initPager(
         chooseType: String = "",
     ) = withContext(Dispatchers.Main) {
-        val combine = userConfig.combineGallery
+        val combine = userConfig.combineGallery || chooseType == CHOOSE_MEDIA
         binding.galleryPager.adapter = MyFragmentStateAdapter(
             this@GalleryActivity,
             mutableListOf<Fragment>().also { fs ->

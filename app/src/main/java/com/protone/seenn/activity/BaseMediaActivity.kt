@@ -175,7 +175,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
     }
 
     fun addCate(gms: MutableList<GalleryMedia>) {
-        cateDialog({
+        cateDialog(addCate = {
             titleDialog(R.string.addCate.getString(), "") { re ->
                 if (re.isEmpty()) {
                     "请输入内容".toast()
@@ -183,13 +183,13 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                 }
                 addCate(re, gms)
             }
-        }) {
+        }, addCon = {
             launch(Dispatchers.IO) {
                 startActivityForResult(
                     GalleryActivity::class.intent.also { intent ->
                         intent.putExtra(
                             GalleryViewModel.CHOOSE_MODE,
-                            GalleryViewModel.CHOOSE_PHOTO
+                            GalleryViewModel.CHOOSE_MEDIA
                         )
                     }
                 ).let { result ->
@@ -199,7 +199,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                     } else showFailedToast()
                 }
             }
-        }
+        })
     }
 
     private fun addCate(cate: String, gms: MutableList<GalleryMedia>) {

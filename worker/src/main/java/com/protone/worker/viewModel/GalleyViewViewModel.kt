@@ -1,15 +1,11 @@
 package com.protone.worker.viewModel
 
 import android.net.Uri
-import com.protone.api.baseType.deleteFile
-import com.protone.api.baseType.getString
-import com.protone.api.baseType.imageSaveToDisk
+import com.protone.api.baseType.*
 import com.protone.api.entity.GalleryMedia
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.userConfig
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.util.stream.Collectors
 import kotlin.streams.toList
 
@@ -29,7 +25,7 @@ class GalleryViewViewModel : BaseViewModel() {
     var curPosition: Int = 0
     lateinit var galleryMedias: MutableList<GalleryMedia>
 
-    suspend fun initGalleryData(gallery: String, isVideo: Boolean) = withContext(Dispatchers.IO) {
+    suspend fun initGalleryData(gallery: String, isVideo: Boolean) = withDefaultContext {
         var allMedia = (DatabaseHelper.instance.signedGalleryDAOBridge.let {
             if (userConfig.combineGallery) it.getAllSignedMedia() else it.getAllMediaByType(isVideo)
         } ?: mutableListOf()) as MutableList<GalleryMedia>
@@ -40,12 +36,11 @@ class GalleryViewViewModel : BaseViewModel() {
         galleryMedias = allMedia
     }
 
-    suspend fun getSignedMedia() = withContext(Dispatchers.IO) {
+    suspend fun getSignedMedia() =
         DatabaseHelper.instance.signedGalleryDAOBridge.getSignedMedia(galleryMedias[curPosition].uri)
-    }
 
     suspend fun getNotesWithGallery(mediaUri: Uri): MutableList<String> =
-        withContext(Dispatchers.IO) {
+        withDefaultContext {
             DatabaseHelper
                 .instance
                 .galleriesWithNotesDAOBridge
@@ -56,15 +51,19 @@ class GalleryViewViewModel : BaseViewModel() {
                 }.toList() as MutableList<String>
         }
 
-    suspend fun prepareSharedMedia() = withContext(Dispatchers.IO) {
+    suspend fun prepareSharedMedia() = withIOContext {
         getCurrentMedia().let {
             it.uri.imageSaveToDisk(it.name, "SharedMedia")
         }
     }
 
-    suspend fun deleteSharedMedia(path: String) = withContext(Dispatchers.IO) {
+    suspend fun deleteSharedMedia(path: String) = withIOContext {
         path.deleteFile()
     }
+
+    suspend fun getMediaByUri(uri: Uri) =
+        DatabaseHelper.instance.signedGalleryDAOBridge.getSignedMedia(uri)
+
 
     fun getCurrentMedia() = galleryMedias[curPosition]
 

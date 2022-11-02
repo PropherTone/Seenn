@@ -24,14 +24,19 @@ class GalleryViewFragment(
         savedInstanceState: Bundle?
     ): View {
         return if (galleryMedia.isVideo) {
-            videoBinding = RichVideoLayoutBinding.inflate(inflater, container, false)
-            videoBinding?.richVideo?.setVideoPath(galleryMedia.uri)
-            videoBinding?.richVideo?.title = galleryMedia.name
-            videoBinding!!.root
+            RichVideoLayoutBinding.inflate(inflater, container, false).also {
+                videoBinding = it
+                it.richVideo.setVideoPath(galleryMedia.uri)
+                it.richVideo.title = galleryMedia.name
+                it.root.setOnClickListener {
+                    singleClick.invoke()
+                }
+            }.root
         } else {
-            imageBinding = GalleryVp2AdapterLayoutBinding.inflate(inflater, container, false)
-            imageBinding?.image?.onSingleTap = singleClick
-            imageBinding!!.root
+            GalleryVp2AdapterLayoutBinding.inflate(inflater, container, false).also {
+                imageBinding = it
+                it.image.onSingleTap = singleClick
+            }.root
         }
     }
 

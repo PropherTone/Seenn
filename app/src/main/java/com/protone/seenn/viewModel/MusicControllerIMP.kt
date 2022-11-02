@@ -8,14 +8,14 @@ import com.protone.api.baseType.getString
 import com.protone.api.context.*
 import com.protone.api.entity.Music
 import com.protone.seenn.broadcast.musicBroadCastManager
-import com.protone.seenn.service.MusicService
+import com.protone.seenn.service.MusicBinder
 import com.protone.ui.R
 import com.protone.ui.customView.Bubble
 import com.protone.ui.customView.ColorfulProgressBar
 import com.protone.ui.customView.musicPlayer.BaseMusicPlayer
 
 class MusicControllerIMP(private val controller: BaseMusicPlayer) {
-    var binder: MusicService.MusicBinder? = null
+    var binder: MusicBinder? = null
 
     companion object {
         const val LOOP_SINGLE = 0
@@ -25,13 +25,13 @@ class MusicControllerIMP(private val controller: BaseMusicPlayer) {
         const val RANDOM = 4
     }
 
-    var loop = 1
+    private var loop = 1
 
     private val bubble = Bubble(controller.context)
 
     fun setBinder(
         lifecycle: LifecycleOwner,
-        binder: MusicService.MusicBinder,
+        binder: MusicBinder,
         onPlaying: ((Music) -> Unit)? = null,
         onLoop: ((Int) -> Unit)? = null
     ) {

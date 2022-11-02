@@ -25,7 +25,6 @@ class SeennApplication : Application() {
         SCrashHandler.path =
             if (result) "${base?.externalCacheDir?.path}/CrashLog/s_crash_log_${todayDate}.txt"
             else "${base?.externalCacheDir?.path}/s_crash_log_${todayDate}.txt"
-
     }
 
 }

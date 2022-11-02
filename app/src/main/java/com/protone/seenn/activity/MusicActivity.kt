@@ -78,8 +78,6 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 musicShowBucket.setOnStateListener(this@MusicActivity)
                 musicMusicList.setPadding(0, 0, 0, mySmallMusicPlayer.height)
                 appToolbar.setExpanded(false, false)
-                musicBucketNamePhanton.isGone = false
-                musicFinishPhanton.isGone = false
                 bucketContainerBlur.renderFrame()
             }
             appToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -225,6 +223,8 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 musicBucketNamePhanton.y = location[1].toFloat()
                 musicFinish.getLocationOnScreen(location)
                 musicFinishPhanton.y = location[1].toFloat()
+                musicBucketNamePhanton.isGone = false
+                musicFinishPhanton.isGone = false
                 root.viewTreeObserver.addOnPreDrawListener {
                     if (doBlur) bucketContainerBlur.renderFrame()
                     true

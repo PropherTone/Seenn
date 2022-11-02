@@ -17,7 +17,7 @@ import com.protone.api.entity.Music
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.musicBroadCastManager
 import com.protone.seenn.databinding.PickMusicActivityBinding
-import com.protone.seenn.service.MusicService
+import com.protone.seenn.service.MusicBinder
 import com.protone.ui.adapter.AddMusicListAdapter
 import com.protone.ui.customView.blurView.DefaultBlurController
 import com.protone.ui.customView.blurView.DefaultBlurEngine
@@ -111,7 +111,7 @@ class PickMusicActivity :
     private suspend fun initSeen(
         bucket: String,
         mode: String,
-        binder: MusicService.MusicBinder? = null
+        binder: MusicBinder? = null
     ) {
         binding.addMBConfirm.also {
             it.isGone = mode == ADD_BUCKET || mode == SEARCH_MUSIC

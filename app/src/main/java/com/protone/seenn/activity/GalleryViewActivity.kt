@@ -17,6 +17,8 @@ import com.protone.api.context.intent
 import com.protone.api.context.root
 import com.protone.api.entity.GalleryMedia
 import com.protone.api.json.toEntity
+import com.protone.api.json.toJson
+import com.protone.api.json.toUri
 import com.protone.api.onResult
 import com.protone.seenn.R
 import com.protone.seenn.databinding.GalleryViewActivityBinding
@@ -50,6 +52,7 @@ class GalleryViewActivity : BaseMediaActivity<
                 galleryVView.setCurrentItem(galleryVView.currentItem - 1, true)
             }
             galleryVLinks.apply {
+                layoutManager = LinearLayoutManager(context)
                 adapter = CheckListAdapter(this@GalleryViewActivity, check = false).also {
                     it.startNote = {
                         startActivity(NoteViewActivity::class.intent.apply {
@@ -57,17 +60,25 @@ class GalleryViewActivity : BaseMediaActivity<
                         })
                     }
                 }
-                layoutManager = LinearLayoutManager(context)
             }
             galleryVCatoContainer.apply {
-                adapter = CatoListAdapter(this@GalleryViewActivity,
-                    object : CatoListAdapter.CatoListDataProxy {
-                        override fun getMedia(): GalleryMedia {
-                            return viewModel.getCurrentMedia()
-                        }
-                    })
                 layoutManager = LinearLayoutManager(context).also {
                     it.orientation = LinearLayoutManager.HORIZONTAL
+                }
+                adapter = CatoListAdapter(this@GalleryViewActivity,
+                    object : CatoListAdapter.CatoListDataProxy {
+                        override suspend fun getMedia(cate: String): GalleryMedia? =
+                            viewModel.getMediaByUri(cate.toUri())
+                    }).also {
+                    it.setItemClick { cate ->
+                        launch {
+                            val media = viewModel.getMediaByUri(cate.toUri())
+                            startActivity(GalleryViewActivity::class.intent.apply {
+                                putExtra(GalleryViewViewModel.MEDIA, media?.toJson())
+                                putExtra(GalleryViewViewModel.IS_VIDEO, media?.isVideo)
+                            })
+                        }
+                    }
                 }
             }
         }
@@ -111,10 +122,7 @@ class GalleryViewActivity : BaseMediaActivity<
 
     private suspend fun GalleryViewViewModel.setInfo() = withContext(Dispatchers.Default) {
         val galleryMedia = getSignedMedia()
-        removeCato()
-        galleryMedia?.cate?.onEach {
-
-        }
+        refreshCate(galleryMedia?.cate)
         setNotes(getNotesWithGallery(galleryMedia?.uri ?: Uri.EMPTY))
     }
 
@@ -146,14 +154,16 @@ class GalleryViewActivity : BaseMediaActivity<
         onChange: (Int) -> Unit
     ) {
         binding.galleryVView.apply {
-            val onSingleClick = {
-                binding.galleryVCover.isVisible = !binding.galleryVCover.isVisible
-            }
             adapter = object : FragmentStateAdapter(this@GalleryViewActivity) {
                 override fun getItemCount(): Int = data.size
                 override fun getItemViewType(position: Int): Int = position
                 override fun createFragment(position: Int): Fragment =
-                    GalleryViewFragment(data[position], onSingleClick)
+                    GalleryViewFragment(data[position], singleClick = {
+                        binding.galleryVCover.isVisible = !binding.galleryVCover.isVisible
+                        if (binding.galleryVCover.isVisible) {
+                            sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
+                        }
+                    })
             }
             binding.galleryVCover.isVisible = false
 
@@ -165,7 +175,9 @@ class GalleryViewActivity : BaseMediaActivity<
 
                 override fun onPageScrollStateChanged(state: Int) {
                     super.onPageScrollStateChanged(state)
-                    if (state == ViewPager2.SCREEN_STATE_OFF) sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
+                    if (state == ViewPager2.SCREEN_STATE_OFF && binding.galleryVCover.isVisible) {
+                        sendViewEvent(GalleryViewViewModel.GalleryViewEvent.SetNote)
+                    }
                 }
             })
             setCurrentItem(position, false)
@@ -196,8 +208,9 @@ class GalleryViewActivity : BaseMediaActivity<
             (binding.galleryVLinks.adapter as CheckListAdapter).dataList = notes
     }
 
-    private suspend fun removeCato() = withContext(Dispatchers.Main) {
-        binding.galleryVCatoContainer.removeAllViews()
+    private suspend fun refreshCate(cate: List<String>?) = withContext(Dispatchers.Main) {
+        (binding.galleryVCatoContainer.adapter as CatoListAdapter).refresh(cate)
+
     }
 
     fun showPop() {

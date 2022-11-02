@@ -11,7 +11,7 @@ import com.protone.api.context.root
 import com.protone.api.entity.Note
 import com.protone.api.json.toJson
 import com.protone.seenn.databinding.NoteViewActivityBinding
-import com.protone.seenn.service.MusicService
+import com.protone.seenn.service.MusicBinder
 import com.protone.ui.customView.richText.RichNoteImageLoader
 import com.protone.ui.customView.richText.RichNoteView
 import com.protone.worker.R
@@ -24,7 +24,7 @@ class NoteViewActivity :
     BaseActivity<NoteViewActivityBinding, NoteViewViewModel, NoteViewViewModel.NoteViewEvent>(true) {
     override val viewModel: NoteViewViewModel by viewModels()
 
-    private var binder: MusicService.MusicBinder? = null
+    private var binder: MusicBinder? = null
 
     override fun createView(): NoteViewActivityBinding {
         return NoteViewActivityBinding.inflate(layoutInflater, root, false).apply {

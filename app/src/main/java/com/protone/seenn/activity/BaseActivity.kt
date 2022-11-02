@@ -17,6 +17,7 @@ import com.protone.api.context.*
 import com.protone.api.onResult
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.MusicReceiver
+import com.protone.seenn.service.MusicBinder
 import com.protone.seenn.service.MusicService
 import com.protone.worker.IntentDataHolder
 import com.protone.worker.viewModel.BaseViewModel
@@ -28,9 +29,8 @@ import java.util.concurrent.atomic.AtomicInteger
 
 abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseViewModel.ViewEvent>(
     handleEvent: Boolean
-) :
-    AppCompatActivity(),
-    CoroutineScope by MainScope() {
+) : AppCompatActivity(), CoroutineScope by MainScope() {
+
     protected abstract val viewModel: VM
     protected lateinit var binding: VB
         private set
@@ -100,10 +100,13 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseVi
             activityOperationReceiver,
             IntentFilter(ACTIVITY_FINISH)
         )
-        binding = createView()
-        setContentView(binding.root)
-        lifecycleScope.launchWhenStarted {
-            viewModel.init()
+        binding = createView().apply {
+            setContentView(root)
+            root.onGlobalLayout {
+                lifecycleScope.launchWhenStarted {
+                    viewModel.init()
+                }
+            }
         }
     }
 
@@ -158,11 +161,11 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseVi
         viewEvent = null
     }
 
-    fun bindMusicService(block: suspend (MusicService.MusicBinder) -> Unit) {
+    fun bindMusicService(block: suspend (MusicBinder) -> Unit) {
         serviceConnection = object : ServiceConnection {
             override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
                 launch {
-                    block(p1 as MusicService.MusicBinder)
+                    block(p1 as MusicBinder)
                 }
             }
 
@@ -272,13 +275,14 @@ abstract class BaseActivity<VB : ViewDataBinding, VM : BaseViewModel, T : BaseVi
 
     override fun onDestroy() {
         try {
+            Log.d(TAG, "onDestroy: ${this@BaseActivity::class.simpleName}")
             binding.unbind()
-            cancel()
-            activityOperationBroadcast.unregisterReceiver(activityOperationReceiver)
             serviceConnection?.let { unbindService(it) }
             musicReceiver?.let { unregisterReceiver(it) }
+            activityOperationBroadcast.unregisterReceiver(activityOperationReceiver)
         } finally {
             super.onDestroy()
+            cancel()
         }
     }
 
