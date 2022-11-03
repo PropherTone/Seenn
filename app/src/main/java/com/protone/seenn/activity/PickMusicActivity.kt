@@ -3,6 +3,7 @@ package com.protone.seenn.activity
 import android.content.Intent
 import android.graphics.Rect
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,7 +39,7 @@ class PickMusicActivity :
             activity = this@PickMusicActivity
             fitStatuesBarUsePadding(searchContainer)
             linkInput(addMBList, addMBSearch)
-            actionBtnContainer.initBlurTool(DefaultBlurController(root, DefaultBlurEngine()))
+            actionBtnContainer.initBlurTool(DefaultBlurController(root as ViewGroup, DefaultBlurEngine()))
                 .apply {
                     setBlurRadius(24f)
                 }

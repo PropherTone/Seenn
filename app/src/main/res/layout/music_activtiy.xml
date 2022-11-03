@@ -183,7 +183,7 @@
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-        <com.protone.ui.customView.TableCardView
+        <com.protone.ui.customView.BlurTableCardView
             android:id="@+id/music_bucketContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -192,11 +192,6 @@
             android:elevation="2dp"
             android:focusable="true"
             android:orientation="vertical">
-
-            <com.protone.ui.customView.blurView.SBlurView
-                android:id="@+id/bucket_container_blur"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
 
             <com.protone.ui.customView.SwitchImageView
                 android:id="@+id/musicPlayerCover"
@@ -251,7 +246,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/music_bucket" />
 
-        </com.protone.ui.customView.TableCardView>
+        </com.protone.ui.customView.BlurTableCardView>
 
         <ImageView
             android:id="@+id/music_finishPhanton"

@@ -1,5 +1,6 @@
 package com.protone.seenn.activity
 
+import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
@@ -63,14 +64,14 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
             musicPlayerCover.updateLayoutParams {
                 height += (toolbar.minHeight + statuesBarHeight)
             }
-            bucketContainerBlur.initBlurTool(
+            musicBucketContainer.initBlurTool(
                 DefaultBlurController(
-                    root,
+                    root as ViewGroup,
                     DefaultBlurEngine().also {
                         it.scaleFactor = 16f
                     })
             )
-            bucketContainerBlur.setForeColor(getColor(R.color.foreDark))
+            musicBucketContainer.setForeColor(getColor(R.color.foreDark))
             root.onGlobalLayout {
                 actionBtnContainer.marginBottom(mySmallMusicPlayer.height + search.marginBottom)
                 appToolbar.paddingTop(appToolbar.paddingTop + statuesBarHeight)
@@ -78,7 +79,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 musicShowBucket.setOnStateListener(this@MusicActivity)
                 musicMusicList.setPadding(0, 0, 0, mySmallMusicPlayer.height)
                 appToolbar.setExpanded(false, false)
-                bucketContainerBlur.renderFrame()
+                musicBucketContainer.renderFrame()
             }
             appToolbar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
                 toolbar.progress = -verticalOffset / appBarLayout.totalScrollRange.toFloat()
@@ -226,7 +227,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                 musicBucketNamePhanton.isGone = false
                 musicFinishPhanton.isGone = false
                 root.viewTreeObserver.addOnPreDrawListener {
-                    if (doBlur) bucketContainerBlur.renderFrame()
+                    if (doBlur) musicBucketContainer.renderFrame()
                     true
                 }
             }
@@ -325,7 +326,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
             doBlur = true
             var isDone = false
             musicBucketContainer.show(onStart = {
-                bucketContainerBlur.setWillMove(true)
+                musicBucketContainer.setWillMove(true)
                 musicBucketNamePhanton.isGone = false
                 musicFinishPhanton.isGone = false
             }, update = {
@@ -338,7 +339,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                     }
                 }
             }, onEnd = {
-                bucketContainerBlur.setWillMove(false)
+                musicBucketContainer.setWillMove(false)
             })
         }
     }
@@ -348,13 +349,13 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
             musicBucketNamePhanton.isGone = true
             musicFinishPhanton.isGone = true
             musicBucketContainer.hide(onStart = {
-                bucketContainerBlur.setWillMove(true)
+                musicBucketContainer.setWillMove(true)
                 TransitionManager.beginDelayedTransition(musicBucketContainer)
                 musicPlayerCover.updateLayoutParams {
                     height -= (toolbar.minHeight + statuesBarHeight)
                 }
             }, onEnd = {
-                bucketContainerBlur.setWillMove(false)
+                musicBucketContainer.setWillMove(false)
                 doBlur = false
             })
         }

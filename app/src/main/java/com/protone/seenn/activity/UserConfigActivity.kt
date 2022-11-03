@@ -37,7 +37,7 @@ class UserConfigActivity : BaseActivity<
     override fun createView(): UserConfigActivityBinding {
         return UserConfigActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@UserConfigActivity
-            blur.initBlurTool(DefaultBlurController(root, DefaultBlurEngine())).apply {
+            blur.initBlurTool(DefaultBlurController(root as ViewGroup, DefaultBlurEngine())).apply {
                 setBlurRadius(24f)
             }
         }

@@ -5,12 +5,12 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.util.AttributeSet
-import android.widget.FrameLayout
 import androidx.annotation.ColorInt
+import androidx.constraintlayout.widget.ConstraintLayout
 
-class SBlurView @JvmOverloads constructor(
+open class SBlurView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr), IBlurConfig {
+) : ConstraintLayout(context, attrs, defStyleAttr), IBlurConfig {
 
     private var blurTool: BaseBlurFactory = EmptyIBlurTool()
         set(value) {
@@ -25,11 +25,6 @@ class SBlurView @JvmOverloads constructor(
         return this.blurTool
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        blurTool.resize()
-    }
-
     override fun onDrawForeground(canvas: Canvas?) {
         if (maskColor == Color.TRANSPARENT) return
         canvas?.drawColor(maskColor)
@@ -41,10 +36,13 @@ class SBlurView @JvmOverloads constructor(
         super.onDraw(canvas)
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        blurTool.setBlurView(this)
+    }
+
     fun renderFrame() {
-        if (!blurTool.blur()) {
-            blurTool.setBlurView(this)
-        }
+        blurTool.blur()
     }
 
     override fun onDetachedFromWindow() {

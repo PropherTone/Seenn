@@ -1,16 +1,23 @@
 package com.protone.ui.customView.blurView
 
 import android.graphics.*
-import android.view.View
-import android.view.ViewTreeObserver
+import android.util.Log
+import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import androidx.core.view.isVisible
 
 abstract class BaseBlurFactory(protected val blurEngine: BlurEngine) : IBlurTool, IBlurConfig {
+
+    companion object {
+        const val TAG = "BlurFactory"
+    }
+
     protected val scaleFactory = ScaleFactory()
-    protected val decorCanvas = BlurCanvas()
+    protected var decorCanvas: BlurCanvas = BlurCanvas()
     protected var decorBitmap: Bitmap? = null
 
     protected var canMove = false
+    protected var isResized = false
 
     protected var maskColor: Int = Color.TRANSPARENT
         private set
@@ -19,7 +26,7 @@ abstract class BaseBlurFactory(protected val blurEngine: BlurEngine) : IBlurTool
 
     protected fun transformCanvas() {
         scaleFactory.apply {
-            decorCanvas.save()
+            if (canMove) decorCanvas.save()
             decorCanvas.translate(leftScaled, rightScaled)
             decorCanvas.scale(1 / wScaled, 1 / hScaled)
         }
@@ -44,7 +51,7 @@ abstract class BaseBlurFactory(protected val blurEngine: BlurEngine) : IBlurTool
 
     override fun setWillMove(willMove: Boolean) {
         if (canMove != willMove) {
-            if (willMove) decorCanvas.restore()
+            if (willMove && isResized) decorCanvas.restore()
             else transformCanvas()
         }
         this.canMove = willMove
@@ -53,7 +60,7 @@ abstract class BaseBlurFactory(protected val blurEngine: BlurEngine) : IBlurTool
     inner class BlurCanvas : Canvas()
 }
 
-class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
+class DefaultBlurController(private val root: ViewGroup, blurEngine: BlurEngine) :
     BaseBlurFactory(blurEngine) {
 
     private var blurView: SBlurView? = null
@@ -62,17 +69,15 @@ class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
         flags = Paint.FILTER_BITMAP_FLAG
     }
 
-    private var isResized = false
-    private var start = false
+    private var isInit = false
 
     override fun drawDecor() {
-        if (!start && !isResized) return
+        if (!isResized) return
         root.apply {
             if (width <= 0 || height <= 0) return
-            decorBitmap?.eraseColor(Color.TRANSPARENT)
             if (canMove) {
                 decorCanvas.save()
-                calculateSize()
+                calculateSize(true)
                 draw(decorCanvas)
                 decorCanvas.restore()
             } else {
@@ -82,19 +87,21 @@ class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
     }
 
     override fun blur(): Boolean {
-        if (!start) return false
+        if (!isInit) return false
+        if (!root.isVisible && blurView?.isVisible == false) return true
         drawDecor()
         decorBitmap = decorBitmap?.apply { blurEngine.blur(this) }
         return true
     }
 
-    private fun calculateSize() {
-        start = false
+    private fun calculateSize(changeWH: Boolean = false) {
         isResized = false
         blurView?.apply {
             scaleFactory.apply {
-                wScaled = (width / (decorBitmap?.width ?: width).toFloat())
-                hScaled = (height / (decorBitmap?.height ?: height).toFloat())
+                if (!changeWH) {
+                    wScaled = (width / (decorBitmap?.width ?: width).toFloat())
+                    hScaled = (height / (decorBitmap?.height ?: height).toFloat())
+                }
                 val rootLocation = intArrayOf(0, 0)
                 val viewLocation = intArrayOf(0, 0)
                 root.getLocationOnScreen(rootLocation)
@@ -107,35 +114,19 @@ class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
             transformCanvas()
         }
         isResized = true
-        start = true
     }
 
-    override fun resize() {
-        start = false
-        isResized = false
-        blurView?.apply {
-            if (width == 0 || height == 0) return@apply
-            val scaleFactor = blurEngine.getScaleFactor(width)
-            makeCanvas(
-                (width / scaleFactor).toInt(),
-                (height / scaleFactor).toInt(),
-                blurEngine.getBitmapConfig()
-            )
-            calculateSize()
-        }
-    }
-
-    override fun drawBlurred(canvas: Canvas?) {
-        if (!start) return
-        decorBitmap?.also {
-            canvas?.apply {
-                save()
-                scale(scaleFactory.wScaled, scaleFactory.hScaled)
-                drawBitmap(it, 0f, 0f, bitmapPaint)
-                restore()
-            }
+    override fun drawBlurred(canvas: Canvas?): Boolean {
+        if (!isInit) return true
+        canvas?.apply {
+            if (this is BlurCanvas) return false
+            save()
+            scale(scaleFactory.wScaled, scaleFactory.hScaled)
+            decorBitmap?.apply { drawBitmap(this, 0f, 0f, bitmapPaint) }
+            restore()
             drawMask(canvas)
         }
+        return true
     }
 
     override fun drawMask(canvas: Canvas?) {
@@ -145,38 +136,47 @@ class DefaultBlurController(private val root: View, blurEngine: BlurEngine) :
     }
 
     override fun setBlurView(view: SBlurView) {
-        this.blurView = view.apply {
-            setWillNotDraw(true)
-            onGlobalLayout {
-                resize()
-                setWillNotDraw(false)
+        isInit = false
+        isResized = false
+        view.apply {
+            blurView = this
+            if (width == 0 || height == 0) {
+                setWillNotDraw(true)
+                return
             }
+            init(width, height)
+            if (canMove) decorCanvas.restore()
         }
     }
 
+    private fun init(w: Int, h: Int) {
+        if (w == 0 || h == 0) {
+            Log.e(TAG, "The view's width or height can't be zero.")
+            return
+        }
+        blurView?.setWillNotDraw(false)
+        val scaleFactor = blurEngine.getScaleFactor(w)
+        makeCanvas(
+            (w / scaleFactor).toInt(),
+            (h / scaleFactor).toInt(),
+            blurEngine.getBitmapConfig()
+        )
+        calculateSize()
+        isInit = true
+    }
+
     override fun release() {
-        start = false
+        isInit = false
         blurView?.setWillNotDraw(true)
         decorBitmap?.recycle()
     }
 
-    private inline fun View.onGlobalLayout(crossinline block: View.() -> Unit) {
-        val view = this
-        viewTreeObserver.addOnGlobalLayoutListener(object :
-            ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                viewTreeObserver.removeOnGlobalLayoutListener(this)
-                block.invoke(view)
-            }
-        })
-    }
 }
 
 class EmptyIBlurTool(blurEngine: BlurEngine = DefaultBlurEngine()) : BaseBlurFactory(blurEngine) {
     override fun drawDecor() = Unit
     override fun blur() = false
-    override fun resize() = Unit
-    override fun drawBlurred(canvas: Canvas?) = Unit
+    override fun drawBlurred(canvas: Canvas?) = true
     override fun drawMask(canvas: Canvas?) = Unit
     override fun setMaskXfMode(mode: PorterDuff.Mode) = Unit
     override fun setBlurView(view: SBlurView) = Unit

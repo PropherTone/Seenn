@@ -8,8 +8,7 @@ interface IBlurTool {
     fun setBlurView(view: SBlurView)
     fun drawDecor()
     fun blur() : Boolean
-    fun resize()
-    fun drawBlurred(canvas: Canvas?)
+    fun drawBlurred(canvas: Canvas?): Boolean
     fun drawMask(canvas: Canvas?)
     fun release()
 }

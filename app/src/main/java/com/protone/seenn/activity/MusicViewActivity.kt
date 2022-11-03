@@ -29,7 +29,7 @@ class MusicViewActivity :
         return MusicViewActivityBinding.inflate(layoutInflater, root, false).apply {
             activity = this@MusicViewActivity
             toolBar.layoutParams = toolBar.layoutParams.apply { height = statuesBarHeight }
-            pop.initBlurTool(DefaultBlurController(root, DefaultBlurEngine())).apply {
+            pop.initBlurTool(DefaultBlurController(root as ViewGroup, DefaultBlurEngine())).apply {
                 setMaskColor(Color.BLACK)
                 setMaskXfMode(PorterDuff.Mode.SCREEN)
                 setBlurRadius(16f)
