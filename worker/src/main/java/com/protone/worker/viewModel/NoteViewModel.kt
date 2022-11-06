@@ -1,6 +1,7 @@
 package com.protone.worker.viewModel
 
 import androidx.lifecycle.viewModelScope
+import com.protone.api.baseType.bufferCollect
 import com.protone.api.baseType.deleteFile
 import com.protone.api.baseType.getString
 import com.protone.api.context.SApplication
@@ -30,7 +31,7 @@ class NoteViewModel : BaseViewModel() {
 
     fun collectNoteEvent(callBack: suspend (MediaAction) -> Unit) {
         viewModelScope.launch(Dispatchers.Default) {
-            DatabaseHelper.instance.mediaNotifier.buffer().collect {
+            DatabaseHelper.instance.mediaNotifier.bufferCollect {
                 callBack.invoke(it)
             }
         }

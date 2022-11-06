@@ -122,6 +122,7 @@ class MusicListAdapter(context: Context, private val musicList: MutableList<Musi
     fun getPlayList() = musicList.toMutableList()
 
     fun playPosition(music: Music) {
+        if (selectList.contains(music)) return
         emit(MusicListEvent.PlayPosition(music))
     }
 

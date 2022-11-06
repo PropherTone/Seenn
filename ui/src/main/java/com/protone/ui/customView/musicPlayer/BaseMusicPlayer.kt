@@ -7,7 +7,11 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.core.content.res.ResourcesCompat
+import com.protone.api.baseType.launchDefault
 import com.protone.api.baseType.toBitmap
+import com.protone.api.baseType.withDefaultContext
+import com.protone.api.baseType.withMainContext
 import com.protone.api.img.Blur
 import com.protone.api.isInDebug
 import com.protone.ui.R
@@ -19,6 +23,12 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs), CoroutineScope by CoroutineScope(Dispatchers.Main) {
 
+    val baseAlbumDrawable by lazy {
+        ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_music_note_24, null)
+    }
+    val baseCoverDrawable by lazy {
+        ResourcesCompat.getDrawable(resources, R.drawable.main_background, null)
+    }
     abstract val next: ImageView?
     abstract val control: ImageView
     abstract val previous: ImageView?
@@ -60,38 +70,46 @@ abstract class BaseMusicPlayer @JvmOverloads constructor(
 
     private fun loadAlbum(albumUri: Uri?) {
         launch {
-            val albumBitmap = albumUri?.toBitmap()
+            val albumBitmap = withDefaultContext {
+                albumUri?.toBitmap()
+            }
             if (albumBitmap == null) {
-                coverSwitcher.setImageResource(R.drawable.ic_baseline_music_note_24)
+                coverSwitcher.setImageDrawable(baseAlbumDrawable)
             } else {
                 try {
-                    loadBlurCover(albumBitmap)
                     coverSwitcher.setImageBitmap(albumBitmap)
                 } catch (e: Exception) {
                     if (isInDebug()) e.printStackTrace()
-                    coverSwitcher.setImageResource(R.drawable.ic_baseline_music_note_24)
+                    coverSwitcher.setImageDrawable(baseAlbumDrawable)
                 }
             }
+            loadBlurCover(albumBitmap)
         }
     }
 
-    private fun loadBlurCover(albumBitmap: Bitmap) {
-        launch(Dispatchers.Default) {
+    private fun loadBlurCover(albumBitmap: Bitmap?) {
+        launchDefault {
             try {
+                if (albumBitmap == null) {
+                    withMainContext {
+                        switcher.setImageDrawable(baseCoverDrawable)
+                    }
+                    return@launchDefault
+                }
                 val blur = Blur.blur(albumBitmap, radius = 12, sampling = 10)
                 if (interceptAlbumCover) {
-                    withContext(Dispatchers.Main) {
+                    withMainContext {
                         onBlurAlbumCover?.invoke(blur)
                     }
-                    return@launch
+                    return@launchDefault
                 }
-                withContext(Dispatchers.Main) {
+                withMainContext {
                     switcher.setImageBitmap(blur)
                 }
             } catch (e: Exception) {
                 if (isInDebug()) e.printStackTrace()
-                withContext(Dispatchers.Main) {
-                    switcher.setImageBitmap(null)
+                withMainContext {
+                    switcher.setImageDrawable(baseCoverDrawable)
                 }
             }
         }

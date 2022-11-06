@@ -1,18 +1,22 @@
 package com.protone.seenn.activity
 
 import android.content.Intent
+import android.net.Uri
 import androidx.activity.viewModels
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.tabs.TabLayoutMediator
+import com.protone.api.baseType.launchIO
 import com.protone.api.context.root
+import com.protone.api.entity.GalleryMedia
 import com.protone.api.json.toJson
 import com.protone.api.json.toUriJson
 import com.protone.seenn.databinding.GalleryActivityBinding
 import com.protone.seenn.fragment.GalleryFragment
 import com.protone.ui.R
 import com.protone.ui.adapter.MyFragmentStateAdapter
+import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.userConfig
 import com.protone.worker.viewModel.BaseViewModel
 import com.protone.worker.viewModel.GalleryViewModel
@@ -20,6 +24,7 @@ import com.protone.worker.viewModel.GalleryViewModel.Companion.CHOOSE_MEDIA
 import com.protone.worker.viewModel.GalleryViewModel.Companion.CHOOSE_PHOTO
 import com.protone.worker.viewModel.GalleryViewModel.Companion.CHOOSE_VIDEO
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class GalleryActivity :

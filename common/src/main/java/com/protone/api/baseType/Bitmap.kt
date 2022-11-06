@@ -64,7 +64,7 @@ fun getMatrix(h: Int, w: Int, output: Int): Matrix {
     return matrix
 }
 
-fun calculateInSampleSize(outWidth: Int, outHeight: Int, h: Int, w: Int): Int {
+fun calculateInSampleSize(outWidth: Int, outHeight: Int, w: Int, h: Int): Int {
     var sampleSize = 1
     if (outHeight > h || outWidth > w) {
         val halfHeight = outHeight / 2

@@ -48,6 +48,7 @@ abstract class MusicReceiver : BroadcastReceiver() {
                     refresh(isPlaying, ref = true)
                 }
                 MUSIC_PLAY_CUR -> {
+                    isPlaying = true
                     refresh(true)
                 }
             }

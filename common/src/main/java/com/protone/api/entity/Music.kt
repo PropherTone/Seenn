@@ -76,5 +76,20 @@ data class Music(
         return result
     }
 
-
 }
+
+fun getEmptyMusic() = Music(
+    0,
+    "NO MUSIC",
+    0,
+    null,
+    null,
+    null,
+    "",
+    null,
+    null,
+    0L,
+    0L,
+    Uri.EMPTY
+)
+

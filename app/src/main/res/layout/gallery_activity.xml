@@ -38,19 +38,7 @@
                 app:tabIndicatorColor="@color/white"
                 app:tabRippleColor="@color/glass"
                 app:tabSelectedTextColor="@color/white"
-                app:tabTextColor="@color/white">
-
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="@string/photo" />
-
-                <com.google.android.material.tabs.TabItem
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="@string/video" />
-
-            </com.google.android.material.tabs.TabLayout>
+                app:tabTextColor="@color/white"/>
 
             <ImageView
                 android:id="@+id/gallery_choose_confirm"

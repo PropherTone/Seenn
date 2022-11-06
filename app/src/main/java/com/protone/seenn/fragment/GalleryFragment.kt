@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,9 +15,9 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.protone.api.TAG
 import com.protone.api.animation.AnimationHelper
-import com.protone.api.baseType.getString
-import com.protone.api.baseType.toast
+import com.protone.api.baseType.*
 import com.protone.api.context.intent
 import com.protone.api.context.onGlobalLayout
 import com.protone.api.entity.GalleryMedia
@@ -34,9 +35,11 @@ import com.protone.ui.databinding.GalleryFragmentLayoutBinding
 import com.protone.ui.dialog.titleDialog
 import com.protone.ui.itemDecoration.GalleryItemDecoration
 import com.protone.worker.IntentDataHolder
+import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.viewModel.GalleryFragmentViewModel
 import com.protone.worker.viewModel.GalleryViewViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
@@ -70,7 +73,7 @@ class GalleryFragment(
         viewModel.apply {
             attachFragEvent(onAttach)
             launch(Dispatchers.Default) {
-                fragEvent.buffer().collect {
+                fragEvent.bufferCollect {
                     when (it) {
                         is GalleryFragmentViewModel.FragEvent.AddBucket -> {
                             insertNewMedias(it.name, it.list)
@@ -150,12 +153,7 @@ class GalleryFragment(
 
                     override fun onNegative() {
                         if (viewModel.rightGallery == "") {
-                            binding.galleryBucket.findViewHolderForLayoutPosition(0)?.let {
-                                if (it is BaseAdapter.Holder<*> && it.binding is GalleryBucketListLayoutBinding) {
-                                    (it.binding as GalleryBucketListLayoutBinding).bucket.performClick()
-                                    return
-                                }
-                            }
+                            onGallerySelected(R.string.all_gallery.getString())
                         }
                         viewModel.isBucketShowUp = false
                         galleryToolButton.isVisible = onSelectMod
@@ -208,14 +206,10 @@ class GalleryFragment(
                 context,
                 object : GalleryBucketAdapter.GalleryBucketAdapterDataProxy {
                     override fun deleteGalleryBucket(bucket: String) {
-                        viewModel.deletegalleryBucket(bucket)
+                        viewModel.deleteGalleryBucket(bucket)
                     }
                 }
-            ) {
-                viewModel.rightGallery = it
-                binding.galleryShowBucket.negative()
-                noticeListUpdate(viewModel.getGallery(it))
-            }
+            ) { onGallerySelected(it) }
             addItemDecoration(object : RecyclerView.ItemDecoration() {
                 override fun getItemOffsets(
                     outRect: Rect,
@@ -230,12 +224,18 @@ class GalleryFragment(
         }
     }
 
+    private fun onGallerySelected(gallery: String) {
+        viewModel.rightGallery = gallery
+        binding.galleryShowBucket.negative()
+        noticeListUpdate(viewModel.getGallery(gallery))
+    }
+
     private fun insertBucket(pairs: Pair<Uri, Array<String>>) {
         getBucketAdapter().insertBucket(pairs)
     }
 
     private fun refreshBucket(media: GalleryMedia): Unit = viewModel.run {
-        getBucketAdapter().run {
+        getBucketAdapter().apply {
             refreshBucket(getBucket(media.bucket))
             refreshBucket(getBucket(R.string.all_gallery.getString()))
         }
@@ -243,17 +243,15 @@ class GalleryFragment(
 
     private fun noticeListUpdate(media: GalleryMedia, status: GalleryListAdapter.MediaStatus) {
         if (viewModel.isBucketShowUp) return
-        launch {
-            when (status) {
-                GalleryListAdapter.MediaStatus.INSERTED -> {
-                    getListAdapter().noticeListItemInsert(media)
-                }
-                GalleryListAdapter.MediaStatus.DELETED -> {
-                    getListAdapter().noticeListItemDelete(media)
-                }
-                GalleryListAdapter.MediaStatus.UPDATED -> {
-                    getListAdapter().noticeListItemUpdate(media)
-                }
+        when (status) {
+            GalleryListAdapter.MediaStatus.INSERTED -> {
+                getListAdapter().noticeListItemInsert(media)
+            }
+            GalleryListAdapter.MediaStatus.DELETED -> {
+                getListAdapter().noticeListItemDelete(media)
+            }
+            GalleryListAdapter.MediaStatus.UPDATED -> {
+                getListAdapter().noticeListItemUpdate(media)
             }
         }
     }

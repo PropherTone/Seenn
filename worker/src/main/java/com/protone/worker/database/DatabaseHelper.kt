@@ -458,7 +458,49 @@ class DatabaseHelper {
             signedGalleryDAO.deleteSignedMediaByUri(uri)
         }
 
-        suspend fun deleteSignedMediasByGallery(gallery:String) = withIOContext {
+        fun send1() {
+            sendEvent(
+                MediaAction.OnMediaDeleted(
+                    GalleryMedia(
+                        Uri.EMPTY,
+                        "",
+                        null,
+                        "",
+                        0,
+                        null,
+                        null,
+                        0L,
+                        0L,
+                        null,
+                        0L,
+                        false
+                    )
+                )
+            )
+        }
+
+        fun send2() {
+            sendEvent(
+                MediaAction.OnMediaInserted(
+                    GalleryMedia(
+                        Uri.EMPTY,
+                        "",
+                        null,
+                        "",
+                        0,
+                        null,
+                        null,
+                        0L,
+                        0L,
+                        null,
+                        0L,
+                        false
+                    )
+                )
+            )
+        }
+
+        suspend fun deleteSignedMediasByGallery(gallery: String) = withIOContext {
             sendEvent(MediaAction.OnGalleryDeleted(gallery))
             signedGalleryDAO.deleteSignedMediasByGallery(gallery)
         }

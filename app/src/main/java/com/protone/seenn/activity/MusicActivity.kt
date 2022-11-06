@@ -109,8 +109,6 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                         binding.apply {
                             if (it.icon != null) {
                                 Glide.with(this@MusicActivity).asDrawable().load(it.icon)
-                                    .transition(DrawableTransitionOptions.withCrossFade())
-                                    .skipMemoryCache(true)
                                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                                     .override(
                                         musicBucketIcon.measuredWidth,
@@ -120,6 +118,7 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
                                     binding.blurredBucketCover.setImageBitmap(Blur.blur(bm, 24, 10))
                                 }
                             } else {
+                                blurredBucketCover.setImageDrawable(mySmallMusicPlayer.baseCoverDrawable)
                                 musicBucketIcon.setImageDrawable(R.drawable.ic_baseline_music_note_24.getDrawable())
                             }
                             musicBucketName.text = it.name
@@ -233,6 +232,8 @@ class MusicActivity : BaseActivity<MusicActivtiyBinding, MusicModel, MusicModel.
             }
         }
     }
+
+
 
     private fun initMusicList() {
         binding.musicMusicList.apply {

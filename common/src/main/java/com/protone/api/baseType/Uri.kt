@@ -18,10 +18,10 @@ import java.io.IOException
 suspend fun Uri.imageSaveToFile(
     fileName: String,
     dir: String? = null,
-    w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
-    h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
-) = withContext(Dispatchers.IO) {
-    if (this == Uri.EMPTY) return@withContext null
+    w: Int = 0,
+    h: Int = 0
+) = withIOContext {
+    if (this == Uri.EMPTY) return@withIOContext null
     toBitmap(w, h)?.let {
         try {
             it.saveToFile("$fileName.png", dir)
@@ -37,17 +37,15 @@ suspend fun Uri.imageSaveToFile(
 suspend fun Uri.imageSaveToDisk(
     fileName: String,
     dir: String? = null,
-    w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
-    h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
+    w: Int = 0,
+    h: Int = 0
 ): String? {
     if (this == Uri.EMPTY) return null
     var exists = false
-    var hasBytes = true
     return onResult {
         val bytes = SApplication.app.contentResolver.openInputStream(this@imageSaveToDisk)
             ?.use { inputStream -> inputStream.readBytes() } ?: toBitmapByteArray()
         it.resumeWith(Result.success(if (bytes == null) {
-            hasBytes = false
             null
         } else SApplication.app.filesDir.absolutePath.useAsParentDirToSaveFile(
             fileName,
@@ -68,24 +66,36 @@ suspend fun Uri.imageSaveToDisk(
     }.let {
         if (it == null && exists) {
             this@imageSaveToDisk.imageSaveToDisk("${fileName}_new.png", dir, w, h)
-        } else if (hasBytes) {
-            imageSaveToFile(fileName, dir, w, h)
-        } else null
+        } else it
     }
 }
 
 suspend fun Uri.toBitmap(
-    w: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon),
-    h: Int = SApplication.app.resources.getDimensionPixelSize(R.dimen.huge_icon)
+    w: Int = 0,
+    h: Int = 0
 ): Bitmap? = onResult {
     if (this != Uri.EMPTY) it.resumeWith(Result.success(
         toMediaBitmap(w, h) ?: try {
             toBitmapByteArray()?.let { byteArray ->
+                val options = BitmapFactory.Options()
+                if (w != 0 && h != 0) {
+                    options.inJustDecodeBounds = true
+                    val bitmap = BitmapFactory.decodeByteArray(
+                        byteArray,
+                        0,
+                        byteArray.size,
+                        options
+                    )
+                    options.inSampleSize =
+                        calculateInSampleSize(options.outWidth, options.outHeight, w, h)
+                    bitmap.recycle()
+                    options.inJustDecodeBounds = false
+                }
                 BitmapFactory.decodeByteArray(
                     byteArray,
                     0,
                     byteArray.size,
-                    null
+                    options
                 )
             }
         } catch (e: IOException) {
@@ -103,16 +113,14 @@ fun Uri.toMediaBitmap(w: Int, h: Int): Bitmap? {
     val os = ByteArrayOutputStream()
     return try {
         val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        val bitmap = BitmapFactory.decodeStream(ois, null, options)
-        ois?.close()
-        options.inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight, w, h)
-        bitmap?.recycle()
-        options.inJustDecodeBounds = false
-        ois = try {
-            SApplication.app.contentResolver.openInputStream(this)
-        } catch (e: FileNotFoundException) {
-            return null
+        if (w != 0 && h != 0) {
+            options.inJustDecodeBounds = true
+            val bitmap = BitmapFactory.decodeStream(ois, null, options)
+            options.inSampleSize = calculateInSampleSize(options.outWidth, options.outHeight, w, h)
+            bitmap?.recycle()
+            ois?.close()
+            ois = SApplication.app.contentResolver.openInputStream(this)
+            options.inJustDecodeBounds = false
         }
         BitmapFactory.decodeStream(ois, null, options)
     } catch (e: IOException) {

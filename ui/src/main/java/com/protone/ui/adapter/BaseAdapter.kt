@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
+import com.protone.api.baseType.bufferCollect
+import com.protone.api.baseType.launchDefault
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -25,8 +27,8 @@ abstract class BaseAdapter<B : ViewDataBinding, T>(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        if (handleEvent) launch(Dispatchers.Default) {
-            adapterFlow.buffer().collect {
+        if (handleEvent) launchDefault {
+            adapterFlow.bufferCollect {
                 onEventIO(it)
             }
         }

@@ -100,7 +100,7 @@ fun Activity.funcForMultiRename(
     }
 }
 
-suspend fun Activity.deleteMedia(uri: Uri): Boolean {
+fun Activity.deleteMedia(uri: Uri): Boolean {
     return try {
         grantUriPermission(
             packageName,
@@ -180,6 +180,7 @@ fun Activity.removeSoftInputStatusListener() {
     onLayoutChangeListener = null
 }
 
+@Suppress("DEPRECATION")
 fun Activity.setTransparentClipStatusBar() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         window.isStatusBarContrastEnforced = false

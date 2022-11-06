@@ -26,7 +26,7 @@ abstract class BaseBlurFactory(protected val blurEngine: BlurEngine) : IBlurTool
 
     protected fun transformCanvas() {
         scaleFactory.apply {
-            if (canMove) decorCanvas.save()
+            decorCanvas.save()
             decorCanvas.translate(leftScaled, rightScaled)
             decorCanvas.scale(1 / wScaled, 1 / hScaled)
         }

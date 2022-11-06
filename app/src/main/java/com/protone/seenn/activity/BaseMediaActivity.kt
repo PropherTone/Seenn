@@ -3,9 +3,7 @@ package com.protone.seenn.activity
 import android.view.View
 import androidx.core.view.isGone
 import androidx.databinding.ViewDataBinding
-import com.protone.api.baseType.getFileMimeType
-import com.protone.api.baseType.getString
-import com.protone.api.baseType.toast
+import com.protone.api.baseType.*
 import com.protone.api.context.*
 import com.protone.api.entity.GalleryMedia
 import com.protone.seenn.R
@@ -113,7 +111,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
             getString(R.string.rename),
             ""
         ) { name ->
-            launch(Dispatchers.IO) {
+            launchIO {
                 gm.forEach {
                     val result = funcForMultiRename(
                         "$name(${gm.indexOf(it)}).${it.name.getFileMimeType()}",
@@ -125,7 +123,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                         reList.add(it.name)
                     }
                 }
-                withContext(Dispatchers.Main) {
+                withMainContext {
                     checkListDialog(R.string.this_file_op_failed.getString(), reList)
                 }
             }
@@ -136,10 +134,9 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         gm: GalleryMedia,
         callBack: (List<GalleryMedia>) -> Unit
     ) {
-        launch(Dispatchers.IO) {
+        launchDefault {
             val result = deleteMedia(gm.uri)
             if (result) {
-                DatabaseHelper.instance.signedGalleryDAOBridge.deleteSignedMedia(gm)
                 callBack.invoke(mutableListOf(gm))
                 R.string.success.getString().toast()
             } else R.string.not_supported.getString().toast()
@@ -150,15 +147,11 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         gm: List<GalleryMedia>,
         callBack: (List<GalleryMedia>) -> Unit
     ) {
-        launch(Dispatchers.IO) {
+        launchDefault {
             val reList = arrayListOf<GalleryMedia>()
             gm.forEach {
                 val result = deleteMedia(it.uri)
-                if (result) {
-                    DatabaseHelper.instance.signedGalleryDAOBridge.deleteSignedMedia(it)
-                } else {
-                    reList.add(it)
-                }
+                if (!result) reList.add(it)
             }
             callBack.invoke(reList)
             if (reList.size > 0) {
@@ -184,7 +177,7 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
                 addCate(re, gms)
             }
         }, addCon = {
-            launch(Dispatchers.IO) {
+            launchDefault {
                 startActivityForResult(
                     GalleryActivity::class.intent.also { intent ->
                         intent.putExtra(
@@ -219,18 +212,13 @@ abstract class BaseMediaActivity<VB : ViewDataBinding, VM : BaseViewModel, T : B
         isVideo: Boolean,
         gms: MutableList<GalleryMedia>,
         callback: (String, MutableList<GalleryMedia>) -> Unit
-    ) = launch(Dispatchers.Main) {
+    ) = launchMain {
         val pop = ColorfulPopWindow(this@BaseMediaActivity)
         pop.startListPopup(
             anchor = anchor,
-            dataList = withContext(Dispatchers.IO) {
-                val list = mutableListOf<String>()
-                DatabaseHelper.instance.galleryBucketDAOBridge.getAllGalleryBucket(isVideo)
-                    ?.forEach {
-                        list.add(it.type)
-                    }
-                list
-            }) { re ->
+            dataList = DatabaseHelper.instance.galleryBucketDAOBridge.getAllGalleryBucket(isVideo)
+                ?.map { it.type }?.toList() as MutableList<String>? ?: mutableListOf()
+        ) { re ->
             if (re != null) {
                 gms.let { list ->
                     list.forEach {

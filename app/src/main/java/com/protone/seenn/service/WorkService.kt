@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import android.util.Log
 import com.protone.api.ActiveTimer
 import com.protone.api.TAG
+import com.protone.api.baseType.bufferCollect
 import com.protone.api.baseType.toast
 import com.protone.api.context.workIntentFilter
 import com.protone.api.entity.GalleryMedia
@@ -126,7 +127,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                             emit(music)
                         }
                     }
-                }.buffer().collect {
+                }.bufferCollect {
                     insertMusic(it)
                 }
                 deleteMusicMulti(allMusic)
@@ -139,12 +140,15 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
     }
 
     private fun updateGallery(uri: Uri) = launch(Dispatchers.IO) {
-        scanGalleryWithUri(uri) {
-            val checkedMedia =
-                DatabaseHelper
-                    .instance
-                    .signedGalleryDAOBridge
-                    .insertSignedMediaChecked(it)
+        if (!isUriExist(uri)) {
+            DatabaseHelper.instance.signedGalleryDAOBridge.deleteSignedMediaByUri(uri)
+            Log.d(TAG, "updateGallery(uri: Uri):!isUriExist 相册更新完毕")
+            makeToast("相册更新完毕")
+        } else scanGalleryWithUri(uri) {
+            val checkedMedia = DatabaseHelper
+                .instance
+                .signedGalleryDAOBridge
+                .insertSignedMediaChecked(it)
             if (checkedMedia != null) {
                 Log.d(TAG, "updateGallery(uri: Uri): 相册更新完毕")
                 makeToast("相册更新完毕")
@@ -167,7 +171,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                             emit(it)
                         }
                     }
-                }.buffer().collect {
+                }.bufferCollect {
                     deleteSignedMedia(it)
                 }
             }
@@ -198,7 +202,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                     scanPicture { _, galleryMedia ->
                         emit(galleryMedia)
                     }
-                }.buffer().collect {
+                }.bufferCollect {
                     sortMedia(this@run, allSignedMedia, it)
                 }
             }
@@ -208,7 +212,7 @@ class WorkService : LifecycleService(), CoroutineScope by CoroutineScope(Dispatc
                     scanVideo { _, galleryMedia ->
                         emit(galleryMedia)
                     }
-                }.buffer().collect {
+                }.bufferCollect {
                     sortMedia(this@run, allSignedMedia, it)
                 }
             }

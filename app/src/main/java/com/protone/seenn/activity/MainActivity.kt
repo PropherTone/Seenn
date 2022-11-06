@@ -4,19 +4,17 @@ import androidx.activity.viewModels
 import androidx.core.view.isGone
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.protone.api.baseType.getString
-import com.protone.api.baseType.toDateString
-import com.protone.api.baseType.toast
+import com.protone.api.baseType.*
 import com.protone.api.context.intent
 import com.protone.api.context.onGlobalLayout
 import com.protone.api.context.root
 import com.protone.api.entity.Music
+import com.protone.api.entity.getEmptyMusic
 import com.protone.api.json.toEntity
 import com.protone.api.json.toJson
 import com.protone.api.todayDate
 import com.protone.seenn.databinding.MainActivityTempBinding
 import com.protone.seenn.service.WorkService
-import com.protone.seenn.service.getEmptyMusic
 import com.protone.seenn.viewModel.MusicControllerIMP
 import com.protone.worker.R
 import com.protone.worker.database.DatabaseHelper
@@ -25,7 +23,6 @@ import com.protone.worker.viewModel.GalleryViewViewModel
 import com.protone.worker.viewModel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity :
     BaseActivity<MainActivityTempBinding, MainViewModel, MainViewModel.MainViewEvent>(true) {
@@ -52,9 +49,9 @@ class MainActivity :
                     .load(value)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(binding.userIcon)
-                launch(Dispatchers.IO) {
+                launchIO {
                     val loadBlurIcon = viewModel.loadBlurIcon(value)
-                    withContext(Dispatchers.Main) {
+                    withMainContext {
                         binding.userBack.setImageBitmap(loadBlurIcon)
                     }
                 }

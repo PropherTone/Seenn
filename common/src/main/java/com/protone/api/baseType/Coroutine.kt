@@ -1,9 +1,7 @@
 package com.protone.api.baseType
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 inline fun CoroutineScope.launchDefault(crossinline func: suspend CoroutineScope.() -> Unit) {
     launch(Dispatchers.Default) {
@@ -37,3 +35,10 @@ suspend inline fun <T> withDefaultContext(crossinline func: suspend CoroutineSco
     withContext(Dispatchers.Default) {
         func.invoke(this)
     }
+
+@OptIn(InternalCoroutinesApi::class)
+suspend inline fun <T> Flow<T>.bufferCollect(crossinline action: suspend (value: T) -> Unit) {
+    buffer().collect(object : FlowCollector<T> {
+        override suspend fun emit(value: T) = action(value)
+    })
+}

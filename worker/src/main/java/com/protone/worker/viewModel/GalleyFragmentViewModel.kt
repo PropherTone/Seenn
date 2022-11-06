@@ -1,8 +1,11 @@
 package com.protone.worker.viewModel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.protone.api.TAG
+import com.protone.api.baseType.bufferCollect
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.toast
 import com.protone.api.entity.GalleryBucket
@@ -55,7 +58,7 @@ class GalleryFragmentViewModel : ViewModel() {
         R.string.all_gallery.getString()
     } else rightGallery
 
-    fun getBucket(bucket: String) = Pair(
+    fun  getBucket(bucket: String) = Pair(
         if ((getGallery(bucket)?.size ?: 0) > 0) {
             getGallery(bucket)?.get(0)?.uri ?: Uri.EMPTY
         } else Uri.EMPTY,
@@ -71,7 +74,7 @@ class GalleryFragmentViewModel : ViewModel() {
         DatabaseHelper.instance
             .signedGalleryDAOBridge
             .run {
-                observegallery()
+                observeGallery()
                 val signedMedias =
                     (if (combine) getAllSignedMedia() else getAllMediaByType(isVideo)) as MutableList<GalleryMedia>?
                 if (signedMedias == null) {
@@ -138,7 +141,7 @@ class GalleryFragmentViewModel : ViewModel() {
             }
     }
 
-    fun deletegalleryBucket(bucket: String) {
+    fun deleteGalleryBucket(bucket: String) {
         viewModelScope.launch(Dispatchers.IO) {
             DatabaseHelper.instance.galleryBucketDAOBridge.run {
                 getGalleryBucket(bucket)?.let { deleteGalleryBucketAsync(it) }
@@ -169,21 +172,19 @@ class GalleryFragmentViewModel : ViewModel() {
         }
     }
 
-    private fun observegallery() {
+    private fun observeGallery() {
         viewModelScope.launch(Dispatchers.Default) {
-            val allgallery = R.string.all_gallery.getString()
-            suspend fun sortDeleteMedia(
+            val allGallery = R.string.all_gallery.getString()
+            fun sortDeleteMedia(
                 media: GalleryMedia,
-                map: MutableMap<String?, MutableList<GalleryMedia>>,
-                flow: MutableSharedFlow<FragEvent>
+                map: MutableMap<String?, MutableList<GalleryMedia>>
             ) {
                 if (map[media.bucket]?.remove(media) == true
                     && (map[media.bucket]?.size ?: 0) <= 0
                 ) {
                     map.remove(media.bucket)
                 }
-                map[allgallery]?.remove(media)
-                flow.emit(FragEvent.OnMediaDeleted(media))
+                map[allGallery]?.remove(media)
             }
 
             suspend fun insertNewMedia(
@@ -201,26 +202,27 @@ class GalleryFragmentViewModel : ViewModel() {
                 } else map[media.bucket]?.add(media)
             }
 
-            DatabaseHelper.instance.mediaNotifier.buffer().collect {
+            DatabaseHelper.instance.mediaNotifier.bufferCollect {
                 while (!isDataSorted) delay(200)
                 when (it) {
                     is MediaAction.OnMediaDeleted -> {
-                        if (it.media.isVideo != isVideo) return@collect
-                        sortDeleteMedia(it.media, galleryMap, _fragFlow)
+                        if (it.media.isVideo != isVideo) return@bufferCollect
+                        sortDeleteMedia(it.media, galleryMap)
+                        sendEvent(FragEvent.OnMediaDeleted(it.media))
                     }
                     is MediaAction.OnMediaInserted -> {
-                        if (it.media.isVideo != isVideo) return@collect
+                        if (it.media.isVideo != isVideo) return@bufferCollect
                         insertNewMedia(galleryMap, it.media)
-                        galleryMap[allgallery]?.add(it.media)
+                        galleryMap[allGallery]?.add(it.media)
                         sendEvent(FragEvent.OnMediaInserted(it.media))
                     }
                     is MediaAction.OnMediaUpdated -> {
-                        if (it.media.isVideo != isVideo) return@collect
-                        galleryMap[allgallery]?.first { sortMedia -> it.media.uri == sortMedia.uri }
+                        if (it.media.isVideo != isVideo) return@bufferCollect
+                        galleryMap[allGallery]?.first { sortMedia -> it.media.uri == sortMedia.uri }
                             ?.let { sortedMedia ->
-                                val allIndex = galleryMap[allgallery]?.indexOf(sortedMedia)
+                                val allIndex = galleryMap[allGallery]?.indexOf(sortedMedia)
                                 if (allIndex != null && allIndex != -1) {
-                                    galleryMap[allgallery]?.set(allIndex, it.media)
+                                    galleryMap[allGallery]?.set(allIndex, it.media)
                                     val index = galleryMap[sortedMedia.bucket]?.indexOf(sortedMedia)
                                     if (sortedMedia.bucket != it.media.bucket) {
                                         galleryMap[sortedMedia.bucket]?.remove(sortedMedia)

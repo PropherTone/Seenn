@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.EditText
 import com.protone.api.TAG
+import com.protone.api.baseType.bufferCollect
 import com.protone.api.baseType.deleteFile
 import com.protone.api.baseType.imageSaveToDisk
 import com.protone.api.baseType.toBitmap
@@ -187,7 +188,7 @@ class RichNoteHandler(private val editor: ISpanForEditor) {
                 }.start()
                 async(Dispatchers.Default) {
                     while (isActive) {
-                        taskChannel.receiveAsFlow().buffer().collect {
+                        taskChannel.receiveAsFlow().bufferCollect {
                             if (it.second < childCount) {
                                 richArray[it.second] = it.first
                                 count++

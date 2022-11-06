@@ -1,12 +1,15 @@
 package com.protone.worker.viewModel
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.tabs.TabLayout
+import com.protone.api.baseType.bufferCollect
 import com.protone.api.baseType.getString
 import com.protone.api.entity.GalleryMedia
 import com.protone.worker.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
@@ -35,11 +38,11 @@ class GalleryViewModel : BaseViewModel(), TabLayout.OnTabSelectedListener {
         viewModelScope.launch(Dispatchers.Default) {
             if (frag1 != null) {
                 mailers[0] = frag1
-                mailers[0]?.collect(onAction())
+                mailers[0]?.bufferCollect(onAction())
             }
             if (frag2 != null) {
                 mailers[1] = frag2
-                mailers[1]?.collect(onAction())
+                mailers[1]?.bufferCollect(onAction())
             }
         }
     }

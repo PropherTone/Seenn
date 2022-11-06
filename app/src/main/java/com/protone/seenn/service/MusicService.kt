@@ -8,12 +8,14 @@ import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import android.widget.RemoteViews
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.protone.api.baseType.toBitmap
 import com.protone.api.context.*
 import com.protone.api.entity.Music
+import com.protone.api.entity.getEmptyMusic
 import com.protone.seenn.R
 import com.protone.seenn.broadcast.ApplicationBroadCast
 import com.protone.seenn.broadcast.MusicReceiver
@@ -74,9 +76,13 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
     private val loopModeLive = MutableLiveData<Int>()
 
     private val appReceiver = object : ApplicationBroadCast() {
+        private var isDestroy = false
         override fun finish() {
-            SApplication.app.stopService(MusicService::class.intent)
-            onDestroy()
+            if (!isDestroy) {
+                isDestroy = true
+                SApplication.app.stopService(MusicService::class.intent)
+                onDestroy()
+            }
         }
 
         override fun music() {
@@ -137,9 +143,13 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
 
     override fun onDestroy() {
         finishMusic()
-        unregisterReceiver(receiver)
-        unregisterReceiver(appReceiver)
-        musicBroadCastManager.unregisterReceiver(receiver)
+        try {
+            unregisterReceiver(receiver)
+            unregisterReceiver(appReceiver)
+            musicBroadCastManager.unregisterReceiver(receiver)
+        } catch (e: IllegalArgumentException) {
+            Log.d("TAG", "onDestroy")
+        }
         notificationManager?.cancelAll()
         super.onDestroy()
         cancel()
@@ -370,21 +380,6 @@ class MusicService : Service(), CoroutineScope by CoroutineScope(Dispatchers.Def
         }
     }
 }
-
-fun getEmptyMusic() = Music(
-    0,
-    "NO MUSIC",
-    0,
-    null,
-    null,
-    null,
-    "",
-    null,
-    null,
-    0L,
-    0L,
-    Uri.EMPTY
-)
 
 class MusicBinder(private val iMusic: IMusicService) : Binder(), IMusicService {
     override fun setLoopMode(mode: Int) = iMusic.setLoopMode(mode)

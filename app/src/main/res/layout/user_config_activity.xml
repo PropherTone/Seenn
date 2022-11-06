@@ -42,6 +42,7 @@
                 android:contentDescription="@string/action"
                 android:onClick="@{()-> activity.finish()}"
                 android:padding="@dimen/icon_padding_lite"
+                android:background="@drawable/background_ripple_glass"
                 android:src="@drawable/ic_round_keyboard_backspace_24_white" />
 
         </com.protone.ui.customView.blurView.SBlurView>

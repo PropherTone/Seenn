@@ -1,6 +1,7 @@
 package com.protone.worker.viewModel
 
 import androidx.lifecycle.viewModelScope
+import com.protone.api.baseType.bufferCollect
 import com.protone.api.baseType.getString
 import com.protone.api.baseType.imageSaveToDisk
 import com.protone.api.entity.Music
@@ -43,7 +44,7 @@ class MusicModel : BaseViewModel() {
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            DatabaseHelper.instance.mediaNotifier.buffer().collect {
+            DatabaseHelper.instance.mediaNotifier.bufferCollect {
                 when (it) {
                     is MediaAction.OnNewMusicBucket ->
                         onMusicDataEvent?.onNewMusicBucket(it.musicBucket)

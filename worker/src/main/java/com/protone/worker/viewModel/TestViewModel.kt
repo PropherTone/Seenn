@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.TextView
 import androidx.lifecycle.viewModelScope
 import com.protone.api.TAG
+import com.protone.api.baseType.bufferCollect
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.buffer
@@ -17,7 +18,7 @@ class TestViewModel : BaseViewModel() {
 
     fun fun1() {
         coroutineScope.launch {
-            flow.buffer().collect {
+            flow.bufferCollect {
                 Log.d(TAG, "collect: $it")
             }
         }

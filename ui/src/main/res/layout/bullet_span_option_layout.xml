@@ -75,7 +75,7 @@
                 android:layout_height="@dimen/smaller_Icon"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="@dimen/small_margin"
-                android:background="@drawable/oval_fore_dark"
+                android:background="@drawable/oval_fore_ripple_dark"
                 android:contentDescription="@string/action"
                 android:padding="@dimen/icon_padding"
                 android:src="@drawable/ic_baseline_add_24_black" />

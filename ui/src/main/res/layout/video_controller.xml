@@ -29,7 +29,7 @@
         android:id="@+id/v_start"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:background="@drawable/oval_fore_dark"
+        android:background="@drawable/oval_fore_ripple_dark"
         android:contentDescription="@string/action"
         android:padding="@dimen/icon_padding_lite"
         android:src="@drawable/ic_baseline_play_arrow_24_white"

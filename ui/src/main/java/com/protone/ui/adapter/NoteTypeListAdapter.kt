@@ -76,15 +76,17 @@ class NoteTypeListAdapter(
         notifyItemInserted(noteDirList.size)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun setNoteTypeList(list: List<NoteDir>) {
+        val size = noteDirList.size
         noteDirList.clear()
+        notifyItemRangeRemoved(0,size)
+        selectList.clear()
         NoteDir(R.string.all.getString(), "").let {
             noteDirList.add(it)
             selectList.add(it)
         }
         noteDirList.addAll(list)
-        notifyDataSetChanged()
+        notifyItemRangeInserted(0,noteDirList.size)
     }
 
     interface NoteTypeListAdapterDataProxy {
