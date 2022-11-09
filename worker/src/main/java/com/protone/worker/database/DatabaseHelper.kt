@@ -9,6 +9,7 @@ import com.protone.api.entity.*
 import com.protone.database.R
 import com.protone.database.room.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
@@ -247,7 +248,7 @@ class DatabaseHelper {
 
         suspend fun insertNoteDirRs(
             noteDir: NoteDir,
-        ): Pair<Boolean, String> {
+        ): Pair<Boolean, NoteDir> {
             var count = 0
             val tempName = noteDir.name
             val names = mutableMapOf<String, Int>()
@@ -261,7 +262,7 @@ class DatabaseHelper {
                 noteDir.name = "${tempName}(${++count})"
             }
             insertNoteDir(noteDir)
-            return Pair(getNoteDir(noteDir.name) != null, noteDir.name)
+            return getNoteDir(noteDir.name).let { Pair(it != null, it ?: noteDir) }
         }
 
         suspend fun doDeleteNoteDirRs(noteDir: NoteDir): Boolean {
@@ -529,23 +530,35 @@ class DatabaseHelper {
             noteDAO.getAllNote()
         }
 
+        fun getAllNoteFlow(): Flow<List<Note>> = noteDAO.getAllNoteFlow()
+
         suspend fun getNoteByName(name: String): Note? = withIOContext {
             noteDAO.getNoteByName(name)
         }
 
-        suspend fun updateNote(note: Note): Int? = withIOContext {
-            sendEvent(MediaAction.OnNoteUpdated(note))
-            noteDAO.updateNote(note)
+        suspend fun getNoteById(id: Long): Note? = withIOContext {
+            noteDAO.getNoteById(id)
+        }
+
+        suspend fun updateNote(note: Note): Int = withIOContext {
+            noteDAO.updateNote(note).run {
+                sendEvent(MediaAction.OnNoteUpdated(note))
+                this
+            }
         }
 
         suspend fun deleteNote(note: Note) = withIOContext {
-            sendEvent(MediaAction.OnNoteDeleted(note))
-            noteDAO.deleteNote(note)
+            noteDAO.deleteNote(note).run {
+                sendEvent(MediaAction.OnNoteDeleted(note))
+            }
         }
 
         suspend fun insertNote(note: Note): Long = withIOContext {
-            sendEvent(MediaAction.OnNoteInserted(note))
-            noteDAO.insertNote(note)
+            noteDAO.insertNote(note).run {
+                note.noteId = this
+                sendEvent(MediaAction.OnNoteInserted(note))
+                this
+            }
         }
 
     }
@@ -569,6 +582,9 @@ class DatabaseHelper {
             sendEvent(MediaAction.OnNoteDirDeleted(noteDir))
             noteTypeDAO.deleteNoteDir(noteDir)
         }
+
+        fun getALLNoteDirFlow(): Flow<List<NoteDir>?> = noteTypeDAO.getALLNoteDirFlow()
+
     }
 
     sealed class BaseGalleryBucketDAO : BaseDao() {
@@ -632,6 +648,9 @@ class DatabaseHelper {
         suspend fun getNoteDirWithNote(noteId: Long): List<NoteDir> = withIOContext {
             noteDirWithNoteDAO.getNoteDirWithNote(noteId) ?: mutableListOf()
         }
+
+        fun getNotesWithNoteDirFlow(noteDirId: Long): Flow<List<Note>?> =
+            noteDirWithNoteDAO.getNotesWithNoteDirFlow(noteDirId)
     }
 
     sealed class BaseMusicWithMusicBucketDAO : BaseDao() {

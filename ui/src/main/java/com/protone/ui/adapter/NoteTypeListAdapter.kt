@@ -39,7 +39,7 @@ class NoteTypeListAdapter(
     }
 
     var addNote: ((String?) -> Unit)? = null
-    var onTypeSelected: ((String?) -> Unit)? = null
+    var onTypeSelected: ((NoteDir) -> Unit)? = null
 
     override fun onBindViewHolder(holder: Holder<NoteTpyeListAdapterBinding>, position: Int) {
         setSelect(holder, noteDirList[position] in selectList)
@@ -47,7 +47,7 @@ class NoteTypeListAdapter(
             root.setOnClickListener {
                 if (noteDirList[position] in selectList) return@setOnClickListener
                 checkSelect(holder, noteDirList[position])
-                onTypeSelected?.invoke(noteTypeName.text.toString())
+                onTypeSelected?.invoke(noteDirList[position])
             }
             root.setOnLongClickListener {
                 AlertDialog.Builder(context).setPositiveButton(

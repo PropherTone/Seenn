@@ -96,15 +96,15 @@ class NoteEditActivity :
             )
         } else {
             noteByName = noteName?.let {
-                getNoteByName(it)?.let { n ->
-                    if (checkNoteCover(n)) {
-                        setNoteIcon(n.imagePath)
+                getNoteByName(it)?.let { note ->
+                    if (checkNoteCover(note.imagePath ?: "")) {
+                        setNoteIcon(note.imagePath)
                     } else {
                         setNoteIcon(iconUri)
                     }
-                    title = n.title
-                    initEditor(n.richCode, n.text)
-                    n
+                    title = note.title
+                    initEditor(note.richCode, note.text)
+                    note
                 }
             }
         }

@@ -2,10 +2,15 @@ package com.protone.seenn.activity
 
 import android.animation.ValueAnimator
 import android.transition.TransitionManager
+import android.util.Log
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.protone.api.TAG
 import com.protone.api.baseType.getString
+import com.protone.api.baseType.launchDefault
+import com.protone.api.baseType.launchIO
 import com.protone.api.baseType.toast
 import com.protone.api.context.intent
 import com.protone.api.context.root
@@ -14,12 +19,15 @@ import com.protone.api.entity.NoteDir
 import com.protone.seenn.databinding.NoteActivityBinding
 import com.protone.ui.R
 import com.protone.ui.adapter.NoteListAdapter
+import com.protone.ui.adapter.NoteListAdapterTemp
 import com.protone.ui.adapter.NoteTypeListAdapter
 import com.protone.ui.dialog.titleDialog
+import com.protone.worker.database.DatabaseHelper
 import com.protone.worker.database.MediaAction
 import com.protone.worker.viewModel.NoteEditViewModel
 import com.protone.worker.viewModel.NoteViewModel
 import com.protone.worker.viewModel.NoteViewViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
@@ -37,8 +45,8 @@ class NoteActivity :
     override suspend fun NoteViewModel.init() {
         initList()
         binding.noteList.adapter.apply {
-            this as NoteListAdapter
-            this.noteListEventListener = object : NoteListAdapter.NoteListEvent {
+            this as NoteListAdapterTemp
+            this.noteListEventListener = object : NoteListAdapterTemp.NoteListEvent {
                 override fun onNote(title: String) {
                     startActivity(NoteViewActivity::class.intent.also {
                         it.putExtra(NoteViewViewModel.NOTE_NAME, title)
@@ -56,25 +64,22 @@ class NoteActivity :
             startActivity(NoteEditActivity::class.intent.putExtra(NoteEditViewModel.NOTE_DIR, it))
         }
         onTypeSelected { type ->
-            refreshNoteList(viewModel.getNoteList(type))
+            launch {
+                refreshNoteList(viewModel.getNoteList(type))
+            }
         }
 
         refreshList()
 
         collectNoteEvent {
             when (it) {
-                is MediaAction.OnNoteDeleted -> {
-                    deleteNoteCache(it.note)
-                    getNoteListAdapter()?.deleteNote(it.note)
-                }
-                is MediaAction.OnNoteUpdated ->
-                    getNote(it.note.title)?.let { note -> getNoteListAdapter()?.updateNote(note) }
-                is MediaAction.OnNoteInserted ->
-                    getNote(it.note.title)?.let { note -> getNoteListAdapter()?.insertNote(note) }
-                is MediaAction.OnNoteDirInserted -> {}
-                is MediaAction.OnNoteDirDeleted -> {}
+                is MediaAction.OnNoteDeleted -> deleteNoteCache(it.note)
                 else -> Unit
             }
+        }
+
+        watchNotes {
+            getNoteListAdapter()?.submitList(it)
         }
 
         onViewEvent {
@@ -93,8 +98,7 @@ class NoteActivity :
                 launch {
                     viewModel.insertNoteDir(re, "").let { pair ->
                         if (pair.first) {
-                            (binding.noteBucketList.adapter as NoteTypeListAdapter)
-                                .insertNoteDir(NoteDir(pair.second, ""))
+                            getNoteTypeAdapter()?.insertNoteDir(pair.second)
                         } else {
                             R.string.failed_msg.getString().toast()
                         }
@@ -130,7 +134,7 @@ class NoteActivity :
         binding.apply {
             noteList.also {
                 it.layoutManager = LinearLayoutManager(this@NoteActivity)
-                it.adapter = NoteListAdapter(this@NoteActivity)
+                it.adapter = NoteListAdapterTemp(this@NoteActivity)
             }
             noteBucketList.also {
                 it.layoutManager = LinearLayoutManager(this@NoteActivity)
@@ -148,20 +152,20 @@ class NoteActivity :
         getNoteTypeAdapter()?.addNote = it
     }
 
-    private fun onTypeSelected(it: ((String?) -> Unit)?) {
+    private fun onTypeSelected(it: ((NoteDir) -> Unit)?) {
         getNoteTypeAdapter()?.onTypeSelected = it
     }
 
     private fun refreshNoteList(list: List<Note>) {
-        getNoteListAdapter()?.setNoteList(list)
+        getNoteListAdapter()?.submitList(list)
     }
 
     private fun refreshNoteType(list: List<NoteDir>) {
         getNoteTypeAdapter()?.setNoteTypeList(list)
     }
 
-    private fun getNoteListAdapter(): NoteListAdapter? {
-        return (binding.noteList.adapter as NoteListAdapter?)
+    private fun getNoteListAdapter(): NoteListAdapterTemp? {
+        return (binding.noteList.adapter as NoteListAdapterTemp?)
     }
 
     private fun getNoteTypeAdapter(): NoteTypeListAdapter? {

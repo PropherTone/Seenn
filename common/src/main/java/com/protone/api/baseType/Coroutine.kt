@@ -3,23 +3,21 @@ package com.protone.api.baseType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
-inline fun CoroutineScope.launchDefault(crossinline func: suspend CoroutineScope.() -> Unit) {
+inline fun CoroutineScope.launchDefault(crossinline func: suspend CoroutineScope.() -> Unit): Job =
     launch(Dispatchers.Default) {
         func.invoke(this)
     }
-}
 
-inline fun CoroutineScope.launchIO(crossinline func: suspend CoroutineScope.() -> Unit) {
+
+inline fun CoroutineScope.launchIO(crossinline func: suspend CoroutineScope.() -> Unit) : Job =
     launch(Dispatchers.IO) {
         func.invoke(this)
     }
-}
 
-inline fun CoroutineScope.launchMain(crossinline func: suspend CoroutineScope.() -> Unit) {
+inline fun CoroutineScope.launchMain(crossinline func: suspend CoroutineScope.() -> Unit) : Job =
     launch(Dispatchers.Main) {
         func.invoke(this)
     }
-}
 
 suspend inline fun <T> withMainContext(crossinline func: suspend CoroutineScope.() -> T) =
     withContext(Dispatchers.Main) {

@@ -24,7 +24,7 @@ suspend fun Uri.imageSaveToFile(
     if (this == Uri.EMPTY) return@withIOContext null
     toBitmap(w, h)?.let {
         try {
-            it.saveToFile("$fileName.png", dir)
+            it.saveToFile(fileName, dir)
         } finally {
             if (!it.isRecycled) {
                 it.recycle()
@@ -42,13 +42,17 @@ suspend fun Uri.imageSaveToDisk(
 ): String? {
     if (this == Uri.EMPTY) return null
     var exists = false
+    var mimeType = ""
     return onResult {
         val bytes = SApplication.app.contentResolver.openInputStream(this@imageSaveToDisk)
             ?.use { inputStream -> inputStream.readBytes() } ?: toBitmapByteArray()
         it.resumeWith(Result.success(if (bytes == null) {
             null
         } else SApplication.app.filesDir.absolutePath.useAsParentDirToSaveFile(
-            fileName,
+            bytes.getMediaMimeType().let { mime ->
+                mimeType = mime
+                "$fileName.$mimeType"
+            },
             dir,
             onExists = { file ->
                 if (file.getSHA() == bytes.getSHA()) {
@@ -65,7 +69,7 @@ suspend fun Uri.imageSaveToDisk(
         )))
     }.let {
         if (it == null && exists) {
-            this@imageSaveToDisk.imageSaveToDisk("${fileName}_new.png", dir, w, h)
+            this@imageSaveToDisk.imageSaveToDisk("${fileName}_new", dir, w, h)
         } else it
     }
 }

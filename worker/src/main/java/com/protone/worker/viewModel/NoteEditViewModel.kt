@@ -44,7 +44,7 @@ class NoteEditViewModel : BaseViewModel() {
             if (!it.isNullOrEmpty()) {
                 it
             } else {
-                if (null == iconUri) {
+                if (null != iconUri) {
                     R.string.failed_upload_image.getString().toast()
                 }
                 iconUri?.toUriJson()
@@ -121,14 +121,14 @@ class NoteEditViewModel : BaseViewModel() {
         DatabaseHelper.instance.noteDAOBridge.getNoteByName(name)
 
 
-    suspend fun checkNoteCover(note: Note) = onResult { co ->
+    suspend fun checkNoteCover(imagePath: String) = onResult { co ->
         onEdit = true
-        if (note.imagePath == null) return@onResult
-        val file = File(note.imagePath)
+        if (imagePath.isEmpty()) return@onResult
+        val file = File(imagePath)
         if (file.isFile) {
             co.resumeWith(Result.success(true))
         } else {
-            iconUri = note.imagePath.toUri()
+            iconUri = imagePath.toUri()
             co.resumeWith(Result.success(false))
         }
     }

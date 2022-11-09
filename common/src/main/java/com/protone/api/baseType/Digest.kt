@@ -5,13 +5,14 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
+import java.lang.StringBuilder
 import java.security.MessageDigest
+import java.util.*
+import kotlin.experimental.and
 
-fun ByteArray.getSHA():String?{
+fun ByteArray.getSHA(): String? {
     return try {
-        MessageDigest.getInstance("SHA").let {
-            String(it.digest(this))
-        }
+        String(MessageDigest.getInstance("SHA").digest(this))
     } catch (e: Exception) {
         null
     }
@@ -69,4 +70,33 @@ fun File.getMD5(): String? {
         } catch (e: IOException) {
         }
     }
+}
+
+fun ByteArray.toHexString(): String {
+    val stringBuilder = StringBuilder()
+    if (this.isEmpty()) return ""
+    this.forEach {
+        val hexString = Integer.toHexString((it and 0xFF.toByte()).toInt())
+        if (hexString.length < 2) {
+            stringBuilder.append(0)
+        }
+        stringBuilder.append(hexString)
+    }
+    return stringBuilder.toString()
+}
+
+fun ByteArray.getMediaMimeType(): String {
+    val hexString = this.toHexString()
+    return mutableMapOf<String, String>().apply {
+        put("FFD8FF", "jpg"); // JPEG (jpg)
+        put("89504E47", "png"); // PNG (png)
+        put("47494638", "gif"); // GIF (gif)
+        put("49492A00227105008037", "tif"); // TIFF (tif)
+        put("424D228C010000000000", "bmp"); // 16色位图(bmp)
+        put("424D8240090000000000", "bmp"); // 24位位图(bmp)
+        put("424D8E1B030000000000", "bmp"); // 256色位图(bmp)
+        put("41433130313500000000", "dwg"); // CAD (dwg)
+    }.map {
+        if (it.value == hexString.uppercase(Locale.ROOT)) it.value else "png"
+    }.takeIf { it.isNotEmpty() }?.get(0) ?: "png"
 }

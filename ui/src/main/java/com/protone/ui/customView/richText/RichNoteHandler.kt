@@ -22,11 +22,11 @@ import com.protone.api.spans.toBase64
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
+import java.util.*
+import kotlin.experimental.and
 
 class RichNoteHandler(private val editor: ISpanForEditor) {
 

@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.protone.api.entity.NoteDir
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteTypeDAO {
@@ -20,4 +21,8 @@ interface NoteTypeDAO {
 
     @Query("SELECT * FROM NoteDir")
     fun getALLNoteDir(): List<NoteDir>?
+
+    @Query("SELECT * FROM NoteDir")
+    fun getALLNoteDirFlow(): Flow<List<NoteDir>?>
+
 }
